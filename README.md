@@ -54,10 +54,15 @@ A working environment for professionals and Home-Lab users.
 4. create a directory to house the Workspaces filesystem root e.g.: `sudo mkdir /var/www/workspaces`
 5. change into the newly created directory `cd /var/www/workspaces`
 6. clone the workspaces docker configuration from git `git clone git@github.com:tricolorsoftware/workspaces.git .`
-7. copy `meta/backend.service` to `/etc/systemd/system/`.
-8. run `docker-compose up` to start the workspaces docker image and install all remaining dependencies
-9. open your browser and head to `https://[server-ip]` and follow the on-screen instructions to complete the setup.
-10. Enjoy! :D
+7. run `bun install`
+8. change into the `instance` directory
+9. copy `meta/backend.service` to `/etc/systemd/system/workspaces-backend.service`.
+10. run `systemctl enable workspaces-backend --now` to start the backend
+11. change into the project root `/var/www/workspaces`
+12. run `bun build-web`
+13. choose a webserver of your choice to serve `/var/www/workspaces/instance/web/dist` (caddy is fast & easy to use)
+14. open your browser and head to `https://[server-ip]` and login as the user `admin` with password `password` to finish setup.
+15. Enjoy! :D
 
 ## Installation Guide for Development Environments
 
