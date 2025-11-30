@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin bash
 
 cd /var/www/workspaces/instance/ || {
     echo "Failed to change directory to /var/www/workspaces/instance/"
