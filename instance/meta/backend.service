@@ -1,0 +1,14 @@
+[Unit]
+Description=Start workspace instance backend
+After=network.target
+StartLimitBurst=10
+StartLimitIntervalSec=60
+
+[Service]
+Type=simple
+ExecStart=/var/www/workspaces/instance/meta/backend.sh
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
