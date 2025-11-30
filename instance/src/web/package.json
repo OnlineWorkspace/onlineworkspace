@@ -5,7 +5,7 @@
     "type": "module",
     "scripts": {
         "dev": "vite --host",
-        "build": "tsc -b && vite build",
+        "build": "vite build",
         "preview": "vite preview"
     },
     "dependencies": {
@@ -20,6 +20,6 @@
         "typescript": "~5.8.3",
         "vite": "^7.1.2",
         "vite-plugin-solid": "^2.11.8",
-        "sass-embedded":"^1.93.3"
+        "sass-embedded": "^1.93.3"
     }
 }

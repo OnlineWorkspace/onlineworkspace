@@ -3,10 +3,13 @@ import { createEffect, createResource, createSignal, For, type Component } from 
 import styles from "./Index.module.scss";
 import UKIconButton from "@tcsw/uikit-solid/src/components/iconButton/UKIconButton.jsx";
 import trpc from "../../lib/trpc";
-import UKListItem from "@tcsw/uikit-solid/src/components/list/UKListItem.jsx";
 import UKButton from "@tcsw/uikit-solid/src/components/button/UKButton.jsx";
 import UKDivider from "@tcsw/uikit-solid/src/components/divider/UKDivider.jsx";
 import { DividerDirection } from "@tcsw/uikit-solid/src/components/divider/lib/direction.js";
+import UKStack from "@tcsw/uikit-solid/src/components/stack/UKStack.jsx";
+import UKSwitch from "@tcsw/uikit-solid/src/components/switch/UKSwitch.jsx";
+import UKStackItem from "@tcsw/uikit-solid/src/components/stack/UKStackItem.jsx";
+import UKIcon from "@tcsw/uikit-solid/src/components/icon/UKIcon.jsx";
 
 const ManageInstalledPage: Component = () => {
     const [selectionMode, setSelectionMode] = createSignal<boolean>(false);
@@ -26,9 +29,10 @@ const ManageInstalledPage: Component = () => {
                 <UKText role={"title"} size="l">
                     Manage Installed Applications
                 </UKText>
-                {selectedApplicationIds().length > 0 && (
+                {selectionMode() && (
                     <>
                         <UKButton
+                            disabled={selectedApplicationIds().length < 1}
                             leadingIcon={"delete"}
                             onClick={async () => {
                                 await trpc.manageInstalled.uninstallApplications.mutate({ applications: selectedApplicationIds() });
@@ -67,11 +71,58 @@ const ManageInstalledPage: Component = () => {
                 )}
             </div>
             <UKDivider direction={DividerDirection.horizontal} />
-            <div class={styles.content} data-view-type={"list"}>
+            <UKStack class={styles.content}>
                 <For each={installedApplications()?.applications || []}>
                     {(app) => {
                         return (
-                            <UKListItem
+                            <UKStackItem
+                                leading={
+                                    app.icon.type === "icon"
+                                        ? { type: "icon" as const, value: app.icon.value }
+                                        : { type: "image" as const, value: "unknown", alt: "" }
+                                }
+                                supportingText={`(${app.id}) - ${app.description}`}
+                                labelText={app.displayName}
+                                component={
+                                    !selectionMode() ? (
+                                        <UKSwitch
+                                            icon={true}
+                                            class={styles.stackSwitch}
+                                            getValue={(val) => {
+                                                if (val) {
+                                                    setEnabledApplications((prev) => [...prev, app.id]);
+                                                    return;
+                                                }
+
+                                                setEnabledApplications((prev) => prev.filter((i) => i !== app.id));
+                                            }}
+                                            value={enabledApplications().includes(app.id)}
+                                        />
+                                    ) : (
+                                        <UKIcon class={styles.stackSelect}>
+                                            {selectedApplicationIds().includes(app.id) ? "check" : "check_indeterminate_small"}
+                                        </UKIcon>
+                                    )
+                                }
+                                onClick={
+                                    selectionMode()
+                                        ? () => {
+                                              if (!selectedApplicationIds().includes(app.id)) {
+                                                  setSelectedApplicationIds((prev) => [...prev, app.id]);
+                                              } else {
+                                                  setSelectedApplicationIds((prev) => prev.filter((i) => i !== app.id));
+                                              }
+                                          }
+                                        : undefined
+                                }
+                            />
+                        );
+                    }}
+                </For>
+            </UKStack>
+            {/*<F`or each={installedApplications()?.applications || []}>
+                    {(app) => {
+                        return <UKListItem
                                 divider
                                 onClick={() => {
                                     if (selectionMode()) {
@@ -115,8 +166,7 @@ const ManageInstalledPage: Component = () => {
                             ></UKListItem>
                         );
                     }}
-                </For>
-            </div>
+                </For>*/}
             <div class={styles.actions}>
                 <UKButton
                     onClick={async () => {

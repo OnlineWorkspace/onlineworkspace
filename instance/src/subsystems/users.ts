@@ -1,10 +1,9 @@
 import { sql } from "bun";
-import { Instance } from "../index.js";
+import type { Instance } from "../index.js";
 import SubSystem from "../subSystems.js";
 import path from "path";
 import { promises as fs } from "fs";
 import sharp from "sharp";
-import crypto from "crypto";
 
 export interface IUserDatabaseUser {
     id: number;

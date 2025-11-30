@@ -21,18 +21,13 @@
 }
 
 .content {
-    &[data-view-type="list"] {
-        display: flex;
-        flex-direction: column;
-        max-width: 768px;
-        width: 100%;
-        margin-left: auto;
-        margin-right: auto;
-        padding-top: 1rem;
-        user-select: none;
-    }
-    &[data-view-type="grid"] {
-    }
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    padding-top: 1rem;
+    user-select: none;
 }
 
 .actions {
@@ -46,4 +41,16 @@
     padding-bottom: 1rem;
     align-items: center;
     justify-content: end;
+}
+
+.stackSwitch {
+    margin-left: auto;
+    margin-top: auto;
+    margin-bottom: auto;
+}
+
+.stackSelect {
+    margin-left: auto;
+    margin-top: auto;
+    margin-bottom: auto;
 }

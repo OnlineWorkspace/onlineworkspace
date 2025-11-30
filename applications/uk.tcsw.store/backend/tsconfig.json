@@ -9,8 +9,5 @@
         "strict": true,
         "skipLibCheck": true
     },
-    "include": [
-        ".",
-        "./vm.d.ts"
-    ]
+    "include": [".", "./global.d.ts"]
 }

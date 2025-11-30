@@ -167,7 +167,7 @@
 }
 
 .labelText {
-    color: var(--uk-sys-color-on-surface);
+    color: rgb(var(--uk-sys-color-on-surface));
     font-family: var(--uk-sys-typescale-body-large-font) sans-serif;
     line-height: var(--uk-sys-typescale-body-large-line-height);
     font-size: var(--uk-sys-typescale-body-large-size);
@@ -177,7 +177,7 @@
 
 .supportingText {
     margin: 0;
-    color: var(--uk-sys-color-on-surface-variant);
+    color: rgb(var(--uk-sys-color-on-surface-variant));
     font-family: var(--uk-sys-typescale-body-medium-font) sans-serif;
     line-height: var(--uk-sys-typescale-body-medium-line-height);
     font-size: var(--uk-sys-typescale-body-medium-size);

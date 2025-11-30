@@ -1,6 +1,8 @@
 import { useLocation, useNavigate } from "@solidjs/router";
+import UKIndeterminateSpinner from "@tcsw/uikit-solid/src/components/indeterminateSpinner/UKIndeterminateSpinner.jsx";
 import UKNavigationRail from "@tcsw/uikit-solid/src/components/navigationRail/UKNavigationRail.jsx";
-import type { Component, ParentProps } from "solid-js";
+import { Suspense, type Component, type ParentProps } from "solid-js";
+import styles from "./Layout.module.scss";
 
 const Layout: Component<ParentProps> = (props) => {
     const location = useLocation();
@@ -25,6 +27,14 @@ const Layout: Component<ParentProps> = (props) => {
                         navigate("/app/uk.tcsw.settings/profile");
                     },
                     active: location.pathname === "/app/uk.tcsw.settings/profile",
+                },
+                {
+                    icon: "passkey",
+                    label: "Authentication",
+                    onClick() {
+                        navigate("/app/uk.tcsw.settings/authentication");
+                    },
+                    active: location.pathname === "/app/uk.tcsw.settings/authentication",
                 },
                 {
                     icon: "storage",
@@ -52,7 +62,7 @@ const Layout: Component<ParentProps> = (props) => {
                 },
             ]}
         >
-            {props.children}
+            <Suspense fallback={<UKIndeterminateSpinner class={styles.spinner} />}>{props.children}</Suspense>
         </UKNavigationRail>
     );
 };

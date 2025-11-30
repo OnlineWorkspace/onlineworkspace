@@ -1,5 +1,5 @@
 import chalk from "chalk";
-import { Instance } from "./index.js";
+import type { Instance } from "./index.js";
 import { WorkspacesFeatureFlags } from "./subsystems/configuration.js";
 import util from "node:util";
 

@@ -2,6 +2,8 @@
     background-color: rgb(var(--uk-sys-color-background));
     color: rgb(var(--uk-sys-color-on-background));
     transition: background-color var(--uk-sys-motion-duration-250) var(--uk-sys-motion-easing-standard-normal);
+    font-family: monospace;
+    font-size: 2rem;
     min-height: 100vh;
     width: 100%;
 }

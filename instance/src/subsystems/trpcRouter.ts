@@ -1,11 +1,10 @@
-import { initTRPC, tracked, TRPCError } from "@trpc/server";
+import { initTRPC, TRPCError } from "@trpc/server";
 import z from "zod";
-import { Instance } from "../index.js";
+import type { Instance } from "../index.js";
 import { AuthorizedDeviceType } from "./authorization.js";
-import { FetchCreateContextFnOptions } from "@trpc/server/adapters/fetch";
-import { WorkspacesNotificationEventEmitterEvent, WorkspacesNotificationPriority, type WorkspacesNotification } from "./notifications.js";
+import type { FetchCreateContextFnOptions } from "@trpc/server/adapters/fetch";
+import { WorkspacesNotificationEventEmitterEvent, type WorkspacesNotification } from "./notifications.js";
 import { on } from "node:events";
-import { $ZodTypeInternals } from "zod/v4/core";
 
 export const createTRPCContext = (instance: Instance) => (opt: FetchCreateContextFnOptions) => {
     return {
@@ -78,7 +77,7 @@ export const workspacesRouter = t.router({
                     email: z.boolean(),
                 }),
             )
-            .query(async (opt) => {
+            .query(async () => {
                 return {
                     // TODO: change to true when an email server exists (links to emailServerStuff)
                     email: false,

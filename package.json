@@ -16,6 +16,7 @@
     "scripts": {
         "backend": "bun --watch instance/src/index.ts",
         "web": "bun run --cwd instance/src/web dev",
+        "build-web": "bun run --cwd instance/src/web build",
         "uikit": "bun run --cwd uikit-solid dev"
     },
     "private": true,

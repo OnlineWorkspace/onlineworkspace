@@ -53,10 +53,10 @@ export default class NotificationsSubsystem extends SubSystem {
     }
 
     // TODO: implement this
-    applyNotice(targetUserId: number, noticeType: WorkspacesNoticeType[], noticeTitle: string, noticeBody: string) {
-        this.log.warning("Notices are Unimplemented");
-        return this;
-    }
+    // applyNotice(targetUserId: number, noticeType: WorkspacesNoticeType[], noticeTitle: string, noticeBody: string) {
+    //     this.log.warning("Notices are Unimplemented");
+    //     return this;
+    // }
 
     send(
         recipient: number,

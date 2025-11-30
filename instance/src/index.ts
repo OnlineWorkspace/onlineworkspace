@@ -1,4 +1,4 @@
-import { SubSystems } from "./subSystems.js";
+import type { SubSystems } from "./subSystems.js";
 import Log from "./log.js";
 import ConfigurationSubsystem from "./subsystems/configuration.js";
 import FilesystemSubsystem from "./subsystems/filesystem.js";
@@ -8,10 +8,10 @@ import ConsoleCommandsSubsytem from "./subsystems/consoleCommands.js";
 import DatabaseSubsystem from "./subsystems/database.js";
 import AuthorizationSubsystem from "./subsystems/authorization.js";
 // https://github.com/cah4a/trpc-bun-adapter/blob/main/src/createBunHttpHandler.ts TODO: patch this and merge into the instance package
-import { BunWSClientCtx, createBunServeHandler } from "trpc-bun-adapter";
-import { AnyRouter } from "@trpc/server";
+import type { BunWSClientCtx } from "trpc-bun-adapter";
+import type { AnyRouter } from "@trpc/server";
 import { createTRPCContext as createWorkspacesTRPCContext, workspacesRouter } from "./subsystems/trpcRouter.js";
-import { BunRequest, file } from "bun";
+import { type BunRequest, file } from "bun";
 import ApplicationsSubsystem from "./subsystems/applications.js";
 import path from "path";
 import TRPCSubsystem from "./subsystems/trpc.js";
@@ -122,7 +122,7 @@ class Instance {
                         },
                     },
                 },
-                fetch(request, server) {
+                fetch(_request, _server) {
                     // will be executed if it's not a TRPC request
                     return new Response("Unknown path");
                 },
@@ -187,9 +187,10 @@ class Instance {
     }
 }
 
-const INSTANCE = new Instance();
-
-export default INSTANCE;
+// @ts-ignore
 export type { Instance };
+
+const INSTANCE = new Instance();
+export default INSTANCE;
 
 await INSTANCE.startup();

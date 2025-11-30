@@ -134,10 +134,12 @@ export default ApplicationsRouter`;
                     stderr: "pipe",
                 });
 
+                // @ts-ignore
                 for await (const msg of child.stdout) {
                     this.log.info("Applications Initial Startup -> " + Buffer.from(msg).toString());
                 }
 
+                // @ts-ignore
                 for await (const msg of child.stderr) {
                     this.log.error("Applications Initial Startup -> " + Buffer.from(msg).toString());
                 }
@@ -348,6 +350,7 @@ export default ApplicationsRouter`;
 
             const MODULE_LOG_PREFIX = `${app.manifest.id} -> `;
 
+            // @ts-ignore
             for await (const msg of child.stdout) {
                 let bufMsg = MODULE_LOG_PREFIX + Buffer.from(msg).toString();
 
@@ -358,6 +361,7 @@ export default ApplicationsRouter`;
                 this.log.info(bufMsg);
             }
 
+            // @ts-ignore
             for await (const msg of child.stderr) {
                 let bufMsg = MODULE_LOG_PREFIX + Buffer.from(msg).toString();
 
@@ -403,6 +407,7 @@ export default ApplicationsRouter`;
             app.enabled = false;
             this.log.info(`Disabled application '${applicationId}'`);
             await this.instance.promptForRestart(`Disable application '${applicationId}'`);
+            this.enabledApplications = this.enabledApplications.filter((a) => a !== app.manifest?.id);
         } else {
             this.log.error(`Couldn't find application with id '${applicationId}'`);
         }

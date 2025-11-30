@@ -3,7 +3,7 @@ import SubSystem from "../subSystems.js";
 import * as readline from "readline";
 import { promises as fs } from "fs";
 import path from "path";
-import Command, { ICommandRuntimeParameters } from "./consoleCommands/command.js";
+import Command, { type ICommandRuntimeParameters } from "./consoleCommands/command.js";
 
 export default class ConsoleCommandsSubsytem extends SubSystem {
     rlInterface!: readline.Interface;
@@ -67,7 +67,7 @@ export default class ConsoleCommandsSubsytem extends SubSystem {
                 }
             });
 
-            process.stdin.on("keypress", async (str, key) => {
+            process.stdin.on("keypress", async (_str, key) => {
                 if (key.name === "up") {
                     if (historyIndex === 0) {
                         return;

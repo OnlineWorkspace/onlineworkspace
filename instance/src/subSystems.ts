@@ -1,4 +1,4 @@
-import { Instance } from "./index.js";
+import type { Instance } from "./index.js";
 import type { Logger } from "./log.js";
 import type AuthorizationSubsystem from "./subsystems/authorization.js";
 import type ConfigurationSubsystem from "./subsystems/configuration.js";

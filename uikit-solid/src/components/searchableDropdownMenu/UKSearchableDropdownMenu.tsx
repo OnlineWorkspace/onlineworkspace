@@ -60,8 +60,8 @@ const UKSearchableDropdownMenu: Component<{
                 forceFocussed={isFocussed()}
                 setValue={query()}
                 onEscape={() => setIsFocussed(false)}
-                leadingIcon={props.inputLeadingIcon}
-                trailingIcon={props.inputTrailingIcon}
+                leadingIcon={props.inputLeadingIcon ? { icon: props.inputLeadingIcon } : undefined}
+                trailingIcon={props.inputTrailingIcon ? { icon: props.inputTrailingIcon } : undefined}
             />
             {isFocussed() && (
                 <UKMenu

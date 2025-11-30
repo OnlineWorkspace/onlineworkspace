@@ -52,7 +52,7 @@ export default class AuthorizationSubsystem extends SubSystem {
                             { title: "Change Your Password", icon: "key", body: "Please change your password from the default!" },
                             { buttons: [{ id: "change-password", label: "Change Password", type: "filled" }] },
                             {
-                                onButton(id) {
+                                onButton(_id) {
                                     return {
                                         action: {
                                             type: "navigate",
@@ -104,7 +104,7 @@ export default class AuthorizationSubsystem extends SubSystem {
 
         const sessionsDb = this.instance.subSystems.database.db();
 
-        const session = (await sessionsDb`DELETE FROM Sessions WHERE user_id = ${userId} AND session_token = ${token}`)?.[0];
+        (await sessionsDb`DELETE FROM Sessions WHERE user_id = ${userId} AND session_token = ${token}`)?.[0];
 
         return true;
     }

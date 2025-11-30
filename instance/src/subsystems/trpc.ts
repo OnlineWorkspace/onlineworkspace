@@ -1,9 +1,9 @@
-import { BunRequest, Server } from "bun";
-import { Instance } from "../index.js";
+import { type BunRequest, type Server } from "bun";
+import type { Instance } from "../index.js";
 import SubSystem from "../subSystems.js";
-import { TRPCBuiltRouter } from "@trpc/server";
+import { type TRPCBuiltRouter } from "@trpc/server";
 import { createTRPCContext } from "./trpcRouter.js";
-import { FetchCreateContextFnOptions, fetchRequestHandler } from "@trpc/server/adapters/fetch";
+import { type FetchCreateContextFnOptions, fetchRequestHandler } from "@trpc/server/adapters/fetch";
 
 export default class TRPCSubsystem extends SubSystem {
     registeredRouters: {
@@ -24,7 +24,7 @@ export default class TRPCSubsystem extends SubSystem {
         return true;
     }
 
-    private attemptTRPCRequest(req: BunRequest, server: Server<ReturnType<typeof createTRPCContext>>) {
+    private attemptTRPCRequest(req: BunRequest) {
         const url = new URL(req.url);
 
         for (const router of this.registeredRouters) {
@@ -75,7 +75,7 @@ export default class TRPCSubsystem extends SubSystem {
                     });
                 }
 
-                let trpcResponse = await self.attemptTRPCRequest(req, server);
+                let trpcResponse = await self.attemptTRPCRequest(req);
 
                 if (trpcResponse) {
                     trpcResponse.headers.set("Access-Control-Allow-Origin", "http://localhost:5173");

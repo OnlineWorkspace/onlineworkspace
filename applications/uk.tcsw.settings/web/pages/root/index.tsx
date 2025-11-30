@@ -6,21 +6,28 @@ import UKAvatar from "@tcsw/uikit-solid/src/components/avatar/UKAvatar.jsx";
 import UKText from "@tcsw/uikit-solid/src/components/text/UKText.jsx";
 import Shortcut from "./component/Shortcut/Shortcut";
 import trpc from "../../lib/trpc";
+import { useNavigate } from "@solidjs/router";
 
 const RootPage: Component = () => {
+    const navigate = useNavigate();
     const [fullName] = createResource(() => trpc.overview.user.fullName.query());
     const [role] = createResource(() => trpc.overview.user.role.query());
 
     return (
         <div class={styles.root}>
             <div class={styles.content}>
-                <div class={styles.header}>
+                <div
+                    class={styles.header}
+                    onClick={() => {
+                        navigate("/app/uk.tcsw.settings/profile");
+                    }}
+                >
                     <UKAvatar username="username" avatar="/assets/placeholder/avatar.png" size="l" />
                     <div>
                         <UKText role="display" size="l" emphasized class={styles.fullName}>
                             {fullName() || "Unknown"}
                         </UKText>
-                        <UKText role="label" size="m" class={styles.permissionLevel}>
+                        <UKText role="label" size="l" class={styles.permissionLevel}>
                             {role() || "Unknown"}
                         </UKText>
                     </div>

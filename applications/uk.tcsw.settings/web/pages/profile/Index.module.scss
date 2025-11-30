@@ -1,24 +1,16 @@
 .root {
     display: flex;
     flex-direction: column;
-    padding: 1rem;
-    min-height: 100%;
-    overflow-y: auto;
-}
-
-.content {
-    display: flex;
-    flex-direction: column;
-    max-width: 64rem;
-    width: 100%;
-    height: max-content;
     gap: 1rem;
-    margin: auto;
+    width: 100%;
+    align-items: center;
 }
 
-.divider {
-    margin-top: 1rem;
-    margin-bottom: 1rem;
+.subheading {
+    width: 100%;
+    max-width: 64rem;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
 }
 
 .header {
@@ -27,7 +19,7 @@
     align-items: center;
     padding-left: 1rem;
     gap: 1rem;
-    margin-top: 2rem;
+    margin-top: 5rem;
     cursor: pointer;
 
     .fullName {

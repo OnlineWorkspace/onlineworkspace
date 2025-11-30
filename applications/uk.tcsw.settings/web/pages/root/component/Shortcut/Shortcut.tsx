@@ -3,6 +3,7 @@ import type { Component } from "solid-js";
 import styles from "./Shortcut.module.scss";
 import UKIcon from "@tcsw/uikit-solid/src/components/icon/UKIcon.jsx";
 import UKText from "@tcsw/uikit-solid/src/components/text/UKText.jsx";
+import { useNavigate } from "@solidjs/router";
 
 const Shortcut: Component<{
     title: string;
@@ -10,12 +11,16 @@ const Shortcut: Component<{
     icon: string;
     path: string;
 }> = (props) => {
+    const navigate = useNavigate();
+
     return (
         <>
             <UKCard
                 class={styles.root}
                 onClick={() => {
-                    return 0;
+                    navigate(props.path);
+
+                    return;
                 }}
             >
                 <UKIcon class={styles.icon}>{props.icon}</UKIcon>

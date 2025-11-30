@@ -50,6 +50,7 @@
         background-color: rgb(var(--uk-sys-color-secondary-container));
 
         > .logout {
+            visibility: visible;
             pointer-events: all;
             opacity: 1;
             transition: opacity var(--uk-sys-motion-duration-1000) var(--uk-sys-motion-easing-emphasized-decelerate);
@@ -63,5 +64,6 @@
         top: 0.75rem;
         right: 0.75rem;
         opacity: 0;
+        visibility: hidden;
     }
 }
