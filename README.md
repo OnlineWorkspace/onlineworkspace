@@ -55,14 +55,15 @@ A working environment for professionals and Home-Lab users.
 5. change into the newly created directory `cd /var/www/workspaces`
 6. clone the workspaces docker configuration from git `git clone git@github.com:tricolorsoftware/workspaces.git .`
 7. run `bun install`
-8. change into the `instance` directory
-9. copy `meta/backend.service` to `/etc/systemd/system/workspaces-backend.service`.
-10. run `systemctl enable workspaces-backend --now` to start the backend
-11. change into the project root `/var/www/workspaces`
-12. run `bun build-web`
-13. choose a webserver of your choice to serve `/var/www/workspaces/instance/web/dist` (caddy is fast & easy to use)
-14. open your browser and head to `https://[server-ip]` and login as the user `admin` with password `password` to finish setup.
-15. Enjoy! :D
+8. create a postgresql database called `tricolor_workspaces`
+9. change into the `instance` directory
+10. copy `meta/backend.service` to `/etc/systemd/system/workspaces-backend.service`.
+11. run `systemctl enable workspaces-backend --now` to start the backend
+12. change into the project root `/var/www/workspaces`
+13. run `bun build-web`
+14. choose a webserver of your choice to serve `/var/www/workspaces/instance/web/dist` (caddy is fast & easy to use)
+15. open your browser and head to `https://[server-ip]` and login as the user `admin` with password `password` to finish setup.
+16. Enjoy! :D
 
 ## Installation Guide for Development Environments
 

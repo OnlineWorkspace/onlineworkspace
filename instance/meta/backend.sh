@@ -1,8 +1,8 @@
-#!/usr/bin bash
+#!/usr/bin/bash
 
-cd /var/www/workspaces/instance/ || {
-    echo "Failed to change directory to /var/www/workspaces/instance/"
+cd /var/www/workspaces/ || {
+    echo "Failed to change directory to /var/www/workspaces/"
     exit 1
 }
 
-bun /var/www/workspaces/instance/src/index.ts
+bun ./instance/src/index.ts
