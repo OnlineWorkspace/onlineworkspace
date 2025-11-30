@@ -9,6 +9,8 @@ Type=simple
 ExecStart=/var/www/workspaces/instance/meta/backend.sh
 Restart=on-failure
 RestartSec=5
+User=root
+Environment="PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/root/.bun/bin/"
 
 [Install]
 WantedBy=multi-user.target
