@@ -45,12 +45,14 @@ const RootPage: Component = () => {
                     icon="wallpaper"
                     path="/app/uk.tcsw.settings/customization"
                 />
-                <Shortcut
-                    title="Configure Instance"
-                    description="(ADMINISTRATORS ONLY) Manage the instance & it’s users"
-                    icon="settings_applications"
-                    path="/app/uk.tcsw.settings/instance"
-                />
+                {role() === "Administrator" && (
+                    <Shortcut
+                        title="Configure Instance"
+                        description="(ADMINISTRATORS ONLY) Manage the instance & it’s users"
+                        icon="settings_applications"
+                        path="/app/uk.tcsw.settings/instance"
+                    />
+                )}
             </div>
         </div>
     );

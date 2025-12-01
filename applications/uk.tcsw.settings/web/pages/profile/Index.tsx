@@ -8,6 +8,7 @@ import UKAvatar from "@tcsw/uikit-solid/src/components/avatar/UKAvatar.jsx";
 
 const ProfilePage: Component = () => {
     const [name, { mutate: setName }] = createResource(() => trpc.profile.name.query());
+    const [username, { mutate: setUsername }] = createResource(() => trpc.profile.username.query());
     const [gender, { mutate: setGender }] = createResource(() => trpc.profile.gender.query());
     const [email, { mutate: setEmail }] = createResource(() => trpc.profile.email.query());
     const [role] = createResource(() => trpc.profile.role.query());
@@ -36,6 +37,17 @@ const ProfilePage: Component = () => {
                     }}
                     labelText="Profile picture"
                     supportingText="Help people identify you at a glance"
+                    onClick={() => {
+                        return 0;
+                    }}
+                />
+                <UKStackItem
+                    leading={{
+                        type: "icon",
+                        value: "alternate_email",
+                    }}
+                    labelText="Username"
+                    supportingText={username()}
                     onClick={() => {
                         return 0;
                     }}
