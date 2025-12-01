@@ -4,6 +4,7 @@ import * as readline from "readline";
 import { promises as fs } from "fs";
 import path from "path";
 import Command, { type ICommandRuntimeParameters } from "./consoleCommands/command.js";
+import ansiEscapes from "ansi-escapes";
 
 export default class ConsoleCommandsSubsytem extends SubSystem {
     rlInterface!: readline.Interface;
@@ -21,7 +22,7 @@ export default class ConsoleCommandsSubsytem extends SubSystem {
     }
 
     override async startup() {
-        if (!this.instance.subSystems.configuration.hasFeature("slash_commands")) return true;
+        if (!this.instance.subSystems.configuration.hasFeature("slash_commands") || !process.stdout.cursorTo) return true;
 
         const commands = await fs.readdir(path.join(this.instance.subSystems.filesystem.SRC_ROOT, "/subsystems/consoleCommands/commands/"));
         for (const cmd of commands) {
@@ -182,7 +183,7 @@ export default class ConsoleCommandsSubsytem extends SubSystem {
                     process.stdout.cursorTo(CURSOR_MIN_POS());
                     process.stdout.clearLine(1);
                     process.stdout.write(line);
-                    process.stdout.cursorTo(cursorPos);
+                    process.stdout.write(ansiEscapes.cursorTo(cursorPos));
                     return;
                 } else if (key.name === "space") {
                     cursorPos++;

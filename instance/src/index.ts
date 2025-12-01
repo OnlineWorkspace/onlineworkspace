@@ -155,9 +155,11 @@ class Instance {
         this.subSystems.consoleCommands.currentCommandInterface.cb = () => 0;
         this.log.system.info("Shutting down...");
 
-        process.stdout.cursorTo(0, 0);
-        process.stdout.clearScreenDown();
-        process.stdout.cursorTo(0, 0);
+        if (!!process.stdout.cursorTo) {
+            process.stdout.cursorTo(0, 0);
+            process.stdout.clearScreenDown();
+            process.stdout.cursorTo(0, 0);
+        }
 
         const goodbye = [
             "Goodbye!",

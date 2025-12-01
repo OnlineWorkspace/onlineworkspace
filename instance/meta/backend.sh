@@ -6,3 +6,4 @@ cd /var/www/workspaces/ || {
 }
 
 bun ./instance/src/index.ts
+

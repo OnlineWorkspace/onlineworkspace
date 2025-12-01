@@ -27,33 +27,55 @@ class Logger {
         this.log = log;
 
         global.console.log = (...data: any[]): void => {
-            process.stdout.cursorTo(0, this._internal_getWindowSize()[1], () => {
-                process.stdout.clearLine(1, () => {
-                    let writtenData = "";
-                    for (const d of data) {
-                        if (d.toString !== undefined) {
-                            writtenData += util.format(d);
+            if (!!process.stdout.cursorTo) {
+                process.stdout.cursorTo(0, this._internal_getWindowSize()[1], () => {
+                    process.stdout.clearLine(1, () => {
+                        let writtenData = "";
+                        for (const d of data) {
+                            if (d.toString !== undefined) {
+                                writtenData += util.format(d);
+                            } else {
+                                writtenData += util.inspect(d, {
+                                    compact: false,
+                                    colors: true,
+                                    depth: 3,
+                                    breakLength: this._internal_getWindowSize()[0] - this.log.META_LENGTH + 6,
+                                });
+                            }
+                            writtenData += " ";
+                        }
+                        if (writtenData.endsWith("\n")) {
+                            process.stdout.write(writtenData, () => {
+                                this._internal_writePrompt();
+                            });
                         } else {
-                            writtenData += util.inspect(d, {
-                                compact: false,
-                                colors: true,
-                                depth: 3,
-                                breakLength: this._internal_getWindowSize()[0] - this.log.META_LENGTH + 6,
+                            process.stdout.write(writtenData + "\n", () => {
+                                this._internal_writePrompt();
                             });
                         }
-                        writtenData += " ";
-                    }
-                    if (writtenData.endsWith("\n")) {
-                        process.stdout.write(writtenData, () => {
-                            this._internal_writePrompt();
-                        });
-                    } else {
-                        process.stdout.write(writtenData + "\n", () => {
-                            this._internal_writePrompt();
-                        });
-                    }
+                    });
                 });
-            });
+            } else {
+                let writtenData = "";
+                for (const d of data) {
+                    if (d.toString !== undefined) {
+                        writtenData += util.format(d);
+                    } else {
+                        writtenData += util.inspect(d, {
+                            compact: false,
+                            colors: true,
+                            depth: 3,
+                            breakLength: this._internal_getWindowSize()[0] - this.log.META_LENGTH + 6,
+                        });
+                    }
+                    writtenData += " ";
+                }
+                if (writtenData.endsWith("\n")) {
+                    process.stdout.write(writtenData);
+                } else {
+                    process.stdout.write(writtenData + "\n");
+                }
+            }
         };
 
         return this;
@@ -189,7 +211,8 @@ class Logger {
     }
 
     _internal_writePrompt() {
-        if (!this.log.instance?.subSystems.configuration?.hasFeature(WorkspacesFeatureFlags.SlashCommands)) return this;
+        if (!this.log.instance?.subSystems.configuration?.hasFeature(WorkspacesFeatureFlags.SlashCommands) || !process.stdout.cursorTo)
+            return this;
 
         process.stdout.cursorTo(0, this._internal_getWindowSize()[1], () => {
             process.stdout.write(
