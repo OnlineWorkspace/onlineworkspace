@@ -40,6 +40,13 @@ const AppLayout: Component<RouteSectionProps<unknown>> = (props) => {
                                 window.location.href = sc.location.value;
                             }
                         },
+                        onMiddleClick() {
+                            if (sc.location.type === "local") {
+                                window.open(sc.location.value, "_blank");
+                            } else if (sc.location.type === "remote") {
+                                window.open(sc.location.value, "_blank");
+                            }
+                        }
                     };
                 }),
             ]}

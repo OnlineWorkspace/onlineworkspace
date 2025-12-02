@@ -2364,33 +2364,33 @@ export default function App() {
                 {"Hello world"}
             </UKChip>
 
-            <UKExtendedFloatingActionButton leadingIcon={"mail"} color="primary" size="small">Test</UKExtendedFloatingActionButton>
-            <UKExtendedFloatingActionButton leadingIcon={"mail"} color="primary" size="medium">Test</UKExtendedFloatingActionButton>
-            <UKExtendedFloatingActionButton leadingIcon={"mail"} color="primary" size="large">Test</UKExtendedFloatingActionButton>
+            <UKExtendedFloatingActionButton onClick={() => 0} leadingIcon={"mail"} color="primary" size="small">Test</UKExtendedFloatingActionButton>
+            <UKExtendedFloatingActionButton onClick={() => 0} leadingIcon={"mail"} color="primary" size="medium">Test</UKExtendedFloatingActionButton>
+            <UKExtendedFloatingActionButton onClick={() => 0} leadingIcon={"mail"} color="primary" size="large">Test</UKExtendedFloatingActionButton>
 
-            <UKExtendedFloatingActionButton leadingIcon={"mail"} color="secondary" size="small">Test</UKExtendedFloatingActionButton>
-            <UKExtendedFloatingActionButton leadingIcon={"mail"} color="secondary" size="medium">Test</UKExtendedFloatingActionButton>
-            <UKExtendedFloatingActionButton leadingIcon={"mail"} color="secondary" size="large">Test</UKExtendedFloatingActionButton>
+            <UKExtendedFloatingActionButton onClick={() => 0} leadingIcon={"mail"} color="secondary" size="small">Test</UKExtendedFloatingActionButton>
+            <UKExtendedFloatingActionButton onClick={() => 0} leadingIcon={"mail"} color="secondary" size="medium">Test</UKExtendedFloatingActionButton>
+            <UKExtendedFloatingActionButton onClick={() => 0} leadingIcon={"mail"} color="secondary" size="large">Test</UKExtendedFloatingActionButton>
 
-            <UKExtendedFloatingActionButton leadingIcon={"mail"} color="tertiary" size="small">Test</UKExtendedFloatingActionButton>
-            <UKExtendedFloatingActionButton leadingIcon={"mail"} color="tertiary" size="medium">Test</UKExtendedFloatingActionButton>
-            <UKExtendedFloatingActionButton leadingIcon={"mail"} color="tertiary" size="large">Test</UKExtendedFloatingActionButton>
+            <UKExtendedFloatingActionButton onClick={() => 0} leadingIcon={"mail"} color="tertiary" size="small">Test</UKExtendedFloatingActionButton>
+            <UKExtendedFloatingActionButton onClick={() => 0} leadingIcon={"mail"} color="tertiary" size="medium">Test</UKExtendedFloatingActionButton>
+            <UKExtendedFloatingActionButton onClick={() => 0} leadingIcon={"mail"} color="tertiary" size="large">Test</UKExtendedFloatingActionButton>
 
-            <UKExtendedFloatingActionButton leadingIcon={"mail"} color="tonal-primary" size="small">Test</UKExtendedFloatingActionButton>
-            <UKExtendedFloatingActionButton leadingIcon={"mail"} color="tonal-primary" size="medium">Test</UKExtendedFloatingActionButton>
-            <UKExtendedFloatingActionButton leadingIcon={"mail"} color="tonal-primary" size="large">Test</UKExtendedFloatingActionButton>
+            <UKExtendedFloatingActionButton onClick={() => 0} leadingIcon={"mail"} color="tonal-primary" size="small">Test</UKExtendedFloatingActionButton>
+            <UKExtendedFloatingActionButton onClick={() => 0} leadingIcon={"mail"} color="tonal-primary" size="medium">Test</UKExtendedFloatingActionButton>
+            <UKExtendedFloatingActionButton onClick={() => 0} leadingIcon={"mail"} color="tonal-primary" size="large">Test</UKExtendedFloatingActionButton>
 
-            <UKExtendedFloatingActionButton leadingIcon={"mail"} color="tonal-secondary" size="small">Test</UKExtendedFloatingActionButton>
-            <UKExtendedFloatingActionButton leadingIcon={"mail"} color="tonal-secondary" size="medium">Test</UKExtendedFloatingActionButton>
-            <UKExtendedFloatingActionButton leadingIcon={"mail"} color="tonal-secondary" size="large">Test</UKExtendedFloatingActionButton>
+            <UKExtendedFloatingActionButton onClick={() => 0} leadingIcon={"mail"} color="tonal-secondary" size="small">Test</UKExtendedFloatingActionButton>
+            <UKExtendedFloatingActionButton onClick={() => 0} leadingIcon={"mail"} color="tonal-secondary" size="medium">Test</UKExtendedFloatingActionButton>
+            <UKExtendedFloatingActionButton onClick={() => 0} leadingIcon={"mail"} color="tonal-secondary" size="large">Test</UKExtendedFloatingActionButton>
 
-            <UKExtendedFloatingActionButton leadingIcon={"mail"} color="tonal-tertiary" size="small">Test</UKExtendedFloatingActionButton>
-            <UKExtendedFloatingActionButton leadingIcon={"mail"} color="tonal-tertiary" size="medium">Test</UKExtendedFloatingActionButton>
-            <UKExtendedFloatingActionButton leadingIcon={"mail"} color="tonal-tertiary" size="large">Test</UKExtendedFloatingActionButton>
+            <UKExtendedFloatingActionButton onClick={() => 0} leadingIcon={"mail"} color="tonal-tertiary" size="small">Test</UKExtendedFloatingActionButton>
+            <UKExtendedFloatingActionButton onClick={() => 0} leadingIcon={"mail"} color="tonal-tertiary" size="medium">Test</UKExtendedFloatingActionButton>
+            <UKExtendedFloatingActionButton onClick={() => 0} leadingIcon={"mail"} color="tonal-tertiary" size="large">Test</UKExtendedFloatingActionButton>
 
 
             <span>
-                UIKit Material Expressive for SolidJS | "@yourdash/uikit-solid" | Created by{" "}
+                UIKit Material Expressive for SolidJS | "@tcsw/uikit-solid" | Created by{" "}
                 <a href={"https://github.com/ewsgit"}>Ewsgit</a>
             </span>
         </Root>

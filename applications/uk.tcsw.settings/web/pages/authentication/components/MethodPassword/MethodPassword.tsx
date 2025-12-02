@@ -1,6 +1,6 @@
 import UKButton from "@tcsw/uikit-solid/src/components/button/UKButton.jsx";
 import UKStackItem from "@tcsw/uikit-solid/src/components/stack/UKStackItem.jsx";
-import {createResource, type Component} from "solid-js";
+import {createResource, Suspense, type Component} from "solid-js";
 import trpc from "../../../../lib/trpc";
 import styles from "./MethodPassword.module.scss"
 import UKText from "@tcsw/uikit-solid/src/components/text/UKText.jsx";

@@ -34,7 +34,7 @@ const router = t.router({
                 await opt.ctx.instance.subSystems.users.getUserById(opt.ctx.userId)
             )?.setFullName(fullNameSplit.shift() || "Unknown", fullNameSplit.join(" "));
 
-            return;
+            return true;
         }),
         getUsername: procedure.output(z.string()).query(async (opt) => {
             const username = await (await opt.ctx.instance.subSystems.users.getUserById(opt.ctx.userId))?.getUsername();
@@ -44,7 +44,7 @@ const router = t.router({
         setUsername: procedure.input(z.string()).mutation(async (opt) => {
             await (await opt.ctx.instance.subSystems.users.getUserById(opt.ctx.userId))?.setUsername(opt.input);
 
-            return;
+            return true;
         }),
         getGender: procedure.output(z.string()).query(async (opt) => {
             const gender = await (await opt.ctx.instance.subSystems.users.getUserById(opt.ctx.userId))?.getGender();
@@ -56,7 +56,7 @@ const router = t.router({
 
             await (await opt.ctx.instance.subSystems.users.getUserById(opt.ctx.userId))?.setGender(opt.input);
 
-            return;
+            return true;
         }),
         getEmail: procedure.output(z.string()).query(async (opt) => {
             const email = await (await opt.ctx.instance.subSystems.users.getUserById(opt.ctx.userId))?.getEmail();
@@ -66,7 +66,7 @@ const router = t.router({
         setEmail: procedure.input(z.email()).mutation(async (opt) => {
             await (await opt.ctx.instance.subSystems.users.getUserById(opt.ctx.userId))?.setEmail(opt.input);
 
-            return;
+            return true;
         }),
         getRole: procedure.output(z.string()).query(async (opt) => {
             const isAdministrator = await (await opt.ctx.instance.subSystems.users.getUserById(opt.ctx.userId))?.isAdministrator();

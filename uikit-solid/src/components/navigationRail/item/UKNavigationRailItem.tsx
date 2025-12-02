@@ -9,13 +9,18 @@ const UKNavigationRailItem: Component<{
     imageIcon?: string;
     label: string;
     onClick: () => void;
+    onMiddleClick?: () => void;
     badgeCount?: number;
     active?: boolean;
     // not passed to item by the user
     expanded: boolean;
 }> = (props) => {
     return (
-        <button class={styles.root} data-active={props.active} data-expanded={props.expanded} onClick={props.onClick}>
+        <button class={styles.root} data-active={props.active} data-expanded={props.expanded} onClick={props.onClick} onAuxClick={(e) => {
+            if (e.button === 1) {
+                props.onMiddleClick?.()
+            }
+        }}>
             {props.badgeCount === undefined ? (
                 <>{props.imageIcon !== undefined ? <img /> : <UKIcon class={styles.icon}>{props.icon}</UKIcon>}</>
             ) : (

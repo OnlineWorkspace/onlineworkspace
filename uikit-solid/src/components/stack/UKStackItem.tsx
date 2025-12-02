@@ -90,7 +90,9 @@ const UKStackItem: Component<{
                                 </Suspense>
                             </div>
                         )}
-                        {props.inlineComponent}
+                        <Suspense>
+                            {props.inlineComponent}
+                        </Suspense>
                     </button>
                 </Match>
                 <Match when={!props.onClick}>
@@ -129,11 +131,15 @@ const UKStackItem: Component<{
                                 </Suspense>
                             </div>
                         )}
-                        {props.inlineComponent}
+                        <Suspense>
+                            {props.inlineComponent}
+                        </Suspense>
                     </div>
                 </Match>
             </Switch>
-            {expanded() && props.expandedComponent}
+            <Suspense>
+                {expanded() && props.expandedComponent}
+            </Suspense>
         </div>
     );
 };
