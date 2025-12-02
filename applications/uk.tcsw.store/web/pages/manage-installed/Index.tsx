@@ -83,7 +83,7 @@ const ManageInstalledPage: Component = () => {
                                 }
                                 supportingText={`(${app.id}) - ${app.description}`}
                                 labelText={app.displayName}
-                                component={
+                                inlineComponent={
                                     !selectionMode() ? (
                                         <UKSwitch
                                             icon={true}

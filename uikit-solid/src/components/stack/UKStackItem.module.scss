@@ -1,16 +1,60 @@
 .root {
+    display: flex;
+    flex-direction: column;
+    background-color: rgb(var(--uk-sys-color-surface-container-highest));
+    border-radius: 0.25rem;
+
+    &:first-child {
+        border-top-left-radius: 1.25rem;
+        border-top-right-radius: 1.25rem;
+
+        .collapsedArea {
+            border-top-left-radius: 1.25rem;
+            border-top-right-radius: 1.25rem;
+        }
+    }
+
+    &:last-child {
+        border-bottom-left-radius: 1.25rem;
+        border-bottom-right-radius: 1.25rem;
+
+        .collapsedArea {
+            border-bottom-left-radius: 1.25rem;
+            border-bottom-right-radius: 1.25rem;
+        }
+    }
+
+    & > *:nth-child(2) {
+        z-index: 1;
+        animation: fadeSlideIn var(--uk-sys-motion-duration-500) var(--uk-sys-motion-easing-emphasized-decelerate) forwards;
+
+        @keyframes fadeSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-0.5rem);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    }
+}
+
+.collapsedArea {
     position: relative;
     padding: 0.75rem 1rem;
     min-height: 3.5rem;
     background-color: rgb(var(--uk-sys-color-surface-container-highest));
     color: rgb(var(--uk-sys-color-on-surface-container-highest));
     border-radius: 0.25rem;
-    overflow: hidden;
     display: flex;
     flex-direction: row;
     gap: 0.75rem;
     border: none;
     align-items: center;
+    overflow: hidden;
+    z-index: 2;
 
     transition:
         outline-color var(--uk-sys-motion-duration-100) var(--uk-sys-motion-easing-standard-decelerate),
@@ -58,16 +102,6 @@
                 background-color: rgb(var(--uk-sys-color-on-surface), var(--uk-sys-state-active-state-layer-opacity));
             }
         }
-    }
-
-    &:first-child {
-        border-top-left-radius: 1.25rem;
-        border-top-right-radius: 1.25rem;
-    }
-
-    &:last-child {
-        border-bottom-left-radius: 1.25rem;
-        border-bottom-right-radius: 1.25rem;
     }
 }
 

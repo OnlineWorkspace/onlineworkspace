@@ -22,27 +22,27 @@ const router = t.router({
         },
     },
     profile: {
-        name: procedure.output(z.string()).query(async (opt) => {
+        getName: procedure.output(z.string()).query(async (opt) => {
             const fullName = await (await opt.ctx.instance.subSystems.users.getUserById(opt.ctx.userId))?.getFullName();
 
             return `${fullName?.forename} ${fullName?.surname || ""}` || "Unknown User";
         }),
-        username: procedure.output(z.string()).query(async (opt) => {
+        getUsername: procedure.output(z.string()).query(async (opt) => {
             const username = await (await opt.ctx.instance.subSystems.users.getUserById(opt.ctx.userId))?.getUsername();
 
             return username || "unknown";
         }),
-        gender: procedure.output(z.string()).query(async (opt) => {
+        getGender: procedure.output(z.string()).query(async (opt) => {
             const gender = await (await opt.ctx.instance.subSystems.users.getUserById(opt.ctx.userId))?.getGender();
 
             return gender || "female";
         }),
-        email: procedure.output(z.string()).query(async (opt) => {
+        getEmail: procedure.output(z.string()).query(async (opt) => {
             const email = await (await opt.ctx.instance.subSystems.users.getUserById(opt.ctx.userId))?.getEmail();
 
             return email || "unknown";
         }),
-        role: procedure.output(z.string()).query(async (opt) => {
+        getRole: procedure.output(z.string()).query(async (opt) => {
             const isAdministrator = await (await opt.ctx.instance.subSystems.users.getUserById(opt.ctx.userId))?.isAdministrator();
 
             return isAdministrator ? "Administrator" : "User";
