@@ -126,6 +126,18 @@ export default class AuthorizationSubsystem extends SubSystem {
         return true;
     }
 
+    async hasPassword(userId: number) {
+        const db = this.instance.subSystems.database.db();
+
+        if (!(await this.instance.subSystems.users.doesUserExist(userId))) {
+            return false;
+        }
+
+        let hashedPassword = (await db`SELECT hashed_password FROM Users WHERE id = ${userId}`)?.[0]?.hashed_password;
+
+        return typeof hashedPassword === "string";
+    }
+
     async startup() {
         // loop through all users, check for any session tokens which are expired and remove them from the user's valud sessions pool
 

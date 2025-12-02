@@ -14,7 +14,7 @@ const UKSearchableDropdownMenu: Component<{
     inputLeadingIcon?: string;
     inputTrailingIcon?: string;
 }> = (props) => {
-    const [query, setQuery] = createSignal<string>("");
+    const [query, setQuery] = createSignal<string>(props.defaultValue || "");
     const [isFocussed, setIsFocussed] = createSignal<boolean>(false);
     const [queriedItems, setQueriedItems] = createSignal<SearchableDropdownMenuItems>(props.items);
 

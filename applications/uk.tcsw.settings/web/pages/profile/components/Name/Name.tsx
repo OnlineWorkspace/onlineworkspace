@@ -24,7 +24,9 @@ const Name: Component = () => {
                     <UKTextField color="outlined" getValue={setName} defaultValue={name()} label="Name" />
                     <UKButton
                         class={styles.button}
-                        onClick={() => {
+                        onClick={async () => {
+                            await trpc.profile.setName.mutate(name() || "");
+
                             refetchName();
                         }}
                     >

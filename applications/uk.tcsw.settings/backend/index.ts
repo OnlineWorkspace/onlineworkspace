@@ -27,25 +27,60 @@ const router = t.router({
 
             return `${fullName?.forename} ${fullName?.surname || ""}` || "Unknown User";
         }),
+        setName: procedure.input(z.string()).mutation(async (opt) => {
+            let fullNameSplit = opt.input.split(" ");
+
+            await (
+                await opt.ctx.instance.subSystems.users.getUserById(opt.ctx.userId)
+            )?.setFullName(fullNameSplit.shift() || "Unknown", fullNameSplit.join(" "));
+
+            return;
+        }),
         getUsername: procedure.output(z.string()).query(async (opt) => {
             const username = await (await opt.ctx.instance.subSystems.users.getUserById(opt.ctx.userId))?.getUsername();
 
             return username || "unknown";
+        }),
+        setUsername: procedure.input(z.string()).mutation(async (opt) => {
+            await (await opt.ctx.instance.subSystems.users.getUserById(opt.ctx.userId))?.setUsername(opt.input);
+
+            return;
         }),
         getGender: procedure.output(z.string()).query(async (opt) => {
             const gender = await (await opt.ctx.instance.subSystems.users.getUserById(opt.ctx.userId))?.getGender();
 
             return gender || "female";
         }),
+        setGender: procedure.input(z.string()).mutation(async (opt) => {
+            if (opt.input !== "male" && opt.input !== "female" && opt.input !== "other") return;
+
+            await (await opt.ctx.instance.subSystems.users.getUserById(opt.ctx.userId))?.setGender(opt.input);
+
+            return;
+        }),
         getEmail: procedure.output(z.string()).query(async (opt) => {
             const email = await (await opt.ctx.instance.subSystems.users.getUserById(opt.ctx.userId))?.getEmail();
 
             return email || "unknown";
         }),
+        setEmail: procedure.input(z.email()).mutation(async (opt) => {
+            await (await opt.ctx.instance.subSystems.users.getUserById(opt.ctx.userId))?.setEmail(opt.input);
+
+            return;
+        }),
         getRole: procedure.output(z.string()).query(async (opt) => {
             const isAdministrator = await (await opt.ctx.instance.subSystems.users.getUserById(opt.ctx.userId))?.isAdministrator();
 
             return isAdministrator ? "Administrator" : "User";
+        }),
+    },
+    authentication: {
+        hasPassword: procedure.output(z.boolean()).query(async (opt) => {
+            const user = await opt.ctx.instance.subSystems.users.getUserById(opt.ctx.userId);
+
+            if (!user) return false;
+
+            return instance.subSystems.authorization.hasPassword(user?.userId);
         }),
     },
 });

@@ -45,7 +45,9 @@ const Gender: Component = () => {
                     />
                     <UKButton
                         class={styles.button}
-                        onClick={() => {
+                        onClick={async () => {
+                            await trpc.profile.setGender.mutate(gender() || "other");
+
                             refetchGender();
                         }}
                     >

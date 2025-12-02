@@ -129,6 +129,11 @@ export const workspacesRouter = t.router({
                 let splitDisplayName = opt.input.displayName.split(" ");
                 await user.setFullName(splitDisplayName[0], splitDisplayName.slice(1).join(" "));
 
+                await user.setEmail(opt.input.emailAddress);
+
+                if (opt.input.gender === "male" || opt.input.gender === "female" || opt.input.gender === "other")
+                    await user.setGender(opt.input.gender);
+
                 await user.setQuota(20);
 
                 await opt.ctx.instance.subSystems.authorization.setPassword(user.userId, opt.input.password);
@@ -146,7 +151,7 @@ export const workspacesRouter = t.router({
                     };
                 }
 
-                opt.ctx.rawRequest.resHeaders.set("set-cookie", Bun.Cookie.from("Authorization", session, { secure: true }).serialize());
+                opt.ctx.rawRequest.resHeaders.set("set-cookie", Bun.Cookie.from("Authorization", session, { secure: false }).serialize());
 
                 return {
                     type: "success",
@@ -183,7 +188,7 @@ export const workspacesRouter = t.router({
                     };
                 }
 
-                opt.ctx.rawRequest.resHeaders.set("set-cookie", Bun.Cookie.from("Authorization", session, { secure: true }).serialize());
+                opt.ctx.rawRequest.resHeaders.set("set-cookie", Bun.Cookie.from("Authorization", session, { secure: false }).serialize());
 
                 return {
                     type: "success",

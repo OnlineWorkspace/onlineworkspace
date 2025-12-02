@@ -1,39 +1,33 @@
 import UKStackItem from "@tcsw/uikit-solid/src/components/stack/UKStackItem.jsx";
 import { createResource, type Component } from "solid-js";
 import trpc from "../../../../lib/trpc";
-import styles from "./Username.module.scss";
 import UKButton from "@tcsw/uikit-solid/src/components/button/UKButton.jsx";
 import UKTextField from "@tcsw/uikit-solid/src/components/textField/UKTextField.jsx";
+import styles from "./Email.module.scss";
 
-const Username: Component = () => {
-    const [username, { mutate: setUsername, refetch: refetchUsername }] = createResource(() => trpc.profile.getUsername.query());
+const Email: Component = () => {
+    const [email, { mutate: setEmail, refetch: refetchEmail }] = createResource(() => trpc.profile.getEmail.query());
 
     return (
         <UKStackItem
             leading={{
                 type: "icon",
-                value: "alternate_email",
+                value: "email",
             }}
-            labelText="Username"
-            supportingText={username()}
+            labelText="Email"
+            supportingText={email()}
             onCollapse={() => {
-                refetchUsername();
+                refetchEmail();
             }}
             expandedComponent={
                 <div class={styles.expanded}>
-                    <UKTextField
-                        color="outlined"
-                        getValue={setUsername}
-                        defaultValue={username()}
-                        label="Username"
-                        leadingIcon={{ icon: "alternate_email" }}
-                    />
+                    <UKTextField color="outlined" getValue={setEmail} defaultValue={email()} label="Email" />
                     <UKButton
                         class={styles.button}
                         onClick={async () => {
-                            await trpc.profile.setUsername.mutate(username() || "");
+                            await trpc.profile.setEmail.mutate(email() || "");
 
-                            refetchUsername();
+                            refetchEmail();
                         }}
                     >
                         Save
@@ -44,4 +38,4 @@ const Username: Component = () => {
     );
 };
 
-export default Username;
+export default Email;

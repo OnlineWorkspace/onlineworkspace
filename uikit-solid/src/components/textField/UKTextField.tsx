@@ -4,6 +4,8 @@ import type { DOMElement } from "solid-js/jsx-runtime";
 import clsx from "clsx";
 import UKIcon from "../icon/UKIcon";
 
+
+// TODO: add reveal password 'eye' icon
 const UKTextField: Component<{
     color: "filled" | "outlined";
     leadingIcon?: {icon: string, onClick?: () => void};
