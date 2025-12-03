@@ -406,6 +406,7 @@ export default class UsersSubsystem extends SubSystem {
             is_email_verified - is the user's chosen contact email verified to be theirs (boolean)
             socials - the user's chosen social media links in the format '[name]:-:[url]' as such, the string ':-:' must not be in either [name] or [url] (string[])
             hashed_password - the user's password after it has been hashed by bun (string)
+            two_factor_otp_secret - the user's secret string used to verify 2fa opt codes
         */
         await db`CREATE TABLE IF NOT EXISTS Users (
             id SERIAL PRIMARY KEY,
@@ -419,7 +420,8 @@ export default class UsersSubsystem extends SubSystem {
             is_administrator BOOL DEFAULT FALSE,
             is_email_verified BOOL DEFAULT FALSE,
             socials TEXT[] DEFAULT '{}',
-            hashed_password TEXT
+            hashed_password TEXT,
+            two_factor_otp_secret TEXT
         )`;
 
         let administratorUserId = await this.createUser("admin");

@@ -1,6 +1,6 @@
 import UKButton from "@tcsw/uikit-solid/src/components/button/UKButton.jsx";
 import UKStackItem from "@tcsw/uikit-solid/src/components/stack/UKStackItem.jsx";
-import {createResource, type Component} from "solid-js";
+import {createResource, Suspense, type Component} from "solid-js";
 import trpc from "../../../../lib/trpc";
 import styles from "./MethodTwoFactor.module.scss"
 import UKText from "@tcsw/uikit-solid/src/components/text/UKText.jsx";
@@ -22,19 +22,21 @@ const MethodTwoFactor: Component = () => {
             }}
             inlineComponent={hasPassword() && <UKIcon class={styles.enabledIcon}>check</UKIcon>}
             expandedComponent={
-                <div class={styles.expanded}>
-                    <UKText role="body" size="m">
-                        Use an OTP passcode to verify it's really you trying to login.
-                    </UKText>
-                    <UKButton
-                        class={styles.button}
-                        onClick={async () => {
-                            return 0
-                        }}
-                    >
-                        {hasPassword() ? "Reset" : "Set"} OTP two factor
-                    </UKButton>
-                </div>
+                <Suspense>
+                    <div class={styles.expanded}>
+                        <UKText role="body" size="m">
+                            Use an OTP passcode to verify it's really you trying to login.
+                        </UKText>
+                        <UKButton
+                            class={styles.button}
+                            onClick={async () => {
+                                return 0
+                            }}
+                        >
+                            {hasPassword() ? "Reset" : "Set"} OTP two factor
+                        </UKButton>
+                    </div>
+                </Suspense>
             }
         />
     );

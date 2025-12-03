@@ -5,12 +5,14 @@ import { AuthorizedDeviceType } from "./authorization.js";
 import type { FetchCreateContextFnOptions } from "@trpc/server/adapters/fetch";
 import { WorkspacesNotificationEventEmitterEvent, type WorkspacesNotification } from "./notifications.js";
 import { on } from "node:events";
+import type { Server } from "bun";
 
-export const createTRPCContext = (instance: Instance) => (opt: FetchCreateContextFnOptions) => {
+export const createTRPCContext = (instance: Instance) => (opt: FetchCreateContextFnOptions, server: Server<{}>) => {
     return {
         rawRequest: {
             req: opt.req,
             resHeaders: opt.resHeaders,
+            server: server,
         },
         instance: instance,
     };
@@ -142,6 +144,8 @@ export const workspacesRouter = t.router({
                     user.userId,
                     opt.input.password,
                     AuthorizedDeviceType.UnknownBrowser,
+                    undefined,
+                    opt.ctx.rawRequest.server.requestIP(opt.ctx.rawRequest.req)?.address,
                 );
 
                 if (session === undefined) {
@@ -179,6 +183,8 @@ export const workspacesRouter = t.router({
                     user.userId,
                     opt.input.password,
                     AuthorizedDeviceType.UnknownBrowser,
+                    undefined,
+                    opt.ctx.rawRequest.server.requestIP(opt.ctx.rawRequest.req)?.address,
                 );
 
                 if (session === undefined) {

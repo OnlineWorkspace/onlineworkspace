@@ -17,7 +17,7 @@ const UKStackItem: Component<{
     labelText?: string;
     supportingText?: string;
 }> = (props) => {
-    const [expanded, setExpanded] = createSignal<boolean>(false);
+    const [ expanded, setExpanded ] = createSignal<boolean>(false);
 
     if (!!props.expandedComponent && props.onClick) {
         console.error("Cannot have a UKStackItem with both expandedComponent & onClick");
@@ -137,9 +137,7 @@ const UKStackItem: Component<{
                     </div>
                 </Match>
             </Switch>
-            <Suspense>
-                {expanded() && props.expandedComponent}
-            </Suspense>
+            {expanded() && props.expandedComponent}
         </div>
     );
 };

@@ -1,6 +1,6 @@
 import UKButton from "@tcsw/uikit-solid/src/components/button/UKButton.jsx";
 import UKStackItem from "@tcsw/uikit-solid/src/components/stack/UKStackItem.jsx";
-import {createResource, type Component} from "solid-js";
+import {createResource, Suspense, type Component} from "solid-js";
 import trpc from "../../../../lib/trpc";
 import styles from "./MethodPasskey.module.scss"
 import UKText from "@tcsw/uikit-solid/src/components/text/UKText.jsx";
@@ -22,19 +22,22 @@ const MethodPasskey: Component = () => {
             }}
             inlineComponent={hasPassword() && <UKIcon class={styles.enabledIcon}>check</UKIcon>}
             expandedComponent={
+                <Suspense>
                 <div class={styles.expanded}>
                     <UKText role="body" size="m">
                         Use a passkey to login to your Tricolor Workspaces account.
                     </UKText>
-                    <UKButton
+                        <UKButton
+                            disabled={!hasPassword()}
                         class={styles.button}
                         onClick={async () => {
                             return 0
                         }}
                     >
-                        {hasPassword() ? "Reset" : "Set"} passkey
+                            Enable experimental passkey support
                     </UKButton>
-                </div>
+                    </div>
+                </Suspense>
             }
         />
     );

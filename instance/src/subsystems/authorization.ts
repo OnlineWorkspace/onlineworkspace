@@ -8,6 +8,9 @@ export enum AuthorizedDeviceType {
     UnknownBrowser,
 }
 
+// the number of ms that a login session is valid for
+export const SESSION_VALID_TERM_MS = 7 * 24 * 60 * 60 * 1000;
+
 export default class AuthorizationSubsystem extends SubSystem {
     constructor(instance: Instance) {
         super("authorization", instance);
@@ -17,7 +20,13 @@ export default class AuthorizationSubsystem extends SubSystem {
 
     // Creates a new session for a user
     // @returns {string} the new session's sessionToken
-    async createSession(userId: number, password: string, deviceId: AuthorizedDeviceType): Promise<string | undefined> {
+    async createSession(
+        userId: number,
+        password: string,
+        deviceId: AuthorizedDeviceType,
+        otpCode?: string,
+        ipAddress?: string,
+    ): Promise<string | undefined> {
         try {
             const usersDb = this.instance.subSystems.database.db();
 
@@ -33,8 +42,7 @@ export default class AuthorizationSubsystem extends SubSystem {
 
             const sessionToken = crypto.getRandomValues(new Uint32Array(16)).join("");
 
-            // valid for 7 days?
-            await sessionsDb`INSERT INTO Sessions (user_id, session_token, device_id, valid_until) VALUES (${userId}, ${sessionToken}, ${deviceId}, ${Date.now() + 7 * 24 * 60 * 60 * 1000})`;
+            await sessionsDb`INSERT INTO Sessions (user_id, session_token, device_type, valid_until, ip_address) VALUES (${userId}, ${sessionToken}, ${deviceId}, ${Date.now() + SESSION_VALID_TERM_MS}, ${ipAddress || "Anonymous"})`;
 
             const user = await this.instance.subSystems.users.getUserById(userId);
 
@@ -148,14 +156,15 @@ export default class AuthorizationSubsystem extends SubSystem {
         // session_id - the id of the session (number)
         // user_id - the id of the user (number)
         // session_token - the session's access token in the format 'workspaces_session:[user_id]:[token]' (string)
-        // device_id - the session's device type (AuthorizedDeviceType)
+        // device_type - the session's device type (AuthorizedDeviceType)
         // valid_until - the epoch time which when reached, the session will be invalid (number)
         await db`CREATE TABLE IF NOT EXISTS Sessions (
             session_id SERIAL PRIMARY KEY,
             user_id INTEGER,
             session_token TEXT,
-            device_id INTEGER,
-            valid_until BIGINT
+            device_type INTEGER,
+            valid_until BIGINT,
+            ip_address TEXT DEFAULT 'Anonymous'
         )`;
 
         return true;

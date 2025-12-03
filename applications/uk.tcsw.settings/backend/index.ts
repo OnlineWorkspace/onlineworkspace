@@ -1,3 +1,7 @@
+/// <reference path="./global.d.ts" />
+
+import { SESSION_VALID_TERM_MS } from "./node_modules/@tcsw/workspaces-instance/src/subsystems/authorization";
+import { AuthorizedDeviceType } from "@tcsw/workspaces-instance/src/subsystems/authorization";
 import { createTRPCContext, procedure } from "@tcsw/workspaces-instance/src/subsystems/trpcRouter";
 import { initTRPC } from "@trpc/server";
 import z from "zod";
@@ -82,6 +86,41 @@ const router = t.router({
 
             return instance.subSystems.authorization.hasPassword(user?.userId);
         }),
+        getSessions: procedure
+            .output(
+                z
+                    .object({
+                        sessionId: z.number(),
+                        deviceType: z.enum(AuthorizedDeviceType),
+                        firstLoginTimestamp: z.number(),
+                        ipAddress: z.string(),
+                    })
+                    .array(),
+            )
+            .query(async (opt) => {
+                const user = await opt.ctx.instance.subSystems.users.getUserById(opt.ctx.userId);
+
+                if (!user) return [];
+
+                const db = instance.subSystems.database.db();
+
+                const sessions =
+                    (await db`SELECT session_id, device_type, valid_until, ip_address FROM Sessions WHERE user_id = ${user.userId}`) as {
+                        session_id: number;
+                        device_type: AuthorizedDeviceType;
+                        valid_until: number;
+                        ip_address: string;
+                    }[];
+
+                return sessions.map((s) => {
+                    return {
+                        sessionId: s.session_id,
+                        deviceType: s.device_type,
+                        firstLoginTimestamp: s.valid_until - SESSION_VALID_TERM_MS,
+                        ipAddress: s.ip_address,
+                    };
+                });
+            }),
     },
 });
 

@@ -22,7 +22,8 @@ const MethodPassword: Component = () => {
             }}
             inlineComponent={hasPassword() && <UKIcon class={styles.enabledIcon}>check</UKIcon>}
             expandedComponent={
-                <div class={styles.expanded}>
+                <Suspense>
+                    <div class={styles.expanded}>
                     <UKText role="body" size="m">
                         Use a password to login to your Tricolor Workspaces account.
                     </UKText>
@@ -34,7 +35,8 @@ const MethodPassword: Component = () => {
                     >
                         {hasPassword() ? "Reset" : "Set"} password
                     </UKButton>
-                </div>
+                    </div>
+                </Suspense>
             }
         />
     );

@@ -9,7 +9,7 @@ export default class TRPCSubsystem extends SubSystem {
     registeredRouters: {
         basePath: string;
         router: TRPCBuiltRouter<any, any>;
-        createContext: (opts: FetchCreateContextFnOptions) => object;
+        createContext: (opts: FetchCreateContextFnOptions, server: Server<ReturnType<typeof createTRPCContext>>) => object;
     }[];
 
     constructor(instance: Instance) {
@@ -24,7 +24,7 @@ export default class TRPCSubsystem extends SubSystem {
         return true;
     }
 
-    private attemptTRPCRequest(req: BunRequest) {
+    private attemptTRPCRequest(req: BunRequest, server: Server<ReturnType<typeof createTRPCContext>>) {
         const url = new URL(req.url);
 
         for (const router of this.registeredRouters) {
@@ -33,7 +33,7 @@ export default class TRPCSubsystem extends SubSystem {
             }
 
             return fetchRequestHandler({
-                createContext: router.createContext,
+                createContext: (opts) => router.createContext(opts, server),
                 req,
                 endpoint: router.basePath ?? "",
                 router: router.router,
@@ -75,7 +75,7 @@ export default class TRPCSubsystem extends SubSystem {
                     });
                 }
 
-                let trpcResponse = await self.attemptTRPCRequest(req);
+                let trpcResponse = await self.attemptTRPCRequest(req, server);
 
                 if (trpcResponse) {
                     trpcResponse.headers.set("Access-Control-Allow-Origin", "http://localhost:5173");

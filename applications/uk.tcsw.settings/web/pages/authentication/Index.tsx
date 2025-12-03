@@ -5,6 +5,7 @@ import UKText from "@tcsw/uikit-solid/src/components/text/UKText.jsx";
 import MethodPassword from "./components/MethodPassword/MethodPassword";
 import MethodTwoFactor from "./components/MethodTwoFactor/MethodTwoFactor";
 import MethodPasskey from "./components/MethodPasskey/MethodPasskey";
+import Sessions from "./components/Sessions/Sessions";
 
 const AuthenticationPage: Component = () => {
     return <div class={styles.root}>
@@ -20,7 +21,7 @@ const AuthenticationPage: Component = () => {
             Logged in devices
         </UKText>
         <UKStack>
-
+            <Sessions />
         </UKStack>
     </div>;
 };
