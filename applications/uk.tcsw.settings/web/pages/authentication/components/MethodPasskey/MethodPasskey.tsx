@@ -7,7 +7,7 @@ import UKText from "@tcsw/uikit-solid/src/components/text/UKText.jsx";
 import UKIcon from "@tcsw/uikit-solid/src/components/icon/UKIcon.jsx";
 
 const MethodPasskey: Component = () => {
-    const [ hasPassword, {refetch: refetchHasPassword} ] = createResource(() => trpc.authentication.hasPassword.query());
+    const [ hasPasskey, {refetch: refetchHasPasskey} ] = createResource(() => trpc.authentication.hasPasskey.query());
 
     return (
         <UKStackItem
@@ -16,26 +16,26 @@ const MethodPasskey: Component = () => {
                 value: "passkey",
             }}
             labelText="Login with Passkey"
-            supportingText={hasPassword() ? "You have password authentication enabled" : "Setup password authentication"}
+            supportingText={hasPasskey() ? "You have passkey authentication enabled" : "Setup passkey authentication"}
             onCollapse={() => {
-                refetchHasPassword();
+                refetchHasPasskey();
             }}
-            inlineComponent={hasPassword() && <UKIcon class={styles.enabledIcon}>check</UKIcon>}
+            inlineComponent={hasPasskey() && <UKIcon class={styles.enabledIcon}>check</UKIcon>}
             expandedComponent={
                 <Suspense>
-                <div class={styles.expanded}>
-                    <UKText role="body" size="m">
-                        Use a passkey to login to your Tricolor Workspaces account.
-                    </UKText>
+                    <div class={styles.expanded}>
+                        <UKText role="body" size="m">
+                            Use a passkey to login to your Tricolor Workspaces account.
+                        </UKText>
                         <UKButton
-                            disabled={!hasPassword()}
-                        class={styles.button}
-                        onClick={async () => {
-                            return 0
-                        }}
-                    >
+                            disabled={true}
+                            class={styles.button}
+                            onClick={async () => {
+                                return 0
+                            }}
+                        >
                             Enable experimental passkey support
-                    </UKButton>
+                        </UKButton>
                     </div>
                 </Suspense>
             }

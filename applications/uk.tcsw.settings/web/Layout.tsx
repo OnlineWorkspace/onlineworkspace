@@ -13,7 +13,7 @@ const Layout: Component<ParentProps> = (props) => {
             expanded={true}
             items={[
                 {
-                    icon: "home",
+                    icon: {type: "icon", value: "home"},
                     label: "Overview",
                     onClick() {
                         navigate("/app/uk.tcsw.settings");
@@ -21,7 +21,7 @@ const Layout: Component<ParentProps> = (props) => {
                     active: location.pathname === "/app/uk.tcsw.settings",
                 },
                 {
-                    icon: "person",
+                    icon: {type: "icon", value: "person"},
                     label: "Profile",
                     onClick() {
                         navigate("/app/uk.tcsw.settings/profile");
@@ -29,7 +29,7 @@ const Layout: Component<ParentProps> = (props) => {
                     active: location.pathname === "/app/uk.tcsw.settings/profile",
                 },
                 {
-                    icon: "passkey",
+                    icon: {type: "icon", value: "passkey"},
                     label: "Authentication",
                     onClick() {
                         navigate("/app/uk.tcsw.settings/authentication");
@@ -37,7 +37,7 @@ const Layout: Component<ParentProps> = (props) => {
                     active: location.pathname === "/app/uk.tcsw.settings/authentication",
                 },
                 {
-                    icon: "storage",
+                    icon: {type: "icon", value: "storage"},
                     label: "Storage",
                     onClick() {
                         navigate("/app/uk.tcsw.settings/storage");
@@ -45,7 +45,7 @@ const Layout: Component<ParentProps> = (props) => {
                     active: location.pathname === "/app/uk.tcsw.settings/storage",
                 },
                 {
-                    icon: "wallpaper",
+                    icon: {type: "icon", value: "wallpaper"},
                     label: "Customization",
                     onClick() {
                         navigate("/app/uk.tcsw.settings/customization");
@@ -53,7 +53,7 @@ const Layout: Component<ParentProps> = (props) => {
                     active: location.pathname === "/app/uk.tcsw.settings/customization",
                 },
                 {
-                    icon: "settings_applications",
+                    icon: {type: "icon", value: "settings_applications"},
                     label: "Configure Instance",
                     onClick() {
                         navigate("/app/uk.tcsw.settings/instance");

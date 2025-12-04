@@ -121,6 +121,33 @@ class Instance {
                             );
                         },
                     },
+                    "/api/application/:app/icon/": {
+                        GET: async (req: BunRequest) => {
+                            const app = (req.params as { app: string }).app;
+
+                            const cookieString = req.headers?.get("cookie");
+
+                            if (cookieString === null) {
+                                throw Response.json({ code: "UNAUTHORIZED", message: "missing auth cookie" });
+                            }
+
+                            const parsedCookie = Bun.Cookie.parse(cookieString);
+
+                            let userId = await self.subSystems.authorization.verifySession(decodeURIComponent(parsedCookie.value));
+
+                            if (userId === undefined) {
+                                throw Response.json({ code: "UNAUTHORIZED", message: "invalid session" });
+                            }
+
+                            let application = this.subSystems.applications.availableApplications.find((a) => a.manifest?.id === app);
+
+                            if (!application) return Response.json({ code: "INTERNAL_ERROR", message: "Invalid application!" });
+
+                            let applicationIconPath = path.join(application.path, application.manifest?.icon?.value || "");
+
+                            return new Response(file(path.join(applicationIconPath)));
+                        },
+                    },
                 },
                 fetch(_request, _server) {
                     // will be executed if it's not a TRPC request

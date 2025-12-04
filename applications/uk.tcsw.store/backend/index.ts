@@ -29,17 +29,30 @@ const router = t.router({
                     enabledApplications: z.string().array(),
                 }),
             )
-            .query(async () => {
+            .query(async (opt) => {
                 return {
                     applications: instance.subSystems.applications.availableApplications
                         .map((app) => {
                             if (!app.manifest) return undefined;
 
+                            let icon = { type: "icon" as "icon" | "image", value: "indeterminate_question_box" };
+
+                            if (app.manifest?.icon) {
+                                if (app.manifest.icon.type === "image") {
+                                    icon = {
+                                        type: "image",
+                                        value: `${opt.ctx.rawRequest.destinationHostname}api/application/${app.manifest.id}/icon/`,
+                                    };
+                                } else {
+                                    icon = app.manifest.icon;
+                                }
+                            }
+
                             return {
                                 id: app.manifest.id,
                                 displayName: app.manifest.displayName || app.manifest.id,
                                 version: app.manifest.version || "rolling",
-                                icon: app.manifest.icon || { type: "icon", value: "indeterminate_question_box" },
+                                icon: icon,
                                 description: app.manifest.description || "Description not supplied",
                             };
                         })

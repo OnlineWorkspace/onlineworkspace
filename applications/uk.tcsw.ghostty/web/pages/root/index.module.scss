@@ -1,0 +1,29 @@
+.root {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2rem;
+    padding: 1rem;
+    width: 100%;
+    height: 100%;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.welcomeMessage {
+    background: #0001;
+    padding: 1.5rem;
+    border-radius: var(--uk-sys-shape-corner-medium);
+    backdrop-filter: blur(0.5rem);
+}
+
+.widgets {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr 1fr;
+    background: #0002;
+    padding: 1rem;
+    border-radius: calc(var(--uk-sys-shape-corner-medium) + 1rem);
+}

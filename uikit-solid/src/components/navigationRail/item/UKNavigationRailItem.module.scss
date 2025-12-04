@@ -37,6 +37,23 @@
             margin-bottom var(--uk-sys-motion-duration-250) var(--uk-sys-motion-easing-emphasized-decelerate);
     }
 
+    & .imageIcon {
+        margin: 0;
+
+        width: 24px;
+        height: 24px;
+
+        transition:
+            width var(--uk-sys-motion-duration-250) var(--uk-sys-motion-easing-emphasized-decelerate),
+            height var(--uk-sys-motion-duration-250) var(--uk-sys-motion-easing-emphasized-decelerate),
+            background-color var(--uk-sys-motion-duration-250) var(--uk-sys-motion-easing-emphasized-decelerate),
+            color var(--uk-sys-motion-duration-250) var(--uk-sys-motion-easing-emphasized-decelerate),
+            margin-left var(--uk-sys-motion-duration-250) var(--uk-sys-motion-easing-emphasized-decelerate),
+            margin-right var(--uk-sys-motion-duration-250) var(--uk-sys-motion-easing-emphasized-decelerate),
+            margin-top var(--uk-sys-motion-duration-250) var(--uk-sys-motion-easing-emphasized-decelerate),
+            margin-bottom var(--uk-sys-motion-duration-250) var(--uk-sys-motion-easing-emphasized-decelerate);
+    }
+
     & .label {
         color: rgb(var(--uk-sys-color-on-surface-variant));
         position: absolute;
@@ -73,6 +90,11 @@
         & .icon {
             width: 1.5rem;
         }
+
+        & .imageIcon {
+            width: 1.5rem;
+            height: 1.5rem;
+        }
     }
 
     &[data-expanded="false"] {
@@ -85,6 +107,13 @@
             margin-left: 1.25rem;
             margin-right: 1.25rem;
             border-radius: 10rem;
+        }
+
+        & .imageIcon {
+            margin-top: 0.25rem;
+            margin-bottom: 0.25rem;
+            margin-left: 1.25rem;
+            margin-right: 1.25rem;
         }
 
         & .badge {

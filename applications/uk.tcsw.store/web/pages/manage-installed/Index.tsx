@@ -1,23 +1,23 @@
 import UKText from "@tcsw/uikit-solid/src/components/text/UKText.jsx";
-import { createEffect, createResource, createSignal, For, type Component } from "solid-js";
+import {createEffect, createResource, createSignal, For, type Component} from "solid-js";
 import styles from "./Index.module.scss";
 import UKIconButton from "@tcsw/uikit-solid/src/components/iconButton/UKIconButton.jsx";
 import trpc from "../../lib/trpc";
 import UKButton from "@tcsw/uikit-solid/src/components/button/UKButton.jsx";
 import UKDivider from "@tcsw/uikit-solid/src/components/divider/UKDivider.jsx";
-import { DividerDirection } from "@tcsw/uikit-solid/src/components/divider/lib/direction.js";
+import {DividerDirection} from "@tcsw/uikit-solid/src/components/divider/lib/direction.js";
 import UKStack from "@tcsw/uikit-solid/src/components/stack/UKStack.jsx";
 import UKSwitch from "@tcsw/uikit-solid/src/components/switch/UKSwitch.jsx";
 import UKStackItem from "@tcsw/uikit-solid/src/components/stack/UKStackItem.jsx";
 import UKIcon from "@tcsw/uikit-solid/src/components/icon/UKIcon.jsx";
 
 const ManageInstalledPage: Component = () => {
-    const [selectionMode, setSelectionMode] = createSignal<boolean>(false);
-    const [selectedApplicationIds, setSelectedApplicationIds] = createSignal<string[]>([]);
-    const [installedApplications, { refetch: refetchInstalledApplications }] = createResource(() =>
+    const [ selectionMode, setSelectionMode ] = createSignal<boolean>(false);
+    const [ selectedApplicationIds, setSelectedApplicationIds ] = createSignal<string[]>([]);
+    const [ installedApplications, {refetch: refetchInstalledApplications} ] = createResource(() =>
         trpc.manageInstalled.getApplications.query(),
     );
-    const [enabledApplications, setEnabledApplications] = createSignal<string[]>([]);
+    const [ enabledApplications, setEnabledApplications ] = createSignal<string[]>([]);
 
     createEffect(() => {
         setEnabledApplications(installedApplications()?.enabledApplications || []);
@@ -35,7 +35,7 @@ const ManageInstalledPage: Component = () => {
                             disabled={selectedApplicationIds().length < 1}
                             leadingIcon={"delete"}
                             onClick={async () => {
-                                await trpc.manageInstalled.uninstallApplications.mutate({ applications: selectedApplicationIds() });
+                                await trpc.manageInstalled.uninstallApplications.mutate({applications: selectedApplicationIds()});
                                 await refetchInstalledApplications();
                                 setSelectedApplicationIds([]);
                                 setSelectionMode(false);
@@ -78,8 +78,8 @@ const ManageInstalledPage: Component = () => {
                             <UKStackItem
                                 leading={
                                     app.icon.type === "icon"
-                                        ? { type: "icon" as const, value: app.icon.value }
-                                        : { type: "image" as const, value: "unknown", alt: "" }
+                                        ? {type: "icon" as const, value: app.icon.value}
+                                        : {type: "image" as const, value: app.icon.value, alt: ""}
                                 }
                                 supportingText={`(${app.id}) - ${app.description}`}
                                 labelText={app.displayName}
@@ -90,7 +90,7 @@ const ManageInstalledPage: Component = () => {
                                             class={styles.stackSwitch}
                                             getValue={(val) => {
                                                 if (val) {
-                                                    setEnabledApplications((prev) => [...prev, app.id]);
+                                                    setEnabledApplications((prev) => [ ...prev, app.id ]);
                                                     return;
                                                 }
 
@@ -107,12 +107,12 @@ const ManageInstalledPage: Component = () => {
                                 onClick={
                                     selectionMode()
                                         ? () => {
-                                              if (!selectedApplicationIds().includes(app.id)) {
-                                                  setSelectedApplicationIds((prev) => [...prev, app.id]);
-                                              } else {
-                                                  setSelectedApplicationIds((prev) => prev.filter((i) => i !== app.id));
-                                              }
-                                          }
+                                            if (!selectedApplicationIds().includes(app.id)) {
+                                                setSelectedApplicationIds((prev) => [ ...prev, app.id ]);
+                                            } else {
+                                                setSelectedApplicationIds((prev) => prev.filter((i) => i !== app.id));
+                                            }
+                                        }
                                         : undefined
                                 }
                             />
@@ -170,7 +170,7 @@ const ManageInstalledPage: Component = () => {
             <div class={styles.actions}>
                 <UKButton
                     onClick={async () => {
-                        await trpc.manageInstalled.setEnabledApplications.mutate({ enabledApplications: enabledApplications() });
+                        await trpc.manageInstalled.setEnabledApplications.mutate({enabledApplications: enabledApplications()});
                     }}
                     color={"filled"}
                     size={"s"}

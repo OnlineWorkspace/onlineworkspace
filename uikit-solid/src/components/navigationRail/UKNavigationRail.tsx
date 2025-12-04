@@ -17,7 +17,7 @@ const UKNavigationRail: Component<
             onClick: () => void;
         }[];
         items?: {
-            icon: string;
+            icon: {type: "icon" | "image", value: string};
             imageIcon?: string;
             label: string;
             onClick: () => void;

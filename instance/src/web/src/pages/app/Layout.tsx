@@ -1,6 +1,6 @@
-import { createEffect, createResource, createSignal, Suspense, type Component } from "solid-js";
+import {createEffect, createResource, createSignal, Suspense, type Component} from "solid-js";
 import styles from "./Layout.module.scss";
-import { useLocation, useNavigate, type RouteSectionProps } from "@solidjs/router";
+import {useLocation, useNavigate, type RouteSectionProps} from "@solidjs/router";
 import UKIndeterminateSpinner from "@tcsw/uikit-solid/src/components/indeterminateSpinner/UKIndeterminateSpinner.jsx";
 import UKNavigationRail from "@tcsw/uikit-solid/src/components/navigationRail/UKNavigationRail.jsx";
 import NavigationRailAvatar from "./navigationRailAvatar/NavigationRailAvatar";
@@ -12,15 +12,19 @@ import NavigationRailNotifications from "./navigationRailNotifications/Navigatio
 const AppLayout: Component<RouteSectionProps<unknown>> = (props) => {
     const location = useLocation();
     const navigate = useNavigate();
-    const [quickShortcuts] = createResource(() => trpc.app.navigation.quickShortcuts.query());
+    const [ quickShortcuts ] = createResource(() => trpc.app.navigation.quickShortcuts.query());
 
-    const [expanded, setExpanded] = createSignal<boolean>(false);
+    const [ expanded, setExpanded ] = createSignal<boolean>(false);
 
     createEffect(() => {
         // @ts-ignore
-        trpc.app.notifications.listener.subscribe(undefined, (opt) => {
+        let subscription = trpc.app.notifications.listener.subscribe(undefined, (opt) => {
             console.log(opt);
         });
+
+        return (() => {
+            subscription.unsubscribe()
+        })
     });
 
     return (
@@ -30,7 +34,7 @@ const AppLayout: Component<RouteSectionProps<unknown>> = (props) => {
             items={[
                 ...(quickShortcuts() || []).map((sc) => {
                     return {
-                        icon: sc.icon.value || "indeterminate_question_box",
+                        icon: sc.icon || {type: "icon", value: "indeterminate_question_box"},
                         label: sc.label,
                         active: location.pathname.startsWith(sc.location.value),
                         onClick() {

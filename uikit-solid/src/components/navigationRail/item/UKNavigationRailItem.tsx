@@ -1,12 +1,11 @@
-import type { Component } from "solid-js";
+import type {Component} from "solid-js";
 import UKText from "../../text/UKText";
 import UKBadge from "../../badge/UKBadge";
 import UKIcon from "../../icon/UKIcon";
 import styles from "./UKNavigationRailItem.module.scss";
 
 const UKNavigationRailItem: Component<{
-    icon: string;
-    imageIcon?: string;
+    icon: {type: "icon" | "image", value: string};
     label: string;
     onClick: () => void;
     onMiddleClick?: () => void;
@@ -22,10 +21,10 @@ const UKNavigationRailItem: Component<{
             }
         }}>
             {props.badgeCount === undefined ? (
-                <>{props.imageIcon !== undefined ? <img /> : <UKIcon class={styles.icon}>{props.icon}</UKIcon>}</>
+                <>{props.icon.type === "image" ? <img class={styles.imageIcon} src={props.icon.value} /> : <UKIcon class={styles.icon}>{props.icon.value}</UKIcon>}</>
             ) : (
                 <UKBadge class={styles.badge} count={props.badgeCount}>
-                    <>{props.imageIcon !== undefined ? <img /> : <UKIcon class={styles.icon}>{props.icon}</UKIcon>}</>
+                        <>{props.icon.type === "image" ? <img class={styles.imageIcon} src={props.icon.value} /> : <UKIcon class={styles.icon}>{props.icon.value}</UKIcon>}</>
                 </UKBadge>
             )}
             <UKText class={styles.label} role="label" size={props.expanded ? "m" : "s"}>

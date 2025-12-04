@@ -6,12 +6,20 @@ import type { FetchCreateContextFnOptions } from "@trpc/server/adapters/fetch";
 import { WorkspacesNotificationEventEmitterEvent, type WorkspacesNotification } from "./notifications.js";
 import { on } from "node:events";
 import type { Server } from "bun";
+import path from "node:path/posix";
 
 export const createTRPCContext = (instance: Instance) => (opt: FetchCreateContextFnOptions, server: Server<{}>) => {
+    let originUrl = new URL(opt.req.url);
+
+    originUrl.pathname = "";
+    originUrl.search = "";
+    originUrl.hash = "";
+
     return {
         rawRequest: {
             req: opt.req,
             resHeaders: opt.resHeaders,
+            destinationHostname: originUrl.toString(),
             server: server,
         },
         instance: instance,
@@ -24,10 +32,10 @@ export const t = initTRPC.context<ReturnType<typeof createTRPCContext>>().create
             // Enable periodic ping messages to keep connection alive
             enabled: true,
             // Send ping message every 2s
-            intervalMs: 2_000,
+            intervalMs: 4000,
         },
         client: {
-            reconnectAfterInactivityMs: 3_000,
+            reconnectAfterInactivityMs: 5000,
         },
     },
 });
@@ -67,6 +75,19 @@ export const procedure = t.procedure.use(async (opt) => {
             userId: userId,
         },
     });
+});
+export const adminProcedure = procedure.use(async (opt) => {
+    const user = await opt.ctx.instance.subSystems.users.getUserById(opt.ctx.userId);
+
+    if (!user) {
+        throw new TRPCError({ code: "UNAUTHORIZED", message: "invalid session" });
+    }
+
+    if (!(await user.isAdministrator())) {
+        throw new TRPCError({ code: "UNAUTHORIZED", message: "user lacks administrator permissions" });
+    }
+
+    return opt.next();
 });
 
 let notifications: WorkspacesNotification[] = [];
@@ -275,10 +296,18 @@ export const workspacesRouter = t.router({
                     let quickShortcuts = opt.ctx.instance.subSystems.applications.getEnabledApplications();
 
                     return quickShortcuts.map((app) => {
-                        let icon: { type: "icon"; value: string } = { type: "icon", value: "indeterminate_question_box" };
+                        let icon = { type: "icon" as "icon" | "image", value: "indeterminate_question_box" };
 
-                        // @ts-ignore
-                        if (app.manifest?.icon) icon = app.manifest.icon;
+                        if (app.manifest?.icon) {
+                            if (app.manifest.icon.type === "image") {
+                                icon = {
+                                    type: "image",
+                                    value: `${opt.ctx.rawRequest.destinationHostname}api/application/${app.manifest.id}/icon/`,
+                                };
+                            } else {
+                                icon = app.manifest.icon;
+                            }
+                        }
 
                         return {
                             icon: icon,

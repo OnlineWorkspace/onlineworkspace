@@ -86,6 +86,14 @@ const router = t.router({
 
             return instance.subSystems.authorization.hasPassword(user?.userId);
         }),
+        hasTwoFactor: procedure.output(z.boolean()).query(async (opt) => {
+            // TODO: implement this
+            return false;
+        }),
+        hasPasskey: procedure.output(z.boolean()).query(async (opt) => {
+            // TODO: implement this
+            return false;
+        }),
         getSessions: procedure
             .output(
                 z
@@ -120,6 +128,35 @@ const router = t.router({
                         ipAddress: s.ip_address,
                     };
                 });
+            }),
+    },
+    instance: {
+        getUsers: procedure
+            .output(
+                z
+                    .object({
+                        id: z.number(),
+                        username: z.string(),
+                        fullName: z.object({ forename: z.string().optional(), surname: z.string().optional() }),
+                        email: z.string().optional(),
+                        isAdministrator: z.boolean(),
+                    })
+                    .array(),
+            )
+            .query(async (_opt) => {
+                const users = await instance.subSystems.users.getAllUsers();
+
+                return Promise.all(
+                    users.map(async (u) => {
+                        return {
+                            id: u.userId,
+                            username: (await u.getUsername()) || "unknown",
+                            fullName: await u.getFullName(),
+                            email: await u.getEmail(),
+                            isAdministrator: (await u.isAdministrator()) || false,
+                        };
+                    }),
+                );
             }),
     },
 });

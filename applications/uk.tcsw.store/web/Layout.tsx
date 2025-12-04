@@ -9,7 +9,7 @@ const Layout: Component<ParentProps> = (props) => {
     return <UKNavigationRail
         items={[
             {
-                icon: "editor_choice",
+                icon: {type: "icon", value: "editor_choice"},
                 label: "Promoted",
                 onClick() {
                     navigate("/app/uk.tcsw.store")
@@ -17,7 +17,7 @@ const Layout: Component<ParentProps> = (props) => {
                 active: location.pathname === "/app/uk.tcsw.store"
             },
             {
-                icon: "search",
+                icon: {type: "icon", value: "search"},
                 label: "Search",
                 onClick() {
                     navigate("/app/uk.tcsw.store/search")
@@ -25,7 +25,7 @@ const Layout: Component<ParentProps> = (props) => {
                 active: location.pathname === "/app/uk.tcsw.store/search"
             },
             {
-                icon: "category",
+                icon: {type: "icon", value: "category"},
                 label: "Categories",
                 onClick() {
                     navigate("/app/uk.tcsw.store/categories")
@@ -33,7 +33,7 @@ const Layout: Component<ParentProps> = (props) => {
                 active: location.pathname === "/app/uk.tcsw.store/categories"
             },
             {
-                icon: "apps",
+                icon: {type: "icon", value: "apps"},
                 label: "Installed",
                 onClick() {
                     navigate("/app/uk.tcsw.store/manage-installed")

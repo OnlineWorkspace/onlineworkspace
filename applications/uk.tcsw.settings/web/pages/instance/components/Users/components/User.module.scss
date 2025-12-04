@@ -1,0 +1,19 @@
+.expanded {
+    padding: 1rem;
+    display: flex;
+    gap: 1rem;
+    flex-direction: column;
+}
+
+.name {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.boolean {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    align-items: center;
+}
