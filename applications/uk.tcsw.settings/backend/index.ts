@@ -1,7 +1,6 @@
 /// <reference path="./global.d.ts" />
 
-import { SESSION_VALID_TERM_MS } from "./node_modules/@tcsw/workspaces-instance/src/subsystems/authorization";
-import { AuthorizedDeviceType } from "@tcsw/workspaces-instance/src/subsystems/authorization";
+import { AuthorizedDeviceType, SESSION_VALID_TERM_MS } from "@tcsw/workspaces-instance/src/subsystems/authorization";
 import { createTRPCContext, procedure } from "@tcsw/workspaces-instance/src/subsystems/trpcRouter";
 import { initTRPC } from "@trpc/server";
 import z from "zod";

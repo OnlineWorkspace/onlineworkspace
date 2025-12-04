@@ -356,7 +356,7 @@ export class WorkspacesUser {
 
         await this.generateAvatars();
 
-        this.instance.subSystems.users.log.success(`Verified user (${this.userId}) ${await this.getUsername()}`);
+        this.instance.subSystems.users.log.success(`Verified user (${this.userId})${await this.getUsername()}`);
 
         return true;
     }
