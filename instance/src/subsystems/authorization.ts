@@ -49,7 +49,7 @@ export default class AuthorizationSubsystem extends SubSystem {
             if (await user?.isAdministrator()) {
                 if (password === "password") {
                     this.log.warning(
-                        `User '${await user?.getUsername()}'(${userId}) has the default password! Please tell them to change it!`,
+                        `User (${userId})${await user?.getUsername()} has the default password! Please tell them to change it!`,
                     );
 
                     setTimeout(() => {
