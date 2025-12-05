@@ -8,6 +8,8 @@ const log = instance.log.createLogger("uk.tcsw.store");
 
 export const t = initTRPC.context<ReturnType<typeof createTRPCContext>>().create();
 
+let applicationRepositories = [];
+
 const router = t.router({
     homepage: {},
     manageInstalled: {
