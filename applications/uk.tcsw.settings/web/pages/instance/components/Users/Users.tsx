@@ -8,18 +8,20 @@ import User from "./components/User";
 const Users: Component = () => {
     const [ users ] = createResource(() => trpc.instance.getUsers.query())
 
-    return <>
-        <UKText class={instanceStyles.subheading} role="title" size="m" align="start">
-            Instance Users
-        </UKText>
-        <UKStack>
-            <For each={users()}>
-                {user => {
-                    return <User user={user} />
-                }}
-            </For>
-        </UKStack>
-    </>
+    return (
+        <>
+            <UKText class={instanceStyles.subheading} role="title" size="m" align="start">
+                Instance Users
+            </UKText>
+            <UKStack>
+                <For each={users()}>
+                    {(userId) => {
+                        return <User userId={userId} />;
+                    }}
+                </For>
+            </UKStack>
+        </>
+    );
 }
 
 export default Users

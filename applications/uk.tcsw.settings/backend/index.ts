@@ -1,8 +1,9 @@
 /// <reference path="./global.d.ts" />
 
+import { WorkspacesNotificationPriority } from "@tcsw/workspaces-instance/src/subsystems/notifications";
 import { SESSION_VALID_TERM_MS } from "./node_modules/@tcsw/workspaces-instance/src/subsystems/authorization";
 import { AuthorizedDeviceType } from "@tcsw/workspaces-instance/src/subsystems/authorization";
-import { createTRPCContext, procedure } from "@tcsw/workspaces-instance/src/subsystems/trpcRouter";
+import { adminProcedure, createTRPCContext, procedure } from "@tcsw/workspaces-instance/src/subsystems/trpcRouter";
 import { initTRPC } from "@trpc/server";
 import z from "zod";
 
@@ -131,7 +132,13 @@ const router = t.router({
             }),
     },
     instance: {
-        getUsers: procedure
+        getUsers: adminProcedure.output(z.number().array()).query(async (_opt) => {
+            const users = await instance.subSystems.users.getAllUsers();
+
+            return users.map((u) => u.userId);
+        }),
+        getUser: adminProcedure
+            .input(z.object({ userId: z.number() }))
             .output(
                 z
                     .object({
@@ -141,23 +148,121 @@ const router = t.router({
                         email: z.string().optional(),
                         isAdministrator: z.boolean(),
                     })
-                    .array(),
+                    .or(z.undefined()),
             )
-            .query(async (_opt) => {
-                const users = await instance.subSystems.users.getAllUsers();
+            .query(async (opt) => {
+                const u = await instance.subSystems.users.getUserById(opt.input.userId);
 
-                return Promise.all(
-                    users.map(async (u) => {
-                        return {
-                            id: u.userId,
-                            username: (await u.getUsername()) || "unknown",
-                            fullName: await u.getFullName(),
-                            email: await u.getEmail(),
-                            isAdministrator: (await u.isAdministrator()) || false,
-                        };
-                    }),
-                );
+                if (!u) return undefined;
+
+                return {
+                    id: u.userId,
+                    username: (await u.getUsername()) || "unknown",
+                    fullName: await u.getFullName(),
+                    email: await u.getEmail(),
+                    isAdministrator: (await u.isAdministrator()) || false,
+                };
             }),
+        user: {
+            getForename: adminProcedure
+                .input(z.number())
+                .output(z.string())
+                .query(async (opt) => {
+                    const forename = await (await opt.ctx.instance.subSystems.users.getUserById(opt.input))?.getForename();
+
+                    return `${forename}`;
+                }),
+            setForename: adminProcedure.input(z.object({ userId: z.number(), forename: z.string() })).mutation(async (opt) => {
+                await (await opt.ctx.instance.subSystems.users.getUserById(opt.input.userId))?.setForename(opt.input.forename);
+
+                return true;
+            }),
+            getSurname: adminProcedure
+                .input(z.number())
+                .output(z.string())
+                .query(async (opt) => {
+                    const surname = await (await opt.ctx.instance.subSystems.users.getUserById(opt.input))?.getSurname();
+
+                    return `${surname}`;
+                }),
+            setSurname: adminProcedure.input(z.object({ userId: z.number(), surname: z.string() })).mutation(async (opt) => {
+                await (await opt.ctx.instance.subSystems.users.getUserById(opt.input.userId))?.setSurname(opt.input.surname);
+
+                return true;
+            }),
+            getUsername: adminProcedure
+                .input(z.number())
+                .output(z.string())
+                .query(async (opt) => {
+                    const username = await (await opt.ctx.instance.subSystems.users.getUserById(opt.input))?.getUsername();
+
+                    return username || "unknown";
+                }),
+            setUsername: adminProcedure.input(z.object({ userId: z.number(), username: z.string() })).mutation(async (opt) => {
+                await (await opt.ctx.instance.subSystems.users.getUserById(opt.input.userId))?.setUsername(opt.input.username);
+
+                return true;
+            }),
+            getEmail: adminProcedure
+                .input(z.number())
+                .output(z.string())
+                .query(async (opt) => {
+                    const email = await (await opt.ctx.instance.subSystems.users.getUserById(opt.input))?.getEmail();
+
+                    return email || "unknown";
+                }),
+            setEmail: adminProcedure.input(z.object({ userId: z.number(), email: z.email() })).mutation(async (opt) => {
+                await (await opt.ctx.instance.subSystems.users.getUserById(opt.input.userId))?.setEmail(opt.input.email);
+
+                return true;
+            }),
+            getIsAdministrator: adminProcedure
+                .input(z.number())
+                .output(z.boolean())
+                .query(async (opt) => {
+                    const isAdministrator = await (await opt.ctx.instance.subSystems.users.getUserById(opt.input))?.isAdministrator();
+
+                    return isAdministrator || false;
+                }),
+            setIsAdministrator: adminProcedure.input(z.object({ userId: z.number(), administrator: z.boolean() })).mutation(async (opt) => {
+                await (await opt.ctx.instance.subSystems.users.getUserById(opt.ctx.userId))?.setIsAdministrator(opt.input.administrator);
+
+                return true;
+            }),
+            delete: adminProcedure.input(z.object({ userId: z.number() })).mutation(async (opt) => {
+                await (await opt.ctx.instance.subSystems.users.getUserById(opt.ctx.userId))?.delete();
+
+                return true;
+            }),
+            boop: adminProcedure.input(z.object({ userId: z.number() })).mutation(async (opt) => {
+                instance.subSystems.notifications.send(
+                    opt.input.userId,
+                    "commands.notify",
+                    WorkspacesNotificationPriority.Important,
+                    {
+                        title: "Boop",
+                        body: "You have been booped by an administrator!",
+                        icon: "person",
+                    },
+                    {
+                        buttons: [
+                            {
+                                id: "a",
+                                label: "label",
+                                type: "filled",
+                            },
+                            {
+                                id: "a",
+                                label: "label",
+                                type: "tonal",
+                            },
+                        ],
+                    },
+                );
+
+                return true;
+            }),
+        },
     },
 });
 
