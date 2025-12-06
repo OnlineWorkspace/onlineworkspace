@@ -1,0 +1,24 @@
+{
+    "id": "uk.tcsw.console",
+    "displayName": "Console",
+    "icon": {
+        "type": "icon",
+        "value": "terminal"
+    },
+    "description": "The administrator instance console as an application",
+    "authors": [
+        "Ghostty <https://github.com/ghostty-org>",
+        "Coder for ghostty-web <https://github.com/coder>",
+        "Tricolor Software <https://tcsw.uk>"
+    ],
+    "license": "MIT",
+    "source": "https://github.com/tricolorsoftware/workspaces/src/branch/main/packages/applications/uk.tcsw.console",
+    "modules": {
+        "web": {
+            "path": "./web"
+        },
+        "bun": {
+            "path": "./backend/index.ts"
+        }
+    }
+}

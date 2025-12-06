@@ -1,12 +1,13 @@
 import UKText from "@tcsw/uikit-solid/src/components/text/UKText.jsx";
-import {createResource, For, type Component} from "solid-js";
-import instanceStyles from "./../../Index.module.scss"
+import { createResource, For, type Component } from "solid-js";
+import instanceStyles from "./../../Index.module.scss";
 import trpc from "../../../../lib/trpc";
 import UKStack from "@tcsw/uikit-solid/src/components/stack/UKStack.jsx";
 import User from "./components/User";
+import UKStackItem from "@tcsw/uikit-solid/src/components/stack/UKStackItem.jsx";
 
 const Users: Component = () => {
-    const [ users ] = createResource(() => trpc.instance.getUsers.query())
+    const [users] = createResource(() => trpc.instance.getUsers.query());
 
     return (
         <>
@@ -20,8 +21,11 @@ const Users: Component = () => {
                     }}
                 </For>
             </UKStack>
+            <UKStack>
+                <UKStackItem labelText="Create user" expandedComponent={<div>Create user</div>} />
+            </UKStack>
         </>
     );
-}
+};
 
-export default Users
+export default Users;

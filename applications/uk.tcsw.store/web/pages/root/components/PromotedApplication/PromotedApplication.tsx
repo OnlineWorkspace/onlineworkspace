@@ -13,7 +13,13 @@ const PromotedApplication: Component<{ repository: string; applicationId: string
 
     return (
         <>
-            <UKCard color="filled" class={styles.root}>
+            <UKCard
+                color="filled"
+                class={styles.root}
+                onClick={() => {
+                    navigate(`/app/uk.tcsw.store/app/${props.repository}/${props.applicationId}`);
+                }}
+            >
                 <img src={result()?.bannerImage || "/assets/tricolor/tricolor.svg"} class={styles.backgroundImage} />
                 <div class={styles.footer}>
                     <UKText size="l" emphasized role="title">

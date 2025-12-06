@@ -1,4 +1,4 @@
-import { createEffect, createSignal, For, type Component } from "solid-js";
+import { createEffect, createSignal, For, onCleanup, onMount, type Component } from "solid-js";
 import trpc from "../../../lib/trpc";
 import { type WorkspacesNotification } from "../../../../../subsystems/notifications";
 import Notification from "./notification/Notification";
@@ -8,6 +8,7 @@ import UKText from "@tcsw/uikit-solid/src/components/text/UKText.jsx";
 import UKDivider from "@tcsw/uikit-solid/src/components/divider/UKDivider.jsx";
 import { DividerDirection } from "@tcsw/uikit-solid/src/components/divider/lib/direction.js";
 import { useNavigate } from "@solidjs/router";
+import type { Unsubscribable } from "@trpc/server/observable";
 
 const FLYOUT_NOTIFICATION_TIMEOUT = 10_000;
 
@@ -16,9 +17,10 @@ const NavigationRailNotifications: Component<{ expanded: boolean }> = (props) =>
     const [toggled, setToggled] = createSignal<boolean>(false);
     const [notifications, setNotifications] = createSignal<WorkspacesNotification[]>([]);
     const [flyoutNotifications, setFlyoutNotifications] = createSignal<WorkspacesNotification[]>([]);
+    let subscription: Unsubscribable;
 
-    createEffect(() => {
-        const subscription = trpc.app.notifications.listener.subscribe(undefined, {
+    onMount(() => {
+        subscription = trpc.app.notifications.listener.subscribe(undefined, {
             onData(data) {
                 // @ts-ignore
                 setFlyoutNotifications((not) => {
@@ -38,10 +40,10 @@ const NavigationRailNotifications: Component<{ expanded: boolean }> = (props) =>
                 }
             },
         });
+    });
 
-        return () => {
-            subscription.unsubscribe();
-        };
+    onCleanup(() => {
+        subscription.unsubscribe();
     });
 
     return (

@@ -41,6 +41,7 @@ const ApplicationPage: Component = () => {
                     {application()?.displayName}
                 </UKText>
                 <UKButton
+                    disabled={!application()?.isUserAdministrator}
                     class={styles.headerContentButton}
                     leadingIcon={application()?.isInstalled ? "delete" : "download"}
                     onClick={async () => {
