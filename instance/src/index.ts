@@ -16,6 +16,7 @@ import ApplicationsSubsystem from "./subsystems/applications.js";
 import path from "path";
 import TRPCSubsystem from "./subsystems/trpc.js";
 import chalk from "chalk";
+import ImageSubsystem from "./subsystems/image.js";
 
 export enum InstanceStatus {
     Online,
@@ -45,6 +46,7 @@ class Instance {
         this.subSystems.authorization = new AuthorizationSubsystem(this);
         this.subSystems.applications = new ApplicationsSubsystem(this);
         this.subSystems.tRPC = new TRPCSubsystem(this);
+        this.subSystems.image = new ImageSubsystem(this);
 
         this.status = InstanceStatus.Offline;
 
@@ -146,6 +148,34 @@ class Instance {
                             let applicationIconPath = path.join(application.path, application.manifest?.icon?.value || "");
 
                             return new Response(file(path.join(applicationIconPath)));
+                        },
+                    },
+                    "/api/asset/image/:imageId": {
+                        GET: async (req: BunRequest) => {
+                            // @ts-ignore
+                            let image = this.subSystems.image._internalImages.get(req.params["imageId"] as string);
+
+                            if (!image) {
+                                return new Response("Invalid image");
+                            }
+
+                            if (!image.public) {
+                                const cookieString = req.headers?.get("cookie");
+
+                                if (cookieString === null) {
+                                    throw Response.json({ code: "UNAUTHORIZED", message: "missing auth cookie" });
+                                }
+
+                                const parsedCookie = Bun.Cookie.parse(cookieString);
+
+                                let userId = await self.subSystems.authorization.verifySession(decodeURIComponent(parsedCookie.value));
+
+                                if (userId === undefined) {
+                                    throw Response.json({ code: "UNAUTHORIZED", message: "invalid session" });
+                                }
+                            }
+
+                            return new Response(file(image.path));
                         },
                     },
                 },

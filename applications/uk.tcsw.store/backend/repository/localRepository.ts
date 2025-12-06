@@ -2,13 +2,18 @@ import path from "path";
 import ApplicationRepository, { type RepositoryApplication, type RepositoryApplicationSummary } from "./applicationRepository";
 import fs from "fs/promises";
 
-class LocalApplicationRepository extends ApplicationRepository {
+export default class LocalApplicationRepository extends ApplicationRepository {
+    id = "local";
+
     constructor() {
         super();
         return this;
     }
 
-    async getApplicationById(applicationId: string): Promise<RepositoryApplication> {
+    async getApplicationById(applicationId: string): Promise<RepositoryApplication | undefined> {
+        if (!(await fs.exists(path.join(instance.subSystems.filesystem.SRC_ROOT, "../../applications/", applicationId, "manifest.json"))))
+            return undefined;
+
         let applicationManifest = JSON.parse(
             (
                 await fs.readFile(path.join(instance.subSystems.filesystem.SRC_ROOT, "../../applications/", applicationId, "manifest.json"))
@@ -24,9 +29,23 @@ class LocalApplicationRepository extends ApplicationRepository {
                 };
             }),
             description: applicationManifest.description,
-            icon: applicationManifest.icon,
+            icon:
+                applicationManifest.icon.type === "image"
+                    ? {
+                          type: "image",
+                          value: path.join(
+                              instance.subSystems.filesystem.SRC_ROOT,
+                              "../../applications/",
+                              applicationId,
+                              applicationManifest.icon.value,
+                          ),
+                      }
+                    : applicationManifest.icon,
             id: applicationId,
             modules: Object.keys(applicationManifest.modules),
+            bannerImage: applicationManifest.bannerImage
+                ? path.join(instance.subSystems.filesystem.SRC_ROOT, "../../applications/", applicationId, applicationManifest.bannerImage)
+                : undefined,
         };
     }
 
@@ -36,18 +55,25 @@ class LocalApplicationRepository extends ApplicationRepository {
         );
     }
 
-    async getApplicationSummaryById(applicationId: string): Promise<RepositoryApplicationSummary> {
-        let app = this.getApplicationById(applicationId);
+    async getApplicationSummaryById(applicationId: string): Promise<RepositoryApplicationSummary | undefined> {
+        let app = await this.getApplicationById(applicationId);
+
+        if (!app) return undefined;
 
         return {
             id: applicationId,
-            authors: (await app).authors.map((a) => a.name),
-            displayName: (await app).displayName,
-            icon: (await app).icon,
+            authors: app.authors.map((a) => a.name),
+            displayName: app.displayName,
+            icon: app.icon,
+            bannerImage: app.bannerImage,
         };
     }
 
     async getPromotedApplications(): Promise<string[]> {
-        return [];
+        return ["uk.tcsw.dashboard", "uk.tcsw.settings", "uk.tcsw.ghostty"];
+    }
+
+    async getInstallPath(applicationId: string): Promise<string> {
+        return `local:${applicationId}`;
     }
 }

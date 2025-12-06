@@ -7,6 +7,7 @@ import AuthenticationPage from "./pages/authentication/Index";
 import StoragePage from "./pages/storage/Index";
 import CustomizationPage from "./pages/customization/Index";
 import InstancePage from "./pages/instance/Index";
+import ResetPasswordPage from "./pages/authentication/reset-password/Index";
 
 const App: Component = () => {
     return (
@@ -14,7 +15,10 @@ const App: Component = () => {
             <Route component={Layout}>
                 <Route path={"/"} component={RootPage} />
                 <Route path={"/profile"} component={ProfilePage} />
-                <Route path={"/authentication"} component={AuthenticationPage} />
+                <Route path={"/authentication"}>
+                    <Route path={"/"} component={AuthenticationPage} />
+                    <Route path={"/reset-password"} component={ResetPasswordPage} />
+                </Route>
                 <Route path={"/storage"} component={StoragePage} />
                 <Route path={"/customization"} component={CustomizationPage} />
                 <Route path={"/instance"} component={InstancePage} />

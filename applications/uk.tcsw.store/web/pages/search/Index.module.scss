@@ -23,10 +23,10 @@
 .content {
     display: grid;
     grid-template-columns: 1fr;
-    grid-template-rows: auto auto auto auto 1fr;
+    grid-template-rows: auto auto auto 1fr;
     height: 100%;
     width: 100%;
-    gap: 1rem;
+    gap: 2rem;
     padding: 2rem;
 }
 

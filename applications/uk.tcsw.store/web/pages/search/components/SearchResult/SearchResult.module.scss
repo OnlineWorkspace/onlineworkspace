@@ -1,7 +1,6 @@
 .root {
     display: flex;
     flex-direction: column;
-    max-height: max-content;
     gap: 1rem;
     padding: 0;
     user-select: none;
@@ -10,6 +9,11 @@
     > img {
         border-radius: var(--uk-sys-shape-corner-medium);
     }
+}
+
+.headerImage {
+    object-fit: cover;
+    height: 8rem;
 }
 
 .title {

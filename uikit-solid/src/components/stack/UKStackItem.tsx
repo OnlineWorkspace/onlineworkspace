@@ -2,6 +2,7 @@ import { createSignal, Match, Suspense, Switch, type Component, type JSXElement 
 import styles from "./UKStackItem.module.scss";
 import UKIcon from "../icon/UKIcon";
 import UKText from "../text/UKText";
+import clsx from "clsx";
 
 const UKStackItem: Component<{
     onClick?: () => void;
@@ -17,7 +18,7 @@ const UKStackItem: Component<{
     labelText?: string;
     supportingText?: string;
 }> = (props) => {
-    const [ expanded, setExpanded ] = createSignal<boolean>(false);
+    const [expanded, setExpanded] = createSignal<boolean>(false);
 
     if (!!props.expandedComponent && props.onClick) {
         console.error("Cannot have a UKStackItem with both expandedComponent & onClick");
@@ -91,7 +92,13 @@ const UKStackItem: Component<{
                             </div>
                         )}
                         <Suspense>
-                            {props.inlineComponent}
+                            {props.inlineComponent ? (
+                                props.inlineComponent
+                            ) : (
+                                <UKIcon class={clsx(expanded() ? styles.indicatorExpanded : styles.indicatorCollapsed)}>
+                                    chevron_right
+                                </UKIcon>
+                            )}
                         </Suspense>
                     </button>
                 </Match>
@@ -131,9 +138,7 @@ const UKStackItem: Component<{
                                 </Suspense>
                             </div>
                         )}
-                        <Suspense>
-                            {props.inlineComponent}
-                        </Suspense>
+                        <Suspense>{props.inlineComponent}</Suspense>
                     </div>
                 </Match>
             </Switch>

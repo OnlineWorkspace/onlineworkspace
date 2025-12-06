@@ -1,24 +1,43 @@
 import UKCard from "@tcsw/uikit-solid/src/components/card/UKCard.jsx";
-import UKIcon from "@tcsw/uikit-solid/src/components/icon/UKIcon.jsx";
 import UKText from "@tcsw/uikit-solid/src/components/text/UKText.jsx";
-import type {Component} from "solid-js";
-import styles from "./SearchResult.module.scss"
-import {useNavigate} from "@solidjs/router";
+import { createResource, type Component } from "solid-js";
+import styles from "./SearchResult.module.scss";
+import { useNavigate } from "@solidjs/router";
+import trpc from "../../../../lib/trpc";
 
-const SearchResult: Component<{bannerImage?: string, title: string, publisher: string, downloadCount?: number, id: string}> = (props) => {
-    const navigate = useNavigate()
+const SearchResult: Component<{ applicationId: string; repository: string }> = (props) => {
+    const [result] = createResource(() =>
+        trpc.search.getResult.query({ applicationId: props.applicationId, repository: props.repository }),
+    );
+    const navigate = useNavigate();
 
-    return <UKCard onClick={() => {navigate(`/app/uk.tcsw.store/page/${props.id}`)}} color={"filled"} class={styles.root}>
-        <img draggable={false} src={props.bannerImage || "/assets/tricolor/tricolor.svg"} />
-        <UKText class={styles.title} role={"title"} size={"l"}>{props.title}</UKText>
-        <div class={styles.footer}>
-            <UKText role={"label"} size={"m"}>{props.publisher}</UKText>
-            {props.downloadCount && <>
-                <UKIcon class={styles.footerIcon}>download</UKIcon>
-                <UKText role={"label"} size={"m"}>{props.downloadCount}</UKText>
-            </>}
-        </div>
-    </UKCard>
-}
+    return (
+        <UKCard
+            onClick={() => {
+                navigate(`/app/uk.tcsw.store/app/${props.repository}/${props.applicationId}`);
+            }}
+            color={"filled"}
+            class={styles.root}
+        >
+            <img class={styles.headerImage} draggable={false} src={result()?.bannerImage || "/assets/tricolor/tricolor.svg"} />
+            <UKText class={styles.title} role={"title"} size={"l"}>
+                {result()?.displayName}
+            </UKText>
+            <div class={styles.footer}>
+                <UKText role={"label"} size={"m"}>
+                    {result()?.authors.join(" & ")}
+                </UKText>
+                {/*{result()?.downloadCount && (
+                    <>
+                        <UKIcon class={styles.footerIcon}>download</UKIcon>
+                        <UKText role={"label"} size={"m"}>
+                            {result()?.downloadCount}
+                        </UKText>
+                    </>
+                )}*/}
+            </div>
+        </UKCard>
+    );
+};
 
-export default SearchResult
+export default SearchResult;

@@ -6,7 +6,6 @@ import type { FetchCreateContextFnOptions } from "@trpc/server/adapters/fetch";
 import { WorkspacesNotificationEventEmitterEvent, type WorkspacesNotification } from "./notifications.js";
 import { on } from "node:events";
 import type { Server } from "bun";
-import path from "node:path/posix";
 
 export const createTRPCContext = (instance: Instance) => (opt: FetchCreateContextFnOptions, server: Server<{}>) => {
     let originUrl = new URL(opt.req.url);
@@ -19,7 +18,7 @@ export const createTRPCContext = (instance: Instance) => (opt: FetchCreateContex
         rawRequest: {
             req: opt.req,
             resHeaders: opt.resHeaders,
-            destinationHostname: originUrl.toString(),
+            destinationHostname: originUrl.toString().slice(0, -1),
             server: server,
         },
         instance: instance,
@@ -73,6 +72,7 @@ export const procedure = t.procedure.use(async (opt) => {
     return opt.next({
         ctx: {
             userId: userId,
+            user: () => opt.ctx.instance.subSystems.users.getUserById(userId)!,
         },
     });
 });
@@ -302,7 +302,7 @@ export const workspacesRouter = t.router({
                             if (app.manifest.icon.type === "image") {
                                 icon = {
                                     type: "image",
-                                    value: `${opt.ctx.rawRequest.destinationHostname}api/application/${app.manifest.id}/icon/`,
+                                    value: `${opt.ctx.rawRequest.destinationHostname}/api/application/${app.manifest.id}/icon/`,
                                 };
                             } else {
                                 icon = app.manifest.icon;

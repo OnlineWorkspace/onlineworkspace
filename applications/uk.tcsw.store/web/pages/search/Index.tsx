@@ -1,13 +1,16 @@
 import { DividerDirection } from "@tcsw/uikit-solid/src/components/divider/lib/direction.js";
 import UKDivider from "@tcsw/uikit-solid/src/components/divider/UKDivider.jsx";
 import UKText from "@tcsw/uikit-solid/src/components/text/UKText.jsx";
-import { createSignal, type Component } from "solid-js";
+import { createResource, createSignal, For, on, Suspense, type Component } from "solid-js";
 import styles from "./Index.module.scss";
 import UKTextField from "@tcsw/uikit-solid/src/components/textField/UKTextField.jsx";
 import SearchResult from "./components/SearchResult/SearchResult";
+import trpc from "../../lib/trpc";
+import UKIndeterminateSpinner from "@tcsw/uikit-solid/src/components/indeterminateSpinner/UKIndeterminateSpinner.jsx";
 
 const Page: Component = () => {
     const [searchQuery, setSearchQuery] = createSignal<string>("");
+    const [results, { refetch: refetchResults }] = createResource(() => trpc.search.searchFor.query(searchQuery()));
 
     return (
         <div class={styles.page}>
@@ -25,23 +28,25 @@ const Page: Component = () => {
                             return 0;
                         },
                     }}
-                    getValue={setSearchQuery}
+                    getValue={(val) => {
+                        if (searchQuery() !== val) {
+                            setSearchQuery(val);
+                            refetchResults();
+                        }
+                    }}
                     setValue={searchQuery()}
                     color={"filled"}
                     label={"Search"}
                 />
                 <UKDivider direction={DividerDirection.horizontal} />
-                <UKText role="headline" size="m" align="center">
-                    This is unimplemented
-                </UKText>
-                <UKDivider direction={DividerDirection.horizontal} />
                 <div class={styles.resultGrid}>
-                    <SearchResult title={"Dashboard"} publisher={"Tricolor Software"} downloadCount={20} id={"uk.tcsw.dashboard"} />
-                    <SearchResult title={"Store"} publisher={"Tricolor Software"} downloadCount={10} id={"uk.tcsw.store"} />
-                    <SearchResult title={"Network Mapper"} publisher={"Tricolor Software"} downloadCount={202} id={"uk.tcsw.netmap"} />
-                    <SearchResult title={"Dashboard"} publisher={"Tricolor Software"} downloadCount={20} id={"uk.tcsw.dashboard"} />
-                    <SearchResult title={"Dashboard"} publisher={"Tricolor Software"} downloadCount={203} id={"uk.tcsw.dashboard"} />
-                    <SearchResult title={"Dashboard"} publisher={"Tricolor Software"} downloadCount={40} id={"uk.tcsw.dashboard"} />
+                    <Suspense fallback={<UKIndeterminateSpinner />}>
+                        <For each={results()}>
+                            {(result) => {
+                                return <SearchResult applicationId={result.applicationId} repository={result.repository} />;
+                            }}
+                        </For>
+                    </Suspense>
                 </div>
             </div>
         </div>

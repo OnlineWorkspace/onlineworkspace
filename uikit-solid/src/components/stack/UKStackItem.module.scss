@@ -150,3 +150,13 @@
     flex-shrink: 0;
     width: 2.5rem;
 }
+
+.indicatorExpanded {
+    margin-left: auto;
+    rotate: -90deg;
+}
+
+.indicatorCollapsed {
+    margin-left: auto;
+    rotate: 90deg;
+}

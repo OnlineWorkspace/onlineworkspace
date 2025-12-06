@@ -64,7 +64,7 @@ export default class AuthorizationSubsystem extends SubSystem {
                                     return {
                                         action: {
                                             type: "navigate",
-                                            value: "/app/uk.tcsw.settings/user/reset-password",
+                                            value: "/app/uk.tcsw.settings/authentication/reset-password",
                                         },
                                     };
                                 },

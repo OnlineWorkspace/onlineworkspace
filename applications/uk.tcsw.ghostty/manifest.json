@@ -5,6 +5,7 @@
         "type": "image",
         "value": "./icon.png"
     },
+    "bannerImage": "./banner.svg",
     "description": "The Ghostty Terminal for Workspaces",
     "authors": [
         "Ghostty <https://github.com/ghostty-org>",

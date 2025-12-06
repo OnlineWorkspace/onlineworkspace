@@ -3,15 +3,47 @@
 import { createTRPCContext, procedure } from "@tcsw/workspaces-instance/src/subsystems/trpcRouter";
 import { initTRPC } from "@trpc/server";
 import z from "zod";
+import ApplicationRepository from "./repository/applicationRepository";
+import LocalApplicationRepository from "./repository/localRepository";
 
 const log = instance.log.createLogger("uk.tcsw.store");
 
 export const t = initTRPC.context<ReturnType<typeof createTRPCContext>>().create();
 
-let applicationRepositories = [];
+let applicationRepositories: ApplicationRepository[] = [new LocalApplicationRepository()];
 
 const router = t.router({
-    homepage: {},
+    homepage: {
+        promotedApplications: procedure.query(async (opt) => {
+            let output: { applicationId: string; repository: string }[] = [];
+
+            for (const repo of applicationRepositories) {
+                output = [
+                    ...output,
+                    ...(await repo.getPromotedApplications()).map((a) => {
+                        return { applicationId: a, repository: repo.id };
+                    }),
+                ];
+            }
+
+            return output;
+        }),
+        getPromotedApplication: procedure.input(z.object({ applicationId: z.string(), repository: z.string() })).query(async (opt) => {
+            let repository = applicationRepositories.find((repo) => repo.id === opt.input.repository);
+
+            if (!repository) return undefined;
+
+            let app = await repository.getApplicationSummaryById(opt.input.applicationId);
+
+            if (!app) return undefined;
+
+            if (app.bannerImage) {
+                app.bannerImage = `${opt.ctx.rawRequest.destinationHostname}${instance.subSystems.image.serveImage(opt.ctx.userId, app.bannerImage)}`;
+            }
+
+            return app;
+        }),
+    },
     manageInstalled: {
         getApplications: procedure
             .output(
@@ -43,7 +75,7 @@ const router = t.router({
                                 if (app.manifest.icon.type === "image") {
                                     icon = {
                                         type: "image",
-                                        value: `${opt.ctx.rawRequest.destinationHostname}api/application/${app.manifest.id}/icon/`,
+                                        value: `${opt.ctx.rawRequest.destinationHostname}/api/application/${app.manifest.id}/icon/`,
                                     };
                                 } else {
                                     icon = app.manifest.icon;
@@ -92,6 +124,90 @@ const router = t.router({
         }),
     },
     categories: {},
+    search: {
+        searchFor: procedure
+            .input(z.string())
+            .output(z.object({ applicationId: z.string(), repository: z.string() }).array())
+            .query(async (opt) => {
+                let results: { applicationId: string; repository: string }[] = [];
+
+                for (const repo of applicationRepositories) {
+                    results = [
+                        ...results,
+                        ...(await repo.searchForApplicationIds(opt.input)).map((a) => {
+                            return { applicationId: a, repository: repo.id };
+                        }),
+                    ];
+                }
+
+                return results;
+            }),
+        getResult: procedure.input(z.object({ applicationId: z.string(), repository: z.string() })).query(async (opt) => {
+            let repository = applicationRepositories.find((repo) => repo.id === opt.input.repository);
+
+            if (!repository) return undefined;
+
+            let app = await repository.getApplicationSummaryById(opt.input.applicationId);
+
+            if (!app) return undefined;
+
+            if (app.bannerImage) {
+                app.bannerImage = `${opt.ctx.rawRequest.destinationHostname}${instance.subSystems.image.serveImage(opt.ctx.userId, app.bannerImage)}`;
+            }
+
+            return app;
+        }),
+    },
+    app: {
+        get: procedure.input(z.object({ applicationId: z.string(), repository: z.string() })).query(async (opt) => {
+            let repository = applicationRepositories.find((repo) => repo.id === opt.input.repository);
+
+            if (!repository) return undefined;
+
+            let app = await repository.getApplicationById(opt.input.applicationId);
+
+            if (!app) return undefined;
+
+            if (app.icon.type === "image") {
+                app.icon.value = `${opt.ctx.rawRequest.destinationHostname}${instance.subSystems.image.serveImage(opt.ctx.userId, app.icon.value)}`;
+            }
+
+            if (app.bannerImage) {
+                app.bannerImage = `${opt.ctx.rawRequest.destinationHostname}${instance.subSystems.image.serveImage(opt.ctx.userId, app.bannerImage)}`;
+            }
+
+            return {
+                ...app,
+                isUserAdministrator: await (await opt.ctx.user())?.isAdministrator(),
+                isInstalled: opt.ctx.instance.subSystems.applications.enabledApplications.includes(app.id),
+            };
+        }),
+        install: procedure.input(z.object({ applicationId: z.string(), repository: z.string() })).mutation(async (opt) => {
+            let repository = applicationRepositories.find((repo) => repo.id === opt.input.repository);
+
+            if (!repository) return undefined;
+
+            let app = await repository.getApplicationById(opt.input.applicationId);
+
+            if (!app) return undefined;
+
+            // the user must be administrator
+            if (!(await (await opt.ctx.user())?.isAdministrator())) return false;
+
+            await opt.ctx.instance.subSystems.applications.installApplication(await repository.getInstallPath(app.id));
+            await opt.ctx.instance.subSystems.applications.enableApplication(app.id);
+
+            return true;
+        }),
+        uninstall: procedure.input(z.object({ applicationId: z.string() })).mutation(async (opt) => {
+            // the user must be administrator
+            if (!(await (await opt.ctx.user())?.isAdministrator())) return false;
+
+            await opt.ctx.instance.subSystems.applications.uninstallApplication(opt.input.applicationId);
+
+            return true;
+        }),
+    },
 });
 
 export type TRPCRouter = typeof router;

@@ -1,8 +1,8 @@
 import type { Component, ParentProps } from "solid-js";
 import styles from "./UKDialogue.module.scss";
-import type { DialogueType } from "./context";
+import type { DialogueController } from "./context";
 
-const UKDialogue: Component<ParentProps<{ dialogueController: DialogueType }>> = (props) => {
+const UKDialogue: Component<ParentProps<{ dialogueController: DialogueController }>> = (props) => {
     return (
         <div
             class={styles.root}

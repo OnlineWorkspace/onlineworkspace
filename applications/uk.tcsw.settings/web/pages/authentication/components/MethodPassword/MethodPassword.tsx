@@ -1,13 +1,16 @@
 import UKButton from "@tcsw/uikit-solid/src/components/button/UKButton.jsx";
 import UKStackItem from "@tcsw/uikit-solid/src/components/stack/UKStackItem.jsx";
-import {createResource, Suspense, type Component} from "solid-js";
+import { createResource, Suspense, type Component } from "solid-js";
 import trpc from "../../../../lib/trpc";
-import styles from "./MethodPassword.module.scss"
+import styles from "./MethodPassword.module.scss";
 import UKText from "@tcsw/uikit-solid/src/components/text/UKText.jsx";
 import UKIcon from "@tcsw/uikit-solid/src/components/icon/UKIcon.jsx";
+import { useDialogue } from "@tcsw/uikit-solid/src/components/dialogue/useDialogue.js";
+import ResetPasswordDialogue from "./components/ResetPasswordDialogue/ResetPasswordDialogue";
 
 const MethodPassword: Component = () => {
-    const [ hasPassword, {refetch: refetchHasPassword} ] = createResource(() => trpc.authentication.hasPassword.query());
+    const dialogue = useDialogue();
+    const [hasPassword, { refetch: refetchHasPassword }] = createResource(() => trpc.authentication.hasPassword.query());
 
     return (
         <UKStackItem
@@ -24,22 +27,23 @@ const MethodPassword: Component = () => {
             expandedComponent={
                 <Suspense>
                     <div class={styles.expanded}>
-                    <UKText role="body" size="m">
-                        Use a password to login to your Tricolor Workspaces account.
-                    </UKText>
-                    <UKButton
-                        class={styles.button}
-                        onClick={async () => {
-                            return 0
-                        }}
-                    >
-                        {hasPassword() ? "Reset" : "Set"} password
-                    </UKButton>
+                        <UKText role="body" size="m">
+                            Use a password to login to your Tricolor Workspaces account.
+                        </UKText>
+                        <UKButton
+                            class={styles.button}
+                            onClick={async () => {
+                                dialogue.show(<ResetPasswordDialogue dialogueController={dialogue} />);
+                                return 0;
+                            }}
+                        >
+                            {hasPassword() ? "Reset" : "Set"} password
+                        </UKButton>
                     </div>
                 </Suspense>
             }
         />
     );
-}
+};
 
-export default MethodPassword
+export default MethodPassword;
