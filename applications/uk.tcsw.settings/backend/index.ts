@@ -129,6 +129,11 @@ const router = t.router({
                     };
                 });
             }),
+        setPassword: procedure.input(z.object({password: z.string()})).mutation(async (opt) => {
+            await opt.ctx.instance.subSystems.authorization.setPassword(opt.ctx.userId, opt.input.password)
+
+            return true;
+        }),
     },
     instance: {
         getUsers: adminProcedure.output(z.number().array()).query(async (_opt) => {

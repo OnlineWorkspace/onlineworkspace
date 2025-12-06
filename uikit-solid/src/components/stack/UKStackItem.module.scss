@@ -152,6 +152,10 @@
     width: 2.5rem;
 }
 
+.toggleIndicator {
+    transition: rotate var(--uk-sys-motion-duration-100) var(--uk-sys-motion-easing-standard-normal);
+}
+
 .indicatorExpanded {
     margin-left: auto;
     rotate: -90deg;

@@ -8,6 +8,7 @@ import UKTextField from "@tcsw/uikit-solid/src/components/textField/UKTextField.
 import { createSignal, type Component } from "solid-js";
 import styles from "./ResetPasswordDialogue.module.scss";
 import UKButton from "@tcsw/uikit-solid/src/components/button/UKButton.jsx";
+import trpc from "../../../../../../lib/trpc";
 
 const ResetPasswordDialogue: Component<{ dialogueController: DialogueController }> = (props) => {
     const [passwordOne, setPasswordOne] = createSignal<string>("");
@@ -26,7 +27,9 @@ const ResetPasswordDialogue: Component<{ dialogueController: DialogueController 
                     leadingIcon="check"
                     color="filled"
                     class={styles.confirmButton}
-                    onClick={() => 0}
+                    onClick={() => {
+                        if (passwordOne() === passwordTwo()) trpc.authentication.setPassword.mutate({ password: passwordOne() });
+                    }}
                     disabled={!(passwordOne() === passwordTwo())}
                 >
                     Confirm

@@ -95,7 +95,9 @@ const UKStackItem: Component<{
                             {props.inlineComponent ? (
                                 props.inlineComponent
                             ) : (
-                                <UKIcon class={clsx(expanded() ? styles.indicatorExpanded : styles.indicatorCollapsed)}>
+                                <UKIcon
+                                    class={clsx(expanded() ? styles.indicatorExpanded : styles.indicatorCollapsed, styles.toggleIndicator)}
+                                >
                                     chevron_right
                                 </UKIcon>
                             )}
