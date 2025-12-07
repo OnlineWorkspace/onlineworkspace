@@ -10,7 +10,7 @@ const Widget: Component = () => {
 
     return (
         <UKCard class={styles.root}>
-            <UKAvatar avatar="/assets/placeholder/avatar.png" size="m" username="username" />
+            <UKAvatar avatar={userData()?.avatar || "/assets/placeholder/avatar.png"} size="m" username="username" />
             <div>
                 <UKText role="title" align="start" emphasized size="l">
                     {userData()?.displayName || "Unknown"}

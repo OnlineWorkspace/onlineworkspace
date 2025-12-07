@@ -17,6 +17,7 @@ const router = t.router({
                         z.object({
                             displayName: z.string(),
                             username: z.string(),
+                            avatar: z.string(),
                         }),
                     )
                     .query(async (opt) => {
@@ -29,6 +30,7 @@ const router = t.router({
                         return {
                             displayName: `${forename} ${surname}`,
                             username: username,
+                            avatar: `${opt.ctx.rawRequest.destinationHostname}/api/user/me/avatar/m`,
                         };
                     }),
             },

@@ -12,6 +12,7 @@ const RootPage: Component = () => {
     const navigate = useNavigate();
     const [fullName] = createResource(() => trpc.overview.user.fullName.query());
     const [role] = createResource(() => trpc.overview.user.role.query());
+    const [avatar] = createResource(() => trpc.overview.user.getAvatar.query());
 
     return (
         <div class={styles.root}>
@@ -22,7 +23,7 @@ const RootPage: Component = () => {
                         navigate("/app/uk.tcsw.settings/profile");
                     }}
                 >
-                    <UKAvatar username="username" avatar="/assets/placeholder/avatar.png" size="l" />
+                    <UKAvatar username="username" avatar={avatar() || "/assets/placeholder/avatar.png"} size="l" />
                     <div>
                         <UKText role="display" size="l" emphasized class={styles.fullName}>
                             {fullName() || "Unknown"}

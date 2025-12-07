@@ -33,6 +33,7 @@
 
     & > *:nth-child(2) {
         z-index: 1;
+        transform-origin: top;
         animation: fadeSlideIn var(--uk-sys-motion-duration-500) var(--uk-sys-motion-easing-emphasized-decelerate) forwards;
 
         @keyframes fadeSlideIn {

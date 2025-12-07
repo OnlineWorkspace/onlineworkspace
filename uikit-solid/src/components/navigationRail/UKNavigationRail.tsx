@@ -16,15 +16,18 @@ const UKNavigationRail: Component<
             label: string;
             onClick: () => void;
         }[];
-        items?: {
-            icon: {type: "icon" | "image", value: string};
-            imageIcon?: string;
-            label: string;
-            onClick: () => void;
-            onMiddleClick?: () => void;
-            badgeCount?: number;
-            active?: boolean;
-        }[];
+        items?: (
+            | {
+                  icon: { type: "icon" | "image"; value: string };
+                  imageIcon?: string;
+                  label: string;
+                  onClick: () => void;
+                  onMiddleClick?: () => void;
+                  badgeCount?: number;
+                  active?: boolean;
+              }
+            | undefined
+        )[];
         expanded?: boolean;
         setExpanded?: (expanded: boolean) => void;
         type?: "modal" | "surface";
@@ -37,7 +40,11 @@ const UKNavigationRail: Component<
                 {props.anchorPoints?.topMost}
                 {props.setExpanded && <UKNavigationRailMenuButton setExpanded={props.setExpanded} expanded={props.expanded || false} />}
                 {props.anchorPoints?.top}
-                <Index each={props.items}>{(i) => <UKNavigationRailItem expanded={props.expanded || false} {...i()} />}</Index>
+                {props.items ? (
+                    <Index each={props.items.filter((i) => i !== undefined)}>
+                        {(i) => <UKNavigationRailItem expanded={props.expanded || false} {...i()} />}
+                    </Index>
+                ) : null}
                 {props.anchorPoints?.bottom}
             </div>
             <div class={styles.pageRoot}>{props.children}</div>

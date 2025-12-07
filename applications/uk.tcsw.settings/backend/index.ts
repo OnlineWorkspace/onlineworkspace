@@ -5,6 +5,9 @@ import { AuthorizedDeviceType, SESSION_VALID_TERM_MS } from "@tcsw/workspaces-in
 import { adminProcedure, createTRPCContext, procedure } from "@tcsw/workspaces-instance/src/subsystems/trpcRouter";
 import { initTRPC } from "@trpc/server";
 import z from "zod";
+import path from "path";
+import { octetInputParser } from "@trpc/server/http";
+import fs from "fs/promises";
 
 const log = instance.log.createLogger("uk.tcsw.settings");
 
@@ -22,6 +25,9 @@ const router = t.router({
                 const isAdministrator = await (await opt.ctx.instance.subSystems.users.getUserById(opt.ctx.userId))?.isAdministrator();
 
                 return isAdministrator ? "Administrator" : "User";
+            }),
+            getAvatar: procedure.output(z.string()).query(async (opt) => {
+                return `${opt.ctx.rawRequest.destinationHostname}/api/user/me/avatar/l`;
             }),
         },
     },
@@ -77,6 +83,26 @@ const router = t.router({
 
             return isAdministrator ? "Administrator" : "User";
         }),
+        setProfilePicture: procedure.input(octetInputParser).mutation(async (opt) => {
+            const data = opt.input;
+
+            const user = await opt.ctx.user();
+            const userPath = user.getPath();
+
+            if (!userPath) return false;
+
+            let filePath = path.join(userPath, "system/temp/avatar");
+
+            await fs.writeFile(filePath, data);
+
+            await user.setAvatar(filePath);
+            await user.generateAvatars(true);
+
+            return true;
+        }),
+        getProfilePicture: procedure.output(z.string()).query(async (opt) => {
+            return `${opt.ctx.rawRequest.destinationHostname}/api/user/me/avatar/l`;
+        }),
     },
     authentication: {
         hasPassword: procedure.output(z.boolean()).query(async (opt) => {
@@ -129,8 +155,8 @@ const router = t.router({
                     };
                 });
             }),
-        setPassword: procedure.input(z.object({password: z.string()})).mutation(async (opt) => {
-            await opt.ctx.instance.subSystems.authorization.setPassword(opt.ctx.userId, opt.input.password)
+        setPassword: procedure.input(z.object({ password: z.string() })).mutation(async (opt) => {
+            await opt.ctx.instance.subSystems.authorization.setPassword(opt.ctx.userId, opt.input.password);
 
             return true;
         }),
@@ -229,12 +255,12 @@ const router = t.router({
                     return isAdministrator || false;
                 }),
             setIsAdministrator: adminProcedure.input(z.object({ userId: z.number(), administrator: z.boolean() })).mutation(async (opt) => {
-                await (await opt.ctx.instance.subSystems.users.getUserById(opt.ctx.userId))?.setIsAdministrator(opt.input.administrator);
+                await (await opt.ctx.instance.subSystems.users.getUserById(opt.input.userId))?.setIsAdministrator(opt.input.administrator);
 
                 return true;
             }),
             delete: adminProcedure.input(z.object({ userId: z.number() })).mutation(async (opt) => {
-                await (await opt.ctx.instance.subSystems.users.getUserById(opt.ctx.userId))?.delete();
+                await (await opt.ctx.instance.subSystems.users.getUserById(opt.input.userId))?.delete();
 
                 return true;
             }),
@@ -267,6 +293,20 @@ const router = t.router({
                 return true;
             }),
         },
+        isUserAdministrator: procedure.query(async (opt) => {
+            let user = await opt.ctx.user();
+
+            if (user) {
+                return await user.isAdministrator();
+            }
+
+            return this;
+        }),
+        createUser: procedure.input(z.object({ username: z.string() })).mutation(async (opt) => {
+            await opt.ctx.instance.subSystems.users.createUser(opt.input.username);
+
+            return true;
+        }),
     },
 });
 

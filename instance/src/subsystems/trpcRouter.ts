@@ -6,6 +6,7 @@ import type { FetchCreateContextFnOptions } from "@trpc/server/adapters/fetch";
 import { WorkspacesNotificationEventEmitterEvent, type WorkspacesNotification } from "./notifications.js";
 import { on } from "node:events";
 import type { Server } from "bun";
+import type { WorkspacesUser } from "./users.js";
 
 export const createTRPCContext = (instance: Instance) => (opt: FetchCreateContextFnOptions, server: Server<{}>) => {
     let originUrl = new URL(opt.req.url);
@@ -72,7 +73,8 @@ export const procedure = t.procedure.use(async (opt) => {
     return opt.next({
         ctx: {
             userId: userId,
-            user: () => opt.ctx.instance.subSystems.users.getUserById(userId)!,
+            // @ts-ignore
+            user: (): Promise<WorkspacesUser> => opt.ctx.instance.subSystems.users.getUserById(userId),
         },
     });
 });

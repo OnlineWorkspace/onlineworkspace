@@ -13,11 +13,12 @@ import Email from "./components/Email/Email";
 const ProfilePage: Component = () => {
     const [name] = createResource(() => trpc.profile.getName.query());
     const [role] = createResource(() => trpc.profile.getRole.query());
+    const [avatar] = createResource(() => trpc.profile.getProfilePicture.query());
 
     return (
         <div class={styles.root}>
             <div class={styles.header}>
-                <UKAvatar username="username" avatar="/assets/placeholder/avatar.png" size="l" />
+                <UKAvatar username="username" avatar={avatar() || "/assets/placeholder/avatar.png"} size="l" />
                 <div>
                     <UKText role="display" size="l" emphasized class={styles.fullName}>
                         {name() || "Unknown"}

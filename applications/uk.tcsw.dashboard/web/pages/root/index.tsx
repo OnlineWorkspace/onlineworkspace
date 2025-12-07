@@ -15,6 +15,21 @@ const RootPage: Component = () => {
             </UKText>
             <div class={styles.widgets}>
                 <Widgets.user.profile />
+                <Widgets.user.profile />
+                <Widgets.user.profile />
+                <Widgets.user.profile />
+                <Widgets.user.profile />
+                <Widgets.user.profile />
+                <Widgets.user.profile />
+                <Widgets.user.profile />
+                <Widgets.user.profile />
+                <Widgets.user.profile />
+                <Widgets.user.profile />
+                <Widgets.user.profile />
+                <Widgets.user.profile />
+                <Widgets.user.profile />
+                <Widgets.user.profile />
+                <Widgets.user.profile />
             </div>
         </div>
     );

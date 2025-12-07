@@ -342,6 +342,7 @@ export class WorkspacesUser {
             "/assets/avatar",
             "/system",
             "/system/logs",
+            "/system/temp",
         ];
 
         for (const dir of USER_DIRECTORIES) {

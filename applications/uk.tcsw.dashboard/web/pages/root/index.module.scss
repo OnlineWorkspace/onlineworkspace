@@ -13,17 +13,21 @@
 }
 
 .welcomeMessage {
-    background: #0001;
+    background: #0004;
     padding: 1.5rem;
     border-radius: var(--uk-sys-shape-corner-medium);
-    backdrop-filter: blur(0.5rem);
+    backdrop-filter: blur(2rem);
 }
 
 .widgets {
+    width: max-content;
+    max-width: calc(100% - 2rem);
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
-    grid-template-rows: 1fr 1fr 1fr 1fr;
-    background: #0002;
+    grid-template-columns: repeat(auto-fit, minmax(16rem, 24rem));
+    grid-auto-rows: 6rem;
+    background: #0004;
     padding: 1rem;
     border-radius: calc(var(--uk-sys-shape-corner-medium) + 1rem);
+    backdrop-filter: blur(2rem);
+    gap: 1rem;
 }

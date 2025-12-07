@@ -5,10 +5,12 @@ import UKTextField from "@tcsw/uikit-solid/src/components/textField/UKTextField.
 import UKSwitch from "@tcsw/uikit-solid/src/components/switch/UKSwitch.jsx";
 import UKText from "@tcsw/uikit-solid/src/components/text/UKText.jsx";
 import UKButton from "@tcsw/uikit-solid/src/components/button/UKButton.jsx";
-import trpc from "../../../../../lib/trpc";
+import trpc from "../../../../../../lib/trpc";
+import UKButtonGroup from "@tcsw/uikit-solid/src/components/buttonGroup/UKButtonGroup.jsx";
 
 const User: Component<{
     userId: number;
+    updateUsers: () => void;
 }> = (props) => {
     const [username, { mutate: setUsername }] = createResource(() => trpc.instance.user.getUsername.query(props.userId), {
         initialValue: "",
@@ -80,29 +82,32 @@ const User: Component<{
                             value={isAdministrator()}
                         />
                     </div>
-                    <UKButton color={"tonal"} onClick={() => 0}>
-                        Invalidate all sessions
-                    </UKButton>
-                    <UKButton color={"tonal"} onClick={() => 0}>
-                        Force password reset
-                    </UKButton>
-                    <UKButton
-                        color={"standard"}
-                        onClick={() => {
-                            // send a boop notification
-                            trpc.instance.user.boop.mutate({ userId: props.userId });
-                        }}
-                    >
-                        Boop
-                    </UKButton>
-                    <UKButton
-                        color={"standard"}
-                        onClick={() => {
-                            trpc.instance.user.delete.mutate({ userId: props.userId });
-                        }}
-                    >
-                        Delete
-                    </UKButton>
+                    <UKButtonGroup size={"s"} align={"end"}>
+                        <UKButton color={"tonal"} onClick={() => 0}>
+                            Invalidate all sessions
+                        </UKButton>
+                        <UKButton color={"tonal"} onClick={() => 0}>
+                            Force password reset
+                        </UKButton>
+                        <UKButton
+                            color={"standard"}
+                            onClick={() => {
+                                // send a boop notification
+                                trpc.instance.user.boop.mutate({ userId: props.userId });
+                            }}
+                        >
+                            Boop
+                        </UKButton>
+                        <UKButton
+                            color={"standard"}
+                            onClick={async () => {
+                                await trpc.instance.user.delete.mutate({ userId: props.userId });
+                                props.updateUsers();
+                            }}
+                        >
+                            Delete
+                        </UKButton>
+                    </UKButtonGroup>
                 </div>
             }
         />
