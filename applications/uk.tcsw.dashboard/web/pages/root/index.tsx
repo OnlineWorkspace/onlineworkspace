@@ -15,21 +15,9 @@ const RootPage: Component = () => {
             </UKText>
             <div class={styles.widgets}>
                 <Widgets.user.profile />
-                <Widgets.user.profile />
-                <Widgets.user.profile />
-                <Widgets.user.profile />
-                <Widgets.user.profile />
-                <Widgets.user.profile />
-                <Widgets.user.profile />
-                <Widgets.user.profile />
-                <Widgets.user.profile />
-                <Widgets.user.profile />
-                <Widgets.user.profile />
-                <Widgets.user.profile />
-                <Widgets.user.profile />
-                <Widgets.user.profile />
-                <Widgets.user.profile />
-                <Widgets.user.profile />
+                <UKText role={"body"} size="l" align={"center"} emphasized>
+                    Place Widgets Here!
+                </UKText>
             </div>
         </div>
     );
