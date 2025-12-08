@@ -1,5 +1,4 @@
 import type { Component } from "solid-js";
-import "./icon.css";
 import styles from "./UKIcon.module.scss";
 import clsx from "clsx";
 

@@ -1,0 +1,42 @@
+.root {
+    position: relative;
+    display: flex;
+    padding-bottom: 1rem;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    margin-top: auto;
+
+    &[data-expanded="true"] {
+        > .drawer {
+            left: 22.5rem;
+        }
+    }
+
+    &[data-expanded="false"] {
+        > .drawer {
+            left: 6rem;
+        }
+    }
+}
+
+.drawer {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 1rem;
+    bottom: 1rem;
+    z-index: 10;
+    background-color: rgb(var(--uk-sys-color-surface-container));
+    border: 1px solid rgb(var(--uk-sys-color-outline-variant));
+    border-radius: calc(var(--uk-sys-shape-corner-medium) + 1rem);
+    transition: left var(--uk-sys-motion-duration-250) var(--uk-sys-motion-easing-emphasized-decelerate);
+    width: 24rem;
+}
+
+.appsGrid {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}

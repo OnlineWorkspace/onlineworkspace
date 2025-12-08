@@ -17,6 +17,7 @@ import path from "path";
 import TRPCSubsystem from "./subsystems/trpc.js";
 import chalk from "chalk";
 import ImageSubsystem from "./subsystems/image.js";
+import SettingsSubsystem from "./subsystems/settings.js";
 
 export enum InstanceStatus {
     Online,
@@ -47,6 +48,7 @@ class Instance {
         this.subSystems.applications = new ApplicationsSubsystem(this);
         this.subSystems.tRPC = new TRPCSubsystem(this);
         this.subSystems.image = new ImageSubsystem(this);
+        this.subSystems.settings = new SettingsSubsystem(this);
 
         this.status = InstanceStatus.Offline;
 

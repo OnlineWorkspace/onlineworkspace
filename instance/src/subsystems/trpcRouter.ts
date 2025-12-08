@@ -258,7 +258,7 @@ export const workspacesRouter = t.router({
 
             const parsedCookie = Bun.Cookie.parse(cookieString);
 
-            await opt.ctx.instance.subSystems.authorization.endSession(decodeURIComponent(parsedCookie.value));
+            await opt.ctx.instance.subSystems.authorization.endSessionByToken(decodeURIComponent(parsedCookie.value));
 
             return {
                 success: true,
@@ -284,20 +284,21 @@ export const workspacesRouter = t.router({
                     };
                 }),
             },
-            quickShortcuts: procedure
+            getApplications: procedure
                 .output(
                     z.array(
                         z.object({
                             location: z.object({ type: z.union([z.literal("local"), z.literal("remote")]), value: z.string() }),
                             icon: z.object({ type: z.union([z.literal("icon"), z.literal("image")]), value: z.string() }),
                             label: z.string(),
+                            id: z.string(),
                         }),
                     ),
                 )
                 .query(async (opt) => {
-                    let quickShortcuts = opt.ctx.instance.subSystems.applications.getEnabledApplications();
+                    let applications = opt.ctx.instance.subSystems.applications.getEnabledApplications();
 
-                    return quickShortcuts.map((app) => {
+                    return applications.map((app) => {
                         let icon = { type: "icon" as "icon" | "image", value: "indeterminate_question_box" };
 
                         if (app.manifest?.icon) {
@@ -318,9 +319,47 @@ export const workspacesRouter = t.router({
                                 type: "local",
                                 value: `/app/${app.manifest?.id}` || "/404",
                             },
+                            id: app.manifest?.id || "unknown",
                         };
                     });
                 }),
+            getQuickShortcuts: procedure.query(async (opt) => {
+                let applications = opt.ctx.instance.subSystems.applications.getEnabledApplications();
+                let userSettings = await opt.ctx.instance.subSystems.settings.getUser(opt.ctx.userId);
+
+                let quickShortcuts = (userSettings["instance.navigation.quick_shortcuts"] as string[]) || [];
+
+                return quickShortcuts
+                    .map((shortcut) => {
+                        const app = applications.find((a) => a.manifest?.id === shortcut);
+
+                        if (!app) return undefined;
+
+                        let icon = { type: "icon" as "icon" | "image", value: "indeterminate_question_box" };
+
+                        if (app.manifest?.icon) {
+                            if (app.manifest.icon.type === "image") {
+                                icon = {
+                                    type: "image",
+                                    value: `${opt.ctx.rawRequest.destinationHostname}/api/application/${app.manifest.id}/icon/`,
+                                };
+                            } else {
+                                icon = app.manifest.icon;
+                            }
+                        }
+
+                        return {
+                            icon: icon,
+                            label: app.manifest?.displayName || "Unknown",
+                            location: {
+                                type: "local",
+                                value: `/app/${app.manifest?.id}` || "/404",
+                            },
+                            id: app.manifest?.id || "unknown",
+                        };
+                    })
+                    .filter((qs) => qs !== undefined);
+            }),
         },
         notifications: {
             listener: procedure
@@ -343,12 +382,21 @@ export const workspacesRouter = t.router({
                 }),
             respond: procedure
                 .input(z.object({ uuid: z.string(), responseType: z.literal("button"), value: z.string() }))
-                .output(z.object({ ok: z.boolean(), action: z.object({ type: z.literal("navigate"), value: z.string() }).optional() }))
+                .output(
+                    z.object({
+                        ok: z.boolean(),
+                        action: z
+                            .object({ type: z.literal("navigate"), value: z.string() })
+                            .or(z.object({ type: z.literal("reload") }))
+                            .optional(),
+                    }),
+                )
                 .mutation(async (opt) => {
                     const notification = notifications.find((n) => n.uuid === opt.input.uuid);
 
                     if (notification) {
                         let output;
+
                         if (opt.input.responseType === "button") {
                             output = notification.optionsCallbacks?.onButton(opt.input.value);
                         }

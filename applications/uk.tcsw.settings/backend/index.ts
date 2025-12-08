@@ -3,7 +3,7 @@
 import { WorkspacesNotificationPriority } from "@tcsw/workspaces-instance/src/subsystems/notifications";
 import { AuthorizedDeviceType, SESSION_VALID_TERM_MS } from "@tcsw/workspaces-instance/src/subsystems/authorization";
 import { adminProcedure, createTRPCContext, procedure } from "@tcsw/workspaces-instance/src/subsystems/trpcRouter";
-import { initTRPC } from "@trpc/server";
+import { initTRPC, TRPCError } from "@trpc/server";
 import z from "zod";
 import path from "path";
 import { octetInputParser } from "@trpc/server/http";
@@ -98,6 +98,37 @@ const router = t.router({
             await user.setAvatar(filePath);
             await user.generateAvatars(true);
 
+            await opt.ctx.instance.subSystems.notifications.send(
+                user.userId,
+                "uk.tcsw.settings.profile.setProfilePicture",
+                WorkspacesNotificationPriority.Normal,
+                {
+                    title: "Profile Picture Change",
+                    body: "Your profile picture has now been changed, please refresh the page to see your new avatar!",
+                    icon: "person",
+                },
+                {
+                    buttons: [
+                        {
+                            id: "reload",
+                            label: "Refresh",
+                            type: "filled",
+                        },
+                    ],
+                },
+                {
+                    onButton(optionId) {
+                        if (optionId === "reload") {
+                            return {
+                                action: {
+                                    type: "reload",
+                                },
+                            };
+                        }
+                    },
+                },
+            );
+
             return true;
         }),
         getProfilePicture: procedure.output(z.string()).query(async (opt) => {
@@ -128,6 +159,7 @@ const router = t.router({
                         deviceType: z.enum(AuthorizedDeviceType),
                         firstLoginTimestamp: z.number(),
                         ipAddress: z.string(),
+                        isCurrent: z.boolean(),
                     })
                     .array(),
             )
@@ -139,12 +171,23 @@ const router = t.router({
                 const db = instance.subSystems.database.db();
 
                 const sessions =
-                    (await db`SELECT session_id, device_type, valid_until, ip_address FROM Sessions WHERE user_id = ${user.userId}`) as {
+                    (await db`SELECT session_id, device_type, valid_until, ip_address, session_token FROM Sessions WHERE user_id = ${user.userId}`) as {
                         session_id: number;
                         device_type: AuthorizedDeviceType;
                         valid_until: number;
                         ip_address: string;
+                        session_token: string;
                     }[];
+
+                const cookieString = opt.ctx.rawRequest.req.headers?.get("cookie");
+
+                if (cookieString === null) {
+                    throw new TRPCError({ code: "UNAUTHORIZED", message: "missing auth cookie" });
+                }
+
+                const parsedCookie = Bun.Cookie.parse(cookieString);
+
+                let [_, _userId, token] = decodeURIComponent(parsedCookie.value).split(":");
 
                 return sessions.map((s) => {
                     return {
@@ -152,11 +195,17 @@ const router = t.router({
                         deviceType: s.device_type,
                         firstLoginTimestamp: s.valid_until - SESSION_VALID_TERM_MS,
                         ipAddress: s.ip_address,
+                        isCurrent: s.session_token === token,
                     };
                 });
             }),
         setPassword: procedure.input(z.object({ password: z.string() })).mutation(async (opt) => {
             await opt.ctx.instance.subSystems.authorization.setPassword(opt.ctx.userId, opt.input.password);
+
+            return true;
+        }),
+        deleteSession: procedure.input(z.object({ sessionId: z.number() })).mutation(async (opt) => {
+            await opt.ctx.instance.subSystems.authorization.endSessionById(opt.ctx.userId, opt.input.sessionId);
 
             return true;
         }),

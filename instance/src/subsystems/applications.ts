@@ -388,9 +388,25 @@ export default ApplicationsRouter`;
                         {
                             id: "dismiss",
                             label: "Dismiss",
+                            type: "tonal",
+                        },
+                        {
+                            id: "reload",
+                            label: "Reload",
                             type: "filled",
                         },
                     ],
+                },
+                {
+                    onButton(optionId) {
+                        if (optionId === "reload") {
+                            return {
+                                action: {
+                                    type: "reload",
+                                },
+                            };
+                        }
+                    },
                 },
             );
         }
@@ -445,6 +461,12 @@ export default ApplicationsRouter`;
                     onButton(id) {
                         if (id === "restart") {
                             self.instance.shutdown();
+
+                            return {
+                                action: {
+                                    type: "reload",
+                                },
+                            };
                         }
                     },
                 },

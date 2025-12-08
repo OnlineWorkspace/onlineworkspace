@@ -10,6 +10,7 @@ import DatabaseSubsystem from "./subsystems/database.js";
 import ApplicationsSubsystem from "./subsystems/applications.js";
 import TRPCSubsystem from "./subsystems/trpc.js";
 import ImageSubsystem from "./subsystems/image.js";
+import type SettingsSubsystem from "./subsystems/settings.js";
 
 export type SubSystems = {
     users: UsersSubsystem;
@@ -22,6 +23,7 @@ export type SubSystems = {
     applications: ApplicationsSubsystem;
     tRPC: TRPCSubsystem;
     image: ImageSubsystem;
+    settings: SettingsSubsystem;
 } & { [key: string]: SubSystem };
 
 export default abstract class SubSystem {

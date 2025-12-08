@@ -79,6 +79,10 @@ const NavigationRailNotifications: Component<{ expanded: boolean }> = (props) =>
                                     navigate(responseAction.action.value);
                                 }
 
+                                if (responseAction.action?.type === "reload") {
+                                    window.location.reload();
+                                }
+
                                 setFlyoutNotifications((notifications) => notifications.filter((n) => n.uuid !== notification.uuid));
                                 setNotifications((notifications) => notifications.filter((n) => n.uuid !== notification.uuid));
                             }}
@@ -103,6 +107,10 @@ const NavigationRailNotifications: Component<{ expanded: boolean }> = (props) =>
 
                                             if (responseAction.action?.type === "navigate") {
                                                 navigate(responseAction.action.value);
+                                            }
+
+                                            if (responseAction.action?.type === "reload") {
+                                                window.location.reload();
                                             }
 
                                             setNotifications((notifications) => notifications.filter((n) => n.uuid !== notification.uuid));

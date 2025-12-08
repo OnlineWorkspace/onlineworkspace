@@ -28,7 +28,7 @@ export interface WorkspacesNotificationOptions {
 }
 
 export interface WorkspacesNotificationOptionsCallbacks {
-    onButton(optionId: string): void | { action: { type: "navigate"; value: string } };
+    onButton(optionId: string): void | { action: { type: "navigate"; value: string } | { type: "reload" } };
 }
 
 export interface WorkspacesNotification {

@@ -59,7 +59,8 @@ const ManageInstalledPage: Component = () => {
                         setSelectionMode(!selectionMode());
                     }}
                 />
-                {!selectionMode() && (
+                {/* Perhaps add this at some point, create a dialogue with a text field for a custom install uri */}
+                {/* {!selectionMode() && (
                     <UKIconButton
                         color={"filled"}
                         alt={"install application"}
@@ -68,7 +69,7 @@ const ManageInstalledPage: Component = () => {
                             // add logic (probably a dialogue with a UKTextField)
                         }}
                     />
-                )}
+                )} */}
             </div>
             <UKDivider direction={DividerDirection.horizontal} />
             <UKStack class={styles.content}>

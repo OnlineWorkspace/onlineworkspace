@@ -3,7 +3,6 @@ import { applyTheme } from "../core/design/tokens.ts";
 import { baselineTheme } from "../core/design/themes/baseline.ts";
 import { createMediaQuery } from "@solid-primitives/media";
 import styles from "./Root.module.scss";
-import "./Root.css";
 
 const UIKitRoot: Component<{ children?: JSX.Element }> = ({ children }) => {
     const isLightMode = createMediaQuery("(prefers-color-scheme: light)");

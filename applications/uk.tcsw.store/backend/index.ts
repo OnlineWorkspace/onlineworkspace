@@ -197,6 +197,8 @@ const router = t.router({
             await opt.ctx.instance.subSystems.applications.installApplication(await repository.getInstallPath(app.id));
             await opt.ctx.instance.subSystems.applications.enableApplication(app.id);
 
+
+
             return true;
         }),
         uninstall: procedure.input(z.object({ applicationId: z.string() })).mutation(async (opt) => {

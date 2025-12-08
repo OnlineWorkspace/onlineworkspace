@@ -8,11 +8,12 @@ import trpc from "../../lib/trpc";
 import NavigationRailClock from "./navigationRailClock/NavigationRailClock.tsx";
 import UKText from "@tcsw/uikit-solid/src/components/text/UKText.tsx";
 import NavigationRailNotifications from "./navigationRailNotifications/NavigationRailNotifications.tsx";
+import NavigationRailApplications from "./navigationRailApplications/NavigationRailApplications.tsx";
 
 const AppLayout: Component<RouteSectionProps<unknown>> = (props) => {
     const location = useLocation();
     const navigate = useNavigate();
-    const [quickShortcuts] = createResource(() => trpc.app.navigation.quickShortcuts.query());
+    const [quickShortcuts] = createResource(() => trpc.app.navigation.getApplications.query());
 
     const [expanded, setExpanded] = createSignal<boolean>(false);
 
@@ -57,6 +58,7 @@ const AppLayout: Component<RouteSectionProps<unknown>> = (props) => {
                 ),
                 bottom: (
                     <>
+                        <NavigationRailApplications expanded={expanded()} />
                         <UKText class={styles.versionLabel} role={"label"} size={"s"} emphasized={true} align={"center"}>
                             Dev Build
                         </UKText>

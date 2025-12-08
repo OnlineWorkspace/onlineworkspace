@@ -3,11 +3,11 @@ import trpc from "../../../../lib/trpc";
 import Session from "./components/Session/Session";
 
 const Sessions: Component = () => {
-    const [ sessions ] = createResource(() => trpc.authentication.getSessions.query())
+    const [sessions, { refetch: refetchSessions }] = createResource(() => trpc.authentication.getSessions.query());
 
     return <For each={sessions()}>
         {s => {
-            return <Session {...s} />
+            return <Session {...s} refetch={() => refetchSessions} />;
         }}
     </For>
 }
