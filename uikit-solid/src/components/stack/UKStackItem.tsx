@@ -94,7 +94,7 @@ const UKStackItem: Component<{
                         <Suspense>
                             {props.inlineComponent ? (
                                 props.inlineComponent
-                            ) : (
+                            ) : !!props.expandedComponent && (
                                 <UKIcon
                                     class={clsx(expanded() ? styles.indicatorExpanded : styles.indicatorCollapsed, styles.toggleIndicator)}
                                 >

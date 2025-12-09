@@ -28,7 +28,7 @@ const Layout: Component<ParentProps> = (props) => {
                     onClick() {
                         navigate("/app/uk.tcsw.settings/profile");
                     },
-                    active: location.pathname === "/app/uk.tcsw.settings/profile",
+                    active: location.pathname.startsWith("/app/uk.tcsw.settings/profile"),
                 },
                 {
                     icon: { type: "icon", value: "passkey" },
@@ -36,7 +36,7 @@ const Layout: Component<ParentProps> = (props) => {
                     onClick() {
                         navigate("/app/uk.tcsw.settings/authentication");
                     },
-                    active: location.pathname === "/app/uk.tcsw.settings/authentication",
+                    active: location.pathname.startsWith("/app/uk.tcsw.settings/authentication"),
                 },
                 {
                     icon: { type: "icon", value: "storage" },
@@ -44,7 +44,7 @@ const Layout: Component<ParentProps> = (props) => {
                     onClick() {
                         navigate("/app/uk.tcsw.settings/storage");
                     },
-                    active: location.pathname === "/app/uk.tcsw.settings/storage",
+                    active: location.pathname.startsWith("/app/uk.tcsw.settings/storage"),
                 },
                 {
                     icon: { type: "icon", value: "wallpaper" },
@@ -52,7 +52,7 @@ const Layout: Component<ParentProps> = (props) => {
                     onClick() {
                         navigate("/app/uk.tcsw.settings/customization");
                     },
-                    active: location.pathname === "/app/uk.tcsw.settings/customization",
+                    active: location.pathname.startsWith("/app/uk.tcsw.settings/customization"),
                 },
                 isAdministrator()
                     ? {
@@ -61,7 +61,7 @@ const Layout: Component<ParentProps> = (props) => {
                           onClick() {
                               navigate("/app/uk.tcsw.settings/instance");
                           },
-                          active: location.pathname === "/app/uk.tcsw.settings/instance",
+                          active: location.pathname.startsWith("/app/uk.tcsw.settings/instance"),
                       }
                     : undefined,
             ]}

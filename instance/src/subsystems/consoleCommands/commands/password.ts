@@ -24,7 +24,7 @@ export default class PasswordCommand extends Command {
         //             if (password !== "") {
         //                 const db = this.instance.subSystems.database.db();
 
-        //                 const { id: userId } = (await db`SELECT id FROM Users WHERE username = ${username}`)?.[0] || { id: undefined };
+        //                 const { id: userId } = (await db`SELECT id FROM users WHERE username = ${username}`)?.[0] || { id: undefined };
 
         //                 if (!userId) {
         //                     self.log.error(`No such user ${username}`);

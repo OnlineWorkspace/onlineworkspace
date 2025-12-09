@@ -1,6 +1,7 @@
 import type { Instance } from "../index.js";
 import SubSystem from "../subSystems.js";
 import { WorkspacesNotificationPriority } from "./notifications.js";
+import utils from "node:util";
 
 export enum AuthorizedDeviceType {
     Desktop,
@@ -33,7 +34,8 @@ export default class AuthorizationSubsystem extends SubSystem {
             if (
                 !(await Bun.password.verify(
                     password,
-                    (await usersDb`SELECT hashed_password FROM Users WHERE id = ${userId}`)?.[0]?.hashed_password,
+                    (await usersDb`SELECT hashed_password FROM tricolor_workspaces.public.users WHERE id = ${userId}`)?.[0]
+                        ?.hashed_password,
                 ))
             )
                 return undefined;
@@ -42,7 +44,7 @@ export default class AuthorizationSubsystem extends SubSystem {
 
             const sessionToken = crypto.getRandomValues(new Uint32Array(16)).join("");
 
-            await sessionsDb`INSERT INTO Sessions (user_id, session_token, device_type, valid_until, ip_address) VALUES (${userId}, ${sessionToken}, ${deviceId}, ${Date.now() + SESSION_VALID_TERM_MS}, ${ipAddress || "Anonymous"})`;
+            await sessionsDb`INSERT INTO tricolor_workspaces.public.sessions (user_id, session_token, device_type, valid_until, ip_address) VALUES (${userId}, ${sessionToken}, ${deviceId}, ${Date.now() + SESSION_VALID_TERM_MS}, ${ipAddress || "Anonymous"})`;
 
             const user = await this.instance.subSystems.users.getUserById(userId);
 
@@ -76,7 +78,7 @@ export default class AuthorizationSubsystem extends SubSystem {
 
             return `workspaces_session:${userId}:${sessionToken}`;
         } catch (err) {
-            this.log.warning(`Failed to create session. -> ${userId} @ ${AuthorizedDeviceType[deviceId]}`);
+            this.log.warning(`Failed to create session. -> ${userId} @ ${AuthorizedDeviceType[deviceId]}`, utils.inspect(err));
 
             return undefined;
         }
@@ -91,11 +93,11 @@ export default class AuthorizationSubsystem extends SubSystem {
         const sessionsDb = this.instance.subSystems.database.db();
 
         const session = (
-            await sessionsDb`SELECT session_id, valid_until FROM Sessions WHERE user_id = ${userId} AND session_token = ${token}`
+            await sessionsDb`SELECT session_id, valid_until FROM tricolor_workspaces.public.sessions WHERE user_id = ${userId} AND session_token = ${token}`
         )?.[0];
 
         if (Number(session?.valid_until) < Date.now()) {
-            await sessionsDb`DELETE FROM Sessions WHERE user_id = ${userId} AND session_token = ${token}`;
+            await sessionsDb`DELETE FROM tricolor_workspaces.public.sessions WHERE user_id = ${userId} AND session_token = ${token}`;
             return undefined;
         }
 
@@ -112,7 +114,7 @@ export default class AuthorizationSubsystem extends SubSystem {
 
         const sessionsDb = this.instance.subSystems.database.db();
 
-        (await sessionsDb`DELETE FROM Sessions WHERE user_id = ${userId} AND session_token = ${token}`)?.[0];
+        (await sessionsDb`DELETE FROM tricolor_workspaces.public.sessions WHERE user_id = ${userId} AND session_token = ${token}`)
 
         return true;
     }
@@ -123,7 +125,7 @@ export default class AuthorizationSubsystem extends SubSystem {
     async endSessionById(userId: number, sessionId: number): Promise<boolean | undefined> {
         const sessionsDb = this.instance.subSystems.database.db();
 
-        (await sessionsDb`DELETE FROM Sessions WHERE user_id = ${userId} AND session_id = ${sessionId}`)?.[0];
+        await sessionsDb`DELETE FROM tricolor_workspaces.public.sessions WHERE user_id = ${userId} AND session_id = ${sessionId}`;
 
         return true;
     }
@@ -140,7 +142,7 @@ export default class AuthorizationSubsystem extends SubSystem {
 
         const hashedPassword = await Bun.password.hash(password);
 
-        await db`UPDATE Users SET hashed_password = ${hashedPassword} WHERE id = ${userId}`;
+        await db`UPDATE tricolor_workspaces.public.users SET hashed_password = ${hashedPassword} WHERE id = ${userId}`;
 
         return true;
     }
@@ -152,7 +154,8 @@ export default class AuthorizationSubsystem extends SubSystem {
             return false;
         }
 
-        let hashedPassword = (await db`SELECT hashed_password FROM Users WHERE id = ${userId}`)?.[0]?.hashed_password;
+        let hashedPassword = (await db`SELECT hashed_password FROM tricolor_workspaces.public.users WHERE id = ${userId}`)?.[0]
+            ?.hashed_password;
 
         return typeof hashedPassword === "string";
     }

@@ -6,7 +6,7 @@ import { createFileUploader } from "@solid-primitives/upload";
 import trpc from "../../../../lib/trpc";
 
 const ProfilePicture: Component = () => {
-    const { files, selectFiles } = createFileUploader({ accept: "image/*" });
+    const { selectFiles } = createFileUploader({ accept: "image/*", multiple: false });
 
     return (
         <UKStackItem

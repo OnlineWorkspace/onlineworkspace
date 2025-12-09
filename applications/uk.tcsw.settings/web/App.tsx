@@ -8,6 +8,7 @@ import StoragePage from "./pages/storage/Index";
 import CustomizationPage from "./pages/customization/Index";
 import InstancePage from "./pages/instance/Index";
 import ResetPasswordPage from "./pages/authentication/reset-password/Index";
+import WallpaperPage from "./pages/customization/wallpaper/Index.tsx";
 
 const App: Component = () => {
     return (
@@ -20,7 +21,11 @@ const App: Component = () => {
                     <Route path={"/reset-password"} component={ResetPasswordPage} />
                 </Route>
                 <Route path={"/storage"} component={StoragePage} />
-                <Route path={"/customization"} component={CustomizationPage} />
+                <Route path={"/customization"}>
+                    <Route path={"/"} component={CustomizationPage} />
+                    <Route path={"/wallpaper"} component={WallpaperPage} />
+                    <Route path={"/color-theme"} component={CustomizationPage} />
+                </Route>
                 <Route path={"/instance"} component={InstancePage} />
             </Route>
         </>

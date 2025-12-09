@@ -13,7 +13,7 @@ export default class ExitCommand extends Command {
 
         const db = self.instance.subSystems.database.db();
 
-        const users = await db`SELECT * FROM Users ORDER BY id ASC`;
+        const users = await db`SELECT * FROM users ORDER BY id ASC`;
 
         log.info(`(ID) | @username | Forename + Surname`);
         for (const user of users) {

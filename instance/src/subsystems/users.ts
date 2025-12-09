@@ -37,7 +37,7 @@ export class WorkspacesUser {
         const db = this.instance.subSystems.database.db();
 
         try {
-            if ((await db`SELECT username FROM Users WHERE username = ${username}`).count !== 0) return false;
+            if ((await db`SELECT username FROM users WHERE username = ${username}`).count !== 0) return false;
 
             await db`UPDATE Users SET username = ${username} WHERE id = ${this.userId}`;
             return true;
@@ -55,7 +55,7 @@ export class WorkspacesUser {
     async getUsername(): Promise<string | undefined> {
         const db = this.instance.subSystems.database.db();
 
-        return (await db`SELECT username FROM Users WHERE id = ${this.userId}`)?.[0]?.username || undefined;
+        return (await db`SELECT username FROM users WHERE id = ${this.userId}`)?.[0]?.username || undefined;
     }
 
     /**
@@ -84,7 +84,7 @@ export class WorkspacesUser {
     async getForename(): Promise<string | undefined> {
         const db = this.instance.subSystems.database.db();
 
-        return (await db`SELECT forename FROM Users WHERE id = ${this.userId}`)?.[0]?.forename || undefined;
+        return (await db`SELECT forename FROM users WHERE id = ${this.userId}`)?.[0]?.forename || undefined;
     }
 
     /**
@@ -113,7 +113,7 @@ export class WorkspacesUser {
     async getSurname(): Promise<string | undefined> {
         const db = this.instance.subSystems.database.db();
 
-        return (await db`SELECT surname FROM Users WHERE id = ${this.userId}`)?.[0]?.surname || undefined;
+        return (await db`SELECT surname FROM users WHERE id = ${this.userId}`)?.[0]?.surname || undefined;
     }
 
     /**
@@ -163,7 +163,7 @@ export class WorkspacesUser {
     async getQuota(): Promise<number | undefined> {
         const db = this.instance.subSystems.database.db();
 
-        return (await db`SELECT storage_quota FROM Users WHERE id = ${this.userId}`)?.[0]?.storage_quota || undefined;
+        return (await db`SELECT storage_quota FROM users WHERE id = ${this.userId}`)?.[0]?.storage_quota || undefined;
     }
 
     /**
@@ -191,7 +191,7 @@ export class WorkspacesUser {
     async getBio(): Promise<string | undefined> {
         const db = this.instance.subSystems.database.db();
 
-        return (await db`SELECT bio FROM Users WHERE id = ${this.userId}`)?.[0]?.bio || undefined;
+        return (await db`SELECT bio FROM users WHERE id = ${this.userId}`)?.[0]?.bio || undefined;
     }
 
     /**
@@ -218,7 +218,7 @@ export class WorkspacesUser {
     async getEmail(): Promise<string | undefined> {
         const db = this.instance.subSystems.database.db();
 
-        return (await db`SELECT email FROM Users WHERE id = ${this.userId}`)?.[0]?.email || undefined;
+        return (await db`SELECT email FROM users WHERE id = ${this.userId}`)?.[0]?.email || undefined;
     }
 
     /**
@@ -246,7 +246,7 @@ export class WorkspacesUser {
     async getGender(): Promise<string | undefined> {
         const db = this.instance.subSystems.database.db();
 
-        return (await db`SELECT gender FROM Users WHERE id = ${this.userId}`)?.[0]?.gender || undefined;
+        return (await db`SELECT gender FROM users WHERE id = ${this.userId}`)?.[0]?.gender || undefined;
     }
 
     /**
@@ -256,7 +256,7 @@ export class WorkspacesUser {
     async isAdministrator(): Promise<boolean | undefined> {
         const db = this.instance.subSystems.database.db();
 
-        return (await db`SELECT is_administrator FROM Users WHERE id = ${this.userId}`)?.[0]?.is_administrator || false;
+        return (await db`SELECT is_administrator FROM users WHERE id = ${this.userId}`)?.[0]?.is_administrator || false;
     }
 
     /**
@@ -373,7 +373,7 @@ export class WorkspacesUser {
 
         const db = this.instance.subSystems.database.db();
 
-        await db`DELETE FROM Users WHERE id = ${this.userId};`;
+        await db`DELETE FROM users WHERE id = ${this.userId};`;
         await db`DELETE FROM Sessions WHERE user_id = ${this.userId};`;
 
         return true;
@@ -463,7 +463,7 @@ export default class UsersSubsystem extends SubSystem {
     async createUser(username: string): Promise<number | undefined> {
         const db = this.instance.subSystems.database.db();
 
-        if ((await db`SELECT username FROM Users WHERE username = ${username}`).count !== 0) return undefined;
+        if ((await db`SELECT username FROM users WHERE username = ${username}`).count !== 0) return undefined;
 
         let user = {
             username,
@@ -495,7 +495,7 @@ export default class UsersSubsystem extends SubSystem {
     async doesUserExist(userId: number): Promise<boolean> {
         const db = this.instance.subSystems.database.db();
 
-        if ((await db`SELECT username FROM Users WHERE id = ${userId}`).count === 1) return true;
+        if ((await db`SELECT username FROM users WHERE id = ${userId}`).count === 1) return true;
 
         return false;
     }
@@ -507,7 +507,7 @@ export default class UsersSubsystem extends SubSystem {
     async getAllUsers(): Promise<WorkspacesUser[]> {
         const db = this.instance.subSystems.database.db();
 
-        return (await db`SELECT id FROM Users`).map((u: { id: number }) => new WorkspacesUser(this.instance, u.id));
+        return (await db`SELECT id FROM users`).map((u: { id: number }) => new WorkspacesUser(this.instance, u.id));
     }
 
     /**
@@ -529,7 +529,7 @@ export default class UsersSubsystem extends SubSystem {
     async getUserByUsername(username: string): Promise<WorkspacesUser | undefined> {
         const db = this.instance.subSystems.database.db();
 
-        const userId = (await db`SELECT id FROM Users WHERE username = ${username}`)?.[0]?.id;
+        const userId = (await db`SELECT id FROM users WHERE username = ${username}`)?.[0]?.id;
 
         if (!(await this.doesUserExist(userId))) return undefined;
 

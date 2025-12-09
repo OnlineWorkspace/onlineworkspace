@@ -357,6 +357,26 @@ const router = t.router({
             return true;
         }),
     },
+    customization: {
+        wallpaper: {
+            wallpaperHistory: procedure.output(z.object({ name: z.string(), previewSrc: z.string() }).array()).query(async (opt) => {
+                return [];
+            }),
+            officialWallpapers: procedure.output(z.object({ name: z.string(), previewSrc: z.string() }).array()).query(async (opt) => {
+                return [];
+            }),
+            currentWallpaper: procedure.query(async (opt) => {
+                const wallpaperPath = path.join((await opt.ctx.user()).getPath(), "assets/wallpapers/current");
+
+                if (!(await fs.exists(wallpaperPath))) return "/assets/tricolor/tricolor.svg";
+
+                return opt.ctx.instance.subSystems.image.serveImage(opt.ctx.userId, wallpaperPath);
+            }),
+            upload: procedure.input(octetInputParser).mutation(async (opt) => {
+                return 0;
+            }),
+        },
+    },
 });
 
 export type TRPCRouter = typeof router;

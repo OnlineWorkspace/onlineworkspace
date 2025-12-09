@@ -24,7 +24,7 @@ const router = t.router({
                         const db = instance.subSystems.database.db();
 
                         const { forename, surname, username } = (
-                            await db`SELECT forename, surname, username FROM Users WHERE id = ${opt.ctx.userId}`
+                            await db`SELECT forename, surname, username FROM users WHERE id = ${opt.ctx.userId}`
                         )?.[0] || { forename: "Unknown", surname: "", username: "@unknown" };
 
                         return {

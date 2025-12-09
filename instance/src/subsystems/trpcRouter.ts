@@ -271,7 +271,7 @@ export const workspacesRouter = t.router({
                 name: procedure.output(z.object({ username: z.string(), forename: z.string(), surname: z.string() })).query(async (opt) => {
                     const db = opt.ctx.instance.subSystems.database.db();
 
-                    const user = (await db`SELECT username, forename, surname FROM Users WHERE id = ${opt.ctx.userId};`)?.[0];
+                    const user = (await db`SELECT username, forename, surname FROM users WHERE id = ${opt.ctx.userId};`)?.[0];
 
                     if (!user) {
                         throw new TRPCError({ code: "NOT_FOUND", cause: { message: "User does not exist" } });
