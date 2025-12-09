@@ -3,13 +3,14 @@ import Widgets from "../../widgets/widgets";
 import styles from "./index.module.scss";
 import UKText from "@tcsw/uikit-solid/src/components/text/UKText.jsx";
 import trpc from "../../lib/trpc";
-import WALLPAPER from "./../../tricolorwallpaper2.svg";
+import DEFAULT_WALLPAPER from "./../../tricolorwallpaper2.svg";
 
 const RootPage: Component = () => {
+    const [wallpaper] = createResource(() => trpc.dashboard.getWallpaper.query());
     const [welcomeMessage] = createResource(() => trpc.dashboard.welcomeMessage.query());
 
     return (
-        <div class={styles.root} style={{ "background-image": `url(${WALLPAPER})` }}>
+        <div class={styles.root} style={{ "background-image": `url(${wallpaper() || DEFAULT_WALLPAPER})` }}>
             <UKText emphasized role="display" size="l" align="center" class={styles.welcomeMessage}>
                 {welcomeMessage() || ""}
             </UKText>

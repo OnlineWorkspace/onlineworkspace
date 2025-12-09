@@ -1,11 +1,14 @@
-import { For, type Component } from "solid-js";
+import { createResource, For, type Component } from "solid-js";
 import styles from "./ThemePreview.module.scss";
 import UKIcon from "@tcsw/uikit-solid/src/components/icon/UKIcon.tsx";
+import trpc from "../../../../lib/trpc.ts";
 
-const ThemePreview: Component<{ wallpaper?: string }> = (props) => {
+const ThemePreview: Component<{ wallpaperOverride?: string }> = (props) => {
+    const [currentWallpaper] = createResource(() => trpc.customization.wallpaper.currentWallpaper.query());
+
     return (
         <div class={styles.root}>
-            <img src={props.wallpaper || "/assets/tricolor/tricolor.svg"} class={styles.wallpaper} />
+            <img src={props.wallpaperOverride || currentWallpaper() || "/assets/tricolor/tricolor.svg"} class={styles.wallpaper} />
             <div class={styles.sidebar}>
                 <div class={styles.menuButton}>
                     <UKIcon>menu</UKIcon>

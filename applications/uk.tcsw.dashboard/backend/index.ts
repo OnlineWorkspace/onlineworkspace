@@ -3,6 +3,8 @@
 import { createTRPCContext, procedure } from "@tcsw/workspaces-instance/src/subsystems/trpcRouter";
 import { initTRPC } from "@trpc/server";
 import z from "zod";
+import path from "path";
+import fs from "fs/promises";
 
 const log = instance.log.createLogger("uk.tcsw.dashboard");
 
@@ -37,6 +39,13 @@ const router = t.router({
         },
         welcomeMessage: procedure.output(z.string()).query(async (opt) => {
             return `Hiya, ${(await (await opt.ctx.instance.subSystems.users.getUserById(opt.ctx.userId))?.getForename()) || "Anonymous"}!`;
+        }),
+        getWallpaper: procedure.query(async (opt) => {
+            const wallpaperPath = path.join((await opt.ctx.user()).getPath(), "assets/wallpapers/current");
+
+            if (!(await fs.exists(wallpaperPath))) return "/assets/tricolor/tricolor.svg";
+
+            return opt.ctx.rawRequest.destinationHostname + opt.ctx.instance.subSystems.image.serveImage(opt.ctx.userId, wallpaperPath);
         }),
     },
 });

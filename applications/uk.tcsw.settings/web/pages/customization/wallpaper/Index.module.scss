@@ -12,10 +12,61 @@
     margin-top: 1rem;
 }
 
+.sectionHeading {
+    margin-left: 1.5rem;
+    margin-top: 1rem;
+}
+
 .noWallpapersMessage {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
     margin-top: 1rem;
     margin-bottom: 1rem;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.wallpaperHistory {
+    display: flex;
+    flex-direction: row;
+    gap: 0.5rem;
+    padding: 1rem;
+}
+
+.wallpaper {
+    aspect-ratio: 16 / 9;
+    height: 8rem;
+    border-radius: var(--uk-sys-shape-corner-large);
+    overflow: hidden;
+    position: relative;
+
+    > img {
+        height: 100%;
+        width: 100%;
+        object-fit: cover;
+
+        transition:
+            width var(--uk-sys-motion-duration-250) var(--uk-sys-motion-easing-emphasized-decelerate),
+            height var(--uk-sys-motion-duration-250) var(--uk-sys-motion-easing-emphasized-decelerate),
+            margin-top var(--uk-sys-motion-duration-250) var(--uk-sys-motion-easing-emphasized-decelerate),
+            margin-left var(--uk-sys-motion-duration-250) var(--uk-sys-motion-easing-emphasized-decelerate);
+    }
+
+    &:hover {
+        > img {
+            --zoom: 4rem;
+
+            margin-top: calc(var(--zoom) * -0.5);
+            margin-left: calc(var(--zoom) * -0.5);
+            height: calc(100% + var(--zoom));
+            width: calc(100% + var(--zoom));
+        }
+    }
+}
+
+.deleteWallpaper {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem
 }

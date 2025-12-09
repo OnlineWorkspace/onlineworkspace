@@ -33,6 +33,7 @@ const UKButton: Component<{
             data-shape={isSelected() ? ((props.shape || "round") === "round" ? "square" : "round") : props.shape || "round"}
             data-color={props.color || "filled"}
             onClick={(e) => {
+                e.stopPropagation();
                 if (props.type === "toggle") {
                     setIsSelected(!isSelected());
                     props.onClick(e);

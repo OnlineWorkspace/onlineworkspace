@@ -2,7 +2,7 @@ import { type BunRequest, type Server } from "bun";
 import type { Instance } from "../index.js";
 import SubSystem from "../subSystems.js";
 import { type TRPCBuiltRouter } from "@trpc/server";
-import { createTRPCContext } from "./trpcRouter.js";
+import { createTRPCContext, workspacesRouter } from "./trpcRouter.js";
 import { type FetchCreateContextFnOptions, fetchRequestHandler } from "@trpc/server/adapters/fetch";
 
 export default class TRPCSubsystem extends SubSystem {

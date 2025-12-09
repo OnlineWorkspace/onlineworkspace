@@ -34,6 +34,7 @@ const UKIconButton: Component<{
             data-selected={isSelected()}
             disabled={props.disabled || false}
             onClick={(e) => {
+                e.stopPropagation();
                 if (props.type === "toggle") {
                     setIsSelected(!isSelected());
                     props.onClick(e);

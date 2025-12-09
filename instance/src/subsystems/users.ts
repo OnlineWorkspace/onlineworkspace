@@ -340,6 +340,7 @@ export class WorkspacesUser {
             "/fs/Videos",
             "/assets",
             "/assets/avatar",
+            "/assets/wallpapers",
             "/system",
             "/system/logs",
             "/system/temp",

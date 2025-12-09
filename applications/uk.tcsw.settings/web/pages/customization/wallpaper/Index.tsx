@@ -1,28 +1,26 @@
 import type { Component } from "solid-js";
-import { createResource, createSignal, For } from "solid-js";
+import { createResource, For } from "solid-js";
 import ThemePreview from "../components/ThemePreview/ThemePreview.tsx";
-import UKIconButton from "@tcsw/uikit-solid/src/components/iconButton/UKIconButton.tsx";
 import { useNavigate } from "@solidjs/router";
 import UKButton from "@tcsw/uikit-solid/src/components/button/UKButton.tsx";
 import styles from "./Index.module.scss";
 import trpc from "../../../lib/trpc.ts";
 import UKDivider from "@tcsw/uikit-solid/src/components/divider/UKDivider.tsx";
 import { DividerDirection } from "@tcsw/uikit-solid/src/components/divider/lib/direction.ts";
-import UKCard from "@tcsw/uikit-solid/src/components/card/UKCard.tsx";
-import UKIcon from "@tcsw/uikit-solid/src/components/icon/UKIcon.tsx";
 import UKText from "@tcsw/uikit-solid/src/components/text/UKText.tsx";
 import { createFileUploader } from "@solid-primitives/upload";
+import UKIconButton from "@tcsw/uikit-solid/src/components/iconButton/UKIconButton.tsx";
 
 const WallpaperPage: Component = () => {
     const navigate = useNavigate();
     const { selectFiles: selectWallpaperUpload } = createFileUploader({ accept: "image/*", multiple: false });
-    const [currentWallpaper, { refetch: refetchCurrentWallpaper, mutate: setCurrentWallpaper }] = createResource(() =>
+    const [currentWallpaper, { refetch: refetchCurrentWallpaper }] = createResource(() =>
         trpc.customization.wallpaper.currentWallpaper.query(),
     );
     const [previousWallpapers, { refetch: refetchWallpapers }] = createResource(() =>
         trpc.customization.wallpaper.wallpaperHistory.query(),
     );
-    const [officialWallpapers, { refetch: refetchOfficialWallpapers }] = createResource(() => trpc.customization.wallpaper.officialWallpapers.query())
+    const [officialWallpapers] = createResource(() => trpc.customization.wallpaper.officialWallpapers.query());
 
     return (
         <div>
@@ -37,14 +35,21 @@ const WallpaperPage: Component = () => {
                 Back
             </UKButton>
             <div class={styles.header}>
-                <ThemePreview wallpaper={currentWallpaper()} />
+                <ThemePreview wallpaperOverride={currentWallpaper()} />
                 <UKButton
                     color={"filled"}
                     leadingIcon={"upload"}
                     onClick={() => {
                         selectWallpaperUpload(async ([{ file }]) => {
+                            let name = await trpc.customization.wallpaper.upload.mutate(file);
 
-                            await trpc.customization.wallpaper.upload.mutate(file);
+                            await refetchWallpapers();
+
+                            await trpc.customization.wallpaper.setWallpaper.mutate({
+                                name: name,
+                            });
+
+                            await refetchCurrentWallpaper();
                         });
                     }}
                 >
@@ -52,6 +57,9 @@ const WallpaperPage: Component = () => {
                 </UKButton>
             </div>
             <UKDivider direction={DividerDirection.horizontal} />
+            <UKText role={"title"} size={"m"} class={styles.sectionHeading}>
+                Previous Wallpapers
+            </UKText>
             <div class={styles.wallpaperHistory}>
                 {previousWallpapers()?.length === 0 ? (
                     <div class={styles.noWallpapersMessage}>
@@ -66,9 +74,25 @@ const WallpaperPage: Component = () => {
                     <For each={previousWallpapers() || []}>
                         {(wallpaper) => {
                             return (
-                                <div>
-                                    wallpaper
-                                    {wallpaper}
+                                <div
+                                    class={styles.wallpaper}
+                                    onClick={async () => {
+                                        await trpc.customization.wallpaper.setWallpaper.mutate({ name: wallpaper.name });
+                                        refetchCurrentWallpaper();
+                                    }}
+                                >
+                                    <UKIconButton
+                                        size={"xs"}
+                                        class={styles.deleteWallpaper}
+                                        icon={"delete"}
+                                        color={"tonal"}
+                                        onClick={async () => {
+                                            await trpc.customization.wallpaper.delete.mutate({ name: wallpaper.name });
+                                            refetchWallpapers();
+                                        }}
+                                        alt={"delete"}
+                                    />
+                                    <img src={wallpaper.previewSrc} />
                                 </div>
                             );
                         }}
@@ -76,8 +100,20 @@ const WallpaperPage: Component = () => {
                 )}
             </div>
             <UKDivider direction={DividerDirection.horizontal} />
+            <UKText role={"title"} size={"m"} class={styles.sectionHeading}>
+                Official Wallpapers
+            </UKText>
             <div class={styles.officialWallpapers}>
-                {officialWallpapers()}
+                <For each={officialWallpapers() || []}>
+                    {(wallpaper) => {
+                        return (
+                            <>
+                                {wallpaper.name}
+                                {wallpaper.previewSrc}
+                            </>
+                        );
+                    }}
+                </For>
             </div>
         </div>
     );

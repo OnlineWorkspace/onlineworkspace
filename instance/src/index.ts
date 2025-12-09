@@ -195,7 +195,7 @@ class Instance {
             createContext: createWorkspacesTRPCContext(this),
         });
 
-        this.log.system.success(`Listening for requests on port ${this.webServer.port}`);
+        this.log.system.success(`Listening for http requests on port ${this.webServer.port}`);
 
         this.log.system.info("Startup complete");
 

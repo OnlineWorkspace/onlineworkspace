@@ -98,7 +98,7 @@ const router = t.router({
             await user.setAvatar(filePath);
             await user.generateAvatars(true);
 
-            await opt.ctx.instance.subSystems.notifications.send(
+            opt.ctx.instance.subSystems.notifications.send(
                 user.userId,
                 "uk.tcsw.settings.profile.setProfilePicture",
                 WorkspacesNotificationPriority.Normal,
@@ -360,7 +360,24 @@ const router = t.router({
     customization: {
         wallpaper: {
             wallpaperHistory: procedure.output(z.object({ name: z.string(), previewSrc: z.string() }).array()).query(async (opt) => {
-                return [];
+                const wallpapersPath = path.join((await opt.ctx.user()).getPath(), "assets/wallpapers");
+
+                let output: {
+                    name: string;
+                    previewSrc: string;
+                }[] = [];
+
+                for (const wallpaperName of await fs.readdir(wallpapersPath)) {
+                    const wallpaperPath = path.join(wallpapersPath, wallpaperName);
+
+                    output.push({
+                        name: wallpaperName,
+                        previewSrc:
+                            opt.ctx.rawRequest.destinationHostname + instance.subSystems.image.serveImage(opt.ctx.userId, wallpaperPath),
+                    });
+                }
+
+                return output;
             }),
             officialWallpapers: procedure.output(z.object({ name: z.string(), previewSrc: z.string() }).array()).query(async (opt) => {
                 return [];
@@ -370,10 +387,30 @@ const router = t.router({
 
                 if (!(await fs.exists(wallpaperPath))) return "/assets/tricolor/tricolor.svg";
 
-                return opt.ctx.instance.subSystems.image.serveImage(opt.ctx.userId, wallpaperPath);
+                return opt.ctx.rawRequest.destinationHostname + opt.ctx.instance.subSystems.image.serveImage(opt.ctx.userId, wallpaperPath);
             }),
             upload: procedure.input(octetInputParser).mutation(async (opt) => {
-                return 0;
+                const wallpapersPath = path.join((await opt.ctx.user()).getPath(), "assets/wallpapers");
+
+                const wallpaperUUID = Bun.randomUUIDv7();
+
+                await fs.writeFile(path.join(wallpapersPath, wallpaperUUID), opt.input);
+
+                return wallpaperUUID;
+            }),
+            delete: procedure.input(z.object({ name: z.string() })).mutation(async (opt) => {
+                const wallpapersPath = path.join((await opt.ctx.user()).getPath(), "assets/wallpapers");
+
+                await fs.rm(path.join(wallpapersPath, opt.input.name));
+
+                return true;
+            }),
+            setWallpaper: procedure.input(z.object({ name: z.string() })).mutation(async (opt) => {
+                const wallpaperPath = path.join((await opt.ctx.user()).getPath(), "assets/wallpapers");
+
+                await fs.copyFile(path.join(wallpaperPath, opt.input.name), path.join(wallpaperPath, "current"));
+
+                return true;
             }),
         },
     },
