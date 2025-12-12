@@ -8,6 +8,7 @@ import z from "zod";
 import path from "path";
 import { octetInputParser } from "@trpc/server/http";
 import fs from "fs/promises";
+import sharp from "sharp";
 
 const log = instance.log.createLogger("uk.tcsw.settings");
 
@@ -368,6 +369,8 @@ const router = t.router({
                 }[] = [];
 
                 for (const wallpaperName of await fs.readdir(wallpapersPath)) {
+                    if (wallpaperName === "current.png" || wallpaperName === "resized" || !wallpaperName.endsWith(".preview.png")) continue;
+
                     const wallpaperPath = path.join(wallpapersPath, wallpaperName);
 
                     output.push({
@@ -383,20 +386,51 @@ const router = t.router({
                 return [];
             }),
             currentWallpaper: procedure.query(async (opt) => {
-                const wallpaperPath = path.join((await opt.ctx.user()).getPath(), "assets/wallpapers/current");
+                const wallpapersRootPath = path.join((await opt.ctx.user()).getPath(), "assets/wallpapers");
+                const rawWallpaperPath = path.join(wallpapersRootPath, "current.png");
+                const resizedWallpapersPath = path.join(wallpapersRootPath, "resized");
+                const requiredResizedWallpaperPath = path.join(resizedWallpapersPath, `${504}x${280}.png`);
 
-                if (!(await fs.exists(wallpaperPath))) return "/assets/tricolor/tricolor.svg";
+                if (!(await fs.exists(rawWallpaperPath))) {
+                    return "/assets/tricolor/tricolor.svg";
+                }
 
-                return opt.ctx.rawRequest.destinationHostname + opt.ctx.instance.subSystems.image.serveImage(opt.ctx.userId, wallpaperPath);
+                if (!(await fs.exists(requiredResizedWallpaperPath))) {
+                    await instance.subSystems.image.resizeImage(
+                        rawWallpaperPath,
+                        requiredResizedWallpaperPath,
+                        { width: 504, height: 280 },
+                        "png",
+                    );
+                }
+
+                return (
+                    opt.ctx.rawRequest.destinationHostname +
+                    opt.ctx.instance.subSystems.image.serveImage(opt.ctx.userId, requiredResizedWallpaperPath)
+                );
             }),
             upload: procedure.input(octetInputParser).mutation(async (opt) => {
                 const wallpapersPath = path.join((await opt.ctx.user()).getPath(), "assets/wallpapers");
 
                 const wallpaperUUID = Bun.randomUUIDv7();
 
-                await fs.writeFile(path.join(wallpapersPath, wallpaperUUID), opt.input);
+                const bytes = await opt.input.bytes();
 
-                return wallpaperUUID;
+                await sharp(bytes)
+                    .toFormat("png")
+                    .toFile(path.join(wallpapersPath, `${wallpaperUUID}.png`));
+
+                console.log(`converted to PNG -> ${path.join(wallpapersPath, `${wallpaperUUID}.png`)}`);
+
+                await instance.subSystems.image.resizeImage(
+                    path.join(wallpapersPath, `${wallpaperUUID}.png`),
+                    path.join(wallpapersPath, `${wallpaperUUID}.preview.png`),
+                    { width: 296, height: 192 },
+                );
+
+                console.log(`resized preview to -> ${path.join(wallpapersPath, `${wallpaperUUID}.preview.png`)}`);
+
+                return wallpaperUUID + ".png";
             }),
             delete: procedure.input(z.object({ name: z.string() })).mutation(async (opt) => {
                 const wallpapersPath = path.join((await opt.ctx.user()).getPath(), "assets/wallpapers");
@@ -407,8 +441,16 @@ const router = t.router({
             }),
             setWallpaper: procedure.input(z.object({ name: z.string() })).mutation(async (opt) => {
                 const wallpaperPath = path.join((await opt.ctx.user()).getPath(), "assets/wallpapers");
+                const resizedWallpapersPath = path.join(wallpaperPath, "resized");
 
-                await fs.copyFile(path.join(wallpaperPath, opt.input.name), path.join(wallpaperPath, "current"));
+                for (const resizedWallpaper of await fs.readdir(resizedWallpapersPath)) {
+                    await fs.rm(path.join(resizedWallpapersPath, resizedWallpaper));
+                }
+
+                await fs.copyFile(
+                    path.join(wallpaperPath, opt.input.name.replace(".preview", "")),
+                    path.join(wallpaperPath, "current.png"),
+                );
 
                 return true;
             }),

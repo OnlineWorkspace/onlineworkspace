@@ -2,6 +2,7 @@ import { randomUUIDv7 } from "bun";
 import { Instance } from "../index.js";
 import SubSystem from "../subSystems.js";
 import sharp from "sharp";
+import fs from "fs/promises"
 
 export default class ImageSubsystem extends SubSystem {
     _internalImages: Map<string, { userId: number; path: string; validUntil: number; public?: boolean }>;
@@ -29,9 +30,15 @@ export default class ImageSubsystem extends SubSystem {
         return `/api/asset/image/${imageId}`;
     }
 
-    async resizeImage(inputPath: string, outputPath: string, dimensions: { width: number; height: number }): Promise<boolean> {
-        await sharp(inputPath).resize(dimensions).toFile(outputPath);
+    async resizeImage(inputPath: string, outputPath: string, dimensions: { width: number; height: number }, changeFormatTo?: "avif" | "jpeg" | "png"): Promise<boolean> {
+        let sharpInstance = sharp(inputPath).resize(dimensions.width, dimensions.height, { withoutEnlargement: true });
 
-        return false;
+        if (changeFormatTo) {
+            sharpInstance.toFormat(changeFormatTo)
+        }
+
+        await sharpInstance.toFile(outputPath);
+
+        return true;
     }
 }

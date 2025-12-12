@@ -15,10 +15,6 @@ export default class DatabaseSubsystem extends SubSystem {
     }
 
     async startup(): Promise<boolean> {
-        await this.instance.subSystems.filesystem.createDirectoryIfNotExists(
-            path.join(this.instance.subSystems.filesystem.FS_ROOT, "databases"),
-        );
-
         this.createPostgresConnection();
 
         return true;

@@ -177,22 +177,22 @@ class Logger {
 
         switch (type) {
             case LogType.INFO:
-                typeString = chalk.bold(`${chalk.white("[")}${chalk.blue("INF")}${chalk.white("]")}`);
+                typeString = chalk.bold(`${chalk.blue("INF")} ${chalk.white("|")}`);
                 break;
             case LogType.WARNING:
-                typeString = chalk.bold(`${chalk.white("[")}${chalk.yellow("WAR")}${chalk.white("]")}`);
+                typeString = chalk.bold(`${chalk.yellow("WAR")} ${chalk.white("|")}`);
                 break;
             case LogType.ERROR:
-                typeString = chalk.bold(`${chalk.white("[")}${chalk.red("ERR")}${chalk.white("]")}`);
+                typeString = chalk.bold(`${chalk.red("ERR")} ${chalk.white("|")}`);
                 break;
             case LogType.SUCCESS:
-                typeString = chalk.bold(`${chalk.white("[")}${chalk.green("SUC")}${chalk.white("]")}`);
+                typeString = chalk.bold(`${chalk.green("SUC")} ${chalk.white("|")}`);
                 break;
             case LogType.DEBUG:
-                typeString = chalk.bold(`${chalk.white("[")}${chalk.magenta("DBG")}${chalk.white("]")}`);
+                typeString = chalk.bold(`${chalk.magenta("DBG")} ${chalk.white("|")}`);
                 break;
             case LogType.PROMPT:
-                typeString = chalk.bold(`${chalk.white("[")}${chalk.cyan("PRM")}${chalk.white("]")} `);
+                typeString = chalk.bold(`${chalk.cyan("PRM")} ${chalk.white("|")} `);
                 break;
             case LogType.RAW:
                 typeString = `     `;

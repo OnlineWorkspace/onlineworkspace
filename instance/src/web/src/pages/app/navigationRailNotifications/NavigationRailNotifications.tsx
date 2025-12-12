@@ -17,34 +17,34 @@ const NavigationRailNotifications: Component<{ expanded: boolean }> = (props) =>
     const [toggled, setToggled] = createSignal<boolean>(false);
     const [notifications, setNotifications] = createSignal<WorkspacesNotification[]>([]);
     const [flyoutNotifications, setFlyoutNotifications] = createSignal<WorkspacesNotification[]>([]);
-    let subscription: Unsubscribable;
-
-    onMount(() => {
-        subscription = trpc.app.notifications.listener.subscribe(undefined, {
-            onData(data) {
-                // @ts-ignore
-                setFlyoutNotifications((not) => {
-                    return [...not, data];
-                });
-
-                // @ts-ignore
-                setNotifications((not) => {
-                    return [...not, data];
-                });
-
-                // if not urgent, remove after FLYOUT_NOTIFICATION_TIMEOUT
-                if (data.priority !== 2) {
-                    setTimeout(() => {
-                        setFlyoutNotifications((not) => not.filter((n) => n.uuid !== data.uuid));
-                    }, FLYOUT_NOTIFICATION_TIMEOUT);
-                }
-            },
-        });
-    });
-
-    onCleanup(() => {
-        subscription.unsubscribe();
-    });
+    // let subscription: Unsubscribable;
+    //
+    // onMount(() => {
+    //     subscription = trpc.app.notifications.listener.subscribe(undefined, {
+    //         onData(data) {
+    //             // @ts-ignore
+    //             setFlyoutNotifications((not) => {
+    //                 return [...not, data];
+    //             });
+    //
+    //             // @ts-ignore
+    //             setNotifications((not) => {
+    //                 return [...not, data];
+    //             });
+    //
+    //             // if not urgent, remove after FLYOUT_NOTIFICATION_TIMEOUT
+    //             if (data.priority !== 2) {
+    //                 setTimeout(() => {
+    //                     setFlyoutNotifications((not) => not.filter((n) => n.uuid !== data.uuid));
+    //                 }, FLYOUT_NOTIFICATION_TIMEOUT);
+    //             }
+    //         },
+    //     });
+    // });
+    //
+    // onCleanup(() => {
+    //     subscription.unsubscribe();
+    // });
 
     return (
         <div class={styles.root} data-expanded={props.expanded}>

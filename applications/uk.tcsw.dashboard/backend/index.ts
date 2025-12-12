@@ -26,7 +26,7 @@ const router = t.router({
                         const db = instance.subSystems.database.db();
 
                         const { forename, surname, username } = (
-                            await db`SELECT forename, surname, username FROM users WHERE id = ${opt.ctx.userId}`
+                            await db`SELECT forename, surname, username FROM tricolor_workspaces.public.users WHERE id = ${opt.ctx.userId}`
                         )?.[0] || { forename: "Unknown", surname: "", username: "@unknown" };
 
                         return {
@@ -40,12 +40,21 @@ const router = t.router({
         welcomeMessage: procedure.output(z.string()).query(async (opt) => {
             return `Hiya, ${(await (await opt.ctx.instance.subSystems.users.getUserById(opt.ctx.userId))?.getForename()) || "Anonymous"}!`;
         }),
-        getWallpaper: procedure.query(async (opt) => {
-            const wallpaperPath = path.join((await opt.ctx.user()).getPath(), "assets/wallpapers/current");
+        getWallpaper: procedure.input(z.object({ width: z.number(), height: z.number() })).query(async (opt) => {
+            const wallpapersRootPath = path.join((await opt.ctx.user()).getPath(), "assets/wallpapers");
+            const rawWallpaperPath = path.join(wallpapersRootPath, "current.png");
+            const resizedWallpapersPath = path.join(wallpapersRootPath, "resized");
+            const requiredResizedWallpaperPath = path.join(resizedWallpapersPath, `${opt.input.width}x${opt.input.height}.png`)
 
-            if (!(await fs.exists(wallpaperPath))) return "/assets/tricolor/tricolor.svg";
+            if (!(await fs.exists(rawWallpaperPath))) {
+                return "/assets/tricolor/tricolor.svg";
+            }
 
-            return opt.ctx.rawRequest.destinationHostname + opt.ctx.instance.subSystems.image.serveImage(opt.ctx.userId, wallpaperPath);
+            if (!(await fs.exists(requiredResizedWallpaperPath))) {
+                await instance.subSystems.image.resizeImage(rawWallpaperPath, requiredResizedWallpaperPath, { width: opt.input.width, height: opt.input.height }, "png");
+            }
+
+            return opt.ctx.rawRequest.destinationHostname + opt.ctx.instance.subSystems.image.serveImage(opt.ctx.userId, requiredResizedWallpaperPath);
         }),
     },
 });

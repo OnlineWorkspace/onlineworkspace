@@ -6,7 +6,7 @@ import trpc from "../../lib/trpc";
 import DEFAULT_WALLPAPER from "./../../tricolorwallpaper2.svg";
 
 const RootPage: Component = () => {
-    const [wallpaper] = createResource(() => trpc.dashboard.getWallpaper.query());
+    const [wallpaper] = createResource(() => trpc.dashboard.getWallpaper.query({ width: screen.width, height: screen.height }));
     const [welcomeMessage] = createResource(() => trpc.dashboard.welcomeMessage.query());
 
     return (

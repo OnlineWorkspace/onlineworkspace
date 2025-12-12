@@ -37,9 +37,9 @@ export class WorkspacesUser {
         const db = this.instance.subSystems.database.db();
 
         try {
-            if ((await db`SELECT username FROM users WHERE username = ${username}`).count !== 0) return false;
+            if ((await db`SELECT username FROM tricolor_workspaces.public.users WHERE username = ${username}`).count !== 0) return false;
 
-            await db`UPDATE Users SET username = ${username} WHERE id = ${this.userId}`;
+            await db`UPDATE tricolor_workspaces.public.users SET username = ${username} WHERE id = ${this.userId}`;
             return true;
         } catch (err) {
             this.instance.subSystems.users.log.error(`Failed to set username for ${this.userId}`);
@@ -341,6 +341,7 @@ export class WorkspacesUser {
             "/assets",
             "/assets/avatar",
             "/assets/wallpapers",
+            "/assets/wallpapers/resized",
             "/system",
             "/system/logs",
             "/system/temp",
