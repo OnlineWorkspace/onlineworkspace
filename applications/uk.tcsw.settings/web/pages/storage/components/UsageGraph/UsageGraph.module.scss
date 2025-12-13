@@ -1,0 +1,53 @@
+.root {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.bar {
+    display: flex;
+    background: #000;
+    height: 2rem;
+    width: 100%;
+    overflow: hidden;
+}
+
+.barSegment {
+    overflow: hidden;
+    position: relative;
+
+    &::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        background: gray;
+        height: 2rem;
+        width: 100%;
+    }
+
+    &:last-of-type {
+        border-top-right-radius: var(--uk-sys-shape-corner-extra-small);
+        border-bottom-right-radius: var(--uk-sys-shape-corner-extra-small);
+    }
+
+    &:first-of-type {
+        border-top-left-radius: var(--uk-sys-shape-corner-extra-small);
+        border-bottom-left-radius: var(--uk-sys-shape-corner-extra-small);
+    }
+
+    &:not(:last-of-type) {
+        border-right: 1px solid rgb(var(--uk-sys-color-outline));
+    }
+}
+
+.barLabel {
+    position: absolute;
+    left: 0;
+    top: 2rem;
+    color: white;
+    text-overflow: ellipsis;
+    margin: 0.5rem;
+    max-width: 100%;
+    overflow: hidden;
+}

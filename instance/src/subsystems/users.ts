@@ -419,7 +419,7 @@ export default class UsersSubsystem extends SubSystem {
             surname TEXT,
             gender TEXT DEFAULT 'other',
             bio TEXT,
-            storage_quota BIGINT,
+            storage_quota BIGINT DEFAULT 10,
             email TEXT,
             is_administrator BOOL DEFAULT FALSE,
             is_email_verified BOOL DEFAULT FALSE,

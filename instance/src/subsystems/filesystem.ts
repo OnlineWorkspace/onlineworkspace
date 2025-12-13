@@ -27,4 +27,42 @@ export default class FilesystemSubsystem extends SubSystem {
 
         return true;
     }
+
+    getFileType(path: string) {
+        const extension = path.split(".").pop();
+
+        switch (extension) {
+            case "avif":
+            case "jpg":
+            case "jpeg":
+            case "png":
+                return "image";
+            case "txt":
+            case "json":
+            case "js":
+            case "ts":
+            case "tsx":
+            case "scss":
+            case "sass":
+            case "yml":
+            case "yaml":
+            case "xml":
+            case "py":
+            case "toml":
+            case "rs":
+            case "html":
+            case "htm":
+            case "css":
+            case "jsm":
+            case "tsm":
+            case "tsc":
+            case "jsc":
+            case "sql":
+                return "plaintext";
+        }
+
+        this.log.warning(`Unknown file format: '${path}' ext: '${extension}'`);
+
+        return undefined;
+    }
 }

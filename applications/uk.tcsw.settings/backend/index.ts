@@ -406,7 +406,7 @@ const router = t.router({
 
                 return (
                     opt.ctx.rawRequest.destinationHostname +
-                    opt.ctx.instance.subSystems.image.serveImage(opt.ctx.userId, requiredResizedWallpaperPath)
+                    opt.ctx.instance.subSystems.image.serveImage(opt.ctx.userId, requiredResizedWallpaperPath, false, true)
                 );
             }),
             upload: procedure.input(octetInputParser).mutation(async (opt) => {
@@ -455,6 +455,76 @@ const router = t.router({
                 return true;
             }),
         },
+    },
+    storage: {
+        usage: procedure
+            .output(z.object({ displayName: z.string(), percentage: z.number(), size: z.number() }).array())
+            .query(async (opt) => {
+                async function getChildFiles(dir: string) {
+                    const children = await fs.readdir(dir);
+
+                    let output: { type: string | undefined; size: number; path: string }[] = [];
+
+                    for (const child of children) {
+                        const childPath = path.join(dir, child);
+                        const childLstat = await fs.lstat(childPath);
+
+                        if (childLstat.isDirectory()) {
+                            output = [...output, ...(await getChildFiles(childPath))];
+                        } else {
+                            output.push({
+                                path: childPath,
+                                size: childLstat.size,
+                                type: instance.subSystems.filesystem.getFileType(childPath),
+                            });
+                        }
+                    }
+
+                    return output;
+                }
+
+                let files = await getChildFiles((await opt.ctx.user()).getPath());
+
+                let categories: { [categoryId: string]: { fileCount: number; size: number; percentage: number } } = {};
+
+                for (const file of files) {
+                    if (file.type === undefined) {
+                        file.type = "unknown";
+                    }
+
+                    if (!categories[file.type]) {
+                        categories[file.type] = {
+                            fileCount: 0,
+                            size: 0,
+                            percentage: 0,
+                        };
+                    }
+
+                    categories[file.type] = {
+                        fileCount: categories[file.type].fileCount + 1,
+                        size: categories[file.type].size + file.size,
+                        percentage: 0,
+                    };
+                }
+
+                let output: { displayName: string; percentage: number; size: number }[] = [];
+
+                let storageQuota = (await (await opt.ctx.user()).getQuota()) || 1;
+
+                for (const categoryName of Object.keys(categories)) {
+                    const category = categories[categoryName];
+
+                    output.push({
+                        displayName: categoryName,
+                        percentage: Number((category.size / 1000000000 / storageQuota).toFixed(2)),
+                        size: category.size / 1000000000,
+                    });
+                }
+
+                output = output.sort((i, j) => i.size - j.size).reverse();
+
+                return output;
+            }),
     },
 });
 
