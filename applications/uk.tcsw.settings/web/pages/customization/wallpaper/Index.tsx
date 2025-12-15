@@ -64,7 +64,7 @@ const WallpaperPage: Component = () => {
                 Previous Wallpapers
             </UKText>
             <div class={styles.wallpaperHistory}>
-                <Suspense fallback={<UKIndeterminateSpinner/>}>
+                <Suspense fallback={<UKIndeterminateSpinner />}>
                     {previousWallpapers()?.length === 0 ? (
                         <div class={styles.noWallpapersMessage}>
                             <UKText role={"title"} size={"l"} align={"center"}>
@@ -112,10 +112,15 @@ const WallpaperPage: Component = () => {
                 <For each={officialWallpapers() || []}>
                     {(wallpaper) => {
                         return (
-                            <>
-                                {wallpaper.name}
-                                {wallpaper.previewSrc}
-                            </>
+                            <div
+                                class={styles.wallpaper}
+                                onClick={async () => {
+                                    await trpc.customization.wallpaper.setOfficialWallpaper.mutate({ name: wallpaper.name });
+                                    refetchCurrentWallpaper();
+                                }}
+                            >
+                                <img src={wallpaper.previewSrc} alt={"wallpaper preview"} />
+                            </div>
                         );
                     }}
                 </For>

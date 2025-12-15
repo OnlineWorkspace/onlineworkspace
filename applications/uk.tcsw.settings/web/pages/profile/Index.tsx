@@ -9,6 +9,7 @@ import Username from "./components/Username/Username";
 import Name from "./components/Name/Name";
 import Gender from "./components/Gender/Gender";
 import Email from "./components/Email/Email";
+import Bio from "./components/Bio/Bio.tsx";
 
 const ProfilePage: Component = () => {
     const [name] = createResource(() => trpc.profile.getName.query());
@@ -36,6 +37,7 @@ const ProfilePage: Component = () => {
                 <Username />
                 <Name />
                 <Gender />
+                <Bio/>
             </UKStack>
             <UKText class={styles.subheading} role="title" size="m" align="start">
                 Contact info

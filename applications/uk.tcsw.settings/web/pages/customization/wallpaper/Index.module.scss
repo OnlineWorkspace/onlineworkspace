@@ -32,6 +32,15 @@
     flex-direction: row;
     gap: 0.5rem;
     padding: 1rem;
+    flex-wrap: wrap;
+}
+
+.officialWallpapers {
+    display: flex;
+    flex-direction: row;
+    gap: 0.5rem;
+    padding: 1rem;
+    flex-wrap: wrap;
 }
 
 .wallpaper {
@@ -40,6 +49,7 @@
     border-radius: var(--uk-sys-shape-corner-large);
     overflow: hidden;
     position: relative;
+    flex-grow: 1;
 
     > img {
         height: 100%;

@@ -5,15 +5,16 @@
 }
 
 .bar {
+    --bar-height: 2rem;
+
     display: flex;
     background: #000;
-    height: 2rem;
+    height: var(--bar-height);
+    margin-bottom: calc(var(--uk-sys-typescale-label-medium-line-height) + 1rem);
     width: 100%;
-    overflow: hidden;
 }
 
 .barSegment {
-    overflow: hidden;
     position: relative;
 
     &::before {
@@ -22,18 +23,22 @@
         top: 0;
         left: 0;
         background: gray;
-        height: 2rem;
+        height: var(--bar-height);
         width: 100%;
     }
 
     &:last-of-type {
-        border-top-right-radius: var(--uk-sys-shape-corner-extra-small);
-        border-bottom-right-radius: var(--uk-sys-shape-corner-extra-small);
+        &::before {
+            border-top-right-radius: var(--uk-sys-shape-corner-extra-small);
+            border-bottom-right-radius: var(--uk-sys-shape-corner-extra-small);
+        }
     }
 
     &:first-of-type {
-        border-top-left-radius: var(--uk-sys-shape-corner-extra-small);
-        border-bottom-left-radius: var(--uk-sys-shape-corner-extra-small);
+        &::before {
+            border-top-left-radius: var(--uk-sys-shape-corner-extra-small);
+            border-bottom-left-radius: var(--uk-sys-shape-corner-extra-small);
+        }
     }
 
     &:not(:last-of-type) {
@@ -44,7 +49,7 @@
 .barLabel {
     position: absolute;
     left: 0;
-    top: 2rem;
+    top: var(--bar-height);
     color: white;
     text-overflow: ellipsis;
     margin: 0.5rem;

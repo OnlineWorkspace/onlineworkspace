@@ -79,6 +79,16 @@ const router = t.router({
 
             return true;
         }),
+        getBio: procedure.output(z.string()).query(async (opt) => {
+            const bio = await (await opt.ctx.instance.subSystems.users.getUserById(opt.ctx.userId))?.getBio();
+
+            return bio || "";
+        }),
+        setBio: procedure.input(z.string()).mutation(async (opt) => {
+            await (await opt.ctx.instance.subSystems.users.getUserById(opt.ctx.userId))?.setBio(opt.input);
+
+            return true;
+        }),
         getRole: procedure.output(z.string()).query(async (opt) => {
             const isAdministrator = await (await opt.ctx.instance.subSystems.users.getUserById(opt.ctx.userId))?.isAdministrator();
 
@@ -383,7 +393,24 @@ const router = t.router({
                 return output;
             }),
             officialWallpapers: procedure.output(z.object({ name: z.string(), previewSrc: z.string() }).array()).query(async (opt) => {
-                return [];
+                const officialWallpapersPath = path.join(instance.subSystems.filesystem.SRC_ROOT, "assets/wallpapers");
+
+                let output: {
+                    name: string;
+                    previewSrc: string;
+                }[] = [];
+
+                for (const wallpaperName of await fs.readdir(officialWallpapersPath)) {
+                    const wallpaperPath = path.join(officialWallpapersPath, wallpaperName);
+
+                    output.push({
+                        name: wallpaperName,
+                        previewSrc:
+                            opt.ctx.rawRequest.destinationHostname + instance.subSystems.image.serveImage(opt.ctx.userId, wallpaperPath),
+                    });
+                }
+
+                return output;
             }),
             currentWallpaper: procedure.query(async (opt) => {
                 const wallpapersRootPath = path.join((await opt.ctx.user()).getPath(), "assets/wallpapers");
@@ -451,6 +478,19 @@ const router = t.router({
                     path.join(wallpaperPath, opt.input.name.replace(".preview", "")),
                     path.join(wallpaperPath, "current.png"),
                 );
+
+                return true;
+            }),
+            setOfficialWallpaper: procedure.input(z.object({ name: z.string() })).mutation(async (opt) => {
+                const wallpaperPath = path.join((await opt.ctx.user()).getPath(), "assets/wallpapers");
+                const officialWallpaperPath = path.join(instance.subSystems.filesystem.SRC_ROOT, "assets/wallpapers");
+                const resizedWallpapersPath = path.join(wallpaperPath, "resized");
+
+                for (const resizedWallpaper of await fs.readdir(resizedWallpapersPath)) {
+                    await fs.rm(path.join(resizedWallpapersPath, resizedWallpaper));
+                }
+
+                await fs.copyFile(path.join(officialWallpaperPath, opt.input.name), path.join(wallpaperPath, "current.png"));
 
                 return true;
             }),

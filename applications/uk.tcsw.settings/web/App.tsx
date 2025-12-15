@@ -9,6 +9,7 @@ import CustomizationPage from "./pages/customization/Index";
 import InstancePage from "./pages/instance/Index";
 import ResetPasswordPage from "./pages/authentication/reset-password/Index";
 import WallpaperPage from "./pages/customization/wallpaper/Index.tsx";
+import ColorThemePage from "./pages/customization/colorTheme/Index.tsx";
 
 const App: Component = () => {
     return (
@@ -24,7 +25,7 @@ const App: Component = () => {
                 <Route path={"/customization"}>
                     <Route path={"/"} component={CustomizationPage} />
                     <Route path={"/wallpaper"} component={WallpaperPage} />
-                    <Route path={"/color-theme"} component={CustomizationPage} />
+                    <Route path={"/color-theme"} component={ColorThemePage} />
                 </Route>
                 <Route path={"/instance"} component={InstancePage} />
             </Route>

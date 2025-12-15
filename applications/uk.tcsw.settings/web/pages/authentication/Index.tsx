@@ -10,7 +10,7 @@ import UKIndeterminateSpinner from "@tcsw/uikit-solid/src/components/indetermina
 
 const AuthenticationPage: Component = () => {
     return (
-        <Suspense fallback={<UKIndeterminateSpinner />}>
+        <Suspense fallback={<UKIndeterminateSpinner class={styles.spinner} />}>
             <div class={styles.root}>
                 <UKText class={styles.subheading} role="title" size="m" align="start">
                     Login methods
