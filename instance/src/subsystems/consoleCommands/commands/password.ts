@@ -9,42 +9,18 @@ export default class PasswordCommand extends Command {
     async run(parameters: ICommandRuntimeParameters) {
         const self = this;
 
-        let password = "";
+        let username = await this.promptUser("Username", async (u) => {
+            console.log("entered '" + u + "'");
+            return await this.instance.subSystems.users.doesUserExist(Number(u));
+        });
+        let newPassword = await this.promptUser("Password", () => true);
 
-        let username = await this.promptUser("Username", () => true);
-        console.log(username);
+        const userId = (await this.instance.subSystems.users.getUserByUsername(username))?.userId;
 
-        // self.log._internal_promptMessage("Username -> ");
-        // self.instance.subSystems.consoleCommands.currentCommandInterface.cb = async (data) => {
-        //     username = data.trim();
-        //     if (username !== "") {
-        //         self.log._internal_promptMessage("Password -> ");
-        //         self.instance.subSystems.consoleCommands.currentCommandInterface.cb = async (data) => {
-        //             password = data.trim();
-        //             if (password !== "") {
-        //                 const db = this.instance.subSystems.database.db();
+        if (!userId) return this.finishRun();
 
-        //                 const { id: userId } = (await db`SELECT id FROM users WHERE username = ${username}`)?.[0] || { id: undefined };
-
-        //                 if (!userId) {
-        //                     self.log.error(`No such user ${username}`);
-        //                     return this.finishRun();
-        //                 }
-
-        //                 this.instance.subSystems.authorization.setPassword(userId, password);
-        //                 self.log.success(`Set password for ${username}(${userId}) to '${password}'`);
-
-        //                 return this.finishRun();
-        //             } else {
-        //                 self.log._internal_promptMessage("Password -> ");
-        //             }
-        //         };
-        //     } else {
-        //         self.log._internal_promptMessage("Username -> ");
-        //     }
-        // };
+        await this.instance.subSystems.authorization.setPassword(userId, newPassword);
 
         return this.finishRun();
-        return this.continueRun();
     }
 }

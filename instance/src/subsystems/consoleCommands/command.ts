@@ -30,7 +30,7 @@ export default abstract class Command {
         return this;
     }
 
-    promptUser(message: string, validate?: (value: string) => boolean): Promise<string> {
+    promptUser(message: string, validate?: (value: string) => boolean | Promise<boolean>): Promise<string> {
         return new Promise<string>((resolve) => {
             const prompt = `${message} -> `;
             this.instance.subSystems.consoleCommands.currentCommandInterface.active = true;
@@ -38,7 +38,7 @@ export default abstract class Command {
             this.instance.subSystems.consoleCommands.currentCommandInterface.cb = async (data) => {
                 if (!validate) return resolve(data);
 
-                if (validate(data)) {
+                if (await validate(data)) {
                     return resolve(data);
                 } else {
                     this.log.error("invalid input");

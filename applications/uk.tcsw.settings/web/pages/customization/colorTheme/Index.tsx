@@ -1,10 +1,24 @@
-import type { Component } from "solid-js";
+import { createEffect, createResource, type Component } from "solid-js";
 import UKButton from "@tcsw/uikit-solid/src/components/button/UKButton.tsx";
 import { useNavigate } from "@solidjs/router";
-import styles from "./Index.module.scss"
+import styles from "./Index.module.scss";
+import TriColorPreview from "./components/TriColorPreview/TriColorPreview.tsx";
+import { themeFromImage } from "@material/material-color-utilities";
+import trpc from "../../../lib/trpc.ts";
 
 const ColorThemePage: Component = () => {
-    const navigate = useNavigate()
+    const navigate = useNavigate();
+    const [wallpaperSrc] = createResource(() => trpc.customization.wallpaper.currentWallpaper.query());
+
+    createEffect(async () => {
+        if (wallpaperSrc() === undefined) return;
+
+        let sourceImage = new Image();
+        sourceImage.crossOrigin = "http://localhost:5173";
+        sourceImage.src = wallpaperSrc()!;
+
+        console.log(await themeFromImage(sourceImage));
+    });
 
     return (
         <div>
@@ -18,9 +32,18 @@ const ColorThemePage: Component = () => {
             >
                 Back
             </UKButton>
-            Color Theme
+            Matched to your wallpaper
+            <TriColorPreview colors={["#fff", "#f00", "#0f0"]} />
+            <TriColorPreview colors={["#fff", "#f00", "#0f0"]} />
+            <TriColorPreview colors={["#fff", "#f00", "#0f0"]} />
+            <TriColorPreview colors={["#fff", "#f00", "#0f0"]} />
+            Static colors
+            <TriColorPreview colors={["#fff", "#f00", "#0f0"]} />
+            <TriColorPreview colors={["#fff", "#f00", "#0f0"]} />
+            <TriColorPreview colors={["#fff", "#f00", "#0f0"]} />
+            <TriColorPreview colors={["#fff", "#f00", "#0f0"]} />
         </div>
     );
-}
+};
 
-export default ColorThemePage
+export default ColorThemePage;

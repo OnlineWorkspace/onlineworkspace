@@ -18,6 +18,7 @@ import TRPCSubsystem from "./subsystems/trpc.js";
 import chalk from "chalk";
 import ImageSubsystem from "./subsystems/image.js";
 import SettingsSubsystem from "./subsystems/settings.js";
+import WebFrontendSubsystem from "./subsystems/webFrontend.js";
 
 export enum InstanceStatus {
     Online,
@@ -49,6 +50,7 @@ class Instance {
         this.subSystems.tRPC = new TRPCSubsystem(this);
         this.subSystems.image = new ImageSubsystem(this);
         this.subSystems.settings = new SettingsSubsystem(this);
+        this.subSystems.webFrontend = new WebFrontendSubsystem(this);
 
         this.status = InstanceStatus.Offline;
 
@@ -74,9 +76,9 @@ class Instance {
             let subSystemState = await sys.startup();
 
             if (subSystemState === true) {
-                sys.log.success("Startup Complete...");
+                sys.log.success(`${sys.id}: Startup Complete...`);
             } else {
-                sys.log.error("Startup Failed!");
+                sys.log.error(`${sys.id}: Startup Failed!`);
             }
         }
 
@@ -177,7 +179,14 @@ class Instance {
                                 }
                             }
 
-                            return new Response(file(image.path));
+                            return new Response(file(image.path), {
+                                headers: {
+                                    "Access-Control-Allow-Origin": "http://localhost:5173", // TODO: change this according to a config file
+                                    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+                                    "Access-Control-Allow-Headers": "Content-Type, Authorization",
+                                    "Access-Control-Allow-Credentials": "true",
+                                },
+                            });
                         },
                     },
                 },

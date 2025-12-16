@@ -1,0 +1,28 @@
+.root {
+    display: grid;
+
+    --size: 2rem;
+
+    padding: 0.5rem;
+
+    grid-template-columns: var(--size) var(--size);
+    grid-template-rows: var(--size) var(--size);
+
+    width: max-content;
+    height: max-content;
+}
+
+.colorOne {
+    border-top-left-radius: var(--size);
+    border-top-right-radius: var(--size);
+    grid-column-start: 1;
+    grid-column-end: 3;
+}
+
+.colorTwo {
+    border-bottom-left-radius: var(--size);
+}
+
+.colorThree {
+    border-bottom-right-radius: var(--size);
+}

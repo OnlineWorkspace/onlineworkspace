@@ -82,7 +82,7 @@ const WallpaperPage: Component = () => {
                                         class={styles.wallpaper}
                                         onClick={async () => {
                                             await trpc.customization.wallpaper.setWallpaper.mutate({ name: wallpaper.name });
-                                            refetchCurrentWallpaper();
+                                            window.location.reload();
                                         }}
                                     >
                                         <UKIconButton
@@ -96,7 +96,7 @@ const WallpaperPage: Component = () => {
                                             }}
                                             alt={"delete"}
                                         />
-                                        <img src={wallpaper.previewSrc} alt={"wallpaper preview"} />
+                                        <img src={wallpaper.previewSrc} loading={"lazy"} alt={"wallpaper preview"} />
                                     </div>
                                 );
                             }}
@@ -116,10 +116,10 @@ const WallpaperPage: Component = () => {
                                 class={styles.wallpaper}
                                 onClick={async () => {
                                     await trpc.customization.wallpaper.setOfficialWallpaper.mutate({ name: wallpaper.name });
-                                    refetchCurrentWallpaper();
+                                    window.location.reload();
                                 }}
                             >
-                                <img src={wallpaper.previewSrc} alt={"wallpaper preview"} />
+                                <img src={wallpaper.previewSrc} loading={"lazy"} alt={"wallpaper preview"} />
                             </div>
                         );
                     }}

@@ -6,4 +6,9 @@
     font-size: 2rem;
     min-height: 100vh;
     width: 100%;
+
+    &::selection {
+        background-color: rgb(var(--uk-sys-color-primary));
+        color: rgb(var(--uk-sys-color-on-primary));
+    }
 }

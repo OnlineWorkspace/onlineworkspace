@@ -3,6 +3,7 @@
     "author": "Tricolor Software",
     "private": true,
     "dependencies": {
+        "@material/material-color-utilities": "^0.3.0",
         "@solid-primitives/upload": "^0.1.3",
         "@solidjs/router": "^0.15.3",
         "@tcsw/uikit-solid": "workspace:*",

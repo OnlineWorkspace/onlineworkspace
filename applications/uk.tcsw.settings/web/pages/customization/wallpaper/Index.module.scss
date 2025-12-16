@@ -72,11 +72,16 @@
             height: calc(100% + var(--zoom));
             width: calc(100% + var(--zoom));
         }
+
+        .deleteWallpaper {
+            opacity: 1;
+        }
     }
 }
 
 .deleteWallpaper {
     position: absolute;
     top: 0.5rem;
-    right: 0.5rem
+    right: 0.5rem;
+    opacity: 0;
 }

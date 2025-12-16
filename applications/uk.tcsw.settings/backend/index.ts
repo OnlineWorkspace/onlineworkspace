@@ -495,6 +495,25 @@ const router = t.router({
                 return true;
             }),
         },
+        colorTheme: {
+            wallpaperPixeldata: procedure.output(z.number().array()).query(async (opt) => {
+                const wallpaperPath = path.join((await opt.ctx.user()).getPath(), "assets/wallpapers/resized", `${504}x${280}.png`);
+
+                let buf = (await sharp(wallpaperPath).raw().toBuffer({ resolveWithObject: true })).data;
+                let newBuf = [];
+
+                for (let i = 0; i < buf.length; i += 4) {
+                    // RGBA to ARGB
+                    newBuf.push(buf[i + 3]);
+                    newBuf.push(buf[i]);
+                    newBuf.push(buf[i + 1]);
+                    newBuf.push(buf[i + 2]);
+                }
+
+                // wallpaper pixeldata in ARGB format
+                return newBuf;
+            }),
+        },
     },
     storage: {
         usage: procedure
