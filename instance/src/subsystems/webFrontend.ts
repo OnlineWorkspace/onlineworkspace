@@ -13,13 +13,17 @@ export default class WebFrontendSubsystem extends SubSystem {
     }
 
     async startup(): Promise<boolean> {
-        return false;
-
         this.viteServer = await createViteServer({
             configFile: path.join(this.instance.subSystems.filesystem.SRC_ROOT, "web/vite.config.ts"),
             configLoader: "native",
             root: path.join(this.instance.subSystems.filesystem.SRC_ROOT, "web"),
+            clearScreen: false
         });
+
+        await this.viteServer.listen()
+
+        this.log.info("Listening for web requests at:")
+        this.viteServer.printUrls()
 
         return true;
     }

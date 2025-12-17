@@ -20,6 +20,26 @@
     object-fit: cover;
     z-index: -1;
     border-radius: calc(var(--uk-sys-shape-corner-large) - 0.25rem);
+    animation: fadeIn forwards 0.25s var(--uk-sys-motion-easing-standard-decelerate);
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            filter: blur(0.25rem);
+        }
+        to {
+            opacity: 1;
+            filter: blur(0);
+        }
+    }
+}
+
+.wallpaperSpinner {
+    position: absolute;
+    top: 50%;
+    left: calc(50% + 24px);
+    transform: translate(-50%, -50%);
+    z-index: -1;
 }
 
 .sidebar {

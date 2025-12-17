@@ -1,9 +1,10 @@
-import { type Component, lazy } from "solid-js";
+import { type Component, lazy, Suspense } from "solid-js";
 import { Route, Router } from "@solidjs/router";
 import { UIKitRoot } from "@tcsw/uikit-solid/src/index.tsx";
 import AppIndex from "./pages/app/App.tsx";
 import AuthCheck from "./pages/app/AuthCheck.tsx";
 import InternalDialogueRoot from "@tcsw/uikit-solid/src/components/dialogue/InternalDialogueRoot.jsx";
+import UKIndeterminateSpinner from "@tcsw/uikit-solid/src/components/indeterminateSpinner/UKIndeterminateSpinner.tsx";
 
 const ApplicationsRouter = lazy(() => import("../../../../fs/Applications.tsx"));
 
@@ -24,7 +25,9 @@ const App: Component = () => {
                         <Route component={lazy(() => import("./pages/app/Layout.tsx"))}>
                             <Route path={"app"}>
                                 <Route path={"/"} component={AppIndex} />
-                                <ApplicationsRouter />
+                                <Suspense fallback={<UKIndeterminateSpinner />}>
+                                    <ApplicationsRouter />
+                                </Suspense>
                             </Route>
                             <Route path={"*"} component={lazy(() => import("./pages/notFound/Index.tsx"))} />
                         </Route>

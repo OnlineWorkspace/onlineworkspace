@@ -1,14 +1,21 @@
-import { createResource, For, type Component } from "solid-js";
+import { type Component, createResource, For, Suspense } from "solid-js";
 import styles from "./ThemePreview.module.scss";
 import UKIcon from "@tcsw/uikit-solid/src/components/icon/UKIcon.tsx";
 import trpc from "../../../../lib/trpc.ts";
+import UKIndeterminateSpinner from "@tcsw/uikit-solid/src/components/indeterminateSpinner/UKIndeterminateSpinner.tsx";
 
 const ThemePreview: Component<{ wallpaperOverride?: string }> = (props) => {
     const [currentWallpaper] = createResource(() => trpc.customization.wallpaper.currentWallpaper.query());
 
     return (
         <div class={styles.root}>
-            <img src={props.wallpaperOverride || currentWallpaper() || "/assets/tricolor/tricolor.svg"} class={styles.wallpaper} />
+            <Suspense fallback={<UKIndeterminateSpinner class={styles.wallpaperSpinner} />}>
+                <img
+                    alt={""}
+                    src={props.wallpaperOverride || currentWallpaper() || "/assets/tricolor/tricolor.svg"}
+                    class={styles.wallpaper}
+                />
+            </Suspense>
             <div class={styles.sidebar}>
                 <div class={styles.menuButton}>
                     <UKIcon>menu</UKIcon>

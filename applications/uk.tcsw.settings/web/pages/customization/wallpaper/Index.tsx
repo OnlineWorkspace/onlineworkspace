@@ -82,7 +82,7 @@ const WallpaperPage: Component = () => {
                                         class={styles.wallpaper}
                                         onClick={async () => {
                                             await trpc.customization.wallpaper.setWallpaper.mutate({ name: wallpaper.name });
-                                            window.location.reload();
+                                            refetchCurrentWallpaper();
                                         }}
                                     >
                                         <UKIconButton
@@ -116,7 +116,8 @@ const WallpaperPage: Component = () => {
                                 class={styles.wallpaper}
                                 onClick={async () => {
                                     await trpc.customization.wallpaper.setOfficialWallpaper.mutate({ name: wallpaper.name });
-                                    window.location.reload();
+
+                                    refetchCurrentWallpaper()
                                 }}
                             >
                                 <img src={wallpaper.previewSrc} loading={"lazy"} alt={"wallpaper preview"} />
