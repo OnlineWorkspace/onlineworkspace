@@ -16,6 +16,7 @@
 
 .barSegment {
     position: relative;
+    min-width: 2ch;
 
     &::before {
         content: "";

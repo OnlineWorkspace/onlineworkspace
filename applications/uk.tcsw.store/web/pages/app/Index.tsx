@@ -14,7 +14,7 @@ import UKStackItem from "@tcsw/uikit-solid/src/components/stack/UKStackItem.jsx"
 const ApplicationPage: Component = () => {
     const { applicationId, repository } = useParams();
     const navigate = useNavigate();
-    const [application, { refetch: refetchApplication }] = createResource(() => trpc.app.get.query({ applicationId, repository }));
+    const [application] = createResource(() => trpc.app.get.query({ applicationId, repository }));
 
     return (
         <div class={styles.root}>
@@ -29,11 +29,11 @@ const ApplicationPage: Component = () => {
                 Back
             </UKButton>
             <div class={styles.header}>
-                <img class={styles.headerImage} src={application()?.bannerImage || "/assets/tricolor/tricolor.svg"} />
+                <img alt={""} class={styles.headerImage} src={application()?.bannerImage || "/assets/tricolor/tricolor.svg"} />
             </div>
             <div class={styles.headerContent}>
                 {application()?.icon.type === "image" ? (
-                    <img class={styles.iconImage} src={application()?.icon.value || "/assets/tricolor/tricolor.svg"} />
+                    <img alt={""} class={styles.iconImage} src={application()?.icon.value || "/assets/tricolor/tricolor.svg"} />
                 ) : (
                     <UKIcon class={styles.iconIcon}>{application()?.icon.value || ""}</UKIcon>
                 )}
@@ -51,10 +51,10 @@ const ApplicationPage: Component = () => {
 
                         if (app.isInstalled) {
                             await trpc.app.uninstall.mutate({ applicationId: app.id });
-                            refetchApplication();
+                            window.location.reload();
                         } else {
                             await trpc.app.install.mutate({ applicationId: app.id, repository: repository });
-                            refetchApplication();
+                            window.location.reload();
                         }
                     }}
                 >

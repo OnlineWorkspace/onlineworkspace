@@ -53,7 +53,7 @@ const router = t.router({
             return username || "unknown";
         }),
         setUsername: procedure.input(z.string()).mutation(async (opt) => {
-            await (await opt.ctx.instance.subSystems.users.getUserById(opt.ctx.userId))?.setUsername(opt.input);
+            await (await opt.ctx.instance.subSystems.users.getUserById(opt.ctx.userId))?.setUsername(opt.input.toLowerCase());
 
             return true;
         }),
@@ -179,10 +179,10 @@ const router = t.router({
 
                 if (!user) return [];
 
-                const db = instance.subSystems.database.db();
+                const db = instance.subSystems.database.postgres();
 
                 const sessions =
-                    (await db`SELECT session_id, device_type, valid_until, ip_address, session_token FROM Sessions WHERE user_id = ${user.userId}`) as {
+                    (await db`SELECT session_id, device_type, valid_until, ip_address, session_token FROM tricolor_workspaces.public.sessions WHERE user_id = ${user.userId}`) as {
                         session_id: number;
                         device_type: AuthorizedDeviceType;
                         valid_until: number;
@@ -289,7 +289,7 @@ const router = t.router({
                     return username || "unknown";
                 }),
             setUsername: adminProcedure.input(z.object({ userId: z.number(), username: z.string() })).mutation(async (opt) => {
-                await (await opt.ctx.instance.subSystems.users.getUserById(opt.input.userId))?.setUsername(opt.input.username);
+                await (await opt.ctx.instance.subSystems.users.getUserById(opt.input.userId))?.setUsername(opt.input.username.toLowerCase());
 
                 return true;
             }),
@@ -363,7 +363,7 @@ const router = t.router({
             return this;
         }),
         createUser: procedure.input(z.object({ username: z.string() })).mutation(async (opt) => {
-            await opt.ctx.instance.subSystems.users.createUser(opt.input.username);
+            await opt.ctx.instance.subSystems.users.createUser(opt.input.username.toLowerCase());
 
             return true;
         }),

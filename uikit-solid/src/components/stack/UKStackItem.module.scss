@@ -64,10 +64,9 @@
     overflow: hidden;
     z-index: 2;
 
-    transition:
-        outline-color var(--uk-sys-motion-duration-100) var(--uk-sys-motion-easing-standard-decelerate),
-        border-radius var(--uk-sys-motion-duration-100) var(--uk-sys-motion-easing-standard-decelerate),
-        outline-width 0ms linear;
+    transition: outline-color var(--uk-sys-motion-duration-100) var(--uk-sys-motion-easing-standard-decelerate),
+    border-radius var(--uk-sys-motion-duration-100) var(--uk-sys-motion-easing-standard-decelerate),
+    outline-width 0ms linear;
 
     outline-style: solid;
     outline-offset: 2px;

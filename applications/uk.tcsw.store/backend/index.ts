@@ -205,6 +205,7 @@ const router = t.router({
             // the user must be administrator
             if (!(await (await opt.ctx.user())?.isAdministrator())) return false;
 
+            await opt.ctx.instance.subSystems.applications.disableApplication(opt.input.applicationId);
             await opt.ctx.instance.subSystems.applications.uninstallApplication(opt.input.applicationId);
 
             return true;

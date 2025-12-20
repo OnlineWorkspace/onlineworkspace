@@ -25,7 +25,7 @@ const Bio: Component = () => {
                     <UKButton
                         class={styles.button}
                         onClick={async () => {
-                            await trpc.profile.setName.mutate(bio() || "");
+                            await trpc.profile.setBio.mutate(bio() || "");
 
                             refetchBio();
                         }}

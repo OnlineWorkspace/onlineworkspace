@@ -29,7 +29,7 @@ export default class AuthorizationSubsystem extends SubSystem {
         ipAddress?: string,
     ): Promise<string | undefined> {
         try {
-            const usersDb = this.instance.subSystems.database.db();
+            const usersDb = this.instance.subSystems.database.postgres();
 
             if (
                 !(await Bun.password.verify(
@@ -40,7 +40,7 @@ export default class AuthorizationSubsystem extends SubSystem {
             )
                 return undefined;
 
-            const sessionsDb = this.instance.subSystems.database.db();
+            const sessionsDb = this.instance.subSystems.database.postgres();
 
             const sessionToken = crypto.getRandomValues(new Uint32Array(16)).join("");
 
@@ -90,7 +90,7 @@ export default class AuthorizationSubsystem extends SubSystem {
     async verifySession(sessionToken: string): Promise<number | undefined> {
         const [_, userId, token] = sessionToken.split(":");
 
-        const sessionsDb = this.instance.subSystems.database.db();
+        const sessionsDb = this.instance.subSystems.database.postgres();
 
         const session = (
             await sessionsDb`SELECT session_id, valid_until FROM tricolor_workspaces.public.sessions WHERE user_id = ${userId} AND session_token = ${token}`
@@ -112,7 +112,7 @@ export default class AuthorizationSubsystem extends SubSystem {
     async endSessionByToken(sessionToken: string): Promise<boolean | undefined> {
         const [_, userId, token] = sessionToken.split(":");
 
-        const sessionsDb = this.instance.subSystems.database.db();
+        const sessionsDb = this.instance.subSystems.database.postgres();
 
         (await sessionsDb`DELETE FROM tricolor_workspaces.public.sessions WHERE user_id = ${userId} AND session_token = ${token}`)
 
@@ -123,7 +123,7 @@ export default class AuthorizationSubsystem extends SubSystem {
     // @returns {true} the session is removed, and it's token is invalidated
     // @returns {undefined} the sessionToken is invalid
     async endSessionById(userId: number, sessionId: number): Promise<boolean | undefined> {
-        const sessionsDb = this.instance.subSystems.database.db();
+        const sessionsDb = this.instance.subSystems.database.postgres();
 
         await sessionsDb`DELETE FROM tricolor_workspaces.public.sessions WHERE user_id = ${userId} AND session_id = ${sessionId}`;
 
@@ -134,7 +134,7 @@ export default class AuthorizationSubsystem extends SubSystem {
     // @returns {true} successful
     // @returns {false} failed
     async setPassword(userId: number, password: string): Promise<boolean> {
-        const db = this.instance.subSystems.database.db();
+        const db = this.instance.subSystems.database.postgres();
 
         if (!(await this.instance.subSystems.users.doesUserExist(userId))) {
             return false;
@@ -148,7 +148,7 @@ export default class AuthorizationSubsystem extends SubSystem {
     }
 
     async hasPassword(userId: number) {
-        const db = this.instance.subSystems.database.db();
+        const db = this.instance.subSystems.database.postgres();
 
         if (!(await this.instance.subSystems.users.doesUserExist(userId))) {
             return false;
@@ -163,7 +163,7 @@ export default class AuthorizationSubsystem extends SubSystem {
     async startup() {
         // loop through all users, check for any session tokens which are expired and remove them from the user's valud sessions pool
 
-        const db = this.instance.subSystems.database.db();
+        const db = this.instance.subSystems.database.postgres();
 
         // init the sessions database
         //

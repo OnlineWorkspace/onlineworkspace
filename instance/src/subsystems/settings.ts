@@ -14,7 +14,7 @@ export default class SettingsSubsystem extends SubSystem {
     }
 
     async getUser(userId: number): Promise<Record<string, any>> {
-        const db = this.instance.subSystems.database.db();
+        const db = this.instance.subSystems.database.postgres();
         const settings = (await db`SELECT settings FROM users WHERE id = ${userId}`)?.[0]?.settings as Record<string, any>;
 
         return settings;

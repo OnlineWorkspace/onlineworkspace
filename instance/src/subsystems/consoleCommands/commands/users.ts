@@ -11,7 +11,7 @@ export default class ExitCommand extends Command {
 
         const log = self.instance.log.createLogger("users_command");
 
-        const db = self.instance.subSystems.database.db();
+        const db = self.instance.subSystems.database.postgres();
 
         const users = await db`SELECT * FROM users ORDER BY id ASC`;
 

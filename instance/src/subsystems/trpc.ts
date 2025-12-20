@@ -2,7 +2,7 @@ import { type BunRequest, type Server } from "bun";
 import type { Instance } from "../index.js";
 import SubSystem from "../subSystems.js";
 import { type TRPCBuiltRouter } from "@trpc/server";
-import { createTRPCContext, workspacesRouter } from "./trpcRouter.js";
+import { createTRPCContext } from "./trpcRouter.js";
 import { type FetchCreateContextFnOptions, fetchRequestHandler } from "@trpc/server/adapters/fetch";
 
 export default class TRPCSubsystem extends SubSystem {
@@ -75,23 +75,35 @@ export default class TRPCSubsystem extends SubSystem {
                     });
                 }
 
-                let trpcResponse = await self.attemptTRPCRequest(req, server);
+                try {
+                    let trpcResponse = await self.attemptTRPCRequest(req, server);
 
-                if (trpcResponse) {
-                    trpcResponse.headers.set("Access-Control-Allow-Origin", "http://localhost:5173");
-                    trpcResponse.headers.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-                    trpcResponse.headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
-                    trpcResponse.headers.set("Access-Control-Allow-Credentials", "true");
-                    return trpcResponse;
+                    if (trpcResponse) {
+                        trpcResponse.headers.set("Access-Control-Allow-Origin", "http://localhost:5173");
+                        trpcResponse.headers.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+                        trpcResponse.headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
+                        trpcResponse.headers.set("Access-Control-Allow-Credentials", "true");
+                        return trpcResponse;
+                    }
+                } catch (err) {
+                    self.log.error(err);
+                    console.error(new Error("tRPC -----").stack);
+                    return new Response("TRPC failed");
                 }
 
-                const resp = options?.fetch?.call(server, req, server);
-                resp.headers.set("Access-Control-Allow-Origin", "http://localhost:5173");
-                resp.headers.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-                resp.headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
-                resp.headers.set("Access-Control-Allow-Credentials", "true");
+                try {
+                    const resp = options?.fetch?.call(server, req, server);
+                    resp.headers.set("Access-Control-Allow-Origin", "http://localhost:5173");
+                    resp.headers.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+                    resp.headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
+                    resp.headers.set("Access-Control-Allow-Credentials", "true");
 
-                return resp;
+                    return resp;
+                } catch (err) {
+                    self.log.error(err);
+                    console.error(new Error("Generic -----").stack);
+                    return new Response("Generic request error failed");
+                }
             },
             onError: (...p: any[]) => {
                 // Do nothing as the error is most-likely from bun.serve for tRPC contentType, (i have no clue why as everything else is working)

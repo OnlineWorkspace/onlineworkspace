@@ -23,7 +23,7 @@ const router = t.router({
                         }),
                     )
                     .query(async (opt) => {
-                        const db = instance.subSystems.database.db();
+                        const db = instance.subSystems.database.postgres();
 
                         const { forename, surname, username } = (
                             await db`SELECT forename, surname, username FROM tricolor_workspaces.public.users WHERE id = ${opt.ctx.userId}`

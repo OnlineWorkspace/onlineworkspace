@@ -11,6 +11,19 @@
     background-repeat: no-repeat;
     background-size: cover;
     background-position: center;
+
+    animation: fadeIn forwards 0.25s var(--uk-sys-motion-easing-standard-decelerate);
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            filter: blur(0.25rem);
+        }
+        to {
+            opacity: 1;
+            filter: blur(0);
+        }
+    }
 }
 
 .welcomeMessage {

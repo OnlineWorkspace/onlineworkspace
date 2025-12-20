@@ -127,6 +127,7 @@ export const workspacesRouter = t.router({
                 ]),
             )
             .mutation(async (opt) => {
+                const username = opt.input.username.toLowerCase()
                 // TODO: implement this (links to emailServerStuff)
 
                 if (opt.input.emailCode !== "a")
@@ -135,7 +136,7 @@ export const workspacesRouter = t.router({
                         message: "The email code did not match!",
                     };
 
-                const uid = await opt.ctx.instance.subSystems.users.createUser(opt.input.username);
+                const uid = await opt.ctx.instance.subSystems.users.createUser(username);
 
                 if (uid === undefined)
                     return {
@@ -154,7 +155,8 @@ export const workspacesRouter = t.router({
                 let splitDisplayName = opt.input.displayName.split(" ");
                 await user.setFullName(splitDisplayName[0], splitDisplayName.slice(1).join(" "));
 
-                await user.setEmail(opt.input.emailAddress);
+                await user.setEmail(opt.input.emailAddress)
+                await user.setBio(opt.input.bio)
 
                 if (opt.input.gender === "male" || opt.input.gender === "female" || opt.input.gender === "other")
                     await user.setGender(opt.input.gender);
@@ -194,7 +196,8 @@ export const workspacesRouter = t.router({
                 ]),
             )
             .mutation(async (opt) => {
-                const user = await opt.ctx.instance.subSystems.users.getUserByUsername(opt.input.username);
+                const username = opt.input.username.toLowerCase()
+                const user = await opt.ctx.instance.subSystems.users.getUserByUsername(username);
 
                 if (user === undefined)
                     return {
@@ -269,7 +272,7 @@ export const workspacesRouter = t.router({
         navigation: {
             user: {
                 name: procedure.output(z.object({ username: z.string(), forename: z.string(), surname: z.string() })).query(async (opt) => {
-                    const db = opt.ctx.instance.subSystems.database.db();
+                    const db = opt.ctx.instance.subSystems.database.postgres();
 
                     const user = (await db`SELECT username, forename, surname FROM users WHERE id = ${opt.ctx.userId};`)?.[0];
 

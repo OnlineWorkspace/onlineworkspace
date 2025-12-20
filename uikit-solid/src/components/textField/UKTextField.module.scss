@@ -205,23 +205,27 @@ textarea.input {
         width: 0.75rem;
         height: 100%;
         background-color: rgb(var(--uk-sys-color-surface-variant));
+        cursor: default;
     }
 
     &::-webkit-scrollbar-thumb {
         background-color: rgb(var(--uk-sys-color-on-surface-variant));
         border-radius: 10rem;
         border: 2px solid rgb(var(--uk-sys-color-surface-variant));
+        cursor: default;
     }
 
     &::-webkit-scrollbar-button {
         display: none;
         visibility: hidden;
+        cursor: default;
     }
 
     &::-webkit-scrollbar-corner {
         background-color: rgb(var(--uk-sys-color-surface-variant));
         border: solid transparent 0;
         outline: solid transparent 0;
+        cursor: default;
     }
 
     &::-webkit-resizer {
@@ -237,6 +241,7 @@ textarea.input {
         outline-width: 1px;
         outline-offset: 0;
         outline-color: rgb(var(--uk-sys-color-outline));
+        cursor: ns-resize;
     }
 }
 

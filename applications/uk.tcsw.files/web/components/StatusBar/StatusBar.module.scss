@@ -1,0 +1,8 @@
+.root {
+    display: flex;
+    flex-direction: row;
+    grid-column-start: 1;
+    grid-column-end: 3;
+    background-color: rgb(var(--uk-sys-color-surface-container));
+    padding: 0.25rem;
+}

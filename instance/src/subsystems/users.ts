@@ -34,7 +34,7 @@ export class WorkspacesUser {
         @return `true` - successfully changed the username
     */
     async setUsername(username: string): Promise<boolean> {
-        const db = this.instance.subSystems.database.db();
+        const db = this.instance.subSystems.database.postgres();
 
         try {
             if ((await db`SELECT username FROM tricolor_workspaces.public.users WHERE username = ${username}`).count !== 0) return false;
@@ -53,7 +53,7 @@ export class WorkspacesUser {
         @return `undefined` - could not get the user's username
     */
     async getUsername(): Promise<string | undefined> {
-        const db = this.instance.subSystems.database.db();
+        const db = this.instance.subSystems.database.postgres();
 
         return (await db`SELECT username FROM users WHERE id = ${this.userId}`)?.[0]?.username || undefined;
     }
@@ -64,7 +64,7 @@ export class WorkspacesUser {
         @return `true` - successfully changed the forename
     */
     async setForename(forename: string): Promise<boolean> {
-        const db = this.instance.subSystems.database.db();
+        const db = this.instance.subSystems.database.postgres();
 
         try {
             await db`UPDATE Users SET forename = ${forename} WHERE id = ${this.userId}`;
@@ -82,7 +82,7 @@ export class WorkspacesUser {
         @return `undefined` - could not get the user's forename
     */
     async getForename(): Promise<string | undefined> {
-        const db = this.instance.subSystems.database.db();
+        const db = this.instance.subSystems.database.postgres();
 
         return (await db`SELECT forename FROM users WHERE id = ${this.userId}`)?.[0]?.forename || undefined;
     }
@@ -93,10 +93,10 @@ export class WorkspacesUser {
         @return `true` - successfully changed the surname
     */
     async setSurname(surname: string): Promise<boolean> {
-        const db = this.instance.subSystems.database.db();
+        const db = this.instance.subSystems.database.postgres();
 
         try {
-            await db`UPDATE Users SET surname = ${surname} WHERE id = ${this.userId}`;
+            await db`UPDATE tricolor_workspaces.public.users SET surname = ${surname} WHERE id = ${this.userId}`;
 
             return true;
         } catch (err) {
@@ -111,9 +111,9 @@ export class WorkspacesUser {
         @return `undefined` - could not get the user's surname
     */
     async getSurname(): Promise<string | undefined> {
-        const db = this.instance.subSystems.database.db();
+        const db = this.instance.subSystems.database.postgres();
 
-        return (await db`SELECT surname FROM users WHERE id = ${this.userId}`)?.[0]?.surname || undefined;
+        return (await db`SELECT surname FROM tricolor_workspaces.public.users WHERE id = ${this.userId}`)?.[0]?.surname || undefined;
     }
 
     /**
@@ -144,10 +144,10 @@ export class WorkspacesUser {
         @returns `true` - successfully set the quota
     */
     async setQuota(quota: number): Promise<boolean> {
-        const db = this.instance.subSystems.database.db();
+        const db = this.instance.subSystems.database.postgres();
 
         try {
-            await db`UPDATE Users SET storage_quota = ${quota} WHERE id = ${this.userId}`;
+            await db`UPDATE tricolor_workspaces.public.users SET storage_quota = ${quota} WHERE id = ${this.userId}`;
             return true;
         } catch (err) {
             this.instance.subSystems.users.log.error(`Failed to set storage quota for ${this.userId}`);
@@ -161,9 +161,12 @@ export class WorkspacesUser {
         @returns `undefined` - could not get the user's quota
     */
     async getQuota(): Promise<number | undefined> {
-        const db = this.instance.subSystems.database.db();
+        const db = this.instance.subSystems.database.postgres();
 
-        return (await db`SELECT storage_quota FROM users WHERE id = ${this.userId}`)?.[0]?.storage_quota || undefined;
+        return (
+            (await db`SELECT storage_quota FROM tricolor_workspaces.public.users WHERE id = ${this.userId}`)?.[0]?.storage_quota ||
+            undefined
+        );
     }
 
     /**
@@ -172,10 +175,10 @@ export class WorkspacesUser {
         @returns `true` - successfully changed the bio
     */
     async setBio(bio: string): Promise<boolean> {
-        const db = this.instance.subSystems.database.db();
+        const db = this.instance.subSystems.database.postgres();
 
         try {
-            await db`UPDATE Users SET bio = ${bio} WHERE id = ${this.userId}`;
+            await db`UPDATE tricolor_workspaces.public.users SET bio = ${bio} WHERE id = ${this.userId}`;
             return true;
         } catch (err) {
             this.instance.subSystems.users.log.error(`Failed to set bio for ${this.userId}`);
@@ -189,9 +192,9 @@ export class WorkspacesUser {
         @returns `undefined` - could not get the user's bio
     */
     async getBio(): Promise<string | undefined> {
-        const db = this.instance.subSystems.database.db();
+        const db = this.instance.subSystems.database.postgres();
 
-        return (await db`SELECT bio FROM users WHERE id = ${this.userId}`)?.[0]?.bio || undefined;
+        return (await db`SELECT bio FROM tricolor_workspaces.public.users WHERE id = ${this.userId}`)?.[0]?.bio || undefined;
     }
 
     /**
@@ -200,9 +203,9 @@ export class WorkspacesUser {
         @returns `true` - successfully changed the email
     */
     async setEmail(email: string): Promise<boolean> {
-        const db = this.instance.subSystems.database.db();
+        const db = this.instance.subSystems.database.postgres();
         try {
-            await db`UPDATE Users SET email = ${email} WHERE id = ${this.userId}`;
+            await db`UPDATE tricolor_workspaces.public.users SET email = ${email} WHERE id = ${this.userId}`;
             return true;
         } catch (err) {
             this.instance.subSystems.users.log.error(`Failed to set email for ${this.userId}`);
@@ -216,9 +219,9 @@ export class WorkspacesUser {
         @returns `undefined` - could not get the user's email
     */
     async getEmail(): Promise<string | undefined> {
-        const db = this.instance.subSystems.database.db();
+        const db = this.instance.subSystems.database.postgres();
 
-        return (await db`SELECT email FROM users WHERE id = ${this.userId}`)?.[0]?.email || undefined;
+        return (await db`SELECT email FROM tricolor_workspaces.public.users WHERE id = ${this.userId}`)?.[0]?.email || undefined;
     }
 
     /**
@@ -227,10 +230,10 @@ export class WorkspacesUser {
         @returns `true` - successfully changed the gender
     */
     async setGender(gender: "female" | "male" | "other"): Promise<boolean> {
-        const db = this.instance.subSystems.database.db();
+        const db = this.instance.subSystems.database.postgres();
 
         try {
-            await db`UPDATE Users SET gender = ${gender} WHERE id = ${this.userId}`;
+            await db`UPDATE tricolor_workspaces.public.users SET gender = ${gender} WHERE id = ${this.userId}`;
             return true;
         } catch (err) {
             this.instance.subSystems.users.log.error(`Failed to set gender for ${this.userId}`);
@@ -244,9 +247,9 @@ export class WorkspacesUser {
         @returns `undefined` - could not get the user's gender
     */
     async getGender(): Promise<string | undefined> {
-        const db = this.instance.subSystems.database.db();
+        const db = this.instance.subSystems.database.postgres();
 
-        return (await db`SELECT gender FROM users WHERE id = ${this.userId}`)?.[0]?.gender || undefined;
+        return (await db`SELECT gender FROM tricolor_workspaces.public.users WHERE id = ${this.userId}`)?.[0]?.gender || undefined;
     }
 
     /**
@@ -254,9 +257,12 @@ export class WorkspacesUser {
         @returns `boolean` - is the user an administrator
     */
     async isAdministrator(): Promise<boolean | undefined> {
-        const db = this.instance.subSystems.database.db();
+        const db = this.instance.subSystems.database.postgres();
 
-        return (await db`SELECT is_administrator FROM users WHERE id = ${this.userId}`)?.[0]?.is_administrator || false;
+        return (
+            (await db`SELECT is_administrator FROM tricolor_workspaces.public.users WHERE id = ${this.userId}`)?.[0]?.is_administrator ||
+            false
+        );
     }
 
     /**
@@ -265,10 +271,10 @@ export class WorkspacesUser {
         @returns `true` - successfully changed the administrator status
     */
     async setIsAdministrator(administrator: boolean): Promise<boolean> {
-        const db = this.instance.subSystems.database.db();
+        const db = this.instance.subSystems.database.postgres();
 
         try {
-            await db`UPDATE Users SET is_administrator = ${administrator} WHERE id = ${this.userId}`;
+            await db`UPDATE tricolor_workspaces.public.users SET is_administrator = ${administrator} WHERE id = ${this.userId}`;
             return true;
         } catch (err) {
             this.instance.subSystems.users.log.error(`Failed to set is_administrator for ${this.userId}`);
@@ -373,10 +379,10 @@ export class WorkspacesUser {
             force: true,
         });
 
-        const db = this.instance.subSystems.database.db();
+        const db = this.instance.subSystems.database.postgres();
 
-        await db`DELETE FROM users WHERE id = ${this.userId};`;
-        await db`DELETE FROM Sessions WHERE user_id = ${this.userId};`;
+        await db`DELETE FROM tricolor_workspaces.public.users WHERE id = ${this.userId};`;
+        await db`DELETE FROM tricolor_workspaces.public.sessions WHERE user_id = ${this.userId};`;
 
         return true;
     }
@@ -392,7 +398,7 @@ export default class UsersSubsystem extends SubSystem {
     async startup(): Promise<boolean> {
         await super.startup();
 
-        const db = this.instance.subSystems.database.db();
+        const db = this.instance.subSystems.database.postgres();
 
         /**
             init the users database
@@ -463,9 +469,9 @@ export default class UsersSubsystem extends SubSystem {
         @returns undefined - the user already exists
     */
     async createUser(username: string): Promise<number | undefined> {
-        const db = this.instance.subSystems.database.db();
+        const db = this.instance.subSystems.database.postgres();
 
-        if ((await db`SELECT username FROM users WHERE username = ${username}`).count !== 0) return undefined;
+        if ((await db`SELECT username FROM tricolor_workspaces.public.users WHERE username = ${username}`).count !== 0) return undefined;
 
         let user = {
             username,
@@ -473,7 +479,7 @@ export default class UsersSubsystem extends SubSystem {
             surname: "Doe",
         };
 
-        let id = (await db`INSERT INTO Users ${sql(user)} RETURNING id`)?.[0]?.id;
+        let id = (await db`INSERT INTO tricolor_workspaces.public.users ${sql(user)} RETURNING id`)?.[0]?.id;
 
         const ubi = await this.getUserById(id);
 
@@ -495,11 +501,9 @@ export default class UsersSubsystem extends SubSystem {
         @returns false - they do not exist
     */
     async doesUserExist(userId: number): Promise<boolean> {
-        const db = this.instance.subSystems.database.db();
+        const db = this.instance.subSystems.database.postgres();
 
-        if ((await db`SELECT username FROM users WHERE id = ${userId}`).count === 1) return true;
-
-        return false;
+        return (await db`SELECT username FROM tricolor_workspaces.public.users WHERE id = ${userId}`).count === 1;
     }
 
     /**
@@ -507,9 +511,15 @@ export default class UsersSubsystem extends SubSystem {
         @returns `WorkspacesUser[]` - an array of all users
     */
     async getAllUsers(): Promise<WorkspacesUser[]> {
-        const db = this.instance.subSystems.database.db();
+        const db = this.instance.subSystems.database.postgres();
 
-        return (await db`SELECT id FROM users`).map((u: { id: number }) => new WorkspacesUser(this.instance, u.id));
+        try {
+            return (await db`SELECT id FROM tricolor_workspaces.public.users`).map((u: { id: number }) => new WorkspacesUser(this.instance, u.id));
+        } catch (err) {
+            this.log.error("Failed to getAllUsers()", err)
+
+            return []
+        }
     }
 
     /**
@@ -529,9 +539,9 @@ export default class UsersSubsystem extends SubSystem {
         @returns `undefined` - no such user exists
     */
     async getUserByUsername(username: string): Promise<WorkspacesUser | undefined> {
-        const db = this.instance.subSystems.database.db();
+        const db = this.instance.subSystems.database.postgres();
 
-        const userId = (await db`SELECT id FROM users WHERE username = ${username}`)?.[0]?.id;
+        const userId = (await db`SELECT id FROM tricolor_workspaces.public.users WHERE username = ${username}`)?.[0]?.id;
 
         if (!(await this.doesUserExist(userId))) return undefined;
 

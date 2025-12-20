@@ -3,8 +3,9 @@ import { applyTheme } from "../core/design/tokens.ts";
 import { baselineTheme } from "../core/design/themes/baseline.ts";
 import { createMediaQuery } from "@solid-primitives/media";
 import styles from "./Root.module.scss";
+import clsx from "clsx";
 
-const UIKitRoot: Component<{ children?: JSX.Element }> = ({ children }) => {
+const UIKitRoot: Component<{ children?: JSX.Element, class?: string }> = (props) => {
     const isLightMode = createMediaQuery("(prefers-color-scheme: light)");
     let elem!: HTMLDivElement;
 
@@ -15,9 +16,9 @@ const UIKitRoot: Component<{ children?: JSX.Element }> = ({ children }) => {
     });
 
     return (
-        <div class={styles.root} ref={elem}>
+        <div class={clsx(styles.root, props.class)} ref={elem}>
             <style data-uikit-styles></style>
-            {children}
+            {props.children}
         </div>
     );
 };

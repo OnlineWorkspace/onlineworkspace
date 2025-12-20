@@ -13,9 +13,12 @@ export default class ConfigurationSubsystem extends SubSystem {
             password: string;
             host: string;
             port: number;
-            database: string;
         };
     };
+    // http://localhost:3563
+    backendUrl: string;
+    // http://localhost:5173
+    webUrl: string;
     enabledFeatures: WorkspacesFeatureFlags[];
 
     constructor(instance: Instance) {
@@ -29,17 +32,16 @@ export default class ConfigurationSubsystem extends SubSystem {
                 password: "postgres",
                 host: "localhost",
                 port: 5432,
-                database: "tricolor_workspaces",
             },
         };
+        this.backendUrl = "http://localhost:3563"
+        this.webUrl = "http://localhost:5173"
 
         return this;
     }
 
     hasFeature(feature: WorkspacesFeatureFlags | string): boolean {
-        if (this.enabledFeatures.find((f) => f === feature)) return true;
-
-        return false;
+        return !!this.enabledFeatures.find((f) => f === feature);
     }
 
     async startup(): Promise<boolean> {

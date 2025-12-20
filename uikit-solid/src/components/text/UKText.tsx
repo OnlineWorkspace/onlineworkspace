@@ -10,12 +10,14 @@ const UKText: Component<
         align?: "start" | "center" | "end";
         class?: string;
         href?: string;
+        onClick?: (e: MouseEvent) => void;
     }>
 > = (props) => {
     return (
         <Switch>
             <Match when={props.href}>
                 <a
+                    onClick={props.onClick}
                     class={clsx(styles.root, props.class)}
                     data-size={props.size || "s"}
                     data-role={props.role || "body"}
@@ -28,6 +30,7 @@ const UKText: Component<
             </Match>
             <Match when={props.href === undefined}>
                 <div
+                    onClick={props.onClick}
                     class={clsx(styles.root, props.class)}
                     data-size={props.size || "s"}
                     data-role={props.role || "body"}
