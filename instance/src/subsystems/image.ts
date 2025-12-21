@@ -40,16 +40,26 @@ export default class ImageSubsystem extends SubSystem {
         });
         this._internalImagePaths.set(path, imageId);
 
+        this.log.info(`Serving image at '${path}' as '${imageId}'`);
+
         return `/api/asset/image/${imageId}`;
     }
 
     async resizeImage(
         inputPath: string,
         outputPath: string,
-        dimensions: { width: number; height: number },
+        dimensions:
+            | { width: number; height: number }
+            | ((originalSize: { width: number; height: number }) => { width: number; height: number }),
         changeFormatTo?: "avif" | "jpeg" | "png",
     ): Promise<boolean> {
-        let sharpInstance = sharp(inputPath).resize(dimensions.width, dimensions.height, { withoutEnlargement: true });
+        const sharpInstance = sharp(inputPath);
+
+        if (typeof dimensions === "function") {
+            dimensions = dimensions(await sharpInstance.metadata());
+        }
+
+        sharpInstance.resize(dimensions.width, dimensions.height, { withoutEnlargement: true });
 
         if (changeFormatTo) {
             sharpInstance.toFormat(changeFormatTo, { progressive: true });

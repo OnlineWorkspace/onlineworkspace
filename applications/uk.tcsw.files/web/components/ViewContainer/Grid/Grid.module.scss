@@ -1,0 +1,10 @@
+.root {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, 16rem);
+    grid-template-rows: repeat(auto-fit, 8rem);
+    gap: 0.5rem;
+    padding: 1rem;
+    width: 100%;
+    height: max-content;
+    max-height: 100%;
+}

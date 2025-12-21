@@ -6,11 +6,13 @@ import fs from "fs";
 export default class FilesystemSubsystem extends SubSystem {
     readonly SRC_ROOT = path.resolve("./instance/src/");
     readonly FS_ROOT = path.resolve("./fs/");
+    readonly CACHE_PATH = path.join(this.FS_ROOT, "cache");
 
     constructor(instance: Instance) {
         super("filesystem", instance);
 
         fs.mkdirSync(this.FS_ROOT, { recursive: true });
+        fs.mkdirSync(this.CACHE_PATH, { recursive: true });
 
         return this;
     }

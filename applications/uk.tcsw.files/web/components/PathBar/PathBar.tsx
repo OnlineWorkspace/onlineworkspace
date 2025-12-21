@@ -5,14 +5,14 @@ import path from "path-browserify";
 import { useNavigate, useParams } from "@solidjs/router";
 
 const PathBar: Component = () => {
-    const navigate = useNavigate()
-    let { currentPath } = useParams<{ currentPath: string }>()
+    const navigate = useNavigate();
+    let params = useParams<{ currentPath: string }>();
 
     return (
         <div class={styles.root}>
-            <For each={(`/${currentPath || ""}`).split("/")}>
+            <For each={`/${params.currentPath || ""}`.split("/")}>
                 {(segment, index) => {
-                    if (index() === (`/${currentPath || ""}`).split("/").length - 1 && segment === "") return null;
+                    if (index() === `/${params.currentPath || ""}`.split("/").length - 1 && segment === "") return null;
 
                     return (
                         <>
@@ -20,7 +20,7 @@ const PathBar: Component = () => {
                                 onClick={(e) => {
                                     e.stopPropagation();
 
-                                    let split = (`/${currentPath || ""}`).split("/");
+                                    let split = `/${params.currentPath || ""}`.split("/");
                                     let output = "/";
 
                                     for (let i = 0; i < index() + 1; i++) {
@@ -35,7 +35,7 @@ const PathBar: Component = () => {
                                 size={"l"}
                             >
                                 {segment !== "" ? <span>{segment}</span> : null}
-                                {index() !== (`/${currentPath || ""}`).split("/").length - 1 && <span>/</span>}
+                                {index() !== `/${params.currentPath || ""}`.split("/").length - 1 && <span>/</span>}
                             </UKText>
                         </>
                     );
