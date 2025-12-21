@@ -11,7 +11,9 @@ const Layout: Component<ParentProps> = (props) => {
             <ActionsMenuBar />
             <PathBar />
             <SideBar />
-            {props.children}
+            <div class={styles.view}>
+                {props.children}
+            </div>
             <StatusBar />
         </div>
     );

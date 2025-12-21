@@ -99,7 +99,7 @@
         }
 
         &:active:not(:disabled) {
-            border-radius: var(--uk-sys-shape-corner-small);
+            border-radius: var(--uk-sys-shape-corner-small) !important;
         }
     }
 
@@ -141,7 +141,7 @@
         }
 
         &:active:not(:disabled) {
-            border-radius: var(--uk-sys-shape-corner-small);
+            border-radius: var(--uk-sys-shape-corner-small) !important;
         }
     }
 
@@ -183,7 +183,7 @@
         }
 
         &:active:not(:disabled) {
-            border-radius: var(--uk-sys-shape-corner-medium);
+            border-radius: var(--uk-sys-shape-corner-medium) !important;
         }
     }
 
@@ -225,7 +225,7 @@
         }
 
         &:active:not(:disabled) {
-            border-radius: var(--uk-sys-shape-corner-large);
+            border-radius: var(--uk-sys-shape-corner-large) !important;
         }
     }
 
@@ -267,7 +267,7 @@
         }
 
         &:active:not(:disabled) {
-            border-radius: var(--uk-sys-shape-corner-large);
+            border-radius: var(--uk-sys-shape-corner-large) !important;
         }
     }
 

@@ -4,7 +4,7 @@ import UKText from "@tcsw/uikit-solid/src/components/text/UKText.tsx";
 
 const StatusBar: Component = () => {
     return <div class={styles.root}>
-        <UKText role={"label"} size={"m"}>Current Status...</UKText>
+        <UKText role={"label"} size={"m"}>You currently have no active tasks...</UKText>
     </div>
 }
 

@@ -187,6 +187,41 @@ class Instance {
                             });
                         },
                     },
+                    "/api/asset/raw/:assetId": {
+                        GET: async (req: BunRequest) => {
+                            // @ts-ignore
+                            let asset = this.subSystems.filesystem._internalAssets.get(req.params["assetId"] as string);
+
+                            if (!asset) {
+                                return new Response("Invalid raw asset");
+                            }
+
+                            if (!asset.public) {
+                                const cookieString = req.headers?.get("cookie");
+
+                                if (cookieString === null) {
+                                    throw Response.json({ code: "UNAUTHORIZED", message: "missing auth cookie" });
+                                }
+
+                                const parsedCookie = Bun.Cookie.parse(cookieString);
+
+                                let userId = await self.subSystems.authorization.verifySession(decodeURIComponent(parsedCookie.value));
+
+                                if (userId === undefined) {
+                                    throw Response.json({ code: "UNAUTHORIZED", message: "invalid session" });
+                                }
+                            }
+
+                            return new Response(file(asset.path), {
+                                headers: {
+                                    "Access-Control-Allow-Origin": "http://localhost:5173", // TODO: change this according to a config file
+                                    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+                                    "Access-Control-Allow-Headers": "Content-Type, Authorization",
+                                    "Access-Control-Allow-Credentials": "true",
+                                },
+                            });
+                        },
+                    },
                 },
                 fetch(_request, _server) {
                     // will be executed if it's not a TRPC request

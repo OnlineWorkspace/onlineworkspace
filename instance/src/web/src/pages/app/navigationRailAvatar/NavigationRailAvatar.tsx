@@ -34,6 +34,8 @@ const NavigationRailAvatar: Component<{ expanded: boolean }> = (props) => {
                 class={styles.logout}
                 icon={"logout"}
                 alt={"Logout"}
+                color={"filled"}
+                shape={"round"}
                 size={"s"}
                 width={"default"}
                 onClick={async () => {

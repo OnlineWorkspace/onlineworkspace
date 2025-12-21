@@ -2,4 +2,22 @@
     grid-row-start: 2;
     grid-row-end: 4;
     background-color: rgb(var(--uk-sys-color-surface-container));
+
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem;
+    padding-top: 0;
+
+    > button {
+        width: 100%;
+        align-items: center;
+        justify-content: center;
+    }
+}
+
+.headerImage {
+    width: 100%;
+    height: 4.25rem;
+    object-fit: contain;
 }

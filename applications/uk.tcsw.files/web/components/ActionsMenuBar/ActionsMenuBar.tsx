@@ -18,15 +18,33 @@ const ACTIONS: {
         items: [
             {
                 label: "Cut",
-                onClick() {},
+                onClick() {
+                    alert("TODO: Implement me!")
+                },
             },
             {
                 label: "Copy",
-                onClick() {},
+                onClick() {
+                    alert("TODO: Implement me!")
+                },
             },
             {
                 label: "Paste",
-                onClick() {},
+                onClick() {
+                    alert("TODO: Implement me!")
+                },
+            },
+            {
+                label: "Select All",
+                onClick() {
+                    alert("TODO: Implement me!")
+                },
+            },
+            {
+                label: "Select None",
+                onClick() {
+                    alert("TODO: Implement me!")
+                },
             },
         ],
     },

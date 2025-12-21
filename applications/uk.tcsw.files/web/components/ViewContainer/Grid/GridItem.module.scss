@@ -1,14 +1,11 @@
 .root {
-    height: max-content;
     display: grid;
     grid-template-rows: 1fr auto;
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
     padding: 0.5rem;
-    user-select: none;
     -webkit-user-drag: none;
-
     position: relative;
     background-color: transparent;
     user-select: none;
@@ -22,6 +19,10 @@
         max-height: 100%;
         overflow: hidden;
         margin: auto;
+    }
+
+    > .icon {
+        --icon-size: 5rem;
     }
 
     &::after {
@@ -41,11 +42,15 @@
         }
     }
 
-    &:active {
+    &:active, &[data-selected="true"] {
         &::after {
             background-color: rgb(var(--uk-sys-color-primary), var(--uk-sys-state-pressed-state-layer-opacity));
         }
 
         color: rgb(var(--uk-sys-color-primary));
+    }
+
+    &[data-selected="true"] {
+        outline: 0.125rem solid rgb(var(--uk-sys-color-primary));
     }
 }
