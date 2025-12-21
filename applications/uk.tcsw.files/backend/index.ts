@@ -12,7 +12,7 @@ export const t = initTRPC.context<ReturnType<typeof createTRPCContext>>().create
 
 const router = t.router({
     getFileGrid: procedure.input(z.object({ path: z.string(), sortBy: z.enum(["name"]) })).query(async (opt) => {
-        const THUMBNAIL_SIZE = 128
+        const THUMBNAIL_SIZE = 128;
 
         let output: {
             name: string;
@@ -77,9 +77,7 @@ const router = t.router({
             }
 
             let itemName = item;
-            const finalItemPath = path.relative(instance.subSystems.filesystem.FS_ROOT, itemPath)
-
-            console.log(finalItemPath.split(itemName)[0]);
+            const finalItemPath = path.relative(instance.subSystems.filesystem.FS_ROOT, itemPath);
 
             if (finalItemPath.split(itemName)[0] === "users/") {
                 itemName += ` (${await (await instance.subSystems.users.getUserById(Number(itemName)))?.getUsername()})`;
@@ -103,7 +101,7 @@ const router = t.router({
 
         return { type: "success", items: output };
     }),
-    getRawFile: procedure.input(z.string()).query(async opt => {
+    getRawFile: procedure.input(z.string()).query(async (opt) => {
         const finalPath = path.join(instance.subSystems.filesystem.FS_ROOT, opt.input);
         return opt.ctx.rawRequest.destinationHostname + instance.subSystems.filesystem.serveFile(opt.ctx.userId, finalPath);
     }),

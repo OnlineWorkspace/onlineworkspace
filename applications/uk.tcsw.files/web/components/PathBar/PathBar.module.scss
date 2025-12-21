@@ -5,7 +5,7 @@
     background-color: rgb(var(--uk-sys-color-surface-container));
     //border-bottom: 1px solid rgb(var(--uk-sys-color-outline-variant));
     padding: 0.5rem;
-    gap: 1rem;
+    gap: 0.5rem;
 }
 
 .segmentContainer {
@@ -16,6 +16,7 @@
     align-items: center;
     border-radius: var(--uk-sys-shape-corner-medium);
     width: 100%;
+    margin-left: 0.5rem;
 }
 
 .segment {
@@ -57,4 +58,8 @@
 
 .slash {
     font-size: calc(var(--uk-sys-typescale-label-large-size) + 0.25rem);
+}
+
+.textField {
+    flex-grow: 1;
 }

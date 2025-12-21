@@ -24,16 +24,16 @@ const PathBar: Component = () => {
                         output = path.join(output, split[i]);
                     }
 
-                    console.log(output);
-
                     navigate(`/app/uk.tcsw.files/dir${output}`);
                 }}
                 size={"xs"}
                 color={"standard"}
                 alt={"go up one directory"}
                 icon={"arrow_upward"}
+                width="default"
             />
             <UKIconButton
+                disabled={params.currentPath === "users"}
                 onClick={() => {
                     navigate(`/app/uk.tcsw.files/dir/users`);
                 }}
@@ -41,18 +41,21 @@ const PathBar: Component = () => {
                 color={"standard"}
                 alt={"go to home"}
                 icon={"house"}
+                width="default"
             />
             {showTextField() ? (
-                <UKTextField
-                    label={"Path"}
-                    defaultValue={`/${params.currentPath || ""}`}
-                    getValue={(val) => {
-                        if (val[0] === "/") navigate(`/app/uk.tcsw.files/dir${val}`);
-                    }}
-                    onBlur={() => setShowTextField(false)}
-                    onSubmit={() => setShowTextField(false)}
-                    color={"outlined"}
-                />
+                <div class={styles.textField}>
+                    <UKTextField
+                        label={"Path"}
+                        defaultValue={`/${params.currentPath || ""}`}
+                        getValue={(val) => {
+                            if (val[0] === "/") navigate(`/app/uk.tcsw.files/dir${val}`);
+                        }}
+                        onBlur={() => setShowTextField(false)}
+                        onSubmit={() => setShowTextField(false)}
+                        color={"outlined"}
+                    />
+                </div>
             ) : (
                 <>
                     <div class={styles.segmentContainer} onDblClick={() => setShowTextField(true)}>
