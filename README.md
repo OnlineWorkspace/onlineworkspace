@@ -93,9 +93,6 @@ A working environment for professionals and Home-Lab users.
 
 | Dependency | NPM Package       | External Installation Guide | Optional |
 | ---------- | ----------------- | --------------------------- | -------- |
-| SolidJS    | solid             |                             | No       |
-| Vite       | vite              |                             | No       |
-| UIKit      | @tcsw/uikit-solid |                             | No       |
 | Bun        |                   | https://bun.sh              | No       |
 | PostgreSQL |                   | https://www.postgresql.org/ | No       |
 
