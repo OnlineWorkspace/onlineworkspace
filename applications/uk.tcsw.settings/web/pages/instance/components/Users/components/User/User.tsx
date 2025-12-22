@@ -12,14 +12,26 @@ const User: Component<{
     userId: number;
     updateUsers: () => void;
 }> = (props) => {
-    const [username, { mutate: setUsername }] = createResource(() => trpc.instance.user.getUsername.query(props.userId), {
-        initialValue: "",
-    });
-    const [email, { mutate: setEmail }] = createResource(() => trpc.instance.user.getEmail.query(props.userId), { initialValue: "" });
-    const [forename, { mutate: setForename }] = createResource(() => trpc.instance.user.getForename.query(props.userId), {
-        initialValue: "",
-    });
-    const [surname, { mutate: setSurname }] = createResource(() => trpc.instance.user.getSurname.query(props.userId), { initialValue: "" });
+    const [username, { mutate: setUsername }] = createResource(
+        () => trpc.instance.user.getUsername.query(props.userId),
+        {
+            initialValue: "",
+        },
+    );
+    const [email, { mutate: setEmail }] = createResource(
+        () => trpc.instance.user.getEmail.query(props.userId),
+        { initialValue: "" },
+    );
+    const [forename, { mutate: setForename }] = createResource(
+        () => trpc.instance.user.getForename.query(props.userId),
+        {
+            initialValue: "",
+        },
+    );
+    const [surname, { mutate: setSurname }] = createResource(
+        () => trpc.instance.user.getSurname.query(props.userId),
+        { initialValue: "" },
+    );
     const [isAdministrator, { mutate: setIsAdministrator }] = createResource(
         () => trpc.instance.user.getIsAdministrator.query(props.userId),
         { initialValue: false },
@@ -36,7 +48,10 @@ const User: Component<{
                         color="outlined"
                         getValue={(val) => {
                             setUsername(val);
-                            trpc.instance.user.setUsername.mutate({ userId: props.userId, username: val });
+                            trpc.instance.user.setUsername.mutate({
+                                userId: props.userId,
+                                username: val,
+                            });
                         }}
                         defaultValue={username()}
                         label="Username"
@@ -46,7 +61,10 @@ const User: Component<{
                             color="outlined"
                             getValue={(val) => {
                                 setForename(val);
-                                trpc.instance.user.setForename.mutate({ userId: props.userId, forename: val });
+                                trpc.instance.user.setForename.mutate({
+                                    userId: props.userId,
+                                    forename: val,
+                                });
                             }}
                             defaultValue={forename()}
                             label="Forename"
@@ -55,7 +73,10 @@ const User: Component<{
                             color="outlined"
                             getValue={(val) => {
                                 setSurname(val);
-                                trpc.instance.user.setSurname.mutate({ userId: props.userId, surname: val });
+                                trpc.instance.user.setSurname.mutate({
+                                    userId: props.userId,
+                                    surname: val,
+                                });
                             }}
                             defaultValue={surname()}
                             label="Surname"
@@ -65,7 +86,10 @@ const User: Component<{
                         color="outlined"
                         getValue={(val) => {
                             setEmail(val);
-                            trpc.instance.user.setEmail.mutate({ userId: props.userId, email: val });
+                            trpc.instance.user.setEmail.mutate({
+                                userId: props.userId,
+                                email: val,
+                            });
                         }}
                         defaultValue={email()}
                         label="Email"
@@ -77,7 +101,10 @@ const User: Component<{
                         <UKSwitch
                             getValue={(val) => {
                                 setIsAdministrator(val);
-                                trpc.instance.user.setIsAdministrator.mutate({ administrator: val, userId: props.userId });
+                                trpc.instance.user.setIsAdministrator.mutate({
+                                    administrator: val,
+                                    userId: props.userId,
+                                });
                             }}
                             value={isAdministrator()}
                         />

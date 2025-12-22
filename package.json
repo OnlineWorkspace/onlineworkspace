@@ -14,8 +14,7 @@
         "url": "https://github.com/tricolorsoftware/workspaces"
     },
     "scripts": {
-        "backend": "bun --watch instance/src/index.ts",
-        "web": "bun run --cwd instance/src/web dev",
+        "dev": "bun --watch instance/src/index.ts",
         "build-web": "bun run --cwd instance/src/web build",
         "uikit": "bun run --cwd uikit-solid dev"
     },

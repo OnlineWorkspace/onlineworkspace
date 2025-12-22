@@ -5,6 +5,8 @@ import { initTRPC } from "@trpc/server";
 import z from "zod";
 import ApplicationRepository from "./repository/applicationRepository";
 import LocalApplicationRepository from "./repository/localRepository";
+import { DEFAULT_APPLICATIONS } from "@tcsw/workspaces-instance/src/subsystems/applications";
+import { WorkspacesFeatureFlags } from "@tcsw/workspaces-instance/src/subsystems/configuration";
 
 const log = instance.log.createLogger("uk.tcsw.store");
 
@@ -61,6 +63,7 @@ const router = t.router({
                         })
                         .array(),
                     enabledApplications: z.string().array(),
+                    cannotDisable: z.string().array(),
                 }),
             )
             .query(async (opt) => {
@@ -92,6 +95,9 @@ const router = t.router({
                         })
                         .filter((a) => a !== undefined),
                     enabledApplications: instance.subSystems.applications.enabledApplications,
+                    cannotDisable: instance.subSystems.configuration.hasFeature(WorkspacesFeatureFlags.ShootYourselfInTheFoot)
+                        ? []
+                        : DEFAULT_APPLICATIONS,
                 };
             }),
         setEnabledApplications: procedure.input(z.object({ enabledApplications: z.string().array() })).mutation(async (opt) => {
@@ -100,13 +106,13 @@ const router = t.router({
             for (const app of currentlyEnabledApplications) {
                 if (opt.input.enabledApplications.includes(app)) continue;
 
-                instance.subSystems.applications.disableApplication(app);
+                await instance.subSystems.applications.disableApplication(app);
             }
 
             for (const app of opt.input.enabledApplications) {
                 if (currentlyEnabledApplications.includes(app)) continue;
 
-                instance.subSystems.applications.enableApplication(app);
+                await instance.subSystems.applications.enableApplication(app);
             }
 
             return {
@@ -196,8 +202,6 @@ const router = t.router({
 
             await opt.ctx.instance.subSystems.applications.installApplication(await repository.getInstallPath(app.id));
             await opt.ctx.instance.subSystems.applications.enableApplication(app.id);
-
-
 
             return true;
         }),

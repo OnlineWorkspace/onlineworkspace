@@ -13,64 +13,82 @@ import NavigationRailApplications from "./navigationRailApplications/NavigationR
 const AppLayout: Component<RouteSectionProps<unknown>> = (props) => {
     const location = useLocation();
     const navigate = useNavigate();
-    const [quickShortcuts] = createResource(() => trpc.app.navigation.getApplications.query());
 
+    const [quickShortcuts] = createResource(() => trpc.app.navigation.getApplications.query());
     const [expanded, setExpanded] = createSignal<boolean>(false);
 
     return (
-        <UKNavigationRail
-            class={styles.rail}
-            expanded={expanded()}
-            items={[
-                ...(quickShortcuts() || []).map((sc) => {
-                    return {
-                        icon: sc.icon || { type: "icon", value: "indeterminate_question_box" },
-                        label: sc.label,
-                        active: location.pathname.startsWith(sc.location.value),
-                        onClick() {
-                            if (sc.location.type === "local") {
-                                navigate(sc.location.value);
-                            } else if (sc.location.type === "remote") {
-                                window.location.href = sc.location.value;
-                            }
-                        },
-                        onMiddleClick() {
-                            if (sc.location.type === "local") {
-                                window.open(sc.location.value, "_blank");
-                            } else if (sc.location.type === "remote") {
-                                window.open(sc.location.value, "_blank");
-                            }
-                        },
-                    };
-                }),
-            ]}
-            setExpanded={(exp) => setExpanded(exp)}
-            anchorPoints={{
-                topMost: (
-                    <>
-                        <NavigationRailClock expanded={expanded()} />
-                    </>
-                ),
-                top: (
-                    <>
-                        <NavigationRailAvatar expanded={expanded()} />
-                    </>
-                ),
-                bottom: (
-                    <>
-                        <NavigationRailApplications expanded={expanded()} />
-                        <UKText class={styles.versionLabel} role={"label"} size={"s"} emphasized={true} align={"center"}>
-                            Dev Build
-                        </UKText>
-                        <NavigationRailNotifications expanded={expanded()} />
-                    </>
-                ),
-            }}
-        >
-            <div class={styles.page}>
-                <Suspense fallback={<UKIndeterminateSpinner />}>{props.children}</Suspense>
-            </div>
-        </UKNavigationRail>
+        <>
+            {window.localStorage.getItem("tricolor_workspaces_no_app_navigation_rail") !==
+            "true" ? (
+                <UKNavigationRail
+                    class={styles.rail}
+                    expanded={expanded()}
+                    items={[
+                        ...(quickShortcuts() || []).map((sc) => {
+                            return {
+                                icon: sc.icon || {
+                                    type: "icon",
+                                    value: "indeterminate_question_box",
+                                },
+                                label: sc.label,
+                                active: location.pathname.startsWith(sc.location.value),
+                                onClick() {
+                                    if (sc.location.type === "local") {
+                                        navigate(sc.location.value);
+                                    } else if (sc.location.type === "remote") {
+                                        window.location.href = sc.location.value;
+                                    }
+                                },
+                                onMiddleClick() {
+                                    if (sc.location.type === "local") {
+                                        window.open(sc.location.value, "_blank");
+                                    } else if (sc.location.type === "remote") {
+                                        window.open(sc.location.value, "_blank");
+                                    }
+                                },
+                            };
+                        }),
+                    ]}
+                    setExpanded={(exp) => setExpanded(exp)}
+                    anchorPoints={{
+                        topMost: (
+                            <>
+                                <NavigationRailClock expanded={expanded()} />
+                            </>
+                        ),
+                        top: (
+                            <>
+                                <NavigationRailAvatar expanded={expanded()} />
+                            </>
+                        ),
+                        bottom: (
+                            <>
+                                <NavigationRailApplications expanded={expanded()} />
+                                <UKText
+                                    class={styles.versionLabel}
+                                    role={"label"}
+                                    size={"s"}
+                                    emphasized={true}
+                                    align={"center"}
+                                >
+                                    Dev Build
+                                </UKText>
+                                <NavigationRailNotifications expanded={expanded()} />
+                            </>
+                        ),
+                    }}
+                >
+                    <div class={styles.page}>
+                        <Suspense fallback={<UKIndeterminateSpinner />}>{props.children}</Suspense>
+                    </div>
+                </UKNavigationRail>
+            ) : (
+                <div class={styles.page}>
+                    <Suspense fallback={<UKIndeterminateSpinner />}>{props.children}</Suspense>
+                </div>
+            )}
+        </>
     );
 };
 

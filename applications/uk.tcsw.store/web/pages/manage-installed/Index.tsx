@@ -86,19 +86,23 @@ const ManageInstalledPage: Component = () => {
                                 labelText={app.displayName}
                                 inlineComponent={
                                     !selectionMode() ? (
-                                        <UKSwitch
-                                            icon={true}
-                                            class={styles.stackSwitch}
-                                            getValue={(val) => {
-                                                if (val) {
-                                                    setEnabledApplications((prev) => [...prev, app.id]);
-                                                    return;
-                                                }
+                                        installedApplications()?.cannotDisable.includes(app.id) ? (
+                                            <></>
+                                        ) : (
+                                            <UKSwitch
+                                                icon={true}
+                                                class={styles.stackSwitch}
+                                                getValue={(val) => {
+                                                    if (val) {
+                                                        setEnabledApplications((prev) => [...prev, app.id]);
+                                                        return;
+                                                    }
 
-                                                setEnabledApplications((prev) => prev.filter((i) => i !== app.id));
-                                            }}
-                                            value={enabledApplications().includes(app.id)}
-                                        />
+                                                    setEnabledApplications((prev) => prev.filter((i) => i !== app.id));
+                                                }}
+                                                value={enabledApplications().includes(app.id)}
+                                            />
+                                        )
                                     ) : (
                                         <UKIcon class={styles.stackSelect}>
                                             {selectedApplicationIds().includes(app.id) ? "check" : "check_indeterminate_small"}

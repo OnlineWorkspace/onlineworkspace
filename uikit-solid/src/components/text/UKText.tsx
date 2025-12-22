@@ -11,6 +11,7 @@ const UKText: Component<
         class?: string;
         href?: string;
         onClick?: (e: MouseEvent) => void;
+        onDoubleClick?: (e: MouseEvent) => void;
     }>
 > = (props) => {
     return (
@@ -18,6 +19,7 @@ const UKText: Component<
             <Match when={props.href}>
                 <a
                     onClick={props.onClick}
+                    onDblClick={props.onDoubleClick}
                     class={clsx(styles.root, props.class)}
                     data-size={props.size || "s"}
                     data-role={props.role || "body"}
@@ -31,6 +33,7 @@ const UKText: Component<
             <Match when={props.href === undefined}>
                 <div
                     onClick={props.onClick}
+                    onDblClick={props.onDoubleClick}
                     class={clsx(styles.root, props.class)}
                     data-size={props.size || "s"}
                     data-role={props.role || "body"}

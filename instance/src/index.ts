@@ -39,8 +39,8 @@ class Instance {
         // @ts-ignore Don't know, don't care
         this.subSystems = {};
 
-        this.subSystems.configuration = new ConfigurationSubsystem(this);
         this.subSystems.filesystem = new FilesystemSubsystem(this);
+        this.subSystems.configuration = new ConfigurationSubsystem(this);
         this.subSystems.notifications = new NotificationsSubsystem(this);
         this.subSystems.consoleCommands = new ConsoleCommandsSubsytem(this);
         this.subSystems.database = new DatabaseSubsystem(this);

@@ -1,4 +1,4 @@
-import { type Component, createResource, createSignal, For, Suspense } from "solid-js";
+import { type Component, createResource, createSignal, For, Suspense, useContext } from "solid-js";
 import styles from "./Grid.module.scss";
 import { useNavigate, useParams } from "@solidjs/router";
 import trpc from "../../../lib/trpc";
@@ -9,17 +9,26 @@ import { DividerDirection } from "@tcsw/uikit-solid/src/components/divider/lib/d
 import UKText from "@tcsw/uikit-solid/src/components/text/UKText.tsx";
 import UKButton from "@tcsw/uikit-solid/src/components/button/UKButton.tsx";
 import UKButtonGroup from "@tcsw/uikit-solid/src/components/buttonGroup/UKButtonGroup.tsx";
+import { ViewContext } from "../ViewContext";
 
 const GridView: Component = () => {
     const params = useParams();
     const navigate = useNavigate();
-    const [selectedItems, setSelectedItems] = createSignal<string[]>([]);
+    const viewCtx = useContext(ViewContext);
 
     const [gridResource] = createResource(
         () => `/${params.currentPath || ""}`,
-        (pth) => {
-            setSelectedItems([]);
-            return trpc.getFileGrid.query({ path: pth, sortBy: "name" });
+        async (pth) => {
+            viewCtx?.setLastSelectionIndex(undefined);
+            viewCtx?.setSelectedItems([]);
+            const items = await trpc.getFileGrid.query({ path: pth, sortBy: "name" });
+            if (items.type === "success") {
+                // @ts-ignore
+                viewCtx?.setViewItems(items.items.map((i) => i.path));
+            } else {
+                viewCtx?.setViewItems([]);
+            }
+            return items;
         },
     );
 
@@ -29,26 +38,8 @@ const GridView: Component = () => {
                 {gridResource()?.type === "success" ? (
                     // @ts-ignore
                     <For each={gridResource()?.items}>
-                        {(i) => {
-                            return (
-                                <GridItem
-                                    {...i}
-                                    selected={selectedItems().includes(i.path)}
-                                    setSelected={(sel) =>
-                                        setSelectedItems((items) => {
-                                            if (!sel) {
-                                                if (items.includes(i.path)) {
-                                                    return items.filter((fi) => fi !== i.path);
-                                                }
-
-                                                return items;
-                                            }
-
-                                            return [...items, i.path];
-                                        })
-                                    }
-                                />
-                            );
+                        {(i, index) => {
+                            return <GridItem {...i} index={index()} />;
                         }}
                     </For>
                 ) : gridResource()?.type === "error" ? (

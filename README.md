@@ -4,14 +4,29 @@
 
 A working environment for professionals and Home-Lab users.
 
-> [!INFO]
-> New icons are needed for all applications, the current icons are only intended to be placeholders
+> [!WARNING]
+> Workspaces is not yet intended for production use. Although early adoption for testing purposes is appreciated.
 
 ### Links
 
 - Discord -> https://discord.gg/jcJeGEAYhY
-- Source Code (git) -> https://github.com/tricolorsoftware/workspaces
+- Source Code (GitHub) -> https://github.com/tricolorsoftware/workspaces
 
+### Showcase
+
+Sign In Page
+![sign in](metaAssets/signIn.png)
+
+Create Profile
+![create profile](metaAssets/create_profile.png)
+
+Dashboard (Work in progress)
+![dashboard](metaAssets/dashboard.png)
+
+App Navigation Rail
+![app navigation rail](metaAssets/app_navigation_rail.avif)
+
+<!--
 ## Installation Guide for Production Environments (Docker)
 
 ---
@@ -33,8 +48,9 @@ A working environment for professionals and Home-Lab users.
 7. edit `docker-compose.yaml` to your desired configuration from [Insert link to relevant documentation here] before continuing.
 8. run `docker-compose up` to start the workspaces docker image and install all remaining dependencies
 9. open your browser and head to `https://[server-ip]` and follow the on-screen instructions to complete the setup.
-10. Enjoy! :D
+-->
 
+<!--
 ## Installation Guide for Production Environments (Manual)
 
 ---
@@ -63,14 +79,15 @@ A working environment for professionals and Home-Lab users.
 13. run `bun build-web`
 14. choose a webserver of your choice to serve `/var/www/workspaces/instance/web/dist` (caddy is fast & easy to use)
 15. open your browser and head to `https://[server-ip]` and login as the user `admin` with password `password` to finish setup.
-16. Enjoy! :D
+-->
+
 
 ## Installation Guide for Development Environments
 
 ---
 
-> [!WARNING]
-> Ignore this section if you are planning to use workspaces in production, instead please follow the `Installation Guide for Production Environments` section.
+> [!INFO]
+> If you are struggling with the following instructions, please ask for help in the project's discord server which can be found in the links section.
 
 ### Dependencies
 
@@ -80,37 +97,24 @@ A working environment for professionals and Home-Lab users.
 | Vite       | vite              |                             | No       |
 | UIKit      | @tcsw/uikit-solid |                             | No       |
 | Bun        |                   | https://bun.sh              | No       |
-| Docker     |                   | https://www.docker.com/     | Yes      |
 | PostgreSQL |                   | https://www.postgresql.org/ | No       |
 
-### Installation
-
-1. Choose either the `Full-Stack` or `UIKit` section to continue
-
-#### Full-Stack (Workspaces)
+> [!INFO]
+> Please ensure all non-optional dependencies are installed before proceeding.
 
 1. Ensure all non-NPM dependencies are installed
-    1. Linux (Ubuntu)
+    - Ubuntu Linux
         1. Install PostgreSQL -> `sudo apt install postgresql postgresql-contrib`
         2. Start the PostgreSQL service -> `sudo systemctl enable --now postgresql`
         3. Switch to the postgres user -> `sudo su postgres`
-        4. Open the PostgreSQL database with psql -> `psql`
+        4. Open PostgreSQL with psql -> `psql`
         5. Create a PostgreSQL database with the following query -> `CREATE DATABASE tricolor_workspaces;`
         6. Change the PostgreSQL password with the following query -> `ALTER USER postgres WITH PASSWORD 'postgres';`
         7. Exit psql -> `exit;`
         8. Logout from the postgres user -> `exit`
-    2. Windows
+    - Windows
         1. Simply install postgreSQL with the setup file downloaded from the postgreSQL website
-    3. MacOS
-        1. Using Orbstack with Ubuntu follow the linux instructions above
-2. Run `bun install` to install all NPM dependencies
-3. Run `bun run web` and `bun run backend` to start up the web interface and backend in development mode
-4. Enjoy! :D
-
-#### UIKit (UI Library dev page)
-
-1. Ensure all non-NPM dependencies are installed before continuing
-2. Run `bun install` to install all NPM dependencies
-3. cd into the UIKit directory `cd ./packages/uikit-solid`
-4. Run `bun run dev-web` to start up the web interface and backend in development mode
-5. Enjoy! :D
+    - MacOS
+        1. Using Orbstack with Ubuntu follow the Ubuntu Linux instructions above
+2. Run `bun install` inside the project root directory to install all NPM dependencies
+3. Run `bun run dev` to start up the web interface and backend in development mode

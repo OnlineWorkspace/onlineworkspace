@@ -1,60 +1,69 @@
-import { type Component, createSignal, For } from "solid-js";
+import { type Component, createSignal, For, useContext } from "solid-js";
 import UKText from "@tcsw/uikit-solid/src/components/text/UKText.tsx";
 import styles from "./ActionsMenuBar.module.scss";
-
-const ACTIONS: {
-    label: string;
-    items: {
-        label: string;
-        onClick(): void;
-    }[];
-}[] = [
-    {
-        label: "File",
-        items: [],
-    },
-    {
-        label: "Edit",
-        items: [
-            {
-                label: "Cut",
-                onClick() {
-                    alert("TODO: Implement me!")
-                },
-            },
-            {
-                label: "Copy",
-                onClick() {
-                    alert("TODO: Implement me!")
-                },
-            },
-            {
-                label: "Paste",
-                onClick() {
-                    alert("TODO: Implement me!")
-                },
-            },
-            {
-                label: "Select All",
-                onClick() {
-                    alert("TODO: Implement me!")
-                },
-            },
-            {
-                label: "Select None",
-                onClick() {
-                    alert("TODO: Implement me!")
-                },
-            },
-        ],
-    },
-    {
-        label: "View",
-        items: [],
-    },
-];
+import { ViewContext } from "../ViewContainer/ViewContext";
 
 const ActionsMenuBar: Component = () => {
+    const viewCtx = useContext(ViewContext);
+
+    const ACTIONS: {
+        label: string;
+        items: {
+            label: string;
+            onClick(): void;
+        }[];
+    }[] = [
+        {
+            label: "File",
+            items: [],
+        },
+        {
+            label: "Edit",
+            items: [
+                {
+                    label: "Cut",
+                    onClick() {
+                        alert("TODO: Implement me!");
+                    },
+                },
+                {
+                    label: "Copy",
+                    onClick() {
+                        alert("TODO: Implement me!");
+                    },
+                },
+                {
+                    label: "Paste",
+                    onClick() {
+                        alert("TODO: Implement me!");
+                    },
+                },
+                {
+                    label: "Rename",
+                    onClick() {
+                        viewCtx?.setRenameEntry(viewCtx.selectedItems()[0]);
+                    },
+                },
+                {
+                    label: "Select All",
+                    onClick() {
+                        alert("TODO: Implement me!");
+                    },
+                },
+                {
+                    label: "Select None",
+                    onClick() {
+                        alert("TODO: Implement me!");
+                    },
+                },
+            ],
+        },
+        {
+            label: "View",
+            items: [],
+        },
+    ];
+
     const [selectedAction, setSelectedAction] = createSignal<string | undefined>(undefined);
 
     return (
@@ -67,7 +76,9 @@ const ActionsMenuBar: Component = () => {
                                 class={styles.action}
                                 data-selected={selectedAction() === a.label}
                                 onClick={() => {
-                                    setSelectedAction((cl) => (cl === a.label ? undefined : a.label));
+                                    setSelectedAction((cl) =>
+                                        cl === a.label ? undefined : a.label,
+                                    );
                                 }}
                             >
                                 <UKText size={"m"} role={"label"}>
@@ -79,7 +90,10 @@ const ActionsMenuBar: Component = () => {
                                             <For each={a.items}>
                                                 {(i) => {
                                                     return (
-                                                        <div class={styles.item} onClick={i.onClick}>
+                                                        <div
+                                                            class={styles.item}
+                                                            onClick={i.onClick}
+                                                        >
                                                             <UKText size={"m"} role={"body"}>
                                                                 {i.label}
                                                             </UKText>

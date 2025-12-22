@@ -9,7 +9,7 @@ import { WorkspacesNotificationPriority } from "./notifications.js";
 const APPLICATIONS_CONFIG_FILE_PATH = (subsystem: SubSystem) =>
     path.join(subsystem.instance.subSystems.filesystem.FS_ROOT, "applications.json");
 
-const DEFAULT_APPLICATIONS: string[] = ["uk.tcsw.store", "uk.tcsw.dashboard", "uk.tcsw.settings"];
+export const DEFAULT_APPLICATIONS: string[] = ["uk.tcsw.store", "uk.tcsw.dashboard", "uk.tcsw.settings"];
 
 interface AvailableWorkspacesApplication {
     path: string;

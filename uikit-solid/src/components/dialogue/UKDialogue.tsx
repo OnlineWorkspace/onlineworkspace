@@ -1,20 +1,7 @@
-import type { Component, ParentProps } from "solid-js";
-import styles from "./UKDialogue.module.scss";
-import type { DialogueController } from "./context";
+import type { Component } from "solid-js";
 
-const UKDialogue: Component<ParentProps<{ dialogueController: DialogueController }>> = (props) => {
-    return (
-        <div
-            class={styles.root}
-            onClick={(e) => {
-                e.stopPropagation();
-
-                if (e.currentTarget === e.target) props.dialogueController.close();
-            }}
-        >
-            {props.children}
-        </div>
-    );
+const UKDialogue: Component = () => {
+    return <>Dialogue Element</>;
 };
 
 export default UKDialogue;

@@ -9,6 +9,7 @@ import path from "path";
 import { octetInputParser } from "@trpc/server/http";
 import fs from "fs/promises";
 import sharp from "sharp";
+import { WorkspacesFeatureFlags } from "@tcsw/workspaces-instance/src/subsystems/configuration";
 
 const log = instance.log.createLogger("uk.tcsw.settings");
 
@@ -289,7 +290,9 @@ const router = t.router({
                     return username || "unknown";
                 }),
             setUsername: adminProcedure.input(z.object({ userId: z.number(), username: z.string() })).mutation(async (opt) => {
-                await (await opt.ctx.instance.subSystems.users.getUserById(opt.input.userId))?.setUsername(opt.input.username.toLowerCase());
+                await (
+                    await opt.ctx.instance.subSystems.users.getUserById(opt.input.userId)
+                )?.setUsername(opt.input.username.toLowerCase());
 
                 return true;
             }),
@@ -364,6 +367,28 @@ const router = t.router({
         }),
         createUser: procedure.input(z.object({ username: z.string() })).mutation(async (opt) => {
             await opt.ctx.instance.subSystems.users.createUser(opt.input.username.toLowerCase());
+
+            return true;
+        }),
+        getFeatures: procedure.output(z.object({ name: z.string(), id: z.string(), enabled: z.boolean() }).array()).query(async (opt) => {
+            const availableFlags = Object.keys(WorkspacesFeatureFlags);
+
+            return availableFlags.map((f) => {
+                return {
+                    name: f,
+                    // @ts-ignore
+                    id: WorkspacesFeatureFlags[f],
+                    // @ts-ignore
+                    enabled: instance.subSystems.configuration.hasFeature(WorkspacesFeatureFlags[f]),
+                };
+            });
+        }),
+        setFeature: procedure.input(z.object({ id: z.string(), value: z.boolean() })).mutation(async (opt) => {
+            if (opt.input.value) {
+                instance.subSystems.configuration.enableFeature(opt.input.id);
+            } else {
+                instance.subSystems.configuration.disableFeature(opt.input.id);
+            }
 
             return true;
         }),
