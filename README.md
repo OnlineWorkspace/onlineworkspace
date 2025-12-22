@@ -14,17 +14,17 @@ A working environment for professionals and Home-Lab users.
 
 ### Showcase
 
-Sign In Page
-![sign in](metaAssets/signIn.png)
+- Sign In Page
+    - ![sign in](metaAssets/signIn.png)
 
-Create Profile
-![create profile](metaAssets/create_profile.png)
+- Create Profile
+    - ![create profile](metaAssets/create_profile.png)
 
-Dashboard (Work in progress)
-![dashboard](metaAssets/dashboard.png)
+- Dashboard (Work in progress)
+    - ![dashboard](metaAssets/dashboard.png)
 
-App Navigation Rail
-![app navigation rail](metaAssets/app_navigation_rail.avif)
+- App Navigation Rail
+    - ![app navigation rail](metaAssets/app_navigation_rail.avif)
 
 <!--
 ## Installation Guide for Production Environments (Docker)
