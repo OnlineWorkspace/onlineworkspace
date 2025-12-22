@@ -86,7 +86,7 @@ A working environment for professionals and Home-Lab users.
 
 ---
 
-> [!INFO]
+> [!TIP]
 > If you are struggling with the following instructions, please ask for help in the project's discord server which can be found in the links section.
 
 ### Dependencies
@@ -99,7 +99,7 @@ A working environment for professionals and Home-Lab users.
 | Bun        |                   | https://bun.sh              | No       |
 | PostgreSQL |                   | https://www.postgresql.org/ | No       |
 
-> [!INFO]
+> [!IMPORTANT]
 > Please ensure all non-optional dependencies are installed before proceeding.
 
 1. Ensure all non-NPM dependencies are installed
