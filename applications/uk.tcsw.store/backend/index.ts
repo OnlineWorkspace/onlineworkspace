@@ -30,21 +30,25 @@ const router = t.router({
 
             return output;
         }),
-        getPromotedApplication: procedure.input(z.object({ applicationId: z.string(), repository: z.string() })).query(async (opt) => {
-            let repository = applicationRepositories.find((repo) => repo.id === opt.input.repository);
+        getPromotedApplication: procedure
+            .input(z.object({ applicationId: z.string(), repository: z.string() }))
+            .query(async (opt) => {
+                let repository = applicationRepositories.find(
+                    (repo) => repo.id === opt.input.repository,
+                );
 
-            if (!repository) return undefined;
+                if (!repository) return undefined;
 
-            let app = await repository.getApplicationSummaryById(opt.input.applicationId);
+                let app = await repository.getApplicationSummaryById(opt.input.applicationId);
 
-            if (!app) return undefined;
+                if (!app) return undefined;
 
-            if (app.bannerImage) {
-                app.bannerImage = `${opt.ctx.rawRequest.destinationHostname}${instance.subSystems.image.serveImage(opt.ctx.userId, app.bannerImage)}`;
-            }
+                if (app.bannerImage) {
+                    app.bannerImage = `${opt.ctx.rawRequest.destinationHostname}${instance.subSystems.image.serveImage(opt.ctx.userId, app.bannerImage)}`;
+                }
 
-            return app;
-        }),
+                return app;
+            }),
     },
     manageInstalled: {
         getApplications: procedure
@@ -72,7 +76,10 @@ const router = t.router({
                         .map((app) => {
                             if (!app.manifest) return undefined;
 
-                            let icon = { type: "icon" as "icon" | "image", value: "indeterminate_question_box" };
+                            let icon = {
+                                type: "icon" as "icon" | "image",
+                                value: "indeterminate_question_box",
+                            };
 
                             if (app.manifest?.icon) {
                                 if (app.manifest.icon.type === "image") {
@@ -95,39 +102,46 @@ const router = t.router({
                         })
                         .filter((a) => a !== undefined),
                     enabledApplications: instance.subSystems.applications.enabledApplications,
-                    cannotDisable: instance.subSystems.configuration.hasFeature(WorkspacesFeatureFlags.ShootYourselfInTheFoot)
+                    cannotDisable: instance.subSystems.configuration.hasFeature(
+                        WorkspacesFeatureFlags.ShootYourselfInTheFoot,
+                    )
                         ? []
                         : DEFAULT_APPLICATIONS,
                 };
             }),
-        setEnabledApplications: procedure.input(z.object({ enabledApplications: z.string().array() })).mutation(async (opt) => {
-            const currentlyEnabledApplications = instance.subSystems.applications.enabledApplications;
+        setEnabledApplications: procedure
+            .input(z.object({ enabledApplications: z.string().array() }))
+            .mutation(async (opt) => {
+                const currentlyEnabledApplications =
+                    instance.subSystems.applications.enabledApplications;
 
-            for (const app of currentlyEnabledApplications) {
-                if (opt.input.enabledApplications.includes(app)) continue;
+                for (const app of currentlyEnabledApplications) {
+                    if (opt.input.enabledApplications.includes(app)) continue;
 
-                await instance.subSystems.applications.disableApplication(app);
-            }
+                    await instance.subSystems.applications.disableApplication(app);
+                }
 
-            for (const app of opt.input.enabledApplications) {
-                if (currentlyEnabledApplications.includes(app)) continue;
+                for (const app of opt.input.enabledApplications) {
+                    if (currentlyEnabledApplications.includes(app)) continue;
 
-                await instance.subSystems.applications.enableApplication(app);
-            }
+                    await instance.subSystems.applications.enableApplication(app);
+                }
 
-            return {
-                success: true,
-            };
-        }),
-        uninstallApplications: procedure.input(z.object({ applications: z.string().array() })).mutation(async (opt) => {
-            for (const app of opt.input.applications) {
-                await opt.ctx.instance.subSystems.applications.uninstallApplication(app);
-            }
+                return {
+                    success: true,
+                };
+            }),
+        uninstallApplications: procedure
+            .input(z.object({ applications: z.string().array() }))
+            .mutation(async (opt) => {
+                for (const app of opt.input.applications) {
+                    await opt.ctx.instance.subSystems.applications.uninstallApplication(app);
+                }
 
-            return {
-                success: true,
-            };
-        }),
+                return {
+                    success: true,
+                };
+            }),
     },
     categories: {},
     search: {
@@ -148,72 +162,110 @@ const router = t.router({
 
                 return results;
             }),
-        getResult: procedure.input(z.object({ applicationId: z.string(), repository: z.string() })).query(async (opt) => {
-            let repository = applicationRepositories.find((repo) => repo.id === opt.input.repository);
+        getResult: procedure
+            .input(z.object({ applicationId: z.string(), repository: z.string() }))
+            .query(async (opt) => {
+                let repository = applicationRepositories.find(
+                    (repo) => repo.id === opt.input.repository,
+                );
 
-            if (!repository) return undefined;
+                if (!repository) return undefined;
 
-            let app = await repository.getApplicationSummaryById(opt.input.applicationId);
+                let app = await repository.getApplicationSummaryById(opt.input.applicationId);
 
-            if (!app) return undefined;
+                if (!app) return undefined;
 
-            if (app.bannerImage) {
-                app.bannerImage = `${opt.ctx.rawRequest.destinationHostname}${instance.subSystems.image.serveImage(opt.ctx.userId, app.bannerImage)}`;
-            }
+                if (app.bannerImage) {
+                    app.bannerImage = `${opt.ctx.rawRequest.destinationHostname}${instance.subSystems.image.serveImage(opt.ctx.userId, app.bannerImage)}`;
+                }
 
-            return app;
-        }),
+                return app;
+            }),
     },
     app: {
-        get: procedure.input(z.object({ applicationId: z.string(), repository: z.string() })).query(async (opt) => {
-            let repository = applicationRepositories.find((repo) => repo.id === opt.input.repository);
+        get: procedure
+            .input(z.object({ applicationId: z.string(), repository: z.string() }))
+            .query(async (opt) => {
+                let repository = applicationRepositories.find(
+                    (repo) => repo.id === opt.input.repository,
+                );
 
-            if (!repository) return undefined;
+                if (!repository) return undefined;
 
-            let app = await repository.getApplicationById(opt.input.applicationId);
+                let app = await repository.getApplicationById(opt.input.applicationId);
 
-            if (!app) return undefined;
+                if (!app) return undefined;
 
-            if (app.icon.type === "image") {
-                app.icon.value = `${opt.ctx.rawRequest.destinationHostname}${instance.subSystems.image.serveImage(opt.ctx.userId, app.icon.value)}`;
-            }
+                if (app.icon.type === "image") {
+                    app.icon.value = `${opt.ctx.rawRequest.destinationHostname}${instance.subSystems.image.serveImage(opt.ctx.userId, app.icon.value)}`;
+                }
 
-            if (app.bannerImage) {
-                app.bannerImage = `${opt.ctx.rawRequest.destinationHostname}${instance.subSystems.image.serveImage(opt.ctx.userId, app.bannerImage)}`;
-            }
+                if (app.bannerImage) {
+                    app.bannerImage = `${opt.ctx.rawRequest.destinationHostname}${instance.subSystems.image.serveImage(opt.ctx.userId, app.bannerImage)}`;
+                }
 
-            return {
-                ...app,
-                isUserAdministrator: await (await opt.ctx.user())?.isAdministrator(),
-                isInstalled: opt.ctx.instance.subSystems.applications.enabledApplications.includes(app.id),
-            };
-        }),
-        install: procedure.input(z.object({ applicationId: z.string(), repository: z.string() })).mutation(async (opt) => {
-            let repository = applicationRepositories.find((repo) => repo.id === opt.input.repository);
+                return {
+                    ...app,
+                    isUserAdministrator: await (await opt.ctx.user())?.isAdministrator(),
+                    canBeUninstalled: DEFAULT_APPLICATIONS.includes(app.id)
+                        ? instance.subSystems.configuration.hasFeature(
+                              WorkspacesFeatureFlags.ShootYourselfInTheFoot,
+                          )
+                        : true,
+                    isInstalled:
+                        opt.ctx.instance.subSystems.applications.enabledApplications.includes(
+                            app.id,
+                        ),
+                };
+            }),
+        install: procedure
+            .input(z.object({ applicationId: z.string(), repository: z.string() }))
+            .mutation(async (opt) => {
+                let repository = applicationRepositories.find(
+                    (repo) => repo.id === opt.input.repository,
+                );
 
-            if (!repository) return undefined;
+                if (!repository) return undefined;
 
-            let app = await repository.getApplicationById(opt.input.applicationId);
+                let app = await repository.getApplicationById(opt.input.applicationId);
 
-            if (!app) return undefined;
+                if (!app) return undefined;
 
-            // the user must be administrator
-            if (!(await (await opt.ctx.user())?.isAdministrator())) return false;
+                // the user must be administrator
+                if (!(await (await opt.ctx.user())?.isAdministrator())) return false;
 
-            await opt.ctx.instance.subSystems.applications.installApplication(await repository.getInstallPath(app.id));
-            await opt.ctx.instance.subSystems.applications.enableApplication(app.id);
+                await opt.ctx.instance.subSystems.applications.installApplication(
+                    await repository.getInstallPath(app.id),
+                );
+                await opt.ctx.instance.subSystems.applications.enableApplication(app.id);
 
-            return true;
-        }),
-        uninstall: procedure.input(z.object({ applicationId: z.string() })).mutation(async (opt) => {
-            // the user must be administrator
-            if (!(await (await opt.ctx.user())?.isAdministrator())) return false;
+                return true;
+            }),
+        uninstall: procedure
+            .input(z.object({ applicationId: z.string() }))
+            .mutation(async (opt) => {
+                // the user must be administrator
+                if (!(await (await opt.ctx.user())?.isAdministrator())) return false;
+                // the application must not be protected if without ShootYourselfInTheFoot
+                if (DEFAULT_APPLICATIONS.includes(opt.input.applicationId)) {
+                    if (
+                        !instance.subSystems.configuration.hasFeature(
+                            WorkspacesFeatureFlags.ShootYourselfInTheFoot,
+                        )
+                    ) {
+                        return false;
+                    }
+                }
 
-            await opt.ctx.instance.subSystems.applications.disableApplication(opt.input.applicationId);
-            await opt.ctx.instance.subSystems.applications.uninstallApplication(opt.input.applicationId);
+                await opt.ctx.instance.subSystems.applications.disableApplication(
+                    opt.input.applicationId,
+                );
+                await opt.ctx.instance.subSystems.applications.uninstallApplication(
+                    opt.input.applicationId,
+                );
 
-            return true;
-        }),
+                return true;
+            }),
     },
 });
 

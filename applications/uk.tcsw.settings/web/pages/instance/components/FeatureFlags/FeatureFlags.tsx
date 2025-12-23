@@ -8,7 +8,9 @@ import UKSwitch from "@tcsw/uikit-solid/src/components/switch/UKSwitch.jsx";
 import styles from "./FeatureFlags.module.scss";
 
 const FeatureFlags: Component = () => {
-    const [features, { refetch: refetchFeatures }] = createResource(() => trpc.instance.getFeatures.query());
+    const [features, { refetch: refetchFeatures }] = createResource(() =>
+        trpc.instance.getFeatures.query(),
+    );
 
     return (
         <>
@@ -21,14 +23,17 @@ const FeatureFlags: Component = () => {
                         {(feature) => {
                             return (
                                 <UKStackItem
-                                    labelText={feature.name}
-                                    supportingText={`(${feature.id})`}
+                                    labelText={`${feature.name} ('${feature.id}')`}
+                                    supportingText={`${feature.description !== undefined ? `${feature.description}` : ""}`}
                                     inlineComponent={
                                         <UKSwitch
                                             class={styles.switch}
                                             value={feature.enabled}
                                             getValue={async (val) => {
-                                                await trpc.instance.setFeature.mutate({ id: feature.id, value: val });
+                                                await trpc.instance.setFeature.mutate({
+                                                    id: feature.id,
+                                                    value: val,
+                                                });
                                                 refetchFeatures();
                                             }}
                                         />

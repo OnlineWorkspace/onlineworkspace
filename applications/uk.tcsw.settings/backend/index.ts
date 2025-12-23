@@ -1,15 +1,25 @@
 /// <reference path="./global.d.ts" />
 
 import { WorkspacesNotificationPriority } from "@tcsw/workspaces-instance/src/subsystems/notifications";
-import { AuthorizedDeviceType, SESSION_VALID_TERM_MS } from "@tcsw/workspaces-instance/src/subsystems/authorization";
-import { adminProcedure, createTRPCContext, procedure } from "@tcsw/workspaces-instance/src/subsystems/trpcRouter";
+import {
+    AuthorizedDeviceType,
+    SESSION_VALID_TERM_MS,
+} from "@tcsw/workspaces-instance/src/subsystems/authorization";
+import {
+    adminProcedure,
+    createTRPCContext,
+    procedure,
+} from "@tcsw/workspaces-instance/src/subsystems/trpcRouter";
 import { initTRPC, TRPCError } from "@trpc/server";
 import z from "zod";
 import path from "path";
 import { octetInputParser } from "@trpc/server/http";
 import fs from "fs/promises";
 import sharp from "sharp";
-import { WorkspacesFeatureFlags } from "@tcsw/workspaces-instance/src/subsystems/configuration";
+import {
+    FEATURE_FLAG_DESCRIPTIONS,
+    WorkspacesFeatureFlags,
+} from "@tcsw/workspaces-instance/src/subsystems/configuration";
 
 const log = instance.log.createLogger("uk.tcsw.settings");
 
@@ -19,12 +29,16 @@ const router = t.router({
     overview: {
         user: {
             fullName: procedure.output(z.string()).query(async (opt) => {
-                const fullName = await (await opt.ctx.instance.subSystems.users.getUserById(opt.ctx.userId))?.getFullName();
+                const fullName = await (
+                    await opt.ctx.instance.subSystems.users.getUserById(opt.ctx.userId)
+                )?.getFullName();
 
                 return `${fullName?.forename} ${fullName?.surname || ""}` || "Unknown User";
             }),
             role: procedure.output(z.string()).query(async (opt) => {
-                const isAdministrator = await (await opt.ctx.instance.subSystems.users.getUserById(opt.ctx.userId))?.isAdministrator();
+                const isAdministrator = await (
+                    await opt.ctx.instance.subSystems.users.getUserById(opt.ctx.userId)
+                )?.isAdministrator();
 
                 return isAdministrator ? "Administrator" : "User";
             }),
@@ -35,7 +49,9 @@ const router = t.router({
     },
     profile: {
         getName: procedure.output(z.string()).query(async (opt) => {
-            const fullName = await (await opt.ctx.instance.subSystems.users.getUserById(opt.ctx.userId))?.getFullName();
+            const fullName = await (
+                await opt.ctx.instance.subSystems.users.getUserById(opt.ctx.userId)
+            )?.getFullName();
 
             return `${fullName?.forename} ${fullName?.surname || ""}` || "Unknown User";
         }),
@@ -49,49 +65,67 @@ const router = t.router({
             return true;
         }),
         getUsername: procedure.output(z.string()).query(async (opt) => {
-            const username = await (await opt.ctx.instance.subSystems.users.getUserById(opt.ctx.userId))?.getUsername();
+            const username = await (
+                await opt.ctx.instance.subSystems.users.getUserById(opt.ctx.userId)
+            )?.getUsername();
 
             return username || "unknown";
         }),
         setUsername: procedure.input(z.string()).mutation(async (opt) => {
-            await (await opt.ctx.instance.subSystems.users.getUserById(opt.ctx.userId))?.setUsername(opt.input.toLowerCase());
+            await (
+                await opt.ctx.instance.subSystems.users.getUserById(opt.ctx.userId)
+            )?.setUsername(opt.input.toLowerCase());
 
             return true;
         }),
         getGender: procedure.output(z.string()).query(async (opt) => {
-            const gender = await (await opt.ctx.instance.subSystems.users.getUserById(opt.ctx.userId))?.getGender();
+            const gender = await (
+                await opt.ctx.instance.subSystems.users.getUserById(opt.ctx.userId)
+            )?.getGender();
 
             return gender || "female";
         }),
         setGender: procedure.input(z.string()).mutation(async (opt) => {
             if (opt.input !== "male" && opt.input !== "female" && opt.input !== "other") return;
 
-            await (await opt.ctx.instance.subSystems.users.getUserById(opt.ctx.userId))?.setGender(opt.input);
+            await (
+                await opt.ctx.instance.subSystems.users.getUserById(opt.ctx.userId)
+            )?.setGender(opt.input);
 
             return true;
         }),
         getEmail: procedure.output(z.string()).query(async (opt) => {
-            const email = await (await opt.ctx.instance.subSystems.users.getUserById(opt.ctx.userId))?.getEmail();
+            const email = await (
+                await opt.ctx.instance.subSystems.users.getUserById(opt.ctx.userId)
+            )?.getEmail();
 
             return email || "unknown";
         }),
         setEmail: procedure.input(z.email()).mutation(async (opt) => {
-            await (await opt.ctx.instance.subSystems.users.getUserById(opt.ctx.userId))?.setEmail(opt.input);
+            await (
+                await opt.ctx.instance.subSystems.users.getUserById(opt.ctx.userId)
+            )?.setEmail(opt.input);
 
             return true;
         }),
         getBio: procedure.output(z.string()).query(async (opt) => {
-            const bio = await (await opt.ctx.instance.subSystems.users.getUserById(opt.ctx.userId))?.getBio();
+            const bio = await (
+                await opt.ctx.instance.subSystems.users.getUserById(opt.ctx.userId)
+            )?.getBio();
 
             return bio || "";
         }),
         setBio: procedure.input(z.string()).mutation(async (opt) => {
-            await (await opt.ctx.instance.subSystems.users.getUserById(opt.ctx.userId))?.setBio(opt.input);
+            await (
+                await opt.ctx.instance.subSystems.users.getUserById(opt.ctx.userId)
+            )?.setBio(opt.input);
 
             return true;
         }),
         getRole: procedure.output(z.string()).query(async (opt) => {
-            const isAdministrator = await (await opt.ctx.instance.subSystems.users.getUserById(opt.ctx.userId))?.isAdministrator();
+            const isAdministrator = await (
+                await opt.ctx.instance.subSystems.users.getUserById(opt.ctx.userId)
+            )?.isAdministrator();
 
             return isAdministrator ? "Administrator" : "User";
         }),
@@ -212,15 +246,23 @@ const router = t.router({
                 });
             }),
         setPassword: procedure.input(z.object({ password: z.string() })).mutation(async (opt) => {
-            await opt.ctx.instance.subSystems.authorization.setPassword(opt.ctx.userId, opt.input.password);
+            await opt.ctx.instance.subSystems.authorization.setPassword(
+                opt.ctx.userId,
+                opt.input.password,
+            );
 
             return true;
         }),
-        deleteSession: procedure.input(z.object({ sessionId: z.number() })).mutation(async (opt) => {
-            await opt.ctx.instance.subSystems.authorization.endSessionById(opt.ctx.userId, opt.input.sessionId);
+        deleteSession: procedure
+            .input(z.object({ sessionId: z.number() }))
+            .mutation(async (opt) => {
+                await opt.ctx.instance.subSystems.authorization.endSessionById(
+                    opt.ctx.userId,
+                    opt.input.sessionId,
+                );
 
-            return true;
-        }),
+                return true;
+            }),
     },
     instance: {
         getUsers: adminProcedure.output(z.number().array()).query(async (_opt) => {
@@ -235,7 +277,10 @@ const router = t.router({
                     .object({
                         id: z.number(),
                         username: z.string(),
-                        fullName: z.object({ forename: z.string().optional(), surname: z.string().optional() }),
+                        fullName: z.object({
+                            forename: z.string().optional(),
+                            surname: z.string().optional(),
+                        }),
                         email: z.string().optional(),
                         isAdministrator: z.boolean(),
                     })
@@ -259,71 +304,101 @@ const router = t.router({
                 .input(z.number())
                 .output(z.string())
                 .query(async (opt) => {
-                    const forename = await (await opt.ctx.instance.subSystems.users.getUserById(opt.input))?.getForename();
+                    const forename = await (
+                        await opt.ctx.instance.subSystems.users.getUserById(opt.input)
+                    )?.getForename();
 
                     return `${forename}`;
                 }),
-            setForename: adminProcedure.input(z.object({ userId: z.number(), forename: z.string() })).mutation(async (opt) => {
-                await (await opt.ctx.instance.subSystems.users.getUserById(opt.input.userId))?.setForename(opt.input.forename);
+            setForename: adminProcedure
+                .input(z.object({ userId: z.number(), forename: z.string() }))
+                .mutation(async (opt) => {
+                    await (
+                        await opt.ctx.instance.subSystems.users.getUserById(opt.input.userId)
+                    )?.setForename(opt.input.forename);
 
-                return true;
-            }),
+                    return true;
+                }),
             getSurname: adminProcedure
                 .input(z.number())
                 .output(z.string())
                 .query(async (opt) => {
-                    const surname = await (await opt.ctx.instance.subSystems.users.getUserById(opt.input))?.getSurname();
+                    const surname = await (
+                        await opt.ctx.instance.subSystems.users.getUserById(opt.input)
+                    )?.getSurname();
 
                     return `${surname}`;
                 }),
-            setSurname: adminProcedure.input(z.object({ userId: z.number(), surname: z.string() })).mutation(async (opt) => {
-                await (await opt.ctx.instance.subSystems.users.getUserById(opt.input.userId))?.setSurname(opt.input.surname);
+            setSurname: adminProcedure
+                .input(z.object({ userId: z.number(), surname: z.string() }))
+                .mutation(async (opt) => {
+                    await (
+                        await opt.ctx.instance.subSystems.users.getUserById(opt.input.userId)
+                    )?.setSurname(opt.input.surname);
 
-                return true;
-            }),
+                    return true;
+                }),
             getUsername: adminProcedure
                 .input(z.number())
                 .output(z.string())
                 .query(async (opt) => {
-                    const username = await (await opt.ctx.instance.subSystems.users.getUserById(opt.input))?.getUsername();
+                    const username = await (
+                        await opt.ctx.instance.subSystems.users.getUserById(opt.input)
+                    )?.getUsername();
 
                     return username || "unknown";
                 }),
-            setUsername: adminProcedure.input(z.object({ userId: z.number(), username: z.string() })).mutation(async (opt) => {
-                await (
-                    await opt.ctx.instance.subSystems.users.getUserById(opt.input.userId)
-                )?.setUsername(opt.input.username.toLowerCase());
+            setUsername: adminProcedure
+                .input(z.object({ userId: z.number(), username: z.string() }))
+                .mutation(async (opt) => {
+                    await (
+                        await opt.ctx.instance.subSystems.users.getUserById(opt.input.userId)
+                    )?.setUsername(opt.input.username.toLowerCase());
 
-                return true;
-            }),
+                    return true;
+                }),
             getEmail: adminProcedure
                 .input(z.number())
                 .output(z.string())
                 .query(async (opt) => {
-                    const email = await (await opt.ctx.instance.subSystems.users.getUserById(opt.input))?.getEmail();
+                    const email = await (
+                        await opt.ctx.instance.subSystems.users.getUserById(opt.input)
+                    )?.getEmail();
 
                     return email || "unknown";
                 }),
-            setEmail: adminProcedure.input(z.object({ userId: z.number(), email: z.email() })).mutation(async (opt) => {
-                await (await opt.ctx.instance.subSystems.users.getUserById(opt.input.userId))?.setEmail(opt.input.email);
+            setEmail: adminProcedure
+                .input(z.object({ userId: z.number(), email: z.email() }))
+                .mutation(async (opt) => {
+                    await (
+                        await opt.ctx.instance.subSystems.users.getUserById(opt.input.userId)
+                    )?.setEmail(opt.input.email);
 
-                return true;
-            }),
+                    return true;
+                }),
             getIsAdministrator: adminProcedure
                 .input(z.number())
                 .output(z.boolean())
                 .query(async (opt) => {
-                    const isAdministrator = await (await opt.ctx.instance.subSystems.users.getUserById(opt.input))?.isAdministrator();
+                    const isAdministrator = await (
+                        await opt.ctx.instance.subSystems.users.getUserById(opt.input)
+                    )?.isAdministrator();
 
                     return isAdministrator || false;
                 }),
-            setIsAdministrator: adminProcedure.input(z.object({ userId: z.number(), administrator: z.boolean() })).mutation(async (opt) => {
-                await (await opt.ctx.instance.subSystems.users.getUserById(opt.input.userId))?.setIsAdministrator(opt.input.administrator);
+            setIsAdministrator: adminProcedure
+                .input(z.object({ userId: z.number(), administrator: z.boolean() }))
+                .mutation(async (opt) => {
+                    await (
+                        await opt.ctx.instance.subSystems.users.getUserById(opt.input.userId)
+                    )?.setIsAdministrator(opt.input.administrator);
 
-                return true;
-            }),
+                    return true;
+                }),
             delete: adminProcedure.input(z.object({ userId: z.number() })).mutation(async (opt) => {
-                await (await opt.ctx.instance.subSystems.users.getUserById(opt.input.userId))?.delete();
+                await (
+                    await opt.ctx.instance.subSystems.users.getUserById(opt.input.userId)
+                )?.delete();
 
                 return true;
             }),
@@ -370,78 +445,118 @@ const router = t.router({
 
             return true;
         }),
-        getFeatures: procedure.output(z.object({ name: z.string(), id: z.string(), enabled: z.boolean() }).array()).query(async (opt) => {
-            const availableFlags = Object.keys(WorkspacesFeatureFlags);
+        getFeatures: procedure
+            .output(
+                z
+                    .object({
+                        name: z.string(),
+                        id: z.string(),
+                        enabled: z.boolean(),
+                        description: z.string().optional(),
+                    })
+                    .array(),
+            )
+            .query(async (opt) => {
+                const availableFlags = Object.keys(WorkspacesFeatureFlags);
 
-            return availableFlags.map((f) => {
-                return {
-                    name: f,
-                    // @ts-ignore
-                    id: WorkspacesFeatureFlags[f],
-                    // @ts-ignore
-                    enabled: instance.subSystems.configuration.hasFeature(WorkspacesFeatureFlags[f]),
-                };
-            });
-        }),
-        setFeature: procedure.input(z.object({ id: z.string(), value: z.boolean() })).mutation(async (opt) => {
-            if (opt.input.value) {
-                instance.subSystems.configuration.enableFeature(opt.input.id);
-            } else {
-                instance.subSystems.configuration.disableFeature(opt.input.id);
-            }
+                return availableFlags.map((f) => {
+                    return {
+                        name: f,
+                        // @ts-ignore
+                        id: WorkspacesFeatureFlags[f],
+                        enabled: instance.subSystems.configuration.hasFeature(
+                            // @ts-ignore
+                            WorkspacesFeatureFlags[f],
+                        ),
+                        // @ts-ignore
+                        description: FEATURE_FLAG_DESCRIPTIONS[WorkspacesFeatureFlags[f]],
+                    };
+                });
+            }),
+        setFeature: procedure
+            .input(z.object({ id: z.string(), value: z.boolean() }))
+            .mutation(async (opt) => {
+                if (opt.input.value) {
+                    instance.subSystems.configuration.enableFeature(opt.input.id);
+                } else {
+                    instance.subSystems.configuration.disableFeature(opt.input.id);
+                }
 
-            return true;
-        }),
+                return true;
+            }),
     },
     customization: {
         wallpaper: {
-            wallpaperHistory: procedure.output(z.object({ name: z.string(), previewSrc: z.string() }).array()).query(async (opt) => {
-                const wallpapersPath = path.join((await opt.ctx.user()).getPath(), "assets/wallpapers");
+            wallpaperHistory: procedure
+                .output(z.object({ name: z.string(), previewSrc: z.string() }).array())
+                .query(async (opt) => {
+                    const wallpapersPath = path.join(
+                        (await opt.ctx.user()).getPath(),
+                        "assets/wallpapers",
+                    );
 
-                let output: {
-                    name: string;
-                    previewSrc: string;
-                }[] = [];
+                    let output: {
+                        name: string;
+                        previewSrc: string;
+                    }[] = [];
 
-                for (const wallpaperName of await fs.readdir(wallpapersPath)) {
-                    if (wallpaperName === "current.png" || wallpaperName === "resized" || !wallpaperName.endsWith(".preview.png")) continue;
+                    for (const wallpaperName of await fs.readdir(wallpapersPath)) {
+                        if (
+                            wallpaperName === "current.png" ||
+                            wallpaperName === "resized" ||
+                            !wallpaperName.endsWith(".preview.png")
+                        )
+                            continue;
 
-                    const wallpaperPath = path.join(wallpapersPath, wallpaperName);
+                        const wallpaperPath = path.join(wallpapersPath, wallpaperName);
 
-                    output.push({
-                        name: wallpaperName,
-                        previewSrc:
-                            opt.ctx.rawRequest.destinationHostname + instance.subSystems.image.serveImage(opt.ctx.userId, wallpaperPath),
-                    });
-                }
+                        output.push({
+                            name: wallpaperName,
+                            previewSrc:
+                                opt.ctx.rawRequest.destinationHostname +
+                                instance.subSystems.image.serveImage(opt.ctx.userId, wallpaperPath),
+                        });
+                    }
 
-                return output;
-            }),
-            officialWallpapers: procedure.output(z.object({ name: z.string(), previewSrc: z.string() }).array()).query(async (opt) => {
-                const officialWallpapersPath = path.join(instance.subSystems.filesystem.SRC_ROOT, "assets/wallpapers");
+                    return output;
+                }),
+            officialWallpapers: procedure
+                .output(z.object({ name: z.string(), previewSrc: z.string() }).array())
+                .query(async (opt) => {
+                    const officialWallpapersPath = path.join(
+                        instance.subSystems.filesystem.SRC_ROOT,
+                        "assets/wallpapers",
+                    );
 
-                let output: {
-                    name: string;
-                    previewSrc: string;
-                }[] = [];
+                    let output: {
+                        name: string;
+                        previewSrc: string;
+                    }[] = [];
 
-                for (const wallpaperName of await fs.readdir(officialWallpapersPath)) {
-                    const wallpaperPath = path.join(officialWallpapersPath, wallpaperName);
+                    for (const wallpaperName of await fs.readdir(officialWallpapersPath)) {
+                        const wallpaperPath = path.join(officialWallpapersPath, wallpaperName);
 
-                    output.push({
-                        name: wallpaperName,
-                        previewSrc:
-                            opt.ctx.rawRequest.destinationHostname + instance.subSystems.image.serveImage(opt.ctx.userId, wallpaperPath),
-                    });
-                }
+                        output.push({
+                            name: wallpaperName,
+                            previewSrc:
+                                opt.ctx.rawRequest.destinationHostname +
+                                instance.subSystems.image.serveImage(opt.ctx.userId, wallpaperPath),
+                        });
+                    }
 
-                return output;
-            }),
+                    return output;
+                }),
             currentWallpaper: procedure.query(async (opt) => {
-                const wallpapersRootPath = path.join((await opt.ctx.user()).getPath(), "assets/wallpapers");
+                const wallpapersRootPath = path.join(
+                    (await opt.ctx.user()).getPath(),
+                    "assets/wallpapers",
+                );
                 const rawWallpaperPath = path.join(wallpapersRootPath, "current.png");
                 const resizedWallpapersPath = path.join(wallpapersRootPath, "resized");
-                const requiredResizedWallpaperPath = path.join(resizedWallpapersPath, `${504}x${280}.png`);
+                const requiredResizedWallpaperPath = path.join(
+                    resizedWallpapersPath,
+                    `${504}x${280}.png`,
+                );
 
                 if (!(await fs.exists(rawWallpaperPath))) {
                     return "/assets/tricolor/tricolor.svg";
@@ -458,11 +573,19 @@ const router = t.router({
 
                 return (
                     opt.ctx.rawRequest.destinationHostname +
-                    opt.ctx.instance.subSystems.image.serveImage(opt.ctx.userId, requiredResizedWallpaperPath, false, true)
+                    opt.ctx.instance.subSystems.image.serveImage(
+                        opt.ctx.userId,
+                        requiredResizedWallpaperPath,
+                        false,
+                        true,
+                    )
                 );
             }),
             upload: procedure.input(octetInputParser).mutation(async (opt) => {
-                const wallpapersPath = path.join((await opt.ctx.user()).getPath(), "assets/wallpapers");
+                const wallpapersPath = path.join(
+                    (await opt.ctx.user()).getPath(),
+                    "assets/wallpapers",
+                );
 
                 const wallpaperUUID = Bun.randomUUIDv7();
 
@@ -472,7 +595,9 @@ const router = t.router({
                     .toFormat("png")
                     .toFile(path.join(wallpapersPath, `${wallpaperUUID}.png`));
 
-                console.log(`converted to PNG -> ${path.join(wallpapersPath, `${wallpaperUUID}.png`)}`);
+                console.log(
+                    `converted to PNG -> ${path.join(wallpapersPath, `${wallpaperUUID}.png`)}`,
+                );
 
                 await instance.subSystems.image.resizeImage(
                     path.join(wallpapersPath, `${wallpaperUUID}.png`),
@@ -480,19 +605,27 @@ const router = t.router({
                     { width: 296, height: 192 },
                 );
 
-                console.log(`resized preview to -> ${path.join(wallpapersPath, `${wallpaperUUID}.preview.png`)}`);
+                console.log(
+                    `resized preview to -> ${path.join(wallpapersPath, `${wallpaperUUID}.preview.png`)}`,
+                );
 
                 return wallpaperUUID + ".png";
             }),
             delete: procedure.input(z.object({ name: z.string() })).mutation(async (opt) => {
-                const wallpapersPath = path.join((await opt.ctx.user()).getPath(), "assets/wallpapers");
+                const wallpapersPath = path.join(
+                    (await opt.ctx.user()).getPath(),
+                    "assets/wallpapers",
+                );
 
                 await fs.rm(path.join(wallpapersPath, opt.input.name));
 
                 return true;
             }),
             setWallpaper: procedure.input(z.object({ name: z.string() })).mutation(async (opt) => {
-                const wallpaperPath = path.join((await opt.ctx.user()).getPath(), "assets/wallpapers");
+                const wallpaperPath = path.join(
+                    (await opt.ctx.user()).getPath(),
+                    "assets/wallpapers",
+                );
                 const resizedWallpapersPath = path.join(wallpaperPath, "resized");
 
                 for (const resizedWallpaper of await fs.readdir(resizedWallpapersPath)) {
@@ -506,25 +639,41 @@ const router = t.router({
 
                 return true;
             }),
-            setOfficialWallpaper: procedure.input(z.object({ name: z.string() })).mutation(async (opt) => {
-                const wallpaperPath = path.join((await opt.ctx.user()).getPath(), "assets/wallpapers");
-                const officialWallpaperPath = path.join(instance.subSystems.filesystem.SRC_ROOT, "assets/wallpapers");
-                const resizedWallpapersPath = path.join(wallpaperPath, "resized");
+            setOfficialWallpaper: procedure
+                .input(z.object({ name: z.string() }))
+                .mutation(async (opt) => {
+                    const wallpaperPath = path.join(
+                        (await opt.ctx.user()).getPath(),
+                        "assets/wallpapers",
+                    );
+                    const officialWallpaperPath = path.join(
+                        instance.subSystems.filesystem.SRC_ROOT,
+                        "assets/wallpapers",
+                    );
+                    const resizedWallpapersPath = path.join(wallpaperPath, "resized");
 
-                for (const resizedWallpaper of await fs.readdir(resizedWallpapersPath)) {
-                    await fs.rm(path.join(resizedWallpapersPath, resizedWallpaper));
-                }
+                    for (const resizedWallpaper of await fs.readdir(resizedWallpapersPath)) {
+                        await fs.rm(path.join(resizedWallpapersPath, resizedWallpaper));
+                    }
 
-                await fs.copyFile(path.join(officialWallpaperPath, opt.input.name), path.join(wallpaperPath, "current.png"));
+                    await fs.copyFile(
+                        path.join(officialWallpaperPath, opt.input.name),
+                        path.join(wallpaperPath, "current.png"),
+                    );
 
-                return true;
-            }),
+                    return true;
+                }),
         },
         colorTheme: {
             wallpaperPixeldata: procedure.output(z.number().array()).query(async (opt) => {
-                const wallpaperPath = path.join((await opt.ctx.user()).getPath(), "assets/wallpapers/resized", `${504}x${280}.png`);
+                const wallpaperPath = path.join(
+                    (await opt.ctx.user()).getPath(),
+                    "assets/wallpapers/resized",
+                    `${504}x${280}.png`,
+                );
 
-                let buf = (await sharp(wallpaperPath).raw().toBuffer({ resolveWithObject: true })).data;
+                let buf = (await sharp(wallpaperPath).raw().toBuffer({ resolveWithObject: true }))
+                    .data;
                 let newBuf = [];
 
                 for (let i = 0; i < buf.length; i += 4) {
@@ -542,7 +691,11 @@ const router = t.router({
     },
     storage: {
         usage: procedure
-            .output(z.object({ displayName: z.string(), percentage: z.number(), size: z.number() }).array())
+            .output(
+                z
+                    .object({ displayName: z.string(), percentage: z.number(), size: z.number() })
+                    .array(),
+            )
             .query(async (opt) => {
                 async function getChildFiles(dir: string) {
                     const children = await fs.readdir(dir);
@@ -569,7 +722,9 @@ const router = t.router({
 
                 let files = await getChildFiles((await opt.ctx.user()).getPath());
 
-                let categories: { [categoryId: string]: { fileCount: number; size: number; percentage: number } } = {};
+                let categories: {
+                    [categoryId: string]: { fileCount: number; size: number; percentage: number };
+                } = {};
 
                 for (const file of files) {
                     if (file.type === undefined) {

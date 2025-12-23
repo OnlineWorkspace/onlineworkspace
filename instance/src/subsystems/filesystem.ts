@@ -9,7 +9,10 @@ export default class FilesystemSubsystem extends SubSystem {
     readonly FS_ROOT = path.resolve("./fs/");
     readonly CACHE_PATH = path.join(this.FS_ROOT, "cache");
 
-    _internalAssets: Map<string, { userId: number; path: string; validUntil: number; public?: boolean }>;
+    _internalAssets: Map<
+        string,
+        { userId: number; path: string; validUntil: number; public?: boolean }
+    >;
     _internalAssetPaths: Map<string, string>;
 
     constructor(instance: Instance) {
@@ -25,9 +28,15 @@ export default class FilesystemSubsystem extends SubSystem {
     }
 
     getApplicationSrc(applicationId: string) {
-        console.log(this.instance.subSystems.applications.availableApplications.find((a) => a.manifest?.id === applicationId)?.path);
+        console.log(
+            this.instance.subSystems.applications.availableApplications.find(
+                (a) => a.manifest?.id === applicationId,
+            )?.path,
+        );
 
-        return this.instance.subSystems.applications.availableApplications.find((a) => a.manifest?.id === applicationId)?.path;
+        return this.instance.subSystems.applications.availableApplications.find(
+            (a) => a.manifest?.id === applicationId,
+        )?.path;
     }
 
     // Create a directory if it does not already exist
@@ -73,6 +82,7 @@ export default class FilesystemSubsystem extends SubSystem {
             case "tsc":
             case "jsc":
             case "sql":
+            case "lock":
                 return "plaintext";
         }
 
@@ -83,7 +93,13 @@ export default class FilesystemSubsystem extends SubSystem {
 
     // returns an endpoint where the asset located at the provided path can be loaded from on the client
     // defaults to 3hrs validity
-    serveFile(userId: number, path: string, isPublic: boolean = false, dontCachePath = false, validMs: number = 21600000): string {
+    serveFile(
+        userId: number,
+        path: string,
+        isPublic: boolean = false,
+        dontCachePath = false,
+        validMs: number = 21600000,
+    ): string {
         if (!dontCachePath) {
             const existingAsset = this._internalAssetPaths.get(path);
 

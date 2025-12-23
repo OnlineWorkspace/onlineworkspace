@@ -8,6 +8,11 @@ export enum WorkspacesFeatureFlags {
     ShootYourselfInTheFoot = "shoot_yourself_in_the_foot",
 }
 
+export const FEATURE_FLAG_DESCRIPTIONS = {
+    [WorkspacesFeatureFlags.ShootYourselfInTheFoot]:
+        "Allow administrators to alter settings / configuration options which may cause the instance to malfunction. (Only enable this if you are sure you know what you are doing!)",
+};
+
 export default class ConfigurationSubsystem extends SubSystem {
     isDevMode: boolean = true;
     databases: {
@@ -64,7 +69,10 @@ export default class ConfigurationSubsystem extends SubSystem {
     }
 
     async saveConfiguration(): Promise<boolean> {
-        const CONFIGURATION_FILE_PATH = path.join(this.instance.subSystems.filesystem.FS_ROOT, "configuration.json");
+        const CONFIGURATION_FILE_PATH = path.join(
+            this.instance.subSystems.filesystem.FS_ROOT,
+            "configuration.json",
+        );
 
         await fs.writeFile(
             CONFIGURATION_FILE_PATH,
@@ -84,15 +92,21 @@ export default class ConfigurationSubsystem extends SubSystem {
     }
 
     async startup(): Promise<boolean> {
-        const CONFIGURATION_FILE_PATH = path.join(this.instance.subSystems.filesystem.FS_ROOT, "configuration.json");
+        const CONFIGURATION_FILE_PATH = path.join(
+            this.instance.subSystems.filesystem.FS_ROOT,
+            "configuration.json",
+        );
 
         if (!(await fs.exists(CONFIGURATION_FILE_PATH))) {
             await this.saveConfiguration();
         }
 
-        const configurationFile = JSON.parse((await fs.readFile(CONFIGURATION_FILE_PATH)).toString());
+        const configurationFile = JSON.parse(
+            (await fs.readFile(CONFIGURATION_FILE_PATH)).toString(),
+        );
 
-        if (configurationFile.enabledFeatures) this.enabledFeatures = configurationFile.enabledFeatures;
+        if (configurationFile.enabledFeatures)
+            this.enabledFeatures = configurationFile.enabledFeatures;
         if (configurationFile.databases) this.databases = configurationFile.databases;
         if (configurationFile.backendUrl) this.backendUrl = configurationFile.backendUrl;
         if (configurationFile.webUrl) this.webUrl = configurationFile.webUrl;
