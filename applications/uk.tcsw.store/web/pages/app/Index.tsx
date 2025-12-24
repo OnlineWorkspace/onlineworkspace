@@ -29,11 +29,19 @@ const ApplicationPage: Component = () => {
                 Back
             </UKButton>
             <div class={styles.header}>
-                <img alt={""} class={styles.headerImage} src={application()?.bannerImage || "/assets/tricolor/tricolor.svg"} />
+                <img
+                    alt={""}
+                    class={styles.headerImage}
+                    src={application()?.bannerImage || "/assets/tricolor/tricolor.svg"}
+                />
             </div>
             <div class={styles.headerContent}>
                 {application()?.icon.type === "image" ? (
-                    <img alt={""} class={styles.iconImage} src={application()?.icon.value || "/assets/tricolor/tricolor.svg"} />
+                    <img
+                        alt={""}
+                        class={styles.iconImage}
+                        src={application()?.icon.value || "/assets/tricolor/tricolor.svg"}
+                    />
                 ) : (
                     <UKIcon class={styles.iconIcon}>{application()?.icon.value || ""}</UKIcon>
                 )}
@@ -41,7 +49,9 @@ const ApplicationPage: Component = () => {
                     {application()?.displayName}
                 </UKText>
                 <UKButton
-                    disabled={!application()?.isUserAdministrator}
+                    disabled={
+                        !application()?.isUserAdministrator || !application()?.canBeUninstalled
+                    }
                     class={styles.headerContentButton}
                     leadingIcon={application()?.isInstalled ? "delete" : "download"}
                     onClick={async () => {
@@ -53,7 +63,10 @@ const ApplicationPage: Component = () => {
                             await trpc.app.uninstall.mutate({ applicationId: app.id });
                             window.location.reload();
                         } else {
-                            await trpc.app.install.mutate({ applicationId: app.id, repository: repository });
+                            await trpc.app.install.mutate({
+                                applicationId: app.id,
+                                repository: repository,
+                            });
                             window.location.reload();
                         }
                     }}
@@ -93,7 +106,11 @@ const ApplicationPage: Component = () => {
                     }
                 />
             </UKStack>
-            <UKDivider direction={DividerDirection.horizontal} width="middle-inset" class={styles.divider} />
+            <UKDivider
+                direction={DividerDirection.horizontal}
+                width="middle-inset"
+                class={styles.divider}
+            />
             <UKCard color="filled" class={styles.author}>
                 <UKText role="title" size="m">
                     Created by
@@ -108,7 +125,11 @@ const ApplicationPage: Component = () => {
                     }}
                 </For>
             </UKCard>
-            <UKDivider direction={DividerDirection.horizontal} width="middle-inset" class={styles.divider} />
+            <UKDivider
+                direction={DividerDirection.horizontal}
+                width="middle-inset"
+                class={styles.divider}
+            />
             <UKCard color="filled" class={styles.repository}>
                 <UKText role="label" size="m">
                     Repository: {repository}

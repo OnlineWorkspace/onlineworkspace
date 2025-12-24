@@ -1,4 +1,4 @@
-import { type Component, createResource, createSignal, For, Suspense, useContext } from "solid-js";
+import { type Component, createResource, For, Match, Suspense, Switch, useContext } from "solid-js";
 import styles from "./Grid.module.scss";
 import { useNavigate, useParams } from "@solidjs/router";
 import trpc from "../../../lib/trpc";
@@ -35,66 +35,71 @@ const GridView: Component = () => {
     return (
         <div class={styles.root}>
             <Suspense>
-                {gridResource()?.type === "success" ? (
-                    // @ts-ignore
-                    <For each={gridResource()?.items}>
-                        {(i, index) => {
-                            return <GridItem {...i} index={index()} />;
-                        }}
-                    </For>
-                ) : gridResource()?.type === "error" ? (
-                    <div class={styles.errorMessage}>
-                        {/* @ts-ignore */}
-                        <UKIcon>{gridResource()?.icon}</UKIcon>
-                        <UKDivider direction={DividerDirection.horizontal} />
-                        <UKText role={"body"} size={"l"}>
+                <Switch
+                    fallback={
+                        <div class={styles.errorMessage}>
                             {/* @ts-ignore */}
-                            {gridResource()?.message}
-                        </UKText>
-                        <UKButton
-                            color={"filled"}
-                            size={"m"}
-                            leadingIcon={"house"}
-                            onClick={() => {
-                                navigate("/app/uk.tcsw.files/dir/");
+                            <UKIcon>{gridResource()?.icon}</UKIcon>
+                            <UKDivider direction={DividerDirection.horizontal} />
+                            <UKText role={"body"} size={"l"}>
+                                {/* @ts-ignore */}
+                                {gridResource()?.message}
+                            </UKText>
+                            <UKButtonGroup size={"s"}>
+                                <UKButton
+                                    color={"filled"}
+                                    size={"s"}
+                                    leadingIcon={"upload"}
+                                    onClick={() => {
+                                        alert("Implement me!");
+                                    }}
+                                >
+                                    Upload File
+                                </UKButton>
+                                <UKButton
+                                    color={"tonal"}
+                                    size={"s"}
+                                    leadingIcon={"add"}
+                                    onClick={() => {
+                                        alert("Implement me!");
+                                    }}
+                                >
+                                    Create File
+                                </UKButton>
+                            </UKButtonGroup>
+                        </div>
+                    }
+                >
+                    <Match when={gridResource()?.type === "success"}>
+                        {/* @ts-ignore */}
+                        <For each={gridResource()?.items}>
+                            {(i, index) => {
+                                return <GridItem {...i} index={index()} />;
                             }}
-                        >
-                            Go Home
-                        </UKButton>
-                    </div>
-                ) : (
-                    <div class={styles.errorMessage}>
-                        {/* @ts-ignore */}
-                        <UKIcon>{gridResource()?.icon}</UKIcon>
-                        <UKDivider direction={DividerDirection.horizontal} />
-                        <UKText role={"body"} size={"l"}>
+                        </For>
+                    </Match>
+                    <Match when={gridResource()?.type === "error"}>
+                        <div class={styles.errorMessage}>
                             {/* @ts-ignore */}
-                            {gridResource()?.message}
-                        </UKText>
-                        <UKButtonGroup size={"s"}>
+                            <UKIcon>{gridResource()?.icon}</UKIcon>
+                            <UKDivider direction={DividerDirection.horizontal} />
+                            <UKText role={"body"} size={"l"}>
+                                {/* @ts-ignore */}
+                                {gridResource()?.message}
+                            </UKText>
                             <UKButton
                                 color={"filled"}
-                                size={"s"}
-                                leadingIcon={"upload"}
+                                size={"m"}
+                                leadingIcon={"house"}
                                 onClick={() => {
-                                    alert("Implement me!");
+                                    navigate("/app/uk.tcsw.files/dir/");
                                 }}
                             >
-                                Upload File
+                                Go Home
                             </UKButton>
-                            <UKButton
-                                color={"tonal"}
-                                size={"s"}
-                                leadingIcon={"add"}
-                                onClick={() => {
-                                    alert("Implement me!");
-                                }}
-                            >
-                                Create File
-                            </UKButton>
-                        </UKButtonGroup>
-                    </div>
-                )}
+                        </div>
+                    </Match>
+                </Switch>
             </Suspense>
         </div>
     );

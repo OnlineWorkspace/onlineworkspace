@@ -78,7 +78,7 @@ const GridItem: Component<{
                 <UKIcon class={styles.icon}>folder</UKIcon>
             )}
             {viewCtx?.renameEntry() === props.path ? (
-                <>rename me</>
+                <input type="text" placeholder="rename me" />
             ) : (
                 <UKText align="center" role="label" size="m">
                     {props.name}
