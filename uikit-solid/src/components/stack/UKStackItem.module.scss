@@ -33,17 +33,21 @@
 
     & > *:nth-child(2) {
         z-index: 1;
+        interpolate-size: allow-keywords;
         transform-origin: top;
-        animation: fadeSlideIn var(--uk-sys-motion-duration-500) var(--uk-sys-motion-easing-emphasized-decelerate) forwards;
+        animation: fadeSlideIn var(--uk-sys-motion-duration-500)
+            var(--uk-sys-motion-easing-emphasized-decelerate) forwards;
 
         @keyframes fadeSlideIn {
             from {
                 opacity: 0;
-                transform: translateY(-0.5rem) scaleY(0.95);
+                transform: translateY(-0.5rem);
+                height: calc-size(max-content, size / 2);
             }
             to {
                 opacity: 1;
-                transform: translateY(0) scaleY(1);
+                transform: translateY(0);
+                height: max-content;
             }
         }
     }
@@ -64,9 +68,12 @@
     overflow: hidden;
     z-index: 2;
 
-    transition: outline-color var(--uk-sys-motion-duration-100) var(--uk-sys-motion-easing-standard-decelerate),
-    border-radius var(--uk-sys-motion-duration-100) var(--uk-sys-motion-easing-standard-decelerate),
-    outline-width 0ms linear;
+    transition:
+        outline-color var(--uk-sys-motion-duration-100)
+            var(--uk-sys-motion-easing-standard-decelerate),
+        border-radius var(--uk-sys-motion-duration-100)
+            var(--uk-sys-motion-easing-standard-decelerate),
+        outline-width 0ms linear;
 
     outline-style: solid;
     outline-offset: 2px;
@@ -89,7 +96,8 @@
         background-color: transparent;
         pointer-events: none;
         user-select: none;
-        transition: background-color var(--uk-sys-motion-duration-100) var(--uk-sys-motion-easing-standard-normal);
+        transition: background-color var(--uk-sys-motion-duration-100)
+            var(--uk-sys-motion-easing-standard-normal);
     }
 
     &[data-clickable="true"] {
@@ -101,13 +109,19 @@
 
         &:hover {
             &::before {
-                background-color: rgb(var(--uk-sys-color-on-surface), var(--uk-sys-state-hover-state-layer-opacity));
+                background-color: rgb(
+                    var(--uk-sys-color-on-surface),
+                    var(--uk-sys-state-hover-state-layer-opacity)
+                );
             }
         }
 
         &:active {
             &::before {
-                background-color: rgb(var(--uk-sys-color-on-surface), var(--uk-sys-state-active-state-layer-opacity));
+                background-color: rgb(
+                    var(--uk-sys-color-on-surface),
+                    var(--uk-sys-state-active-state-layer-opacity)
+                );
             }
         }
     }

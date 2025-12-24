@@ -5,12 +5,11 @@ import trpc from "../../../../lib/trpc";
 import styles from "./MethodPassword.module.scss";
 import UKText from "@tcsw/uikit-solid/src/components/text/UKText.jsx";
 import UKIcon from "@tcsw/uikit-solid/src/components/icon/UKIcon.jsx";
-import { useDialogue } from "@tcsw/uikit-solid/src/components/dialogue/useDialogue.js";
-import ResetPasswordDialogue from "./components/ResetPasswordDialogue/ResetPasswordDialogue";
 
 const MethodPassword: Component = () => {
-    const dialogue = useDialogue();
-    const [hasPassword, { refetch: refetchHasPassword }] = createResource(() => trpc.authentication.hasPassword.query());
+    const [hasPassword, { refetch: refetchHasPassword }] = createResource(() =>
+        trpc.authentication.hasPassword.query(),
+    );
 
     return (
         <UKStackItem
@@ -19,7 +18,11 @@ const MethodPassword: Component = () => {
                 value: "password",
             }}
             labelText="Login with Password"
-            supportingText={hasPassword() ? "You have password authentication enabled" : "Setup password authentication"}
+            supportingText={
+                hasPassword()
+                    ? "You have password authentication enabled"
+                    : "Setup password authentication"
+            }
             onCollapse={() => {
                 refetchHasPassword();
             }}
@@ -33,7 +36,7 @@ const MethodPassword: Component = () => {
                         <UKButton
                             class={styles.button}
                             onClick={async () => {
-                                dialogue.show(<ResetPasswordDialogue dialogueController={dialogue} />);
+                                alert("Implement new UIKit dialogue");
                                 return 0;
                             }}
                         >

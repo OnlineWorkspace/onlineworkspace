@@ -16,7 +16,8 @@
     width: 6rem;
     padding-left: 1rem;
     padding-right: 1rem;
-    transition: width var(--uk-sys-motion-duration-250) var(--uk-sys-motion-easing-emphasized-decelerate);
+    transition: width var(--uk-sys-motion-duration-250)
+        var(--uk-sys-motion-easing-emphasized-decelerate);
     gap: 0.25rem;
 
     &[data-type="modal"] {
@@ -37,4 +38,5 @@
     overflow-y: auto;
     width: 100%;
     height: 100%;
+    position: relative;
 }

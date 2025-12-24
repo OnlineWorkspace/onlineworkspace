@@ -1,6 +1,6 @@
 import type { Component } from "solid-js";
 
-const UKDialogue: Component = () => {
+const UKDialogue: Component<{ close?: () => void }> = (props) => {
     return <>Dialogue Element</>;
 };
 

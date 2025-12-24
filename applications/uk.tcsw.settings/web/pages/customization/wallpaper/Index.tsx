@@ -11,30 +11,61 @@ import UKText from "@tcsw/uikit-solid/src/components/text/UKText.tsx";
 import { createFileUploader } from "@solid-primitives/upload";
 import UKIconButton from "@tcsw/uikit-solid/src/components/iconButton/UKIconButton.tsx";
 import UKIndeterminateSpinner from "@tcsw/uikit-solid/src/components/indeterminateSpinner/UKIndeterminateSpinner.tsx";
+import UKTopAppBar from "@tcsw/uikit-solid/src/components/topAppBar/UKTopAppBar.jsx";
 
 const WallpaperPage: Component = () => {
     const navigate = useNavigate();
-    const { selectFiles: selectWallpaperUpload } = createFileUploader({ accept: "image/*", multiple: true });
+    const { selectFiles: selectWallpaperUpload } = createFileUploader({
+        accept: "image/*",
+        multiple: true,
+    });
     const [currentWallpaper, { refetch: refetchCurrentWallpaper }] = createResource(() =>
         trpc.customization.wallpaper.currentWallpaper.query(),
     );
     const [previousWallpapers, { refetch: refetchWallpapers }] = createResource(() =>
         trpc.customization.wallpaper.wallpaperHistory.query(),
     );
-    const [officialWallpapers] = createResource(() => trpc.customization.wallpaper.officialWallpapers.query());
+    const [officialWallpapers] = createResource(() =>
+        trpc.customization.wallpaper.officialWallpapers.query(),
+    );
 
     return (
-        <div>
-            <UKButton
-                class={styles.backButton}
-                color={"tonal"}
-                leadingIcon={"chevron_left"}
-                onClick={() => {
-                    navigate("/app/uk.tcsw.settings/customization");
+        <>
+            {/*<UKTopAppBar
+                type={"small"}
+                headline={"Sample headline"}
+                subtitle={"Sample subtitle"}
+                leadingButton={{
+                    accessibleLabel: "Back",
+                    icon: "chevron_left",
+                    onClick() {
+                        navigate("/app/uk.tcsw.settings/customization");
+                    },
                 }}
-            >
-                Back
-            </UKButton>
+            />
+            <UKTopAppBar
+                type={"medium"}
+                headline={"Sample headline"}
+                subtitle={"Sample subtitle"}
+                leadingButton={{
+                    accessibleLabel: "Back",
+                    icon: "chevron_left",
+                    onClick() {
+                        navigate("/app/uk.tcsw.settings/customization");
+                    },
+                }}
+            />*/}
+            <UKTopAppBar
+                type={"small"}
+                headline={"Manage Wallpaper"}
+                leadingButton={{
+                    accessibleLabel: "Back",
+                    icon: "chevron_left",
+                    onClick() {
+                        navigate("/app/uk.tcsw.settings/customization");
+                    },
+                }}
+            />
             <div class={styles.header}>
                 <ThemePreview wallpaperOverride={currentWallpaper()} />
                 <UKButton
@@ -43,7 +74,9 @@ const WallpaperPage: Component = () => {
                     onClick={() => {
                         selectWallpaperUpload(async (files) => {
                             for (const file of files) {
-                                let name = await trpc.customization.wallpaper.upload.mutate(file.file);
+                                let name = await trpc.customization.wallpaper.upload.mutate(
+                                    file.file,
+                                );
                                 await refetchWallpapers();
 
                                 if (files.length === 1) {
@@ -71,7 +104,8 @@ const WallpaperPage: Component = () => {
                                 No Wallpapers
                             </UKText>
                             <UKText role={"body"} size={"l"} align={"center"}>
-                                You have no previous wallpapers, please upload a wallpaper to see it here
+                                You have no previous wallpapers, please upload a wallpaper to see it
+                                here
                             </UKText>
                         </div>
                     ) : (
@@ -81,7 +115,9 @@ const WallpaperPage: Component = () => {
                                     <div
                                         class={styles.wallpaper}
                                         onClick={async () => {
-                                            await trpc.customization.wallpaper.setWallpaper.mutate({ name: wallpaper.name });
+                                            await trpc.customization.wallpaper.setWallpaper.mutate({
+                                                name: wallpaper.name,
+                                            });
                                             refetchCurrentWallpaper();
                                         }}
                                     >
@@ -91,12 +127,18 @@ const WallpaperPage: Component = () => {
                                             icon={"delete"}
                                             color={"tonal"}
                                             onClick={async () => {
-                                                await trpc.customization.wallpaper.delete.mutate({ name: wallpaper.name });
+                                                await trpc.customization.wallpaper.delete.mutate({
+                                                    name: wallpaper.name,
+                                                });
                                                 refetchWallpapers();
                                             }}
                                             alt={"delete"}
                                         />
-                                        <img src={wallpaper.previewSrc} loading={"lazy"} alt={"wallpaper preview"} />
+                                        <img
+                                            src={wallpaper.previewSrc}
+                                            loading={"lazy"}
+                                            alt={"wallpaper preview"}
+                                        />
                                     </div>
                                 );
                             }}
@@ -115,18 +157,24 @@ const WallpaperPage: Component = () => {
                             <div
                                 class={styles.wallpaper}
                                 onClick={async () => {
-                                    await trpc.customization.wallpaper.setOfficialWallpaper.mutate({ name: wallpaper.name });
+                                    await trpc.customization.wallpaper.setOfficialWallpaper.mutate({
+                                        name: wallpaper.name,
+                                    });
 
-                                    refetchCurrentWallpaper()
+                                    refetchCurrentWallpaper();
                                 }}
                             >
-                                <img src={wallpaper.previewSrc} loading={"lazy"} alt={"wallpaper preview"} />
+                                <img
+                                    src={wallpaper.previewSrc}
+                                    loading={"lazy"}
+                                    alt={"wallpaper preview"}
+                                />
                             </div>
                         );
                     }}
                 </For>
             </div>
-        </div>
+        </>
     );
 };
 
