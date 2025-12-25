@@ -11,7 +11,7 @@ export default class PasswordCommand extends Command {
 
         let username = await this.promptUser("Username", async (u) => {
             console.log("entered '" + u + "'");
-            return await this.instance.subSystems.users.doesUserExist(Number(u));
+            return (await this.instance.subSystems.users.getUserByUsername(u)) !== undefined;
         });
         let newPassword = await this.promptUser("Password", () => true);
 

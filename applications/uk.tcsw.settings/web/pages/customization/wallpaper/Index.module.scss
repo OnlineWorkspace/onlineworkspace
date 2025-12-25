@@ -1,3 +1,10 @@
+.root {
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+    max-width: 64rem;
+}
+
 .header {
     display: flex;
     flex-direction: column;
@@ -12,9 +19,11 @@
     margin-top: 1rem;
 }
 
-.sectionHeading {
-    margin-left: 1.5rem;
-    margin-top: 1rem;
+.subheading {
+    width: 100%;
+    max-width: 64rem;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
 }
 
 .noWallpapersMessage {
@@ -45,7 +54,8 @@
 
 .wallpaper {
     aspect-ratio: 16 / 9;
-    height: 8rem;
+    max-height: 8rem;
+    height: 100%;
     border-radius: var(--uk-sys-shape-corner-large);
     overflow: hidden;
     position: relative;
@@ -57,15 +67,19 @@
         object-fit: cover;
 
         transition:
-            width var(--uk-sys-motion-duration-250) var(--uk-sys-motion-easing-emphasized-decelerate),
-            height var(--uk-sys-motion-duration-250) var(--uk-sys-motion-easing-emphasized-decelerate),
-            margin-top var(--uk-sys-motion-duration-250) var(--uk-sys-motion-easing-emphasized-decelerate),
-            margin-left var(--uk-sys-motion-duration-250) var(--uk-sys-motion-easing-emphasized-decelerate);
+            width var(--uk-sys-motion-duration-250)
+                var(--uk-sys-motion-easing-emphasized-decelerate),
+            height var(--uk-sys-motion-duration-250)
+                var(--uk-sys-motion-easing-emphasized-decelerate),
+            margin-top var(--uk-sys-motion-duration-250)
+                var(--uk-sys-motion-easing-emphasized-decelerate),
+            margin-left var(--uk-sys-motion-duration-250)
+                var(--uk-sys-motion-easing-emphasized-decelerate);
     }
 
     &:hover {
         > img {
-            --zoom: 4rem;
+            --zoom: 2rem;
 
             margin-top: calc(var(--zoom) * -0.5);
             margin-left: calc(var(--zoom) * -0.5);
@@ -84,4 +98,22 @@
     top: 0.5rem;
     right: 0.5rem;
     opacity: 0;
+}
+
+.configureWallpaper {
+    display: flex;
+    flex-direction: row;
+    gap: 0.5rem;
+    align-items: center;
+    justify-content: center;
+    padding-bottom: 1rem;
+}
+
+.selectWallpaper {
+    display: flex;
+    flex-direction: row;
+    gap: 0.5rem;
+    align-items: center;
+    justify-content: center;
+    padding-bottom: 1rem;
 }

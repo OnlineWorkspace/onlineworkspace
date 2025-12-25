@@ -1,16 +1,35 @@
-import { createResource, type Component } from "solid-js";
+import { createResource, Suspense, type Component } from "solid-js";
 import Widgets from "../../widgets/widgets";
 import styles from "./index.module.scss";
 import UKText from "@tcsw/uikit-solid/src/components/text/UKText.jsx";
 import trpc from "../../lib/trpc";
-import DEFAULT_WALLPAPER from "./../../tricolorwallpaper2.svg";
+import UKIndeterminateSpinner from "@tcsw/uikit-solid/src/components/indeterminateSpinner/UKIndeterminateSpinner.jsx";
+import clsx from "clsx";
 
 const RootPage: Component = () => {
-    const [wallpaper] = createResource(() => trpc.dashboard.getWallpaper.query({ width: screen.width, height: screen.height }));
+    const [wallpaper] = createResource(() =>
+        trpc.dashboard.getWallpaper.query({ width: screen.width, height: screen.height }),
+    );
+    const [wallpaperOptions] = createResource(() => trpc.dashboard.getWallpaperOptions.query());
     const [welcomeMessage] = createResource(() => trpc.dashboard.welcomeMessage.query());
 
     return (
-        <div class={styles.root} style={{ "background-image": `url(${wallpaper() || DEFAULT_WALLPAPER})` }}>
+        <div class={styles.root}>
+            <Suspense fallback={<UKIndeterminateSpinner class={styles.wallpaperSpinner} />}>
+                <img
+                    alt={""}
+                    src={wallpaper() || "/assets/tricolor/tricolor.svg"}
+                    style={{
+                        // @ts-ignore
+                        "object-fit": wallpaperOptions()?.fit || "cover",
+                    }}
+                    class={clsx(
+                        styles.wallpaper,
+                        styles[wallpaperOptions()?.position?.[0] || "center"],
+                        styles[wallpaperOptions()?.position?.[1] || "middle"],
+                    )}
+                />
+            </Suspense>
             <UKText emphasized role="display" size="l" align="center" class={styles.welcomeMessage}>
                 {welcomeMessage() || ""}
             </UKText>

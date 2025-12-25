@@ -3,17 +3,35 @@ import styles from "./ThemePreview.module.scss";
 import UKIcon from "@tcsw/uikit-solid/src/components/icon/UKIcon.tsx";
 import trpc from "../../../../lib/trpc.ts";
 import UKIndeterminateSpinner from "@tcsw/uikit-solid/src/components/indeterminateSpinner/UKIndeterminateSpinner.tsx";
+import clsx from "clsx";
 
-const ThemePreview: Component<{ wallpaperOverride?: string }> = (props) => {
-    const [currentWallpaper] = createResource(() => trpc.customization.wallpaper.currentWallpaper.query());
+const ThemePreview: Component<{
+    wallpaperOverride?: string;
+    align?: ["left" | "center" | "right", "top" | "middle" | "bottom"];
+    fillStyle?: "cover" | "fill" | "contain";
+}> = (props) => {
+    const [currentWallpaper] = createResource(() =>
+        trpc.customization.wallpaper.currentWallpaper.query(),
+    );
 
     return (
         <div class={styles.root}>
             <Suspense fallback={<UKIndeterminateSpinner class={styles.wallpaperSpinner} />}>
                 <img
                     alt={""}
-                    src={props.wallpaperOverride || currentWallpaper() || "/assets/tricolor/tricolor.svg"}
-                    class={styles.wallpaper}
+                    src={
+                        props.wallpaperOverride ||
+                        currentWallpaper() ||
+                        "/assets/tricolor/tricolor.svg"
+                    }
+                    style={{
+                        "object-fit": props.fillStyle || "cover",
+                    }}
+                    class={clsx(
+                        styles.wallpaper,
+                        styles[props.align?.[0] || "center"],
+                        styles[props.align?.[1] || "middle"],
+                    )}
                 />
             </Suspense>
             <div class={styles.sidebar}>

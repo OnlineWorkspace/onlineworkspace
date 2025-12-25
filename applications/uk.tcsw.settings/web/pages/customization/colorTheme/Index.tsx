@@ -5,10 +5,13 @@ import styles from "./Index.module.scss";
 import TriColorPreview from "./components/TriColorPreview/TriColorPreview.tsx";
 import { themeFromImage } from "@material/material-color-utilities";
 import trpc from "../../../lib/trpc.ts";
+import UKTopAppBar from "@tcsw/uikit-solid/src/components/topAppBar/UKTopAppBar.jsx";
 
 const ColorThemePage: Component = () => {
     const navigate = useNavigate();
-    const [wallpaperSrc] = createResource(() => trpc.customization.wallpaper.currentWallpaper.query());
+    const [wallpaperSrc] = createResource(() =>
+        trpc.customization.wallpaper.currentWallpaper.query(),
+    );
 
     createEffect(async () => {
         if (wallpaperSrc() === undefined) return;
@@ -21,17 +24,18 @@ const ColorThemePage: Component = () => {
     });
 
     return (
-        <div>
-            <UKButton
-                class={styles.backButton}
-                color={"tonal"}
-                leadingIcon={"chevron_left"}
-                onClick={() => {
-                    navigate("/app/uk.tcsw.settings/customization");
+        <>
+            <UKTopAppBar
+                type={"small"}
+                headline={"Color Theme"}
+                leadingButton={{
+                    accessibleLabel: "Back",
+                    icon: "chevron_left",
+                    onClick() {
+                        navigate("/app/uk.tcsw.settings/customization");
+                    },
                 }}
-            >
-                Back
-            </UKButton>
+            />
             Matched to your wallpaper
             <TriColorPreview colors={["#fff", "#f00", "#0f0"]} />
             <TriColorPreview colors={["#fff", "#f00", "#0f0"]} />
@@ -42,7 +46,7 @@ const ColorThemePage: Component = () => {
             <TriColorPreview colors={["#fff", "#f00", "#0f0"]} />
             <TriColorPreview colors={["#fff", "#f00", "#0f0"]} />
             <TriColorPreview colors={["#fff", "#f00", "#0f0"]} />
-        </div>
+        </>
     );
 };
 

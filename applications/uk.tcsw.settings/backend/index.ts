@@ -563,11 +563,22 @@ const router = t.router({
                 }
 
                 if (!(await fs.exists(requiredResizedWallpaperPath))) {
+                    const options = JSON.parse(
+                        (
+                            await fs.readFile(path.join(wallpapersRootPath, "config.json"))
+                        ).toString(),
+                    );
+
                     await instance.subSystems.image.resizeImage(
                         rawWallpaperPath,
                         requiredResizedWallpaperPath,
                         { width: 504, height: 280 },
-                        "png",
+                        {
+                            changeFormatTo: "png",
+                            fit: options?.fit,
+                            position: options?.position,
+                            background: options?.background,
+                        },
                     );
                 }
 
@@ -595,8 +606,8 @@ const router = t.router({
                     .toFormat("png")
                     .toFile(path.join(wallpapersPath, `${wallpaperUUID}.png`));
 
-                console.log(
-                    `converted to PNG -> ${path.join(wallpapersPath, `${wallpaperUUID}.png`)}`,
+                log.info(
+                    `converted '${wallpaperUUID}' to PNG -> '${path.relative(instance.subSystems.filesystem.FS_ROOT, path.join(wallpapersPath, `${wallpaperUUID}.png`))}'`,
                 );
 
                 await instance.subSystems.image.resizeImage(
@@ -605,8 +616,8 @@ const router = t.router({
                     { width: 296, height: 192 },
                 );
 
-                console.log(
-                    `resized preview to -> ${path.join(wallpapersPath, `${wallpaperUUID}.preview.png`)}`,
+                log.info(
+                    `resized '${wallpaperUUID}' preview to -> '${path.relative(instance.subSystems.filesystem.FS_ROOT, path.join(wallpapersPath, `${wallpaperUUID}.preview.png`))}'`,
                 );
 
                 return wallpaperUUID + ".png";
@@ -621,6 +632,45 @@ const router = t.router({
 
                 return true;
             }),
+            getOptions: procedure
+                .output(z.object({ fit: z.string(), position: z.string() }))
+                .query(async (opt) => {
+                    const wallpaperPath = path.join(
+                        (await opt.ctx.user()).getPath(),
+                        "assets/wallpapers",
+                    );
+
+                    return JSON.parse(
+                        (await fs.readFile(path.join(wallpaperPath, "config.json"))).toString() ||
+                            JSON.stringify({ fit: "cover", position: "center" }),
+                    );
+                }),
+            setOptions: procedure
+                .input(z.object({ fit: z.string(), position: z.string(), background: z.string() }))
+                .mutation(async (opt) => {
+                    const wallpaperPath = path.join(
+                        (await opt.ctx.user()).getPath(),
+                        "assets/wallpapers",
+                    );
+                    const resizedWallpapersPath = path.join(wallpaperPath, "resized");
+
+                    for (const resizedWallpaper of await fs.readdir(resizedWallpapersPath)) {
+                        await fs.rm(path.join(resizedWallpapersPath, resizedWallpaper));
+                    }
+
+                    const options = {
+                        fit: opt.input.fit,
+                        position: opt.input.position,
+                        background: opt.input.background || "#ff0",
+                    };
+
+                    await fs.writeFile(
+                        path.join(wallpaperPath, "config.json"),
+                        JSON.stringify(options),
+                    );
+
+                    return true;
+                }),
             setWallpaper: procedure.input(z.object({ name: z.string() })).mutation(async (opt) => {
                 const wallpaperPath = path.join(
                     (await opt.ctx.user()).getPath(),

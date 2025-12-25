@@ -9,7 +9,11 @@ import ansiEscapes from "ansi-escapes";
 export default class ConsoleCommandsSubsytem extends SubSystem {
     rlInterface!: readline.Interface;
     commands: Command[];
-    currentCommandInterface!: { active: boolean; cb: (data: string) => void; minCursorPositionOffset: number };
+    currentCommandInterface!: {
+        active: boolean;
+        cb: (data: string) => void;
+        minCursorPositionOffset: number;
+    };
     commandHistory: string[][];
 
     constructor(instance: Instance) {
@@ -22,12 +26,25 @@ export default class ConsoleCommandsSubsytem extends SubSystem {
     }
 
     override async startup() {
-        if (!this.instance.subSystems.configuration.hasFeature("slash_commands") || !process.stdout.cursorTo) return true;
+        if (
+            !this.instance.subSystems.configuration.hasFeature("slash_commands") ||
+            !process.stdout.cursorTo
+        )
+            return true;
 
-        const commands = await fs.readdir(path.join(this.instance.subSystems.filesystem.SRC_ROOT, "/subsystems/consoleCommands/commands/"));
+        const commands = await fs.readdir(
+            path.join(
+                this.instance.subSystems.filesystem.SRC_ROOT,
+                "/subsystems/consoleCommands/commands/",
+            ),
+        );
         for (const cmd of commands) {
             const importedCommand = await import(
-                path.join(this.instance.subSystems.filesystem.SRC_ROOT, "/subsystems/consoleCommands/commands/", cmd)
+                path.join(
+                    this.instance.subSystems.filesystem.SRC_ROOT,
+                    "/subsystems/consoleCommands/commands/",
+                    cmd,
+                )
             );
             this.commands.push(new importedCommand.default(cmd, this.instance));
             this.log.info(`Registered command ${cmd}`);
@@ -54,7 +71,10 @@ export default class ConsoleCommandsSubsytem extends SubSystem {
             self.currentCommandInterface.active = false;
 
             const CURSOR_MIN_POS = () =>
-                36 + (self.currentCommandInterface.active ? self.currentCommandInterface.minCursorPositionOffset : 0);
+                36 +
+                (self.currentCommandInterface.active
+                    ? self.currentCommandInterface.minCursorPositionOffset
+                    : 0);
             let cursorPos = CURSOR_MIN_POS();
             let historyIndex = 0;
             let line = "";
@@ -148,15 +168,23 @@ export default class ConsoleCommandsSubsytem extends SubSystem {
                     self.commandHistory.push(line.split(" "));
                     historyIndex = self.commandHistory.length - 1;
 
-                    let command = self.commands.find((cmd) => cmd.commandId === cmdId || cmd.aliases.includes(cmdId));
+                    let command = self.commands.find(
+                        (cmd) => cmd.commandId === cmdId || cmd.aliases.includes(cmdId),
+                    );
 
                     if (!command) {
-                        self.log.info("command_manager", `Unable to find the command with id '${cmdId}'`);
+                        self.log.info(
+                            "command_manager",
+                            `Unable to find the command with id '${cmdId}'`,
+                        );
                         line = "";
                         return;
                     }
 
-                    if (command.makeDevModeOnly && !self.instance.subSystems.configuration.isDevMode) {
+                    if (
+                        command.makeDevModeOnly &&
+                        !self.instance.subSystems.configuration.isDevMode
+                    ) {
                         self.log.info(
                             "command_manager",
                             `You are unable to execute the command '${command.commandId}' as this instance is not running in developer mode`,
@@ -165,7 +193,9 @@ export default class ConsoleCommandsSubsytem extends SubSystem {
                         return;
                     }
 
+                    line = "";
                     self.currentCommandInterface.active = true;
+
                     await self.executeCommand(cmdId, {
                         arguments: segments,
                         flags: {},
@@ -179,7 +209,9 @@ export default class ConsoleCommandsSubsytem extends SubSystem {
                         return;
                     }
                     cursorPos--;
-                    line = line.slice(0, cursorPos - CURSOR_MIN_POS()) + line.slice(cursorPos - (CURSOR_MIN_POS() - 1));
+                    line =
+                        line.slice(0, cursorPos - CURSOR_MIN_POS()) +
+                        line.slice(cursorPos - (CURSOR_MIN_POS() - 1));
                     process.stdout.cursorTo(CURSOR_MIN_POS());
                     process.stdout.clearLine(1);
                     process.stdout.write(line);
@@ -208,10 +240,15 @@ export default class ConsoleCommandsSubsytem extends SubSystem {
     }
 
     async executeCommand(commandId: string, parameters: ICommandRuntimeParameters) {
-        let com = this.commands.find((com) => com.commandId === commandId || com.aliases.includes(commandId));
+        let com = this.commands.find(
+            (com) => com.commandId === commandId || com.aliases.includes(commandId),
+        );
 
         if (!com) {
-            this.log.error("command_manager", `Unable to execute command "${commandId}" as no such command exists.`);
+            this.log.error(
+                "command_manager",
+                `Unable to execute command "${commandId}" as no such command exists.`,
+            );
 
             return this;
         }

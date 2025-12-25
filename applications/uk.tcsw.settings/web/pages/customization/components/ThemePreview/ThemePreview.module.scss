@@ -13,11 +13,8 @@
 
 .wallpaper {
     position: absolute;
-    top: 0.25rem;
-    left: 0.25rem;
     width: calc(100% - 0.5rem);
     height: calc(100% - 0.5rem);
-    object-fit: cover;
     z-index: -1;
     border-radius: calc(var(--uk-sys-shape-corner-large) - 0.25rem);
     animation: fadeIn forwards 0.25s var(--uk-sys-motion-easing-standard-decelerate);
@@ -32,6 +29,37 @@
             filter: blur(0);
         }
     }
+
+    --transform-x: 0;
+    --transform-y: 0;
+
+    .left {
+        left: 0.25rem;
+    }
+
+    .center {
+        left: 50%;
+        --transform-x: -50%;
+    }
+
+    .right {
+        right: 0.25rem;
+    }
+
+    .top {
+        top: 0.25rem;
+    }
+
+    .middle {
+        top: 50%;
+        --transform-y: -50%;
+    }
+
+    .bottom {
+        bottom: 0.25rem;
+    }
+
+    transform: translateX(var(--transform-x, 0)) translateY(var(--transform-y, 0));
 }
 
 .wallpaperSpinner {
@@ -47,7 +75,8 @@
     width: 48px;
     background-color: rgb(var(--uk-sys-color-surface));
 
-    border-radius: calc(var(--uk-sys-shape-corner-large) - 0.25rem) 0 0 calc(var(--uk-sys-shape-corner-large) - 0.25rem);
+    border-radius: calc(var(--uk-sys-shape-corner-large) - 0.25rem) 0 0
+        calc(var(--uk-sys-shape-corner-large) - 0.25rem);
 }
 
 .avatar {

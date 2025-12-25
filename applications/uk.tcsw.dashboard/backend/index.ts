@@ -40,22 +40,74 @@ const router = t.router({
         welcomeMessage: procedure.output(z.string()).query(async (opt) => {
             return `Hiya, ${(await (await opt.ctx.instance.subSystems.users.getUserById(opt.ctx.userId))?.getForename()) || "Anonymous"}!`;
         }),
-        getWallpaper: procedure.input(z.object({ width: z.number(), height: z.number() })).query(async (opt) => {
-            const wallpapersRootPath = path.join((await opt.ctx.user()).getPath(), "assets/wallpapers");
-            const rawWallpaperPath = path.join(wallpapersRootPath, "current.png");
-            const resizedWallpapersPath = path.join(wallpapersRootPath, "resized");
-            const requiredResizedWallpaperPath = path.join(resizedWallpapersPath, `${opt.input.width}x${opt.input.height}.png`)
+        getWallpaperOptions: procedure
+            .output(
+                z.object({
+                    fit: z.string(),
+                    position: z.tuple([z.string(), z.string()]).or(z.tuple([z.string()])),
+                }),
+            )
+            .query(async (opt) => {
+                const wallpaperPath = path.join(
+                    (await opt.ctx.user()).getPath(),
+                    "assets/wallpapers",
+                );
 
-            if (!(await fs.exists(rawWallpaperPath))) {
-                return "/assets/tricolor/tricolor.svg";
-            }
+                let options = JSON.parse(
+                    (await fs.readFile(path.join(wallpaperPath, "config.json"))).toString() ||
+                        JSON.stringify({ fit: "cover", position: "center" }),
+                );
 
-            if (!(await fs.exists(requiredResizedWallpaperPath))) {
-                await instance.subSystems.image.resizeImage(rawWallpaperPath, requiredResizedWallpaperPath, { width: opt.input.width, height: opt.input.height }, "png");
-            }
+                options.position = options.position.split(" ");
 
-            return opt.ctx.rawRequest.destinationHostname + opt.ctx.instance.subSystems.image.serveImage(opt.ctx.userId, requiredResizedWallpaperPath);
-        }),
+                return options;
+            }),
+        getWallpaper: procedure
+            .input(z.object({ width: z.number(), height: z.number() }))
+            .query(async (opt) => {
+                const wallpapersRootPath = path.join(
+                    (await opt.ctx.user()).getPath(),
+                    "assets/wallpapers",
+                );
+                const rawWallpaperPath = path.join(wallpapersRootPath, "current.png");
+                const resizedWallpapersPath = path.join(wallpapersRootPath, "resized");
+                const requiredResizedWallpaperPath = path.join(
+                    resizedWallpapersPath,
+                    `${opt.input.width}x${opt.input.height}.png`,
+                );
+
+                if (!(await fs.exists(rawWallpaperPath))) {
+                    return "/assets/tricolor/tricolor.svg";
+                }
+
+                if (!(await fs.exists(requiredResizedWallpaperPath))) {
+                    const options = JSON.parse(
+                        (
+                            await fs.readFile(path.join(wallpapersRootPath, "config.json"))
+                        ).toString(),
+                    );
+
+                    await instance.subSystems.image.resizeImage(
+                        rawWallpaperPath,
+                        requiredResizedWallpaperPath,
+                        { width: opt.input.width, height: opt.input.height },
+                        {
+                            changeFormatTo: "png",
+                            fit: options.fit,
+                            position: options.position,
+                            background: options.background,
+                        },
+                    );
+                }
+
+                return (
+                    opt.ctx.rawRequest.destinationHostname +
+                    opt.ctx.instance.subSystems.image.serveImage(
+                        opt.ctx.userId,
+                        requiredResizedWallpaperPath,
+                    )
+                );
+            }),
     },
 });
 
