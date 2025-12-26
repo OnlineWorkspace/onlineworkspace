@@ -504,7 +504,7 @@ const router = t.router({
                         if (
                             wallpaperName === "current.png" ||
                             wallpaperName === "resized" ||
-                            !wallpaperName.endsWith(".preview.png")
+                            !wallpaperName.endsWith(".png")
                         )
                             continue;
 
@@ -514,7 +514,15 @@ const router = t.router({
                             name: wallpaperName,
                             previewSrc:
                                 opt.ctx.rawRequest.destinationHostname +
-                                instance.subSystems.image.serveImage(opt.ctx.userId, wallpaperPath),
+                                (await instance.subSystems.image.serveImage(
+                                    opt.ctx.userId,
+                                    wallpaperPath,
+                                    {
+                                        resize: {
+                                            dimensions: { width: 296, height: 192 },
+                                        },
+                                    },
+                                )),
                         });
                     }
 
@@ -540,7 +548,10 @@ const router = t.router({
                             name: wallpaperName,
                             previewSrc:
                                 opt.ctx.rawRequest.destinationHostname +
-                                instance.subSystems.image.serveImage(opt.ctx.userId, wallpaperPath),
+                                (await instance.subSystems.image.serveImage(
+                                    opt.ctx.userId,
+                                    wallpaperPath,
+                                )),
                         });
                     }
 
@@ -584,12 +595,14 @@ const router = t.router({
 
                 return (
                     opt.ctx.rawRequest.destinationHostname +
-                    opt.ctx.instance.subSystems.image.serveImage(
+                    (await opt.ctx.instance.subSystems.image.serveImage(
                         opt.ctx.userId,
                         requiredResizedWallpaperPath,
-                        false,
-                        true,
-                    )
+                        {
+                            isPublic: false,
+                            dontCachePath: true,
+                        },
+                    ))
                 );
             }),
             upload: procedure.input(octetInputParser).mutation(async (opt) => {
@@ -610,16 +623,6 @@ const router = t.router({
                     `converted '${wallpaperUUID}' to PNG -> '${path.relative(instance.subSystems.filesystem.FS_ROOT, path.join(wallpapersPath, `${wallpaperUUID}.png`))}'`,
                 );
 
-                await instance.subSystems.image.resizeImage(
-                    path.join(wallpapersPath, `${wallpaperUUID}.png`),
-                    path.join(wallpapersPath, `${wallpaperUUID}.preview.png`),
-                    { width: 296, height: 192 },
-                );
-
-                log.info(
-                    `resized '${wallpaperUUID}' preview to -> '${path.relative(instance.subSystems.filesystem.FS_ROOT, path.join(wallpapersPath, `${wallpaperUUID}.preview.png`))}'`,
-                );
-
                 return wallpaperUUID + ".png";
             }),
             delete: procedure.input(z.object({ name: z.string() })).mutation(async (opt) => {
@@ -633,17 +636,29 @@ const router = t.router({
                 return true;
             }),
             getOptions: procedure
-                .output(z.object({ fit: z.string(), position: z.string() }))
+                .output(
+                    z.object({
+                        fit: z.string(),
+                        position: z.tuple([z.string(), z.string()]).or(z.tuple([z.string()])),
+                    }),
+                )
                 .query(async (opt) => {
                     const wallpaperPath = path.join(
                         (await opt.ctx.user()).getPath(),
                         "assets/wallpapers",
                     );
 
-                    return JSON.parse(
-                        (await fs.readFile(path.join(wallpaperPath, "config.json"))).toString() ||
-                            JSON.stringify({ fit: "cover", position: "center" }),
-                    );
+                    if (await fs.exists(path.join(wallpaperPath, "config.json"))) {
+                        let options = JSON.parse(
+                            (await fs.readFile(path.join(wallpaperPath, "config.json"))).toString(),
+                        );
+
+                        options.position = options.position.split(" ");
+
+                        return options;
+                    } else {
+                        return { fit: "cover", position: ["center"] };
+                    }
                 }),
             setOptions: procedure
                 .input(z.object({ fit: z.string(), position: z.string(), background: z.string() }))

@@ -47,13 +47,13 @@ const ActionsMenuBar: Component = () => {
                 {
                     label: "Select All",
                     onClick() {
-                        alert("TODO: Implement me!");
+                        viewCtx?.setSelectedItems(viewCtx.viewItems());
                     },
                 },
                 {
                     label: "Select None",
                     onClick() {
-                        alert("TODO: Implement me!");
+                        viewCtx?.setSelectedItems([]);
                     },
                 },
             ],

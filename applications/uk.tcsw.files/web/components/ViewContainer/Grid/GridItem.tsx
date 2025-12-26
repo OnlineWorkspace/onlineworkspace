@@ -5,6 +5,7 @@ import { useNavigate } from "@solidjs/router";
 import UKIcon from "@tcsw/uikit-solid/src/components/icon/UKIcon.tsx";
 import trpc from "../../../lib/trpc.ts";
 import { ViewContext } from "../ViewContext.ts";
+import GridItemRename from "./GridItemRename";
 
 const GridItem: Component<{
     name: string;
@@ -12,6 +13,7 @@ const GridItem: Component<{
     type: "file" | "directory";
     icon: string;
     index: number;
+    refetchGrid: () => void;
 }> = (props) => {
     const viewCtx = useContext(ViewContext);
     const navigate = useNavigate();
@@ -28,12 +30,11 @@ const GridItem: Component<{
                 }
             }}
             onClick={(e) => {
-                viewCtx?.setLastSelectionIndex(props.index);
+                e.stopPropagation();
 
                 let selectedItems = viewCtx?.selectedItems() ?? [];
 
                 if (e.ctrlKey) {
-                    viewCtx?.setLastSelectionIndex(props.index);
                     if (selectedItems.includes(props.path)) {
                         selectedItems = selectedItems.filter((fi) => fi !== props.path);
                         viewCtx?.setSelectedItems(selectedItems);
@@ -42,15 +43,33 @@ const GridItem: Component<{
                     }
                 } else if (e.shiftKey) {
                     const lastSelectionIndex = viewCtx?.lastSelectionIndex();
-                    if (lastSelectionIndex === props.index || lastSelectionIndex === undefined)
+                    if (lastSelectionIndex === props.index || lastSelectionIndex === undefined) {
+                        viewCtx?.setLastSelectionIndex(props.index);
+                        if (selectedItems.includes(props.path)) {
+                            if (selectedItems.length === 1) {
+                                viewCtx?.setSelectedItems([]);
+                            } else {
+                                viewCtx?.setSelectedItems([props.path]);
+                            }
+                        } else {
+                            viewCtx?.setSelectedItems([props.path]);
+                        }
                         return;
+                    }
 
                     // select items between lastSelectionIndex and the props.index
                     let itemsBetween: string[] = [];
 
-                    for (let i = lastSelectionIndex; i < (viewCtx?.viewItems().length ?? 0); i++) {
-                        let item = viewCtx?.viewItems()[i];
-                        if (item !== undefined) itemsBetween.push(item);
+                    if (lastSelectionIndex < props.index) {
+                        for (let i = lastSelectionIndex; i < props.index + 1; i++) {
+                            let item = viewCtx?.viewItems()[i];
+                            if (item !== undefined) itemsBetween.push(item);
+                        }
+                    } else {
+                        for (let i = lastSelectionIndex; i > props.index - 1; i--) {
+                            let item = viewCtx?.viewItems()[i];
+                            if (item !== undefined) itemsBetween.push(item);
+                        }
                     }
 
                     viewCtx?.setSelectedItems(itemsBetween);
@@ -70,7 +89,7 @@ const GridItem: Component<{
         >
             {props.type === "file" ? (
                 props.icon ? (
-                    <img draggable={false} alt="" src={props.icon} />
+                    <img draggable={false} alt="" src={props.icon} loading={"lazy"} />
                 ) : (
                     <UKIcon class={styles.icon}>article</UKIcon>
                 )
@@ -78,7 +97,11 @@ const GridItem: Component<{
                 <UKIcon class={styles.icon}>folder</UKIcon>
             )}
             {viewCtx?.renameEntry() === props.path ? (
-                <input type="text" placeholder="rename me" />
+                <GridItemRename
+                    path={props.path}
+                    name={props.name}
+                    refetchGrid={props.refetchGrid}
+                />
             ) : (
                 <UKText align="center" role="label" size="m">
                     {props.name}

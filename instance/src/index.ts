@@ -10,7 +10,10 @@ import AuthorizationSubsystem from "./subsystems/authorization.js";
 // https://github.com/cah4a/trpc-bun-adapter/blob/main/src/createBunHttpHandler.ts TODO: patch this and merge into the instance package
 import type { BunWSClientCtx } from "trpc-bun-adapter";
 import type { AnyRouter } from "@trpc/server";
-import { createTRPCContext as createWorkspacesTRPCContext, workspacesRouter } from "./subsystems/trpcRouter.js";
+import {
+    createTRPCContext as createWorkspacesTRPCContext,
+    workspacesRouter,
+} from "./subsystems/trpcRouter.js";
 import { type BunRequest, file } from "bun";
 import ApplicationsSubsystem from "./subsystems/applications.js";
 import path from "path";
@@ -19,6 +22,7 @@ import chalk from "chalk";
 import ImageSubsystem from "./subsystems/image.js";
 import SettingsSubsystem from "./subsystems/settings.js";
 import WebFrontendSubsystem from "./subsystems/webFrontend.js";
+import { promises as fs } from "fs";
 
 export enum InstanceStatus {
     Online,
@@ -58,13 +62,21 @@ class Instance {
     }
 
     async startup() {
-        this.log.system.info(`--------------------------------------------------------------------------`);
-        this.log.system.info(`   ${chalk.hex("FF002E")(/XXX/)}${chalk.hex("70FF00")(/XXX/)}${chalk.hex("0066FF")(/XXX/)}`);
+        this.log.system.info(
+            `--------------------------------------------------------------------------`,
+        );
+        this.log.system.info(
+            `   ${chalk.hex("FF002E")(/XXX/)}${chalk.hex("70FF00")(/XXX/)}${chalk.hex("0066FF")(/XXX/)}`,
+        );
         this.log.system.info(
             `  ${chalk.hex("FF002E")(/XXX/)}${chalk.hex("70FF00")(/XXX/)}${chalk.hex("0066FF")(/XXX/)}  Workspaces © 2025 Tricolor Software -> https://tcsw.uk`,
         );
-        this.log.system.info(` ${chalk.hex("FF002E")(/XXX/)}${chalk.hex("70FF00")(/XXX/)}${chalk.hex("0066FF")(/XXX/)}`);
-        this.log.system.info(`--------------------------------------------------------------------------`);
+        this.log.system.info(
+            ` ${chalk.hex("FF002E")(/XXX/)}${chalk.hex("70FF00")(/XXX/)}${chalk.hex("0066FF")(/XXX/)}`,
+        );
+        this.log.system.info(
+            `--------------------------------------------------------------------------`,
+        );
         this.log.system.info(`Starting up...`);
 
         if (this.status !== InstanceStatus.Offline) {
@@ -95,15 +107,23 @@ class Instance {
                             const cookieString = req.headers?.get("cookie");
 
                             if (cookieString === null) {
-                                throw Response.json({ code: "UNAUTHORIZED", message: "missing auth cookie" });
+                                throw Response.json({
+                                    code: "UNAUTHORIZED",
+                                    message: "missing auth cookie",
+                                });
                             }
 
                             const parsedCookie = Bun.Cookie.parse(cookieString);
 
-                            let userId = await self.subSystems.authorization.verifySession(decodeURIComponent(parsedCookie.value));
+                            let userId = await self.subSystems.authorization.verifySession(
+                                decodeURIComponent(parsedCookie.value),
+                            );
 
                             if (userId === undefined) {
-                                throw Response.json({ code: "UNAUTHORIZED", message: "invalid session" });
+                                throw Response.json({
+                                    code: "UNAUTHORIZED",
+                                    message: "invalid session",
+                                });
                             }
 
                             switch (size) {
@@ -116,12 +136,22 @@ class Instance {
                                     break;
                                 default:
                                     return new Response(
-                                        file(path.join(self.subSystems.filesystem.FS_ROOT, `users/${userId}/assets/avatar/xs.png`)),
+                                        file(
+                                            path.join(
+                                                self.subSystems.filesystem.FS_ROOT,
+                                                `users/${userId}/assets/avatar/xs.png`,
+                                            ),
+                                        ),
                                     );
                             }
 
                             return new Response(
-                                file(path.join(self.subSystems.filesystem.FS_ROOT, `users/${userId}/assets/avatar/${size}.png`)),
+                                file(
+                                    path.join(
+                                        self.subSystems.filesystem.FS_ROOT,
+                                        `users/${userId}/assets/avatar/${size}.png`,
+                                    ),
+                                ),
                             );
                         },
                     },
@@ -132,30 +162,50 @@ class Instance {
                             const cookieString = req.headers?.get("cookie");
 
                             if (cookieString === null) {
-                                throw Response.json({ code: "UNAUTHORIZED", message: "missing auth cookie" });
+                                throw Response.json({
+                                    code: "UNAUTHORIZED",
+                                    message: "missing auth cookie",
+                                });
                             }
 
                             const parsedCookie = Bun.Cookie.parse(cookieString);
 
-                            let userId = await self.subSystems.authorization.verifySession(decodeURIComponent(parsedCookie.value));
+                            let userId = await self.subSystems.authorization.verifySession(
+                                decodeURIComponent(parsedCookie.value),
+                            );
 
                             if (userId === undefined) {
-                                throw Response.json({ code: "UNAUTHORIZED", message: "invalid session" });
+                                throw Response.json({
+                                    code: "UNAUTHORIZED",
+                                    message: "invalid session",
+                                });
                             }
 
-                            let application = this.subSystems.applications.availableApplications.find((a) => a.manifest?.id === app);
+                            let application =
+                                this.subSystems.applications.availableApplications.find(
+                                    (a) => a.manifest?.id === app,
+                                );
 
-                            if (!application) return Response.json({ code: "INTERNAL_ERROR", message: "Invalid application!" });
+                            if (!application)
+                                return Response.json({
+                                    code: "INTERNAL_ERROR",
+                                    message: "Invalid application!",
+                                });
 
-                            let applicationIconPath = path.join(application.path, application.manifest?.icon?.value || "");
+                            let applicationIconPath = path.join(
+                                application.path,
+                                application.manifest?.icon?.value || "",
+                            );
 
                             return new Response(file(path.join(applicationIconPath)));
                         },
                     },
-                    "/api/asset/image/:imageId": {
+                    "/api/asset/image/:imageId/:resolution": {
                         GET: async (req: BunRequest) => {
-                            // @ts-ignore
-                            let image = this.subSystems.image._internalImages.get(req.params["imageId"] as string);
+                            let image = this.subSystems.image._internalImages.get(
+                                // @ts-ignore
+                                req.params["imageId"] as string,
+                            );
 
                             if (!image) {
                                 return new Response("Invalid image");
@@ -165,32 +215,107 @@ class Instance {
                                 const cookieString = req.headers?.get("cookie");
 
                                 if (cookieString === null) {
-                                    throw Response.json({ code: "UNAUTHORIZED", message: "missing auth cookie" });
+                                    throw Response.json({
+                                        code: "UNAUTHORIZED",
+                                        message: "missing auth cookie",
+                                    });
                                 }
 
                                 const parsedCookie = Bun.Cookie.parse(cookieString);
 
-                                let userId = await self.subSystems.authorization.verifySession(decodeURIComponent(parsedCookie.value));
+                                let userId = await self.subSystems.authorization.verifySession(
+                                    decodeURIComponent(parsedCookie.value),
+                                );
 
                                 if (userId === undefined) {
-                                    throw Response.json({ code: "UNAUTHORIZED", message: "invalid session" });
+                                    throw Response.json({
+                                        code: "UNAUTHORIZED",
+                                        message: "invalid session",
+                                    });
                                 }
                             }
 
-                            return new Response(file(image.path), {
-                                headers: {
-                                    "Access-Control-Allow-Origin": "http://localhost:5173", // TODO: change this according to a config file
-                                    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-                                    "Access-Control-Allow-Headers": "Content-Type, Authorization",
-                                    "Access-Control-Allow-Credentials": "true",
-                                },
-                            });
+                            // @ts-ignore
+                            const resolutionParam = req.params["resolution"] as string;
+
+                            let sourceImage = image[resolutionParam];
+
+                            if (!sourceImage) {
+                                throw Response.json({
+                                    code: "NOT_FOUND",
+                                    message: "missing image",
+                                });
+                            }
+
+                            if (resolutionParam === "raw") {
+                                this.subSystems.image.log.info(
+                                    `Served Image -> '${(req.params as { imageId: string })["imageId"]} @ ${resolutionParam}'`,
+                                );
+                                return new Response(file(sourceImage.path), {
+                                    headers: {
+                                        "Access-Control-Allow-Origin": "http://localhost:5173", // TODO: change this according to a config file
+                                        "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+                                        "Access-Control-Allow-Headers":
+                                            "Content-Type, Authorization",
+                                        "Access-Control-Allow-Credentials": "true",
+                                    },
+                                });
+                            } else {
+                                const outputPath = path.join(
+                                    this.subSystems.filesystem.CACHE_PATH,
+                                    sourceImage.path,
+                                );
+
+                                // FIXME!: IF THE IMAGE AT THE SOURCE PATH IS REPLACED WITH ANOTHER, IT WILL CONTINUE TO SEND THE OLD IMAGE
+                                if (await fs.exists(outputPath)) {
+                                    this.subSystems.image.log.info(
+                                        `Served Image -> '${(req.params as { imageId: string })["imageId"]} @ ${resolutionParam}'`,
+                                    );
+                                    return new Response(file(outputPath), {
+                                        headers: {
+                                            "Access-Control-Allow-Origin": "http://localhost:5173", // TODO: change this according to a config file
+                                            "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+                                            "Access-Control-Allow-Headers":
+                                                "Content-Type, Authorization",
+                                            "Access-Control-Allow-Credentials": "true",
+                                        },
+                                    });
+                                }
+
+                                if (!(await fs.exists(path.join(outputPath, "..")))) {
+                                    await fs.mkdir(path.join(outputPath, ".."), {
+                                        recursive: true,
+                                    });
+                                }
+
+                                await this.subSystems.image.resizeImage(
+                                    sourceImage.path,
+                                    outputPath,
+                                    sourceImage.resize!.dimensions,
+                                    sourceImage.resize!,
+                                );
+
+                                this.subSystems.image.log.info(
+                                    `Served Image -> '${(req.params as { imageId: string })["imageId"]} @ ${resolutionParam}'`,
+                                );
+                                return new Response(file(outputPath), {
+                                    headers: {
+                                        "Access-Control-Allow-Origin": "http://localhost:5173", // TODO: change this according to a config file
+                                        "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+                                        "Access-Control-Allow-Headers":
+                                            "Content-Type, Authorization",
+                                        "Access-Control-Allow-Credentials": "true",
+                                    },
+                                });
+                            }
                         },
                     },
                     "/api/asset/raw/:assetId": {
                         GET: async (req: BunRequest) => {
-                            // @ts-ignore
-                            let asset = this.subSystems.filesystem._internalAssets.get(req.params["assetId"] as string);
+                            let asset = this.subSystems.filesystem._internalAssets.get(
+                                // @ts-ignore
+                                req.params["assetId"] as string,
+                            );
 
                             if (!asset) {
                                 return new Response("Invalid raw asset");
@@ -200,15 +325,23 @@ class Instance {
                                 const cookieString = req.headers?.get("cookie");
 
                                 if (cookieString === null) {
-                                    throw Response.json({ code: "UNAUTHORIZED", message: "missing auth cookie" });
+                                    throw Response.json({
+                                        code: "UNAUTHORIZED",
+                                        message: "missing auth cookie",
+                                    });
                                 }
 
                                 const parsedCookie = Bun.Cookie.parse(cookieString);
 
-                                let userId = await self.subSystems.authorization.verifySession(decodeURIComponent(parsedCookie.value));
+                                let userId = await self.subSystems.authorization.verifySession(
+                                    decodeURIComponent(parsedCookie.value),
+                                );
 
                                 if (userId === undefined) {
-                                    throw Response.json({ code: "UNAUTHORIZED", message: "invalid session" });
+                                    throw Response.json({
+                                        code: "UNAUTHORIZED",
+                                        message: "invalid session",
+                                    });
                                 }
                             }
 

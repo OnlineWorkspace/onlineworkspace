@@ -16,7 +16,7 @@ const GridView: Component = () => {
     const navigate = useNavigate();
     const viewCtx = useContext(ViewContext);
 
-    const [gridResource] = createResource(
+    const [gridResource, { refetch: refetchGrid }] = createResource(
         () => `/${params.currentPath || ""}`,
         async (pth) => {
             viewCtx?.setLastSelectionIndex(undefined);
@@ -33,7 +33,12 @@ const GridView: Component = () => {
     );
 
     return (
-        <div class={styles.root}>
+        <div
+            class={styles.root}
+            onClick={() => {
+                viewCtx?.setSelectedItems([]);
+            }}
+        >
             <Suspense>
                 <Switch
                     fallback={
@@ -74,7 +79,9 @@ const GridView: Component = () => {
                         {/* @ts-ignore */}
                         <For each={gridResource()?.items}>
                             {(i, index) => {
-                                return <GridItem {...i} index={index()} />;
+                                return (
+                                    <GridItem {...i} index={index()} refetchGrid={refetchGrid} />
+                                );
                             }}
                         </For>
                     </Match>

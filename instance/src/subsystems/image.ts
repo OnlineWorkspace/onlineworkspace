@@ -7,7 +7,30 @@ import * as nodePath from "path";
 export default class ImageSubsystem extends SubSystem {
     _internalImages: Map<
         string,
-        { userId: number; path: string; validUntil: number; public?: boolean }
+        {
+            [resolution: string]: {
+                userId: number;
+                path: string;
+                validUntil: number;
+                public?: boolean;
+                resize?: {
+                    dimensions: { width: number; height: number };
+                    changeFormatTo?: "avif" | "jpeg" | "png";
+                    position?:
+                        | "top"
+                        | "right top"
+                        | "right"
+                        | "right bottom"
+                        | "bottom"
+                        | "left bottom"
+                        | "left"
+                        | "left top"
+                        | "centre";
+                    fit?: "cover" | "contain" | "fill";
+                    background?: string;
+                };
+            };
+        }
     >;
     _internalImagePaths: Map<string, string>;
 
@@ -22,38 +45,117 @@ export default class ImageSubsystem extends SubSystem {
 
     // returns an endpoint where the image located at the provided path can be loaded from on the client
     // defaults to 3hrs validity
-    serveImage(
+    async serveImage(
         userId: number,
         path: string,
-        isPublic: boolean = false,
-        dontCachePath = false,
-        validMs: number = 21600000,
-    ): string {
-        if (!dontCachePath) {
-            const existingImage = this._internalImagePaths.get(path);
+        options?: {
+            isPublic?: boolean;
+            dontCachePath?: boolean;
+            validMs?: number;
+            resize?: {
+                dimensions:
+                    | { width: number; height: number }
+                    | ((originalSize: { width: number; height: number }) => {
+                          width: number;
+                          height: number;
+                      });
+                changeFormatTo?: "avif" | "jpeg" | "png";
+                position?:
+                    | "top"
+                    | "right top"
+                    | "right"
+                    | "right bottom"
+                    | "bottom"
+                    | "left bottom"
+                    | "left"
+                    | "left top"
+                    | "centre";
+                fit?: "cover" | "contain" | "fill";
+                background?: string;
+            };
+        },
+    ): Promise<string> {
+        const opts = {
+            isPublic: false,
+            dontCachePath: false,
+            validMs: 21600000,
+            ...options,
+        };
 
-            if (existingImage) {
-                this._internalImages.get(existingImage)!.validUntil = Date.now() + validMs;
+        if (options?.resize?.dimensions) {
+            if (typeof options?.resize?.dimensions === "function") {
+                const sharpInstance = sharp(path);
+                opts.resize!.dimensions = options?.resize?.dimensions(
+                    await sharpInstance.metadata(),
+                );
+            }
+        }
 
-                return `/api/asset/image/${existingImage}`;
+        if (!opts.dontCachePath) {
+            const existingImageId = this._internalImagePaths.get(path);
+
+            if (existingImageId) {
+                const existingImage = this._internalImages.get(existingImageId);
+
+                if (existingImage) {
+                    const requestResolution = opts.resize
+                        ? // @ts-ignore
+                          opts.resize.dimensions.width + "x" + opts.resize.dimensions.height
+                        : "raw";
+
+                    const existingImageOfResolution = existingImage[requestResolution];
+
+                    if (existingImageOfResolution) {
+                        existingImageOfResolution!.validUntil = Date.now() + opts.validMs;
+
+                        return `/api/asset/image/${existingImageId}/${requestResolution}`;
+                    }
+                }
             }
         }
 
         const imageId = randomUUIDv7();
 
-        this._internalImages.set(imageId, {
-            path: path,
-            userId: userId,
-            validUntil: Date.now() + validMs,
-            public: isPublic,
-        });
-        this._internalImagePaths.set(path, imageId);
+        const requestResolution = opts.resize
+            ? // @ts-ignore
+              opts.resize.dimensions.width + "x" + opts.resize.dimensions.height
+            : "raw";
+
+        if (this._internalImages.has(imageId)) {
+            let currentImage = this._internalImages.get(imageId)!;
+
+            currentImage[requestResolution] = {
+                path: path,
+                userId: userId,
+                validUntil: Date.now() + opts.validMs,
+                public: opts.isPublic,
+                // @ts-ignore
+                resize: opts.resize,
+            };
+
+            this._internalImages.set(imageId, currentImage);
+        } else {
+            let currentImage = {
+                [requestResolution]: {
+                    path: path,
+                    userId: userId,
+                    validUntil: Date.now() + opts.validMs,
+                    public: opts.isPublic,
+                    resize: opts.resize,
+                },
+            };
+
+            // @ts-ignore
+            this._internalImages.set(imageId, currentImage);
+
+            this._internalImagePaths.set(path, imageId);
+        }
 
         this.log.info(
             `Serving image at '${nodePath.relative(this.instance.subSystems.filesystem.FS_ROOT, path)}' as '${imageId}'`,
         );
 
-        return `/api/asset/image/${imageId}`;
+        return `/api/asset/image/${imageId}/${requestResolution}`;
     }
 
     async resizeImage(

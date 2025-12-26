@@ -19,6 +19,9 @@ export default class FilesystemSubsystem extends SubSystem {
         super("filesystem", instance);
 
         fs.mkdirSync(this.FS_ROOT, { recursive: true });
+        if (fs.existsSync(this.CACHE_PATH)) {
+            fs.rmSync(this.CACHE_PATH, { recursive: true });
+        }
         fs.mkdirSync(this.CACHE_PATH, { recursive: true });
 
         this._internalAssets = new Map();

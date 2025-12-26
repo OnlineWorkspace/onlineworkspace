@@ -1,4 +1,4 @@
-import { createSignal, type Component, type ParentProps } from "solid-js";
+import { createEffect, createSignal, type Component, type ParentProps } from "solid-js";
 import ActionsMenuBar from "./components/ActionsMenuBar/ActionsMenuBar.tsx";
 import PathBar from "./components/PathBar/PathBar.tsx";
 import SideBar from "./components/SideBar/SideBar.tsx";

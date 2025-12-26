@@ -8,4 +8,6 @@
 
 .view {
     background-color: rgb(var(--uk-sys-color-surface-container));
+    overflow-y: auto;
+    height: 100%;
 }

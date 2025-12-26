@@ -3,5 +3,6 @@
     border-bottom-left-radius: var(--uk-sys-shape-corner-large);
     background-color: rgb(var(--uk-sys-color-background));
     overflow: hidden;
+    overflow-y: auto;
     height: 100%;
 }

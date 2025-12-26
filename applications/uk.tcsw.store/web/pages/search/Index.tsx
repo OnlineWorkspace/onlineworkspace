@@ -1,55 +1,51 @@
-import { DividerDirection } from "@tcsw/uikit-solid/src/components/divider/lib/direction.js";
-import UKDivider from "@tcsw/uikit-solid/src/components/divider/UKDivider.jsx";
-import UKText from "@tcsw/uikit-solid/src/components/text/UKText.jsx";
-import { createResource, createSignal, For, on, Suspense, type Component } from "solid-js";
+import {
+    createEffect,
+    createResource,
+    createSignal,
+    For,
+    Suspense,
+    type Component,
+} from "solid-js";
 import styles from "./Index.module.scss";
-import UKTextField from "@tcsw/uikit-solid/src/components/textField/UKTextField.jsx";
 import SearchResult from "./components/SearchResult/SearchResult";
 import trpc from "../../lib/trpc";
 import UKIndeterminateSpinner from "@tcsw/uikit-solid/src/components/indeterminateSpinner/UKIndeterminateSpinner.jsx";
+import UKTopAppBar from "@tcsw/uikit-solid/src/components/topAppBar/UKTopAppBar.jsx";
 
 const Page: Component = () => {
     const [searchQuery, setSearchQuery] = createSignal<string>("");
-    const [results, { refetch: refetchResults }] = createResource(() => trpc.search.searchFor.query(searchQuery()));
+    const [results, { refetch: refetchResults }] = createResource(() =>
+        trpc.search.searchFor.query(searchQuery()),
+    );
 
     return (
-        <div class={styles.page}>
-            <div class={styles.topBar}>
-                <UKText role={"title"} size="l">
-                    Search
-                </UKText>
-            </div>
-            <UKDivider direction={DividerDirection.horizontal} />
-            <div class={styles.content}>
-                <UKTextField
-                    leadingIcon={{
-                        icon: "search",
-                        onClick: () => {
-                            return 0;
-                        },
-                    }}
-                    getValue={(val) => {
-                        if (searchQuery() !== val) {
-                            setSearchQuery(val);
-                            refetchResults();
-                        }
-                    }}
-                    setValue={searchQuery()}
-                    color={"filled"}
-                    label={"Search"}
-                />
-                <UKDivider direction={DividerDirection.horizontal} />
+        <>
+            <UKTopAppBar
+                type="search"
+                getValue={(val) => {
+                    setSearchQuery(val);
+                    refetchResults();
+                }}
+                value={searchQuery}
+                placeholder={"Search Applications"}
+            />
+            <div class={styles.page}>
                 <div class={styles.resultGrid}>
-                    <Suspense fallback={<UKIndeterminateSpinner />}>
+                    <Suspense fallback={<UKIndeterminateSpinner class={styles.spinner} />}>
                         <For each={results()}>
                             {(result) => {
-                                return <SearchResult applicationId={result.applicationId} repository={result.repository} />;
+                                return (
+                                    <SearchResult
+                                        applicationId={result.applicationId}
+                                        repository={result.repository}
+                                    />
+                                );
                             }}
                         </For>
                     </Suspense>
                 </div>
             </div>
-        </div>
+        </>
     );
 };
 

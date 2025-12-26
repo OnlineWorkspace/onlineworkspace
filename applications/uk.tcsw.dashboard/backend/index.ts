@@ -53,14 +53,17 @@ const router = t.router({
                     "assets/wallpapers",
                 );
 
-                let options = JSON.parse(
-                    (await fs.readFile(path.join(wallpaperPath, "config.json"))).toString() ||
-                        JSON.stringify({ fit: "cover", position: "center" }),
-                );
+                if (await fs.exists(path.join(wallpaperPath, "config.json"))) {
+                    let options = JSON.parse(
+                        (await fs.readFile(path.join(wallpaperPath, "config.json"))).toString(),
+                    );
 
-                options.position = options.position.split(" ");
+                    options.position = options.position.split(" ");
 
-                return options;
+                    return options;
+                } else {
+                    return { fit: "cover", position: ["center"] };
+                }
             }),
         getWallpaper: procedure
             .input(z.object({ width: z.number(), height: z.number() }))
@@ -81,11 +84,20 @@ const router = t.router({
                 }
 
                 if (!(await fs.exists(requiredResizedWallpaperPath))) {
-                    const options = JSON.parse(
-                        (
-                            await fs.readFile(path.join(wallpapersRootPath, "config.json"))
-                        ).toString(),
-                    );
+                    const options = await (async () => {
+                        if (await fs.exists(path.join(wallpapersRootPath, "config.json"))) {
+                            let options = JSON.parse(
+                                (
+                                    await fs.readFile(path.join(wallpapersRootPath, "config.json"))
+                                ).toString(),
+                            );
+
+                            options.position = options.position.split(" ");
+                            return options;
+                        } else {
+                            return { fit: "cover", position: "center" };
+                        }
+                    })();
 
                     await instance.subSystems.image.resizeImage(
                         rawWallpaperPath,
@@ -102,10 +114,10 @@ const router = t.router({
 
                 return (
                     opt.ctx.rawRequest.destinationHostname +
-                    opt.ctx.instance.subSystems.image.serveImage(
+                    (await opt.ctx.instance.subSystems.image.serveImage(
                         opt.ctx.userId,
                         requiredResizedWallpaperPath,
-                    )
+                    ))
                 );
             }),
     },

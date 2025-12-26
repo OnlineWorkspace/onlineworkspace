@@ -40,7 +40,7 @@ const WallpaperPage: Component = () => {
     onMount(async () => {
         const options = await trpc.customization.wallpaper.getOptions.query();
 
-        if (options.position === "center") {
+        if (options.position.length === 1 && options.position[0] === "center") {
             setWallpaperAlignHorizontal("center");
             setWallpaperAlignVertical("middle");
             // @ts-ignore
@@ -50,8 +50,7 @@ const WallpaperPage: Component = () => {
         }
 
         // @ts-ignore
-        let positionSegments: ["left" | "center" | "right", "top" | "middle" | "bottom"] =
-            options.position.split(" ");
+        let positionSegments: ["left" | "center" | "right", "top" | "middle" | "bottom"] = options;
 
         setWallpaperAlignHorizontal(positionSegments[0]);
         setWallpaperAlignVertical(positionSegments[1]);
@@ -69,7 +68,7 @@ const WallpaperPage: Component = () => {
 
             if (wallpaperAlignHorizontal() === "right") position = "right";
 
-            if (position === "middle") {
+            if (position === "center") {
                 if (wallpaperAlignVertical() === "top") position = "top";
 
                 if (wallpaperAlignVertical() === "bottom") position = "bottom";

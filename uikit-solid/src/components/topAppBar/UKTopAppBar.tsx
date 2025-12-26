@@ -1,4 +1,11 @@
-import { createSignal, onCleanup, onMount, type Component, type JSXElement } from "solid-js";
+import {
+    createSignal,
+    onCleanup,
+    onMount,
+    type Accessor,
+    type Component,
+    type JSXElement,
+} from "solid-js";
 import styles from "./UKTopAppBar.module.scss";
 import UKIconButton from "../iconButton/UKIconButton";
 import UKText from "../text/UKText";
@@ -11,6 +18,9 @@ interface ISharedProps {
 const UKTopAppBar: Component<
     | (ISharedProps & {
           type: "search";
+          getValue: (value: string) => void;
+          value: Accessor<string>;
+          placeholder: string;
       })
     | (ISharedProps & {
           type: "small";
@@ -84,10 +94,9 @@ const UKTopAppBar: Component<
                             color={"standard"}
                         />
                     )}
-                    {props.type === "search" && <div class={styles.searchBar}>searchBar</div>}
                     {props.type === "small" && "titleImage" in props ? (
                         <img src={props.titleImage} alt={props.titleImageAccessibleLabel} />
-                    ) : (
+                    ) : props.type !== "search" ? (
                         <div class={styles.titleContainer}>
                             <div class={styles.title}>
                                 {"headline" in props && (
@@ -118,8 +127,25 @@ const UKTopAppBar: Component<
                                 )}
                             </div>
                         </div>
+                    ) : (
+                        <div class={styles.searchBar}>
+                            <UKText
+                                class={styles.placeholder}
+                                size={"l"}
+                                role={"label"}
+                                align={"center"}
+                            >
+                                {props.placeholder}
+                            </UKText>
+                            <input
+                                type="text"
+                                placeholder={" "}
+                                value={props.value()}
+                                onChange={(e) => props.getValue(e.currentTarget.value)}
+                            ></input>
+                        </div>
                     )}
-                    {props.trailingElements}
+                    <div class={styles.trailing}>{props.trailingElements}</div>
                 </div>
             </div>
             <div class={styles.scrolledSpacerElement} />

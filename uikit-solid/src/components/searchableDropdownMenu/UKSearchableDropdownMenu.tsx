@@ -1,7 +1,11 @@
 import { type Component, createEffect, createSignal } from "solid-js";
 import UKTextField from "../textField/UKTextField.tsx";
 import UKMenu from "../menu/UKMenu.tsx";
-import { type SearchableDropDownMenuButtonItem, type SearchableDropdownMenuItems, SearchableDropdownMenuItemType } from "./lib/items.ts";
+import {
+    type SearchableDropDownMenuButtonItem,
+    type SearchableDropdownMenuItems,
+    SearchableDropdownMenuItemType,
+} from "./lib/items.ts";
 import type { MenuButtonItem, MenuDividerItem } from "../menu/lib/items.ts";
 import styles from "./UKSearchableDropdownMenu.module.scss";
 
@@ -48,7 +52,8 @@ const UKSearchableDropdownMenu: Component<{
                         : queriedItems().find((i) => {
                               return (
                                   i?.type === SearchableDropdownMenuItemType.Button &&
-                                  (i as SearchableDropDownMenuButtonItem).label.toLowerCase() === query().toLowerCase().trim()
+                                  (i as SearchableDropDownMenuButtonItem).label.toLowerCase() ===
+                                      query().toLowerCase().trim()
                               );
                           }) === undefined
                 }
@@ -61,25 +66,28 @@ const UKSearchableDropdownMenu: Component<{
                 setValue={query()}
                 onEscape={() => setIsFocussed(false)}
                 leadingIcon={props.inputLeadingIcon ? { icon: props.inputLeadingIcon } : undefined}
-                trailingIcon={props.inputTrailingIcon ? { icon: props.inputTrailingIcon } : undefined}
+                trailingIcon={
+                    props.inputTrailingIcon ? { icon: props.inputTrailingIcon } : undefined
+                }
             />
             {isFocussed() && (
-                <UKMenu
-                    class={styles.menu}
-                    items={queriedItems().map((i) => {
-                        if (i.type === SearchableDropdownMenuItemType.Button) {
-                            return {
-                                ...i,
-                                onClick() {
-                                    setQuery(i.label);
-                                    setIsFocussed(false);
-                                },
-                            } as unknown as MenuButtonItem;
-                        }
+                // <UKMenu
+                //     class={styles.menu}
+                //     items={queriedItems().map((i) => {
+                //         if (i.type === SearchableDropdownMenuItemType.Button) {
+                //             return {
+                //                 ...i,
+                //                 onClick() {
+                //                     setQuery(i.label);
+                //                     setIsFocussed(false);
+                //                 },
+                //             } as unknown as MenuButtonItem;
+                //         }
 
-                        return i as unknown as MenuDividerItem;
-                    })}
-                />
+                //         return i as unknown as MenuDividerItem;
+                //     })}
+                // />
+                <>UKMenu has not been re-implemented!</>
             )}
             {isFocussed() && (
                 <div

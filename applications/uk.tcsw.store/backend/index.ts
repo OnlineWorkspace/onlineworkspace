@@ -44,7 +44,7 @@ const router = t.router({
                 if (!app) return undefined;
 
                 if (app.bannerImage) {
-                    app.bannerImage = `${opt.ctx.rawRequest.destinationHostname}${instance.subSystems.image.serveImage(opt.ctx.userId, app.bannerImage)}`;
+                    app.bannerImage = `${opt.ctx.rawRequest.destinationHostname}${await instance.subSystems.image.serveImage(opt.ctx.userId, app.bannerImage)}`;
                 }
 
                 return app;
@@ -176,7 +176,7 @@ const router = t.router({
                 if (!app) return undefined;
 
                 if (app.bannerImage) {
-                    app.bannerImage = `${opt.ctx.rawRequest.destinationHostname}${instance.subSystems.image.serveImage(opt.ctx.userId, app.bannerImage)}`;
+                    app.bannerImage = `${opt.ctx.rawRequest.destinationHostname}${await instance.subSystems.image.serveImage(opt.ctx.userId, app.bannerImage)}`;
                 }
 
                 return app;
@@ -197,11 +197,11 @@ const router = t.router({
                 if (!app) return undefined;
 
                 if (app.icon.type === "image") {
-                    app.icon.value = `${opt.ctx.rawRequest.destinationHostname}${instance.subSystems.image.serveImage(opt.ctx.userId, app.icon.value)}`;
+                    app.icon.value = `${opt.ctx.rawRequest.destinationHostname}${await instance.subSystems.image.serveImage(opt.ctx.userId, app.icon.value)}`;
                 }
 
                 if (app.bannerImage) {
-                    app.bannerImage = `${opt.ctx.rawRequest.destinationHostname}${instance.subSystems.image.serveImage(opt.ctx.userId, app.bannerImage)}`;
+                    app.bannerImage = `${opt.ctx.rawRequest.destinationHostname}${await instance.subSystems.image.serveImage(opt.ctx.userId, app.bannerImage)}`;
                 }
 
                 return {
