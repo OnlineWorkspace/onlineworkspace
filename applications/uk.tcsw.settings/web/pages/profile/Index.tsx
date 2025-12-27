@@ -10,42 +10,62 @@ import Name from "./components/Name/Name";
 import Gender from "./components/Gender/Gender";
 import Email from "./components/Email/Email";
 import Bio from "./components/Bio/Bio.tsx";
+import UKTopAppBar from "@tcsw/uikit-solid/src/components/topAppBar/UKTopAppBar.jsx";
+import { useNavigate } from "@solidjs/router";
 
 const ProfilePage: Component = () => {
+    const navigate = useNavigate();
     const [name] = createResource(() => trpc.profile.getName.query());
     const [role] = createResource(() => trpc.profile.getRole.query());
     const [avatar] = createResource(() => trpc.profile.getProfilePicture.query());
 
     return (
-        <div class={styles.root}>
-            <div class={styles.header}>
-                <UKAvatar username="username" avatar={avatar() || "/assets/placeholder/avatar.png"} size="l" />
-                <div>
-                    <UKText role="display" size="l" emphasized class={styles.fullName}>
-                        {name() || "Unknown"}
-                    </UKText>
-                    <UKText role="label" size="l" class={styles.permissionLevel}>
-                        {role() || "Unknown"}
-                    </UKText>
+        <>
+            <UKTopAppBar
+                type="small"
+                headline={"Profile"}
+                leadingButton={{
+                    icon: "chevron_left",
+                    onClick() {
+                        navigate("/app/uk.tcsw.settings");
+                    },
+                    accessibleLabel: "Go back",
+                }}
+            />
+            <div class={styles.root}>
+                <div class={styles.header}>
+                    <UKAvatar
+                        username="username"
+                        avatar={avatar() || "/assets/placeholder/avatar.png"}
+                        size="l"
+                    />
+                    <div>
+                        <UKText role="display" size="l" emphasized class={styles.fullName}>
+                            {name() || "Unknown"}
+                        </UKText>
+                        <UKText role="label" size="l" class={styles.permissionLevel}>
+                            {role() || "Unknown"}
+                        </UKText>
+                    </div>
                 </div>
+                <UKText class={styles.subheading} role="title" size="m" align="start">
+                    Basic info
+                </UKText>
+                <UKStack>
+                    <ProfilePicture />
+                    <Username />
+                    <Name />
+                    <Gender />
+                    <Bio />
+                </UKStack>
+                <UKText class={styles.subheading} role="title" size="m" align="start">
+                    Contact info
+                </UKText>
+                <UKStack>
+                    <Email />
+                </UKStack>
             </div>
-            <UKText class={styles.subheading} role="title" size="m" align="start">
-                Basic info
-            </UKText>
-            <UKStack>
-                <ProfilePicture />
-                <Username />
-                <Name />
-                <Gender />
-                <Bio/>
-            </UKStack>
-            <UKText class={styles.subheading} role="title" size="m" align="start">
-                Contact info
-            </UKText>
-            <UKStack>
-                <Email />
-            </UKStack>
-        </div>
+        </>
     );
 };
 

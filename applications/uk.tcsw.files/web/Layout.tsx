@@ -1,4 +1,4 @@
-import { createEffect, createSignal, type Component, type ParentProps } from "solid-js";
+import { createSignal, type Component, type ParentProps } from "solid-js";
 import ActionsMenuBar from "./components/ActionsMenuBar/ActionsMenuBar.tsx";
 import PathBar from "./components/PathBar/PathBar.tsx";
 import SideBar from "./components/SideBar/SideBar.tsx";
@@ -10,6 +10,7 @@ const Layout: Component<ParentProps> = (props) => {
     const [selectedItems, setSelectedItems] = createSignal<string[]>([]);
     const [lastSelectionIndex, setLastSelectionIndex] = createSignal<number | undefined>(undefined);
     const [viewItems, setViewItems] = createSignal<string[]>([]);
+    const [viewType, setViewType] = createSignal<"grid" | "list">("grid");
     const [renameEntry, setRenameEntry] = createSignal<string | undefined>(undefined);
 
     return (
@@ -23,6 +24,8 @@ const Layout: Component<ParentProps> = (props) => {
                 setViewItems: setViewItems,
                 renameEntry: renameEntry,
                 setRenameEntry: setRenameEntry,
+                viewType: viewType,
+                setViewType: setViewType,
             }}
         >
             <div class={styles.root}>

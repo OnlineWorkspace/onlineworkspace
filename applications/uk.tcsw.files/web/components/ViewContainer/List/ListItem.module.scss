@@ -1,0 +1,67 @@
+.root {
+    display: flex;
+    align-items: center;
+    justify-content: start;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    -webkit-user-drag: none;
+    position: relative;
+    background-color: transparent;
+    user-select: none;
+    border-radius: var(--uk-sys-shape-corner-small);
+    overflow: hidden;
+    color: rgb(var(--uk-sys-color-on-background));
+    height: 100%;
+
+    > img {
+        max-width: 100%;
+        max-height: 100%;
+        overflow: hidden;
+        margin: auto;
+    }
+
+    > .icon {
+        --icon-size: 1.5rem;
+    }
+
+    &::after {
+        transition: background-color var(--uk-sys-motion-duration-100)
+            var(--uk-sys-motion-easing-standard-normal);
+        content: "";
+        position: absolute;
+        background-color: transparent;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+    }
+
+    &[data-multiple-of-two="true"] {
+        background-color: #fff1;
+    }
+
+    &:hover {
+        &::after {
+            background-color: rgb(
+                var(--uk-sys-color-primary),
+                var(--uk-sys-state-hover-state-layer-opacity)
+            );
+        }
+    }
+
+    &:active,
+    &[data-selected="true"] {
+        &::after {
+            background-color: rgb(
+                var(--uk-sys-color-primary),
+                var(--uk-sys-state-pressed-state-layer-opacity)
+            );
+        }
+
+        color: rgb(var(--uk-sys-color-primary));
+    }
+
+    &[data-selected="true"] {
+        outline: 0.125rem solid rgb(var(--uk-sys-color-primary));
+    }
+}

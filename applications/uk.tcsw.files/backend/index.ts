@@ -116,9 +116,13 @@ const router = t.router({
             instance.subSystems.filesystem.serveFile(opt.ctx.userId, finalPath)
         );
     }),
-    moveFile: procedure
+    move: procedure
         .input(z.object({ path: z.string(), newPath: z.string() }))
         .mutation(async (opt) => {
+            // TODO: send a failure notification
+            if (path.join(opt.input.newPath, "..") === "users") return false;
+            if (path.join(opt.input.path, "..") === "users") return false;
+
             const finalPath = path.join(instance.subSystems.filesystem.FS_ROOT, opt.input.path);
             const finalNewPath = path.join(
                 instance.subSystems.filesystem.FS_ROOT,
@@ -127,6 +131,29 @@ const router = t.router({
 
             try {
                 await fs.rename(finalPath, finalNewPath);
+
+                return true;
+            } catch (err) {
+                log.error(err);
+
+                return false;
+            }
+        }),
+    copy: procedure
+        .input(z.object({ path: z.string(), newPath: z.string() }))
+        .mutation(async (opt) => {
+            // TODO: send a failure notification
+            if (path.join(opt.input.newPath, "..") === "users") return false;
+            if (path.join(opt.input.path, "..") === "users") return false;
+
+            const finalPath = path.join(instance.subSystems.filesystem.FS_ROOT, opt.input.path);
+            const finalNewPath = path.join(
+                instance.subSystems.filesystem.FS_ROOT,
+                opt.input.newPath,
+            );
+
+            try {
+                await fs.cp(finalPath, finalNewPath, { recursive: true });
 
                 return true;
             } catch (err) {

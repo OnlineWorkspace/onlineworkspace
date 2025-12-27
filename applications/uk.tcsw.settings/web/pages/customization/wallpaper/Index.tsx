@@ -11,6 +11,8 @@ import UKIconButton from "@tcsw/uikit-solid/src/components/iconButton/UKIconButt
 import UKIndeterminateSpinner from "@tcsw/uikit-solid/src/components/indeterminateSpinner/UKIndeterminateSpinner.tsx";
 import UKTopAppBar from "@tcsw/uikit-solid/src/components/topAppBar/UKTopAppBar.jsx";
 import UKButtonGroup from "@tcsw/uikit-solid/src/components/buttonGroup/UKButtonGroup.jsx";
+import UKDivider from "@tcsw/uikit-solid/src/components/divider/UKDivider.jsx";
+import { DividerDirection } from "@tcsw/uikit-solid/src/components/divider/lib/direction.js";
 
 const WallpaperPage: Component = () => {
     const navigate = useNavigate();
@@ -111,6 +113,7 @@ const WallpaperPage: Component = () => {
                         ]}
                         fillStyle={wallpaperFit()}
                     />
+                    <UKDivider direction={DividerDirection.horizontal} width={"middle-inset"} />
                 </div>
 
                 <UKText role={"title"} size={"m"} class={styles.subheading}>

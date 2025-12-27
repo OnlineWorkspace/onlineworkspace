@@ -5,6 +5,7 @@
     width: 100%;
     align-items: center;
     margin-bottom: 1rem;
+    padding-top: 2rem;
 }
 
 .subheading {
@@ -20,7 +21,6 @@
     align-items: center;
     padding-left: 1rem;
     gap: 1rem;
-    margin-top: 5rem;
 
     .fullName {
         color: rgb(var(--uk-sys-color-on-surface));

@@ -8,6 +8,8 @@
     border: none;
     border-radius: var(--uk-sys-shape-corner-full);
     background-color: rgb(var(--uk-sys-color-outline));
+    flex-shrink: 0;
+    flex-grow: 0;
 
     outline-style: solid;
     outline-offset: 2px;
@@ -15,9 +17,11 @@
     outline-color: transparent;
 
     transition:
-        outline-color var(--uk-sys-motion-duration-100) var(--uk-sys-motion-easing-standard-decelerate),
+        outline-color var(--uk-sys-motion-duration-100)
+            var(--uk-sys-motion-easing-standard-decelerate),
         outline-width 0ms linear,
-        background-color var(--uk-sys-motion-duration-100) var(--uk-sys-motion-easing-standard-normal);
+        background-color var(--uk-sys-motion-duration-100)
+            var(--uk-sys-motion-easing-standard-normal);
 
     &:focus-visible {
         background-color: rgb(var(--uk-sys-color-primary));
@@ -35,7 +39,8 @@
         left: 0.125rem;
         width: calc(100% - 0.25rem);
         height: calc(100% - 0.25rem);
-        transition: background-color var(--uk-sys-motion-duration-100) var(--uk-sys-motion-easing-standard-normal);
+        transition: background-color var(--uk-sys-motion-duration-100)
+            var(--uk-sys-motion-easing-standard-normal);
 
         border-radius: var(--uk-sys-shape-corner-full);
         background-color: rgb(var(--uk-sys-color-surface-container-highest));
@@ -55,7 +60,8 @@
             left var(--uk-sys-motion-duration-100) var(--uk-sys-motion-easing-standard-normal),
             width var(--uk-sys-motion-duration-100) var(--uk-sys-motion-easing-standard-normal),
             height var(--uk-sys-motion-duration-100) var(--uk-sys-motion-easing-standard-normal),
-            background-color var(--uk-sys-motion-duration-100) var(--uk-sys-motion-easing-standard-normal),
+            background-color var(--uk-sys-motion-duration-100)
+                var(--uk-sys-motion-easing-standard-normal),
             color var(--uk-sys-motion-duration-100) var(--uk-sys-motion-easing-standard-normal);
 
         display: flex;

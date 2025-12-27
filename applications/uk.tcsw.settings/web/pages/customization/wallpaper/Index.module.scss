@@ -3,6 +3,7 @@
     margin-right: auto;
     width: 100%;
     max-width: 64rem;
+    padding-top: 2rem;
 }
 
 .header {
@@ -11,7 +12,9 @@
     gap: 1rem;
     justify-content: center;
     align-items: center;
-    margin: 1rem;
+    width: max-content;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .backButton {

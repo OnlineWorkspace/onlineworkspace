@@ -1,9 +1,9 @@
 .root {
     display: flex;
     flex-direction: column;
-    padding: 1rem;
-    min-height: 100%;
+    padding-top: 2rem;
     overflow-y: auto;
+    align-items: center;
 }
 
 .content {
@@ -13,7 +13,6 @@
     width: 100%;
     height: max-content;
     gap: 1rem;
-    margin: 4rem auto 2.5rem;
 }
 
 .divider {

@@ -13,7 +13,10 @@ const UsageGraph: Component = () => {
                 <For each={storageUsage()}>
                     {(category) => {
                         return (
-                            <div class={styles.barSegment} style={{ width: `${category.percentage * 100}%` }}>
+                            <div
+                                class={styles.barSegment}
+                                style={{ width: `${category.percentage * 100}%` }}
+                            >
                                 <UKText role="label" size="s" class={styles.barLabel}>
                                     {category.displayName} {category.size.toFixed(1)}GB
                                 </UKText>
@@ -22,9 +25,6 @@ const UsageGraph: Component = () => {
                     }}
                 </For>
             </div>
-            <UKText role="label" size="m">
-                Storage Usage Visualisation
-            </UKText>
         </UKCard>
     );
 };

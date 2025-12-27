@@ -1,13 +1,12 @@
 import { useContext, type Component } from "solid-js";
-import styles from "./GridItem.module.scss";
+import styles from "./ListItem.module.scss";
 import UKText from "@tcsw/uikit-solid/src/components/text/UKText.jsx";
 import { useNavigate } from "@solidjs/router";
 import UKIcon from "@tcsw/uikit-solid/src/components/icon/UKIcon.tsx";
 import trpc from "../../../lib/trpc.ts";
 import { ViewContext } from "../ViewContext.ts";
-import GridItemRename from "./GridItemRename";
 
-const GridItem: Component<{
+const ListItem: Component<{
     name: string;
     path: string;
     type: "file" | "directory";
@@ -21,6 +20,7 @@ const GridItem: Component<{
     return (
         <div
             class={styles.root}
+            data-multiple-of-two={props.index % 2 === 0}
             data-selected={viewCtx?.selectedItems().includes(props.path)}
             onDblClick={async () => {
                 if (props.type === "directory") {
@@ -97,12 +97,13 @@ const GridItem: Component<{
                 <UKIcon class={styles.icon}>folder</UKIcon>
             )}
             {viewCtx?.renameEntry() === props.path ? (
-                <GridItemRename
+                <>{"rename?"}</>
+            ) : (
+                /*<GridItemRename
                     path={props.path}
                     name={props.name}
                     refetchGrid={props.refetchGrid}
-                />
-            ) : (
+                />*/
                 <UKText align="center" role="label" size="m">
                     {props.name}
                 </UKText>
@@ -111,4 +112,4 @@ const GridItem: Component<{
     );
 };
 
-export default GridItem;
+export default ListItem;

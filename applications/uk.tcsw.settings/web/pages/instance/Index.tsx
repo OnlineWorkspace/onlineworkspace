@@ -3,14 +3,32 @@ import styles from "./Index.module.scss";
 import Users from "./components/Users/Users";
 import InstalledApplications from "./components/InstalledApplications/InstalledApplications";
 import FeatureFlags from "./components/FeatureFlags/FeatureFlags";
+import UKTopAppBar from "@tcsw/uikit-solid/src/components/topAppBar/UKTopAppBar.jsx";
+import { useNavigate } from "@solidjs/router";
 
 const InstancePage: Component = () => {
+    const navigate = useNavigate();
+
     return (
-        <div class={styles.root}>
-            <Users />
-            <InstalledApplications />
-            <FeatureFlags />
-        </div>
+        <>
+            <UKTopAppBar
+                type="small"
+                headline={"Configure Instance"}
+                subtitle={"Caution: Advanced users only, change at your own risk."}
+                leadingButton={{
+                    icon: "chevron_left",
+                    onClick() {
+                        navigate("/app/uk.tcsw.settings");
+                    },
+                    accessibleLabel: "Go back",
+                }}
+            />
+            <div class={styles.root}>
+                <Users />
+                <InstalledApplications />
+                <FeatureFlags />
+            </div>
+        </>
     );
 };
 

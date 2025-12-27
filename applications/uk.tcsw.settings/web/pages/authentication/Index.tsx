@@ -7,18 +7,35 @@ import MethodTwoFactor from "./components/MethodTwoFactor/MethodTwoFactor";
 import MethodPasskey from "./components/MethodPasskey/MethodPasskey";
 import Sessions from "./components/Sessions/Sessions";
 import UKIndeterminateSpinner from "@tcsw/uikit-solid/src/components/indeterminateSpinner/UKIndeterminateSpinner.jsx";
+import UKTopAppBar from "@tcsw/uikit-solid/src/components/topAppBar/UKTopAppBar.jsx";
+import { useNavigate } from "@solidjs/router";
 
 const AuthenticationPage: Component = () => {
+    const navigate = useNavigate();
+
     return (
-        <Suspense fallback={<UKIndeterminateSpinner class={styles.spinner} />}>
+        <>
+            <UKTopAppBar
+                type="small"
+                headline={"Authentication"}
+                leadingButton={{
+                    icon: "chevron_left",
+                    onClick() {
+                        navigate("/app/uk.tcsw.settings");
+                    },
+                    accessibleLabel: "Go back",
+                }}
+            />
             <div class={styles.root}>
                 <UKText class={styles.subheading} role="title" size="m" align="start">
                     Login methods
                 </UKText>
                 <UKStack>
-                    <MethodPassword />
-                    <MethodTwoFactor />
-                    <MethodPasskey />
+                    <Suspense fallback={<UKIndeterminateSpinner class={styles.spinner} />}>
+                        <MethodPassword />
+                        <MethodTwoFactor />
+                        <MethodPasskey />
+                    </Suspense>
                 </UKStack>
                 <UKText class={styles.subheading} role="title" size="m" align="start">
                     Logged in devices
@@ -27,7 +44,7 @@ const AuthenticationPage: Component = () => {
                     <Sessions />
                 </UKStack>
             </div>
-        </Suspense>
+        </>
     );
 };
 

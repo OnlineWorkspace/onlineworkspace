@@ -1,0 +1,30 @@
+.root {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 1rem;
+    width: 100%;
+    height: max-content;
+    min-height: 100%;
+    -webkit-user-drag: none;
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+
+    &:has(> .errorMessage) {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+    }
+}
+
+.errorMessage {
+    --icon-size: 5rem;
+    gap: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}

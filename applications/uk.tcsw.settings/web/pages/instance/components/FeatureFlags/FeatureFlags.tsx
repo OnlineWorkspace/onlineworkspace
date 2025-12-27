@@ -1,5 +1,5 @@
 import UKText from "@tcsw/uikit-solid/src/components/text/UKText.jsx";
-import { createResource, For, Suspense, type Component } from "solid-js";
+import { createResource, createSignal, For, Suspense, type Component } from "solid-js";
 import instanceStyles from "./../../Index.module.scss";
 import trpc from "../../../../lib/trpc";
 import UKStack from "@tcsw/uikit-solid/src/components/stack/UKStack.jsx";
@@ -8,7 +8,7 @@ import UKSwitch from "@tcsw/uikit-solid/src/components/switch/UKSwitch.jsx";
 import styles from "./FeatureFlags.module.scss";
 
 const FeatureFlags: Component = () => {
-    const [features, { refetch: refetchFeatures }] = createResource(() =>
+    const [features, { refetch: refetchFeatures, mutate: mutateFeatures }] = createResource(() =>
         trpc.instance.getFeatures.query(),
     );
 
@@ -34,7 +34,19 @@ const FeatureFlags: Component = () => {
                                                     id: feature.id,
                                                     value: val,
                                                 });
-                                                refetchFeatures();
+                                                mutateFeatures((feats) =>
+                                                    feats !== undefined
+                                                        ? feats.map((f) => {
+                                                              if (f.id === feature.id)
+                                                                  return {
+                                                                      ...f,
+                                                                      enabled: val,
+                                                                  };
+
+                                                              return f;
+                                                          })
+                                                        : undefined,
+                                                );
                                             }}
                                         />
                                     }

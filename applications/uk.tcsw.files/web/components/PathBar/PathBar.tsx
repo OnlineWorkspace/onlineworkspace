@@ -1,12 +1,14 @@
-import { type Component, createSignal, For } from "solid-js";
+import { type Component, createSignal, For, useContext } from "solid-js";
 import styles from "./PathBar.module.scss";
 import UKText from "@tcsw/uikit-solid/src/components/text/UKText.tsx";
 import path from "path-browserify";
 import { useNavigate, useParams } from "@solidjs/router";
 import UKIconButton from "@tcsw/uikit-solid/src/components/iconButton/UKIconButton.tsx";
 import UKTextField from "@tcsw/uikit-solid/src/components/textField/UKTextField.tsx";
+import { ViewContext } from "../ViewContainer/ViewContext";
 
 const PathBar: Component = () => {
+    const viewCtx = useContext(ViewContext);
     const navigate = useNavigate();
     let params = useParams<{ currentPath: string }>();
     const [showTextField, setShowTextField] = createSignal();
@@ -43,6 +45,16 @@ const PathBar: Component = () => {
                 icon={"house"}
                 width="default"
             />
+            <UKIconButton
+                onClick={() => {
+                    viewCtx?.setViewType(viewCtx.viewType() === "grid" ? "list" : "grid");
+                }}
+                size={"xs"}
+                color={"standard"}
+                alt={"Change view"}
+                icon={"grid_view"}
+                width="default"
+            />
             {showTextField() ? (
                 <div class={styles.textField}>
                     <UKTextField
@@ -61,7 +73,12 @@ const PathBar: Component = () => {
                     <div class={styles.segmentContainer} onDblClick={() => setShowTextField(true)}>
                         <For each={`/${params.currentPath || ""}`.split("/")}>
                             {(segment, index) => {
-                                if (index() === `/${params.currentPath || ""}`.split("/").length - 1 && segment === "") return null;
+                                if (
+                                    index() ===
+                                        `/${params.currentPath || ""}`.split("/").length - 1 &&
+                                    segment === ""
+                                )
+                                    return null;
 
                                 return (
                                     <>
@@ -69,7 +86,9 @@ const PathBar: Component = () => {
                                             onClick={(e) => {
                                                 e.stopPropagation();
 
-                                                let split = `/${params.currentPath || ""}`.split("/");
+                                                let split = `/${params.currentPath || ""}`.split(
+                                                    "/",
+                                                );
                                                 let output = "/";
 
                                                 for (let i = 0; i < index() + 1; i++) {
@@ -83,9 +102,9 @@ const PathBar: Component = () => {
                                             size={"l"}
                                         >
                                             {segment !== "" ? <span>{segment}</span> : null}
-                                            {index() !== `/${params.currentPath || ""}`.split("/").length - 1 && (
-                                                <span class={styles.slash}>/</span>
-                                            )}
+                                            {index() !==
+                                                `/${params.currentPath || ""}`.split("/").length -
+                                                    1 && <span class={styles.slash}>/</span>}
                                         </UKText>
                                     </>
                                 );

@@ -9,4 +9,6 @@ export const ViewContext = createContext<{
     setViewItems(items: string[]): void;
     renameEntry: Accessor<string | undefined>;
     setRenameEntry(path: string | undefined): void;
+    viewType: Accessor<"grid" | "list">;
+    setViewType(viewType: "grid" | "list"): void;
 }>();
