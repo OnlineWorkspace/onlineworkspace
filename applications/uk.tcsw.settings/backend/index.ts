@@ -135,7 +135,7 @@ const router = t.router({
 
             if (!userPath) return false;
 
-            let filePath = path.join(userPath, "systems/temp/avatar");
+            let filePath = path.join(userPath, "system/temp/avatar");
 
             await fs.writeFile(filePath, data);
 
@@ -473,9 +473,9 @@ const router = t.router({
             .input(z.object({ id: z.string(), value: z.boolean() }))
             .mutation(async (opt) => {
                 if (opt.input.value) {
-                    instance.sys.configuration.enableFeature(opt.input.id);
+                    await instance.sys.configuration.enableFeature(opt.input.id);
                 } else {
-                    instance.sys.configuration.disableFeature(opt.input.id);
+                    await instance.sys.configuration.disableFeature(opt.input.id);
                 }
 
                 return true;
@@ -672,7 +672,7 @@ const router = t.router({
                     const options = {
                         fit: opt.input.fit,
                         position: opt.input.position,
-                        background: opt.input.background || "#ff0",
+                        background: opt.input.background || "#0000",
                     };
 
                     await fs.writeFile(

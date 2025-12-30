@@ -105,6 +105,7 @@ export const adminProcedure = procedure.use(async (opt) => {
     return opt.next();
 });
 
+let temporaryTwoFactorSecrets: Map<number, string> = new Map();
 let emailSignupVerificationCodes: Map<string, string> = new Map();
 let notifications: WorkspacesNotification[] = [];
 
@@ -277,6 +278,43 @@ export const workspacesRouter = t.router({
                     sessionToken: session,
                 };
             }),
+        confirmTwoFactor: procedure
+            .input(z.object({ twoFactorCode: z.string() }))
+            .mutation(async (opt) => {
+                const user = await opt.ctx.user();
+                const secretString = temporaryTwoFactorSecrets.get(user.userId);
+
+                if (secretString === undefined) {
+                    opt.ctx.instance.log.system.warning(
+                        `(${user.userId})${await user.getUsername()} Tried to confirm a two factor code, but they lacked a temporary secret?`,
+                    );
+
+                    return false;
+                }
+
+                let totp = new OTPAuth.TOTP({
+                    issuer: opt.ctx.rawRequest.destinationHostname,
+                    label: `${opt.ctx.instance.sys.configuration.displayName} (Tricolor Workspaces)`,
+                    algorithm: "SHA1",
+                    digits: 6,
+                    secret: secretString,
+                });
+
+                if (totp.validate({ token: opt.input.twoFactorCode }) !== null) {
+                    temporaryTwoFactorSecrets.delete(user.userId);
+                    await opt.ctx.instance.sys.authorization.setTwoFactorAuthenticationSecret(
+                        user.userId,
+                        secretString,
+                    );
+                    opt.ctx.instance.log.system.success(
+                        `(${user.userId})${await user.getUsername()} Setup two-factor authentication on their account!`,
+                    );
+
+                    return true;
+                }
+
+                return false;
+            }),
         enableTwoFactor: procedure
             .output(
                 z
@@ -305,11 +343,11 @@ export const workspacesRouter = t.router({
                 }
 
                 let secretString = generateSecretString();
+                let prevSecretString = temporaryTwoFactorSecrets.get(user.userId);
 
-                await opt.ctx.instance.sys.authorization.setTwoFactorAuthenticationSecret(
-                    user.userId,
-                    secretString,
-                );
+                if (prevSecretString) {
+                    secretString = prevSecretString;
+                }
 
                 let totp = new OTPAuth.TOTP({
                     issuer: opt.ctx.rawRequest.destinationHostname,
@@ -318,6 +356,8 @@ export const workspacesRouter = t.router({
                     digits: 6,
                     secret: secretString,
                 });
+
+                temporaryTwoFactorSecrets.set(user.userId, secretString);
 
                 return {
                     twoFactorSecretURI: totp.toString(),
@@ -415,27 +455,35 @@ export const workspacesRouter = t.router({
         }),
     },
     termsOfUse: publicProcedure.query(async (opt) => {
-        return `Terms of Use: ${opt.ctx.instance.sys.configuration.displayName}
-Effective Date: December 29, 2025
+        const date = new Date(opt.ctx.instance.sys.configuration.termsOfUse.lastUpdated);
 
-1. Acceptance of Terms
-    - By logging in, you agree to these rules. If you do not agree, please do not use the service.
-2. Account Security
-    - You are the gatekeeper of your account. Keep your password private, as you are responsible for all activity that happens under your login.
-3. Content Ownership
-    - What is yours remains yours. We claim no ownership over the files, photos, or data you upload to this instance.
-4. Acceptable Use
-    - Do not use this space for anything illegal, malicious, or harmful. This includes uploading malware or attempting to disrupt the service for others.
-5. Privacy and Access
-    - We value your privacy. We will not access your stored data unless it is strictly necessary for technical support or required by legal authorities.
-6. Storage and Maintenance
-    - While we strive for 100% uptime, this service is provided "as is." We may occasionally perform maintenance that results in temporary downtime.
-7. Personal Responsibility
-    - Hardware and software can fail. You agree to maintain your own external backups of any mission-critical data. We are not liable for data loss.
-8. Termination
-    - We reserve the right to suspend or close accounts that violate these terms or compromise the security of the server.
-9. Policy Updates
-    - These terms may change. If we make significant updates, we will post a notification within the app or send an email.`;
+        const localeDateString: string = date.toLocaleDateString("en-GB", {
+            day: "numeric",
+            month: "long",
+            year: "numeric",
+        });
+
+        const getOrdinalSuffix = (day: number): string => {
+            if (day > 3 && day < 21) return "th";
+            switch (day % 10) {
+                case 1:
+                    return "st";
+                case 2:
+                    return "nd";
+                case 3:
+                    return "rd";
+                default:
+                    return "th";
+            }
+        };
+
+        const day: number = date.getDate();
+        const formattedDate: string = `${day}${getOrdinalSuffix(day)} ${localeDateString.split(" ")[1]}, ${localeDateString.split(" ")[2]}`;
+
+        return `Terms of Use: ${opt.ctx.instance.sys.configuration.displayName}
+Effective Date: ${formattedDate}
+
+${opt.ctx.instance.sys.configuration.termsOfUse.message}`;
     }),
     app: {
         navigation: {

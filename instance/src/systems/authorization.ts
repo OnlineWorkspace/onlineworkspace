@@ -177,10 +177,10 @@ export default class AuthorizationSystem extends System {
             await db`SELECT hashed_password FROM tricolor_workspaces.public.users WHERE id = ${userId}`
         )?.[0]?.hashed_password;
 
-        return typeof hashedPassword === "string";
+        return hashedPassword !== null;
     }
 
-    // Sets a user's two factor authentication secret
+    // Sets a user's two-factor authentication secret
     // @returns {true} successful
     // @returns {false} failed
     async setTwoFactorAuthenticationSecret(userId: number, secret: string) {
@@ -199,7 +199,7 @@ export default class AuthorizationSystem extends System {
         return true;
     }
 
-    // Returns whether a user has a two factor authentication secret or not
+    // Returns whether a user has a two-factor authentication secret or not
     // @returns {true} if they have a factor authentication secret
     // @returns {false} if they lack a factor authentication secret
     async hasTwoFactorAuthenticationSecret(userId: number) {
@@ -209,11 +209,11 @@ export default class AuthorizationSystem extends System {
             return false;
         }
 
-        let hashedPassword = (
+        let twoFactorSecret = (
             await db`SELECT two_factor_secret FROM tricolor_workspaces.public.users WHERE id = ${userId}`
         )?.[0]?.hashed_password;
 
-        return typeof hashedPassword === "string";
+        return twoFactorSecret !== null;
     }
 
     async startup() {

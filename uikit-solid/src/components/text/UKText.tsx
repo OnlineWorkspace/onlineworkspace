@@ -12,6 +12,7 @@ const UKText: Component<
         href?: string;
         onClick?: (e: MouseEvent) => void;
         onDoubleClick?: (e: MouseEvent) => void;
+        retainTextFormatting?: boolean;
     }>
 > = (props) => {
     return (
@@ -25,6 +26,7 @@ const UKText: Component<
                     data-role={props.role || "body"}
                     data-emphasized={props.emphasized || false}
                     data-align={props.align || "start"}
+                    data-retain-text-format={props.retainTextFormatting}
                     href={props.href}
                 >
                     {props.children}
@@ -39,6 +41,7 @@ const UKText: Component<
                     data-role={props.role || "body"}
                     data-emphasized={props.emphasized || false}
                     data-align={props.align || "start"}
+                    data-retain-text-format={props.retainTextFormatting}
                 >
                     {props.children}
                 </div>

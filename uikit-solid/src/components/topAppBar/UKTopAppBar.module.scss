@@ -5,7 +5,7 @@
     height: max-content;
     min-height: var(--top-bar-size);
     flex-shrink: 0;
-    z-index: 1;
+    z-index: 10;
 
     .topAppBar {
         position: absolute;

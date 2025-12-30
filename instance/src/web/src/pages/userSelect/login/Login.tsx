@@ -1,4 +1,4 @@
-import {type Component, createEffect, createSignal} from "solid-js";
+import { type Component, createEffect, createSignal } from "solid-js";
 import UKCard from "@tcsw/uikit-solid/src/components/card/UKCard.tsx";
 import UKButton from "@tcsw/uikit-solid/src/components/button/UKButton.tsx";
 import UKDivider from "@tcsw/uikit-solid/src/components/divider/UKDivider.tsx";
@@ -13,13 +13,13 @@ const UserSelectPage: Component = () => {
     const navigate = useNavigate();
 
     const [username, setUsername] = createSignal("");
-    const [ password, setPassword ] = createSignal("");
+    const [password, setPassword] = createSignal("");
 
     createEffect(async () => {
         if ((await trpc.authorization.isAuthenticated.query()).authenticated) {
-            navigate("/app")
+            navigate("/app");
         }
-    })
+    });
 
     return (
         <UKCard color={"filled"} class={styles.modal}>
@@ -28,8 +28,19 @@ const UserSelectPage: Component = () => {
             </UKText>
             <UKDivider direction={DividerDirection.horizontal} />
             <form>
-                <UKTextField color={"outlined"} label={"Username"} getValue={setUsername} autocomplete="username" />
-                <UKTextField shouldMask={true} color={"outlined"} label={"Password"} autocomplete="password" getValue={setPassword} />
+                <UKTextField
+                    color={"outlined"}
+                    label={"Username"}
+                    getValue={setUsername}
+                    autocomplete="username"
+                />
+                <UKTextField
+                    shouldMask={true}
+                    color={"outlined"}
+                    label={"Password"}
+                    autocomplete="password"
+                    getValue={setPassword}
+                />
                 <div class={styles.loginButtons}>
                     <UKButton onClick={() => 0} disabled={username() === ""} color={"standard"}>
                         Forgot password?
@@ -55,6 +66,19 @@ const UserSelectPage: Component = () => {
                     </UKButton>
                 </div>
             </form>
+            <UKDivider direction={DividerDirection.horizontal} />
+            {/* TODO: implement security key as a login method */}
+            <UKButton
+                class={styles.alternateLoginMethod}
+                leadingIcon={"key"}
+                color={"tonal"}
+                disabled={true}
+                onClick={() => {
+                    return 0;
+                }}
+            >
+                Use Security Key
+            </UKButton>
             <UKDivider direction={DividerDirection.horizontal} />
             <div class={styles.signupSegment}>
                 <UKText role={"body"} size={"m"}>

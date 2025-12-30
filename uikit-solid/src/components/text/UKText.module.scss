@@ -1,7 +1,9 @@
 .root {
     color: unset;
 
-    white-space: pre;
+    &[data-retain-text-format="true"] {
+        white-space: pre;
+    }
 
     &[data-role="display"] {
         &[data-size="s"] {

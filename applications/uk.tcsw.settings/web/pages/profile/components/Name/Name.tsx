@@ -5,8 +5,10 @@ import UKTextField from "@tcsw/uikit-solid/src/components/textField/UKTextField.
 import styles from "./Name.module.scss";
 import UKButton from "@tcsw/uikit-solid/src/components/button/UKButton.jsx";
 
-const Name: Component = () => {
-    const [name, { mutate: setName, refetch: refetchName }] = createResource(() => trpc.profile.getName.query());
+const Name: Component<{ refetchName(): void }> = (props) => {
+    const [name, { mutate: setName, refetch: refetchName }] = createResource(() =>
+        trpc.profile.getName.query(),
+    );
 
     return (
         <UKStackItem
@@ -21,13 +23,19 @@ const Name: Component = () => {
             }}
             expandedComponent={
                 <div class={styles.expanded}>
-                    <UKTextField color="outlined" getValue={setName} defaultValue={name()} label="Name" />
+                    <UKTextField
+                        color="outlined"
+                        getValue={setName}
+                        defaultValue={name()}
+                        label="Name"
+                    />
                     <UKButton
                         class={styles.button}
                         onClick={async () => {
                             await trpc.profile.setName.mutate(name() || "");
 
                             refetchName();
+                            props.refetchName();
                         }}
                     >
                         Save

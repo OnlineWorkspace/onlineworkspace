@@ -25,7 +25,7 @@ const TermsOfUse: Component<{
                     Terms Of Use
                 </UKText>
                 <UKDivider direction={"horizontal"} />
-                <UKText role={"body"} size={"m"}>
+                <UKText retainTextFormatting role={"body"} size={"m"}>
                     {termsOfUse()}
                 </UKText>
                 <UKDivider direction={"horizontal"} />

@@ -1,7 +1,8 @@
 .root {
     display: flex;
     flex-direction: row;
-    width: 512px;
+    max-width: 512px;
+    width: 100%;
     aspect-ratio: 16 / 9;
     background: rgb(var(--uk-sys-color-surface-container-highest));
     position: relative;
@@ -13,10 +14,11 @@
 
 .wallpaper {
     position: absolute;
-    width: calc(100% - 0.5rem);
+    width: calc(100% - calc(0.5rem + 48px));
     height: calc(100% - 0.5rem);
+    margin-left: 48px;
     z-index: -1;
-    border-radius: calc(var(--uk-sys-shape-corner-large) - 0.25rem);
+    border-radius: 0 calc(var(--uk-sys-shape-corner-large) - 0.25rem) calc(var(--uk-sys-shape-corner-large) - 0.25rem) 0;
     animation: fadeIn forwards 0.25s var(--uk-sys-motion-easing-standard-decelerate);
 
     @keyframes fadeIn {

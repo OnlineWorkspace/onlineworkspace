@@ -2,10 +2,8 @@
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
-    width: calc(100% - 2rem);
+    width: 100%;
     max-width: 64rem;
-    margin-left: 1rem;
-    margin-right: 1rem;
 }
 
 .bar {

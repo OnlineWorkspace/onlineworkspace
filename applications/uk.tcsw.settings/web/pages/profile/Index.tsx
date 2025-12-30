@@ -15,9 +15,11 @@ import { useNavigate } from "@solidjs/router";
 
 const ProfilePage: Component = () => {
     const navigate = useNavigate();
-    const [name] = createResource(() => trpc.profile.getName.query());
+    const [name, { refetch: refetchName }] = createResource(() => trpc.profile.getName.query());
     const [role] = createResource(() => trpc.profile.getRole.query());
-    const [avatar] = createResource(() => trpc.profile.getProfilePicture.query());
+    const [avatar, { refetch: refetchAvatar }] = createResource(() =>
+        trpc.profile.getProfilePicture.query(),
+    );
 
     return (
         <>
@@ -36,7 +38,11 @@ const ProfilePage: Component = () => {
                 <div class={styles.header}>
                     <UKAvatar
                         username="username"
-                        avatar={avatar() || "/assets/placeholder/avatar.png"}
+                        avatar={
+                            avatar()
+                                ? `${avatar()}?t=${Date.now()}`
+                                : "/assets/placeholder/avatar.png"
+                        }
                         size="l"
                     />
                     <div>
@@ -52,9 +58,9 @@ const ProfilePage: Component = () => {
                     Basic info
                 </UKText>
                 <UKStack>
-                    <ProfilePicture />
+                    <ProfilePicture refetchAvatar={refetchAvatar} />
                     <Username />
-                    <Name />
+                    <Name refetchName={refetchName} />
                     <Gender />
                     <Bio />
                 </UKStack>

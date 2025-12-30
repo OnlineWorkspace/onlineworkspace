@@ -35,7 +35,7 @@
         z-index: 1;
         interpolate-size: allow-keywords;
         transform-origin: top;
-        animation: fadeSlideIn var(--uk-sys-motion-duration-500)
+        animation: fadeSlideIn var(--uk-sys-motion-duration-250)
             var(--uk-sys-motion-easing-emphasized-decelerate) forwards;
 
         @keyframes fadeSlideIn {

@@ -42,6 +42,7 @@ export default class ConfigurationSystem extends System {
             pass: string;
         };
     };
+    termsOfUse: { message: string; lastUpdated: number };
 
     constructor(instance: Instance) {
         super("configuration", instance);
@@ -71,6 +72,27 @@ export default class ConfigurationSystem extends System {
                 user: "user",
                 pass: "password",
             },
+        };
+        this.termsOfUse = {
+            message: `1. Acceptance of Terms
+    - By logging in, you agree to these rules. If you do not agree, please do not use the service.
+2. Account Security
+    - You are the gatekeeper of your account. Keep your password private, as you are responsible for all activity that happens under your login.
+3. Content Ownership
+    - What is yours remains yours. We claim no ownership over the files, photos, or data you upload to this instance.
+4. Acceptable Use
+    - Do not use this space for anything illegal, malicious, or harmful. This includes uploading malware or attempting to disrupt the service for others.
+5. Privacy and Access
+    - We value your privacy. We will not access your stored data unless it is strictly necessary for technical support or required by legal authorities.
+6. Storage and Maintenance
+    - While we strive for 100% uptime, this service is provided "as is." We may occasionally perform maintenance that results in temporary downtime.
+7. Personal Responsibility
+    - Hardware and software can fail. You agree to maintain your own external backups of any mission-critical data. We are not liable for data loss.
+8. Termination
+    - We reserve the right to suspend or close accounts that violate these terms or compromise the security of the server.
+9. Policy Updates
+    - These terms may change. If we make significant updates, we will post a notification within the app or send an email.`,
+            lastUpdated: Date.now(),
         };
 
         return this;
@@ -113,6 +135,7 @@ export default class ConfigurationSystem extends System {
                     signupRequirements: this.signupRequirements,
                     displayName: this.displayName,
                     mailserver: this.mailserver,
+                    termsOfUse: this.termsOfUse,
                 },
                 null,
                 2,
@@ -145,6 +168,7 @@ export default class ConfigurationSystem extends System {
             this.signupRequirements = configurationFile.signupRequirements;
         if (configurationFile.displayName) this.displayName = configurationFile.displayName;
         if (configurationFile.mailserver) this.mailserver = configurationFile.mailserver;
+        if (configurationFile.termsOfUse) this.termsOfUse = configurationFile.termsOfUse;
 
         for (const feature of Object.keys(WorkspacesFeatureFlags)) {
             this.log.info(

@@ -5,8 +5,11 @@ import { createFileUploader } from "@solid-primitives/upload";
 import styles from "./CropImage.module.scss";
 import trpc from "../../../../../../lib/trpc.ts";
 
-const CropImage: Component = () => {
-    const { selectFiles, files, clearFiles } = createFileUploader({ accept: "image/*", multiple: false });
+const CropImage: Component<{ refetchAvatar(): void }> = (props) => {
+    const { selectFiles, files, clearFiles } = createFileUploader({
+        accept: "image/*",
+        multiple: false,
+    });
 
     const cropperContainer: HTMLDivElement = (<div class={styles.cropper}></div>) as HTMLDivElement;
 
@@ -54,8 +57,8 @@ const CropImage: Component = () => {
                     <UKButton
                         color="tonal"
                         onClick={async () => {
-                            clearFiles()
-                            cropper?.destroy()
+                            clearFiles();
+                            cropper?.destroy();
                         }}
                     >
                         Cancel
@@ -69,7 +72,9 @@ const CropImage: Component = () => {
                                 canvas.toBlob(async (c) => {
                                     if (c) {
                                         await trpc.profile.setProfilePicture.mutate(c);
-                                        window.location.reload();
+                                        props.refetchAvatar();
+                                        clearFiles();
+                                        cropper?.destroy();
                                     }
                                 });
                         }}

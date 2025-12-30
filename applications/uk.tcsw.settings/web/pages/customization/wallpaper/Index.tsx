@@ -84,7 +84,7 @@ const WallpaperPage: Component = () => {
         await trpc.customization.wallpaper.setOptions.mutate({
             fit: wallpaperFit() || "cover",
             position: position,
-            background: "#333",
+            background: "#0000",
         });
 
         refetchCurrentWallpaper();
