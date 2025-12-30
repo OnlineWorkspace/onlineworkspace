@@ -1,4 +1,4 @@
-# Copyright © 2025 Tricolor Software
+# Copyright © 2026 Tricolor Software
 
 Licensed under the MIT License
 

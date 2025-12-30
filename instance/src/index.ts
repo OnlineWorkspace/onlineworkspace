@@ -71,7 +71,7 @@ class Instance {
             `   ${chalk.hex("FF002E")(/XXX/)}${chalk.hex("70FF00")(/XXX/)}${chalk.hex("0066FF")(/XXX/)}`,
         );
         this.log.system.info(
-            `  ${chalk.hex("FF002E")(/XXX/)}${chalk.hex("70FF00")(/XXX/)}${chalk.hex("0066FF")(/XXX/)}  Workspaces © 2025 Tricolor Software -> https://tcsw.uk`,
+            `  ${chalk.hex("FF002E")(/XXX/)}${chalk.hex("70FF00")(/XXX/)}${chalk.hex("0066FF")(/XXX/)}  Workspaces © 2026 Tricolor Software -> https://tcsw.uk`,
         );
         this.log.system.info(
             ` ${chalk.hex("FF002E")(/XXX/)}${chalk.hex("70FF00")(/XXX/)}${chalk.hex("0066FF")(/XXX/)}`,
@@ -102,6 +102,30 @@ class Instance {
         this.webServer = Bun.serve(
             this.sys.tRPC.serve({
                 routes: {
+                    "/api/instance/login/banner": {
+                        GET: async (req: BunRequest) => {
+                            return new Response(
+                                file(
+                                    path.join(
+                                        self.sys.filesystem.FS_ROOT,
+                                        "assets/login/banner.png",
+                                    ),
+                                ),
+                            );
+                        },
+                    },
+                    "/api/instance/login/background": {
+                        GET: async (req: BunRequest) => {
+                            return new Response(
+                                file(
+                                    path.join(
+                                        self.sys.filesystem.FS_ROOT,
+                                        "assets/login/background.png",
+                                    ),
+                                ),
+                            );
+                        },
+                    },
                     "/api/user/me/avatar/:size": {
                         GET: async (req: BunRequest) => {
                             const size = (req.params as { size: string }).size;

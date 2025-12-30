@@ -24,6 +24,24 @@ export default class FilesystemSystem extends System {
         }
         fs.mkdirSync(this.CACHE_PATH, { recursive: true });
 
+        if (!fs.existsSync(path.join(this.FS_ROOT, "assets/login"))) {
+            fs.mkdirSync(path.join(this.FS_ROOT, "assets/login"), { recursive: true });
+        }
+
+        if (!fs.existsSync(path.join(this.FS_ROOT, "assets/login/banner.png"))) {
+            fs.cpSync(
+                path.join(this.SRC_ROOT, "assets/placeholder/banner.png"),
+                path.join(this.FS_ROOT, "assets/login/banner.png"),
+            );
+        }
+
+        if (!fs.existsSync(path.join(this.FS_ROOT, "assets/login/background.png"))) {
+            fs.cpSync(
+                path.join(this.SRC_ROOT, "assets/wallpapers/stars_wallpaper.png"),
+                path.join(this.FS_ROOT, "assets/login/background.png"),
+            );
+        }
+
         this._internalAssets = new Map();
         this._internalAssetPaths = new Map();
 

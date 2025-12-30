@@ -1,5 +1,6 @@
 import { createTRPCClient, httpBatchLink } from "@trpc/client";
 import type { WorkspacesTRPCRouter } from "../../../systems/trpcRouter";
+import backend from "./backend";
 
 const trpc = createTRPCClient<WorkspacesTRPCRouter>({
     links: [
@@ -15,7 +16,7 @@ const trpc = createTRPCClient<WorkspacesTRPCRouter>({
         //     }),
         //     false:
         httpBatchLink({
-            url: "http://localhost:3563/instance/workspaces/trpc",
+            url: backend("/instance/workspaces/trpc"),
             fetch(input, init) {
                 return fetch(input, { credentials: "include", ...init });
             },

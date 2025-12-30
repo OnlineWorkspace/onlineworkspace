@@ -225,7 +225,7 @@ class Logger {
 
         process.stdout.cursorTo(0, this._internal_getWindowSize()[1], () => {
             process.stdout.write(
-                `Workspaces Pre-Alpha ${this.log.instance.sys.configuration?.isDevMode ? `[${this.emphasis("Dev Mode")}] ` : ""}`,
+                `Workspaces Alpha ${this.log.instance.sys.configuration?.isDevMode ? `[${this.emphasis("Dev Mode")}] ` : ""}`,
                 () => {
                     // move the cursor to the metaLen+6th column of the 2nd from the bottom row
                     process.stdout.cursorTo(
