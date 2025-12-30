@@ -1,12 +1,12 @@
 /// <reference path="./global.d.ts" />
 
-import { createTRPCContext, procedure } from "@tcsw/workspaces-instance/src/subsystems/trpcRouter";
+import { createTRPCContext, procedure } from "@tcsw/workspaces-instance/src/systems/trpcRouter";
 import { initTRPC } from "@trpc/server";
 import z from "zod";
 import ApplicationRepository from "./repository/applicationRepository";
 import LocalApplicationRepository from "./repository/localRepository";
-import { DEFAULT_APPLICATIONS } from "@tcsw/workspaces-instance/src/subsystems/applications";
-import { WorkspacesFeatureFlags } from "@tcsw/workspaces-instance/src/subsystems/configuration";
+import { DEFAULT_APPLICATIONS } from "@tcsw/workspaces-instance/src/systems/applications";
+import { WorkspacesFeatureFlags } from "@tcsw/workspaces-instance/src/systems/configuration";
 
 const log = instance.log.createLogger("uk.tcsw.store");
 
@@ -44,7 +44,7 @@ const router = t.router({
                 if (!app) return undefined;
 
                 if (app.bannerImage) {
-                    app.bannerImage = `${opt.ctx.rawRequest.destinationHostname}${await instance.subSystems.image.serveImage(opt.ctx.userId, app.bannerImage)}`;
+                    app.bannerImage = `${opt.ctx.rawRequest.destinationHostname}${await instance.sys.image.serveImage(opt.ctx.userId, app.bannerImage)}`;
                 }
 
                 return app;
@@ -72,7 +72,7 @@ const router = t.router({
             )
             .query(async (opt) => {
                 return {
-                    applications: instance.subSystems.applications.availableApplications
+                    applications: instance.sys.applications.availableApplications
                         .map((app) => {
                             if (!app.manifest) return undefined;
 
@@ -101,8 +101,8 @@ const router = t.router({
                             };
                         })
                         .filter((a) => a !== undefined),
-                    enabledApplications: instance.subSystems.applications.enabledApplications,
-                    cannotDisable: instance.subSystems.configuration.hasFeature(
+                    enabledApplications: instance.sys.applications.enabledApplications,
+                    cannotDisable: instance.sys.configuration.hasFeature(
                         WorkspacesFeatureFlags.ShootYourselfInTheFoot,
                     )
                         ? []
@@ -112,19 +112,18 @@ const router = t.router({
         setEnabledApplications: procedure
             .input(z.object({ enabledApplications: z.string().array() }))
             .mutation(async (opt) => {
-                const currentlyEnabledApplications =
-                    instance.subSystems.applications.enabledApplications;
+                const currentlyEnabledApplications = instance.sys.applications.enabledApplications;
 
                 for (const app of currentlyEnabledApplications) {
                     if (opt.input.enabledApplications.includes(app)) continue;
 
-                    await instance.subSystems.applications.disableApplication(app);
+                    await instance.sys.applications.disableApplication(app);
                 }
 
                 for (const app of opt.input.enabledApplications) {
                     if (currentlyEnabledApplications.includes(app)) continue;
 
-                    await instance.subSystems.applications.enableApplication(app);
+                    await instance.sys.applications.enableApplication(app);
                 }
 
                 return {
@@ -135,7 +134,7 @@ const router = t.router({
             .input(z.object({ applications: z.string().array() }))
             .mutation(async (opt) => {
                 for (const app of opt.input.applications) {
-                    await opt.ctx.instance.subSystems.applications.uninstallApplication(app);
+                    await opt.ctx.instance.sys.applications.uninstallApplication(app);
                 }
 
                 return {
@@ -176,7 +175,7 @@ const router = t.router({
                 if (!app) return undefined;
 
                 if (app.bannerImage) {
-                    app.bannerImage = `${opt.ctx.rawRequest.destinationHostname}${await instance.subSystems.image.serveImage(opt.ctx.userId, app.bannerImage)}`;
+                    app.bannerImage = `${opt.ctx.rawRequest.destinationHostname}${await instance.sys.image.serveImage(opt.ctx.userId, app.bannerImage)}`;
                 }
 
                 return app;
@@ -197,25 +196,24 @@ const router = t.router({
                 if (!app) return undefined;
 
                 if (app.icon.type === "image") {
-                    app.icon.value = `${opt.ctx.rawRequest.destinationHostname}${await instance.subSystems.image.serveImage(opt.ctx.userId, app.icon.value)}`;
+                    app.icon.value = `${opt.ctx.rawRequest.destinationHostname}${await instance.sys.image.serveImage(opt.ctx.userId, app.icon.value)}`;
                 }
 
                 if (app.bannerImage) {
-                    app.bannerImage = `${opt.ctx.rawRequest.destinationHostname}${await instance.subSystems.image.serveImage(opt.ctx.userId, app.bannerImage)}`;
+                    app.bannerImage = `${opt.ctx.rawRequest.destinationHostname}${await instance.sys.image.serveImage(opt.ctx.userId, app.bannerImage)}`;
                 }
 
                 return {
                     ...app,
                     isUserAdministrator: await (await opt.ctx.user())?.isAdministrator(),
                     canBeUninstalled: DEFAULT_APPLICATIONS.includes(app.id)
-                        ? instance.subSystems.configuration.hasFeature(
+                        ? instance.sys.configuration.hasFeature(
                               WorkspacesFeatureFlags.ShootYourselfInTheFoot,
                           )
                         : true,
-                    isInstalled:
-                        opt.ctx.instance.subSystems.applications.enabledApplications.includes(
-                            app.id,
-                        ),
+                    isInstalled: opt.ctx.instance.sys.applications.enabledApplications.includes(
+                        app.id,
+                    ),
                 };
             }),
         install: procedure
@@ -234,10 +232,10 @@ const router = t.router({
                 // the user must be administrator
                 if (!(await (await opt.ctx.user())?.isAdministrator())) return false;
 
-                await opt.ctx.instance.subSystems.applications.installApplication(
+                await opt.ctx.instance.sys.applications.installApplication(
                     await repository.getInstallPath(app.id),
                 );
-                await opt.ctx.instance.subSystems.applications.enableApplication(app.id);
+                await opt.ctx.instance.sys.applications.enableApplication(app.id);
 
                 return true;
             }),
@@ -249,7 +247,7 @@ const router = t.router({
                 // the application must not be protected if without ShootYourselfInTheFoot
                 if (DEFAULT_APPLICATIONS.includes(opt.input.applicationId)) {
                     if (
-                        !instance.subSystems.configuration.hasFeature(
+                        !instance.sys.configuration.hasFeature(
                             WorkspacesFeatureFlags.ShootYourselfInTheFoot,
                         )
                     ) {
@@ -257,10 +255,8 @@ const router = t.router({
                     }
                 }
 
-                await opt.ctx.instance.subSystems.applications.disableApplication(
-                    opt.input.applicationId,
-                );
-                await opt.ctx.instance.subSystems.applications.uninstallApplication(
+                await opt.ctx.instance.sys.applications.disableApplication(opt.input.applicationId);
+                await opt.ctx.instance.sys.applications.uninstallApplication(
                     opt.input.applicationId,
                 );
 
@@ -271,7 +267,7 @@ const router = t.router({
 
 export type TRPCRouter = typeof router;
 
-instance.subSystems.tRPC.registeredRouters.push({
+instance.sys.tRPC.registeredRouters.push({
     basePath: "/app/uk.tcsw.store",
     router: router,
     createContext: createTRPCContext(instance),

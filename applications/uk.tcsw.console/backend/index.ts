@@ -1,6 +1,6 @@
 /// <reference path="./global.d.ts" />
 
-import { createTRPCContext, procedure } from "@tcsw/workspaces-instance/src/subsystems/trpcRouter";
+import { createTRPCContext, procedure } from "@tcsw/workspaces-instance/src/systems/trpcRouter";
 import { initTRPC } from "@trpc/server";
 import chalk from "chalk";
 import EventEmitter, { on } from "node:events";
@@ -16,11 +16,15 @@ const router = t.router({
         // @ts-ignore
         .subscription(async function* (opt) {
             yield [`--------------------------------------------------------------------------`];
-            yield [`   ${chalk.hex("FF002E")(/XXX/)}${chalk.hex("70FF00")(/XXX/)}${chalk.hex("0066FF")(/XXX/)}`];
+            yield [
+                `   ${chalk.hex("FF002E")(/XXX/)}${chalk.hex("70FF00")(/XXX/)}${chalk.hex("0066FF")(/XXX/)}`,
+            ];
             yield [
                 `  ${chalk.hex("FF002E")(/XXX/)}${chalk.hex("70FF00")(/XXX/)}${chalk.hex("0066FF")(/XXX/)}  Workspaces © 2025 Tricolor Software -> https://tcsw.uk`,
             ];
-            yield [` ${chalk.hex("FF002E")(/XXX/)}${chalk.hex("70FF00")(/XXX/)}${chalk.hex("0066FF")(/XXX/)}`];
+            yield [
+                ` ${chalk.hex("FF002E")(/XXX/)}${chalk.hex("70FF00")(/XXX/)}${chalk.hex("0066FF")(/XXX/)}`,
+            ];
             yield [`--------------------------------------------------------------------------`];
             yield [`Connecting to the instance console...`];
 
@@ -32,7 +36,7 @@ const router = t.router({
 
 export type TRPCRouter = typeof router;
 
-instance.subSystems.tRPC.registeredRouters.push({
+instance.sys.tRPC.registeredRouters.push({
     basePath: "/app/uk.tcsw.console",
     router: router,
     createContext: createTRPCContext(instance),

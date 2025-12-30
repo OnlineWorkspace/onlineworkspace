@@ -1,28 +1,29 @@
-import type { SubSystems } from "./subSystems.js";
+import type { Sys } from "./system.js";
 import Log from "./log.js";
-import ConfigurationSubsystem from "./subsystems/configuration.js";
-import FilesystemSubsystem from "./subsystems/filesystem.js";
-import NotificationsSubsystem from "./subsystems/notifications.js";
-import UsersSubsystem from "./subsystems/users.js";
-import ConsoleCommandsSubsytem from "./subsystems/consoleCommands.js";
-import DatabaseSubsystem from "./subsystems/database.js";
-import AuthorizationSubsystem from "./subsystems/authorization.js";
+import ConfigurationSystem from "./systems/configuration.js";
+import FilesystemSystem from "./systems/filesystem.js";
+import NotificationsSystem from "./systems/notifications.js";
+import UsersSystem from "./systems/users.js";
+import ConsoleCommandsSystem from "./systems/consoleCommands.js";
+import DatabaseSystem from "./systems/database.js";
+import AuthorizationSystem from "./systems/authorization.js";
 // https://github.com/cah4a/trpc-bun-adapter/blob/main/src/createBunHttpHandler.ts TODO: patch this and merge into the instance package
 import type { BunWSClientCtx } from "trpc-bun-adapter";
 import type { AnyRouter } from "@trpc/server";
 import {
     createTRPCContext as createWorkspacesTRPCContext,
     workspacesRouter,
-} from "./subsystems/trpcRouter.js";
+} from "./systems/trpcRouter.js";
 import { type BunRequest, file } from "bun";
-import ApplicationsSubsystem from "./subsystems/applications.js";
+import ApplicationsSystem from "./systems/applications.js";
 import path from "path";
-import TRPCSubsystem from "./subsystems/trpc.js";
+import TRPCSystem from "./systems/trpc.js";
 import chalk from "chalk";
-import ImageSubsystem from "./subsystems/image.js";
-import SettingsSubsystem from "./subsystems/settings.js";
-import WebFrontendSubsystem from "./subsystems/webFrontend.js";
+import ImageSystem from "./systems/image.js";
+import SettingsSystem from "./systems/settings.js";
+import WebFrontendSystem from "./systems/webFrontend.js";
 import { promises as fs } from "fs";
+import EmailSystem from "./systems/email.js";
 
 export enum InstanceStatus {
     Online,
@@ -32,7 +33,7 @@ export enum InstanceStatus {
 }
 
 class Instance {
-    subSystems: SubSystems;
+    sys: Sys;
     log: Log;
     webServer!: Bun.Server<BunWSClientCtx<AnyRouter>>;
     status: InstanceStatus;
@@ -41,20 +42,21 @@ class Instance {
         this.log = new Log(this);
 
         // @ts-ignore Don't know, don't care
-        this.subSystems = {};
+        this.sys = {};
 
-        this.subSystems.filesystem = new FilesystemSubsystem(this);
-        this.subSystems.configuration = new ConfigurationSubsystem(this);
-        this.subSystems.notifications = new NotificationsSubsystem(this);
-        this.subSystems.consoleCommands = new ConsoleCommandsSubsytem(this);
-        this.subSystems.database = new DatabaseSubsystem(this);
-        this.subSystems.users = new UsersSubsystem(this);
-        this.subSystems.authorization = new AuthorizationSubsystem(this);
-        this.subSystems.applications = new ApplicationsSubsystem(this);
-        this.subSystems.tRPC = new TRPCSubsystem(this);
-        this.subSystems.image = new ImageSubsystem(this);
-        this.subSystems.settings = new SettingsSubsystem(this);
-        this.subSystems.webFrontend = new WebFrontendSubsystem(this);
+        this.sys.filesystem = new FilesystemSystem(this);
+        this.sys.configuration = new ConfigurationSystem(this);
+        this.sys.notifications = new NotificationsSystem(this);
+        this.sys.consoleCommands = new ConsoleCommandsSystem(this);
+        this.sys.database = new DatabaseSystem(this);
+        this.sys.users = new UsersSystem(this);
+        this.sys.authorization = new AuthorizationSystem(this);
+        this.sys.applications = new ApplicationsSystem(this);
+        this.sys.tRPC = new TRPCSystem(this);
+        this.sys.image = new ImageSystem(this);
+        this.sys.settings = new SettingsSystem(this);
+        this.sys.webFrontend = new WebFrontendSystem(this);
+        this.sys.email = new EmailSystem(this);
 
         this.status = InstanceStatus.Offline;
 
@@ -84,13 +86,13 @@ class Instance {
             return this;
         }
 
-        for (const sys of Object.values(this.subSystems)) {
+        for (const sys of Object.values(this.sys)) {
             let subSystemState = await sys.startup();
 
             if (subSystemState === true) {
-                sys.log.success(`${sys.id}: Startup Complete...`);
+                sys.log.success(`Startup Complete...`);
             } else {
-                sys.log.error(`${sys.id}: Startup Failed!`);
+                sys.log.error(`Startup Failed!`);
             }
         }
 
@@ -98,7 +100,7 @@ class Instance {
 
         // @ts-ignore
         this.webServer = Bun.serve(
-            this.subSystems.tRPC.serve({
+            this.sys.tRPC.serve({
                 routes: {
                     "/api/user/me/avatar/:size": {
                         GET: async (req: BunRequest) => {
@@ -115,7 +117,7 @@ class Instance {
 
                             const parsedCookie = Bun.Cookie.parse(cookieString);
 
-                            let userId = await self.subSystems.authorization.verifySession(
+                            let userId = await self.sys.authorization.verifySession(
                                 decodeURIComponent(parsedCookie.value),
                             );
 
@@ -138,7 +140,7 @@ class Instance {
                                     return new Response(
                                         file(
                                             path.join(
-                                                self.subSystems.filesystem.FS_ROOT,
+                                                self.sys.filesystem.FS_ROOT,
                                                 `users/${userId}/assets/avatar/xs.png`,
                                             ),
                                         ),
@@ -148,7 +150,7 @@ class Instance {
                             return new Response(
                                 file(
                                     path.join(
-                                        self.subSystems.filesystem.FS_ROOT,
+                                        self.sys.filesystem.FS_ROOT,
                                         `users/${userId}/assets/avatar/${size}.png`,
                                     ),
                                 ),
@@ -170,7 +172,7 @@ class Instance {
 
                             const parsedCookie = Bun.Cookie.parse(cookieString);
 
-                            let userId = await self.subSystems.authorization.verifySession(
+                            let userId = await self.sys.authorization.verifySession(
                                 decodeURIComponent(parsedCookie.value),
                             );
 
@@ -181,10 +183,9 @@ class Instance {
                                 });
                             }
 
-                            let application =
-                                this.subSystems.applications.availableApplications.find(
-                                    (a) => a.manifest?.id === app,
-                                );
+                            let application = this.sys.applications.availableApplications.find(
+                                (a) => a.manifest?.id === app,
+                            );
 
                             if (!application)
                                 return Response.json({
@@ -202,7 +203,7 @@ class Instance {
                     },
                     "/api/asset/image/:imageId/:resolution": {
                         GET: async (req: BunRequest) => {
-                            let image = this.subSystems.image._internalImages.get(
+                            let image = this.sys.image._internalImages.get(
                                 // @ts-ignore
                                 req.params["imageId"] as string,
                             );
@@ -223,7 +224,7 @@ class Instance {
 
                                 const parsedCookie = Bun.Cookie.parse(cookieString);
 
-                                let userId = await self.subSystems.authorization.verifySession(
+                                let userId = await self.sys.authorization.verifySession(
                                     decodeURIComponent(parsedCookie.value),
                                 );
 
@@ -248,7 +249,7 @@ class Instance {
                             }
 
                             if (resolutionParam === "raw") {
-                                this.subSystems.image.log.info(
+                                this.sys.image.log.info(
                                     `Served Image -> '${(req.params as { imageId: string })["imageId"]} @ ${resolutionParam}'`,
                                 );
                                 return new Response(file(sourceImage.path), {
@@ -262,13 +263,13 @@ class Instance {
                                 });
                             } else {
                                 const outputPath = path.join(
-                                    this.subSystems.filesystem.CACHE_PATH,
+                                    this.sys.filesystem.CACHE_PATH,
                                     sourceImage.path,
                                 );
 
                                 // FIXME!: IF THE IMAGE AT THE SOURCE PATH IS REPLACED WITH ANOTHER, IT WILL CONTINUE TO SEND THE OLD IMAGE
                                 if (await fs.exists(outputPath)) {
-                                    this.subSystems.image.log.info(
+                                    this.sys.image.log.info(
                                         `Served Image -> '${(req.params as { imageId: string })["imageId"]} @ ${resolutionParam}'`,
                                     );
                                     return new Response(file(outputPath), {
@@ -288,14 +289,14 @@ class Instance {
                                     });
                                 }
 
-                                await this.subSystems.image.resizeImage(
+                                await this.sys.image.resizeImage(
                                     sourceImage.path,
                                     outputPath,
                                     sourceImage.resize!.dimensions,
                                     sourceImage.resize!,
                                 );
 
-                                this.subSystems.image.log.info(
+                                this.sys.image.log.info(
                                     `Served Image -> '${(req.params as { imageId: string })["imageId"]} @ ${resolutionParam}'`,
                                 );
                                 return new Response(file(outputPath), {
@@ -312,7 +313,7 @@ class Instance {
                     },
                     "/api/asset/raw/:assetId": {
                         GET: async (req: BunRequest) => {
-                            let asset = this.subSystems.filesystem._internalAssets.get(
+                            let asset = this.sys.filesystem._internalAssets.get(
                                 // @ts-ignore
                                 req.params["assetId"] as string,
                             );
@@ -333,7 +334,7 @@ class Instance {
 
                                 const parsedCookie = Bun.Cookie.parse(cookieString);
 
-                                let userId = await self.subSystems.authorization.verifySession(
+                                let userId = await self.sys.authorization.verifySession(
                                     decodeURIComponent(parsedCookie.value),
                                 );
 
@@ -360,11 +361,11 @@ class Instance {
                     // will be executed if it's not a TRPC request
                     return new Response("Unknown path");
                 },
-                development: this.subSystems.configuration.isDevMode,
+                development: this.sys.configuration.isDevMode,
             }),
         );
 
-        this.subSystems.tRPC.registeredRouters.push({
+        this.sys.tRPC.registeredRouters.push({
             basePath: "/instance/workspaces/trpc",
             router: workspacesRouter,
             createContext: createWorkspacesTRPCContext(this),
@@ -385,8 +386,8 @@ class Instance {
     }
 
     async shutdown() {
-        this.subSystems.consoleCommands.currentCommandInterface.active = true;
-        this.subSystems.consoleCommands.currentCommandInterface.cb = () => 0;
+        this.sys.consoleCommands.currentCommandInterface.active = true;
+        this.sys.consoleCommands.currentCommandInterface.cb = () => 0;
         this.log.system.info("Shutting down...");
 
         if (!!process.stdout.cursorTo) {

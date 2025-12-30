@@ -1,6 +1,6 @@
 import { createEffect, createSignal, For, onCleanup, onMount, type Component } from "solid-js";
 import trpc from "../../../lib/trpc";
-import { type WorkspacesNotification } from "../../../../../subsystems/notifications";
+import { type WorkspacesNotification } from "../../../../../systems/notifications";
 import Notification from "./notification/Notification";
 import styles from "./NavigationRailNotifications.module.scss";
 import UKIconButton from "@tcsw/uikit-solid/src/components/iconButton/UKIconButton.jsx";
@@ -16,7 +16,9 @@ const NavigationRailNotifications: Component<{ expanded: boolean }> = (props) =>
     const navigate = useNavigate();
     const [toggled, setToggled] = createSignal<boolean>(false);
     const [notifications, setNotifications] = createSignal<WorkspacesNotification[]>([]);
-    const [flyoutNotifications, setFlyoutNotifications] = createSignal<WorkspacesNotification[]>([]);
+    const [flyoutNotifications, setFlyoutNotifications] = createSignal<WorkspacesNotification[]>(
+        [],
+    );
     // let subscription: Unsubscribable;
     //
     // onMount(() => {
@@ -63,8 +65,12 @@ const NavigationRailNotifications: Component<{ expanded: boolean }> = (props) =>
                         <Notification
                             respond={async (type, value) => {
                                 if (type === "close") {
-                                    setFlyoutNotifications((notifications) => notifications.filter((n) => n.uuid !== notification.uuid));
-                                    setNotifications((notifications) => notifications.filter((n) => n.uuid !== notification.uuid));
+                                    setFlyoutNotifications((notifications) =>
+                                        notifications.filter((n) => n.uuid !== notification.uuid),
+                                    );
+                                    setNotifications((notifications) =>
+                                        notifications.filter((n) => n.uuid !== notification.uuid),
+                                    );
 
                                     return;
                                 }
@@ -83,8 +89,12 @@ const NavigationRailNotifications: Component<{ expanded: boolean }> = (props) =>
                                     window.location.reload();
                                 }
 
-                                setFlyoutNotifications((notifications) => notifications.filter((n) => n.uuid !== notification.uuid));
-                                setNotifications((notifications) => notifications.filter((n) => n.uuid !== notification.uuid));
+                                setFlyoutNotifications((notifications) =>
+                                    notifications.filter((n) => n.uuid !== notification.uuid),
+                                );
+                                setNotifications((notifications) =>
+                                    notifications.filter((n) => n.uuid !== notification.uuid),
+                                );
                             }}
                             notification={notification}
                         />
@@ -99,11 +109,12 @@ const NavigationRailNotifications: Component<{ expanded: boolean }> = (props) =>
                                 {(notification) => (
                                     <Notification
                                         respond={async (type, value) => {
-                                            let responseAction = await trpc.app.notifications.respond.mutate({
-                                                uuid: notification.uuid,
-                                                responseType: type as "button",
-                                                value: value,
-                                            });
+                                            let responseAction =
+                                                await trpc.app.notifications.respond.mutate({
+                                                    uuid: notification.uuid,
+                                                    responseType: type as "button",
+                                                    value: value,
+                                                });
 
                                             if (responseAction.action?.type === "navigate") {
                                                 navigate(responseAction.action.value);
@@ -113,9 +124,15 @@ const NavigationRailNotifications: Component<{ expanded: boolean }> = (props) =>
                                                 window.location.reload();
                                             }
 
-                                            setNotifications((notifications) => notifications.filter((n) => n.uuid !== notification.uuid));
+                                            setNotifications((notifications) =>
+                                                notifications.filter(
+                                                    (n) => n.uuid !== notification.uuid,
+                                                ),
+                                            );
                                             setFlyoutNotifications((notifications) =>
-                                                notifications.filter((n) => n.uuid !== notification.uuid),
+                                                notifications.filter(
+                                                    (n) => n.uuid !== notification.uuid,
+                                                ),
                                             );
                                         }}
                                         notification={notification}
@@ -127,9 +144,13 @@ const NavigationRailNotifications: Component<{ expanded: boolean }> = (props) =>
                                 <UKText role="title" size="l" align="center">
                                     Nothing here
                                 </UKText>
-                                <UKDivider width="middle-inset" direction={DividerDirection.horizontal} />
+                                <UKDivider
+                                    width="middle-inset"
+                                    direction={DividerDirection.horizontal}
+                                />
                                 <UKText role="body" size="m" align="center">
-                                    You have no notifications, when you have a notification it will show up here.
+                                    You have no notifications, when you have a notification it will
+                                    show up here.
                                 </UKText>
                             </div>
                         )}

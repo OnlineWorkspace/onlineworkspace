@@ -1,6 +1,6 @@
 import UKCard from "@tcsw/uikit-solid/src/components/card/UKCard.jsx";
 import { For, type Component } from "solid-js";
-import type { WorkspacesNotification } from "../../../../../../subsystems/notifications";
+import type { WorkspacesNotification } from "../../../../../../systems/notifications";
 import UKText from "@tcsw/uikit-solid/src/components/text/UKText.jsx";
 import UKDivider from "@tcsw/uikit-solid/src/components/divider/UKDivider.jsx";
 import { DividerDirection } from "@tcsw/uikit-solid/src/components/divider/lib/direction.js";
@@ -8,21 +8,27 @@ import UKIcon from "@tcsw/uikit-solid/src/components/icon/UKIcon.jsx";
 import UKButton from "@tcsw/uikit-solid/src/components/button/UKButton.jsx";
 import styles from "./Notification.module.scss";
 
-const Notification: Component<{ notification: WorkspacesNotification; respond: (type: "button" | "close", value: string) => void }> = (
-    props,
-) => {
+const Notification: Component<{
+    notification: WorkspacesNotification;
+    respond: (type: "button" | "close", value: string) => void;
+}> = (props) => {
     return (
         <UKCard
             class={styles.root}
             onClick={() => {
-                if (!props.notification.options?.buttons || props.notification.options.buttons.length === 0) {
+                if (
+                    !props.notification.options?.buttons ||
+                    props.notification.options.buttons.length === 0
+                ) {
                     props.respond("close", "");
                 }
             }}
         >
             <div class={styles.progressBar}></div>
             <div class={styles.header}>
-                {props.notification.content.icon && <UKIcon>{props.notification.content.icon}</UKIcon>}
+                {props.notification.content.icon && (
+                    <UKIcon>{props.notification.content.icon}</UKIcon>
+                )}
                 <UKText role="title" size="m">
                     {props.notification.content.title}
                 </UKText>

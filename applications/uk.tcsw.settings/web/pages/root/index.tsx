@@ -48,6 +48,18 @@ const RootPage: Component = () => {
                     />
                     <UKStack>
                         <Shortcut
+                            title="Profile"
+                            description="View & Manage your profile"
+                            icon="person"
+                            path="/app/uk.tcsw.settings/profile"
+                        />
+                        <Shortcut
+                            title="Authentication"
+                            description="View & Manage your login sessions & credentials"
+                            icon="passkey"
+                            path="/app/uk.tcsw.settings/authentication"
+                        />
+                        <Shortcut
                             title="Storage"
                             description="Visualise storage usage & clean up duplicates"
                             icon="storage"

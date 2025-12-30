@@ -1,6 +1,6 @@
 /// <reference path="./global.d.ts" />
 
-import { createTRPCContext, procedure } from "@tcsw/workspaces-instance/src/subsystems/trpcRouter";
+import { createTRPCContext, procedure } from "@tcsw/workspaces-instance/src/systems/trpcRouter";
 import { initTRPC } from "@trpc/server";
 import z from "zod";
 import * as path from "node:path";
@@ -23,7 +23,7 @@ const router = t.router({
                 type: "directory" | "file";
             }[] = [];
 
-            const finalPath = path.join(instance.subSystems.filesystem.FS_ROOT, opt.input.path);
+            const finalPath = path.join(instance.sys.filesystem.FS_ROOT, opt.input.path);
 
             if (!(await fs.exists(finalPath))) {
                 return {
@@ -40,55 +40,48 @@ const router = t.router({
                 let icon = undefined;
 
                 if (!isDirectory) {
-                    switch (instance.subSystems.filesystem.getFileType(itemPath)) {
+                    switch (instance.sys.filesystem.getFileType(itemPath)) {
                         case "image": {
                             icon =
                                 opt.ctx.rawRequest.destinationHostname +
-                                (await instance.subSystems.image.serveImage(
-                                    opt.ctx.userId,
-                                    itemPath,
-                                    {
-                                        resize: {
-                                            dimensions: (dimensions) => {
-                                                let newWidth = THUMBNAIL_SIZE;
-                                                let newHeight = THUMBNAIL_SIZE;
+                                (await instance.sys.image.serveImage(opt.ctx.userId, itemPath, {
+                                    resize: {
+                                        dimensions: (dimensions) => {
+                                            let newWidth = THUMBNAIL_SIZE;
+                                            let newHeight = THUMBNAIL_SIZE;
 
-                                                if (dimensions.width > dimensions.height) {
-                                                    newWidth = THUMBNAIL_SIZE;
-                                                    newHeight = Math.round(
-                                                        (dimensions.height / dimensions.width) *
-                                                            THUMBNAIL_SIZE,
-                                                    );
-                                                }
+                                            if (dimensions.width > dimensions.height) {
+                                                newWidth = THUMBNAIL_SIZE;
+                                                newHeight = Math.round(
+                                                    (dimensions.height / dimensions.width) *
+                                                        THUMBNAIL_SIZE,
+                                                );
+                                            }
 
-                                                if (dimensions.height > dimensions.width) {
-                                                    newHeight = THUMBNAIL_SIZE;
-                                                    newWidth = Math.round(
-                                                        (dimensions.height / dimensions.width) *
-                                                            THUMBNAIL_SIZE,
-                                                    );
-                                                }
+                                            if (dimensions.height > dimensions.width) {
+                                                newHeight = THUMBNAIL_SIZE;
+                                                newWidth = Math.round(
+                                                    (dimensions.height / dimensions.width) *
+                                                        THUMBNAIL_SIZE,
+                                                );
+                                            }
 
-                                                return {
-                                                    width: newWidth,
-                                                    height: newHeight,
-                                                };
-                                            },
+                                            return {
+                                                width: newWidth,
+                                                height: newHeight,
+                                            };
                                         },
                                     },
-                                ));
+                                }));
                         }
                     }
                 }
 
                 let itemName = item;
-                const finalItemPath = path.relative(
-                    instance.subSystems.filesystem.FS_ROOT,
-                    itemPath,
-                );
+                const finalItemPath = path.relative(instance.sys.filesystem.FS_ROOT, itemPath);
 
                 if (finalItemPath.split(itemName)[0] === "users/") {
-                    itemName += ` (${await (await instance.subSystems.users.getUserById(Number(itemName)))?.getUsername()})`;
+                    itemName += ` (${await (await instance.sys.users.getUserById(Number(itemName)))?.getUsername()})`;
                 }
 
                 output.push({
@@ -110,10 +103,10 @@ const router = t.router({
             return { type: "success", items: output };
         }),
     getRawFile: procedure.input(z.string()).query(async (opt) => {
-        const finalPath = path.join(instance.subSystems.filesystem.FS_ROOT, opt.input);
+        const finalPath = path.join(instance.sys.filesystem.FS_ROOT, opt.input);
         return (
             opt.ctx.rawRequest.destinationHostname +
-            instance.subSystems.filesystem.serveFile(opt.ctx.userId, finalPath)
+            instance.sys.filesystem.serveFile(opt.ctx.userId, finalPath)
         );
     }),
     move: procedure
@@ -123,11 +116,8 @@ const router = t.router({
             if (path.join(opt.input.newPath, "..") === "users") return false;
             if (path.join(opt.input.path, "..") === "users") return false;
 
-            const finalPath = path.join(instance.subSystems.filesystem.FS_ROOT, opt.input.path);
-            const finalNewPath = path.join(
-                instance.subSystems.filesystem.FS_ROOT,
-                opt.input.newPath,
-            );
+            const finalPath = path.join(instance.sys.filesystem.FS_ROOT, opt.input.path);
+            const finalNewPath = path.join(instance.sys.filesystem.FS_ROOT, opt.input.newPath);
 
             try {
                 await fs.rename(finalPath, finalNewPath);
@@ -146,11 +136,8 @@ const router = t.router({
             if (path.join(opt.input.newPath, "..") === "users") return false;
             if (path.join(opt.input.path, "..") === "users") return false;
 
-            const finalPath = path.join(instance.subSystems.filesystem.FS_ROOT, opt.input.path);
-            const finalNewPath = path.join(
-                instance.subSystems.filesystem.FS_ROOT,
-                opt.input.newPath,
-            );
+            const finalPath = path.join(instance.sys.filesystem.FS_ROOT, opt.input.path);
+            const finalNewPath = path.join(instance.sys.filesystem.FS_ROOT, opt.input.newPath);
 
             try {
                 await fs.cp(finalPath, finalNewPath, { recursive: true });
@@ -166,7 +153,7 @@ const router = t.router({
 
 export type TRPCRouter = typeof router;
 
-instance.subSystems.tRPC.registeredRouters.push({
+instance.sys.tRPC.registeredRouters.push({
     basePath: "/app/uk.tcsw.files",
     router: router,
     createContext: createTRPCContext(instance),

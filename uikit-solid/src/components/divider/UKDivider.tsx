@@ -4,7 +4,7 @@ import styles from "./UKDivider.module.scss";
 import clsx from "clsx";
 
 const UKDivider: Component<{
-    direction: DividerDirection;
+    direction: "horizontal" | "vertical" | DividerDirection;
     width?: "inset" | "middle-inset" | "full";
     class?: string;
 }> = (props) => {

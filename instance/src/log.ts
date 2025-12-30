@@ -1,6 +1,6 @@
 import chalk from "chalk";
 import type { Instance } from "./index.js";
-import { WorkspacesFeatureFlags } from "./subsystems/configuration.js";
+import { WorkspacesFeatureFlags } from "./systems/configuration.js";
 import util from "node:util";
 
 export enum LogType {
@@ -39,7 +39,10 @@ class Logger {
                                     compact: false,
                                     colors: true,
                                     depth: 3,
-                                    breakLength: this._internal_getWindowSize()[0] - this.log.META_LENGTH + 6,
+                                    breakLength:
+                                        this._internal_getWindowSize()[0] -
+                                        this.log.META_LENGTH +
+                                        6,
                                 });
                             }
                             writtenData += " ";
@@ -65,7 +68,8 @@ class Logger {
                             compact: false,
                             colors: true,
                             depth: 3,
-                            breakLength: this._internal_getWindowSize()[0] - this.log.META_LENGTH + 6,
+                            breakLength:
+                                this._internal_getWindowSize()[0] - this.log.META_LENGTH + 6,
                         });
                     }
                     writtenData += " ";
@@ -211,18 +215,29 @@ class Logger {
     }
 
     _internal_writePrompt() {
-        if (!this.log.instance?.subSystems.configuration?.hasFeature(WorkspacesFeatureFlags.SlashCommands) || !process.stdout.cursorTo)
+        if (
+            !this.log.instance?.sys.configuration?.hasFeature(
+                WorkspacesFeatureFlags.SlashCommands,
+            ) ||
+            !process.stdout.cursorTo
+        )
             return this;
 
         process.stdout.cursorTo(0, this._internal_getWindowSize()[1], () => {
             process.stdout.write(
-                `Workspaces Pre-Alpha ${this.log.instance.subSystems.configuration?.isDevMode ? `[${this.emphasis("Dev Mode")}] ` : ""}`,
+                `Workspaces Pre-Alpha ${this.log.instance.sys.configuration?.isDevMode ? `[${this.emphasis("Dev Mode")}] ` : ""}`,
                 () => {
                     // move the cursor to the metaLen+6th column of the 2nd from the bottom row
-                    process.stdout.cursorTo(this.log.META_LENGTH + 6, this._internal_getWindowSize()[1], () => {
-                        // write the prompt indicator to the stdout
-                        process.stdout.write(`> ${this.log.instance.subSystems.consoleCommands?.rlInterface?.line || ""}`);
-                    });
+                    process.stdout.cursorTo(
+                        this.log.META_LENGTH + 6,
+                        this._internal_getWindowSize()[1],
+                        () => {
+                            // write the prompt indicator to the stdout
+                            process.stdout.write(
+                                `> ${this.log.instance.sys.consoleCommands?.rlInterface?.line || ""}`,
+                            );
+                        },
+                    );
                 },
             );
         });
@@ -255,7 +270,9 @@ class Logger {
 
         console.log(
             typeString,
-            chalk.bold(`${chalk.yellow(this.level.toUpperCase().slice(0, this.log.META_LENGTH).padEnd(this.log.META_LENGTH))} `),
+            chalk.bold(
+                `${chalk.yellow(this.level.toUpperCase().slice(0, this.log.META_LENGTH).padEnd(this.log.META_LENGTH))} `,
+            ),
             ...message,
         );
 

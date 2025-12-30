@@ -1,15 +1,15 @@
-import type {Component} from "solid-js"
-import styles from "./Session.module.scss"
-import UKStackItem from "@tcsw/uikit-solid/src/components/stack/UKStackItem.jsx"
-import {AuthorizedDeviceType} from "../../../../../../../../../instance/src/subsystems/authorization";
+import type { Component } from "solid-js";
+import styles from "./Session.module.scss";
+import UKStackItem from "@tcsw/uikit-solid/src/components/stack/UKStackItem.jsx";
+import { AuthorizedDeviceType } from "@tcsw/workspaces-instance/src/systems/authorization";
 import UKIconButton from "@tcsw/uikit-solid/src/components/iconButton/UKIconButton.jsx";
 import trpc from "../../../../../../lib/trpc";
 
-const ICON_FOR_DEVICE_TYPE: {[ key in AuthorizedDeviceType ]: string} = {
-    [ AuthorizedDeviceType.Desktop ]: "desktop_windows",
-    [ AuthorizedDeviceType.Mobile ]: "mobile",
-    [ AuthorizedDeviceType.UnknownBrowser ]: "web",
-}
+const ICON_FOR_DEVICE_TYPE: { [key in AuthorizedDeviceType]: string } = {
+    [AuthorizedDeviceType.Desktop]: "desktop_windows",
+    [AuthorizedDeviceType.Mobile]: "mobile",
+    [AuthorizedDeviceType.UnknownBrowser]: "web",
+};
 
 const Session: Component<{
     sessionId: number;
@@ -29,7 +29,9 @@ const Session: Component<{
                         alt={"Delete session"}
                         color={"tonal"}
                         onClick={async () => {
-                            await trpc.authentication.deleteSession.mutate({ sessionId: props.sessionId });
+                            await trpc.authentication.deleteSession.mutate({
+                                sessionId: props.sessionId,
+                            });
                             props.refetch();
                         }}
                     />
@@ -41,4 +43,4 @@ const Session: Component<{
     );
 };
 
-export default Session
+export default Session;

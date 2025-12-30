@@ -1,5 +1,8 @@
 import path from "path";
-import ApplicationRepository, { type RepositoryApplication, type RepositoryApplicationSummary } from "./applicationRepository";
+import ApplicationRepository, {
+    type RepositoryApplication,
+    type RepositoryApplicationSummary,
+} from "./applicationRepository";
 import fs from "fs/promises";
 
 export default class LocalApplicationRepository extends ApplicationRepository {
@@ -11,12 +14,28 @@ export default class LocalApplicationRepository extends ApplicationRepository {
     }
 
     async getApplicationById(applicationId: string): Promise<RepositoryApplication | undefined> {
-        if (!(await fs.exists(path.join(instance.subSystems.filesystem.SRC_ROOT, "../../applications/", applicationId, "manifest.json"))))
+        if (
+            !(await fs.exists(
+                path.join(
+                    instance.sys.filesystem.SRC_ROOT,
+                    "../../applications/",
+                    applicationId,
+                    "manifest.json",
+                ),
+            ))
+        )
             return undefined;
 
         let applicationManifest = JSON.parse(
             (
-                await fs.readFile(path.join(instance.subSystems.filesystem.SRC_ROOT, "../../applications/", applicationId, "manifest.json"))
+                await fs.readFile(
+                    path.join(
+                        instance.sys.filesystem.SRC_ROOT,
+                        "../../applications/",
+                        applicationId,
+                        "manifest.json",
+                    ),
+                )
             ).toString(),
         );
 
@@ -34,7 +53,7 @@ export default class LocalApplicationRepository extends ApplicationRepository {
                     ? {
                           type: "image",
                           value: path.join(
-                              instance.subSystems.filesystem.SRC_ROOT,
+                              instance.sys.filesystem.SRC_ROOT,
                               "../../applications/",
                               applicationId,
                               applicationManifest.icon.value,
@@ -44,18 +63,25 @@ export default class LocalApplicationRepository extends ApplicationRepository {
             id: applicationId,
             modules: Object.keys(applicationManifest.modules),
             bannerImage: applicationManifest.bannerImage
-                ? path.join(instance.subSystems.filesystem.SRC_ROOT, "../../applications/", applicationId, applicationManifest.bannerImage)
+                ? path.join(
+                      instance.sys.filesystem.SRC_ROOT,
+                      "../../applications/",
+                      applicationId,
+                      applicationManifest.bannerImage,
+                  )
                 : undefined,
         };
     }
 
     async searchForApplicationIds(query?: string): Promise<string[]> {
-        return (await fs.readdir(path.join(instance.subSystems.filesystem.SRC_ROOT, "../../applications/"))).filter((a) =>
-            query !== undefined ? a.includes(query) : true,
-        );
+        return (
+            await fs.readdir(path.join(instance.sys.filesystem.SRC_ROOT, "../../applications/"))
+        ).filter((a) => (query !== undefined ? a.includes(query) : true));
     }
 
-    async getApplicationSummaryById(applicationId: string): Promise<RepositoryApplicationSummary | undefined> {
+    async getApplicationSummaryById(
+        applicationId: string,
+    ): Promise<RepositoryApplicationSummary | undefined> {
         let app = await this.getApplicationById(applicationId);
 
         if (!app) return undefined;

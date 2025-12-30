@@ -1,6 +1,6 @@
 /// <reference path="./global.d.ts" />
 
-import { createTRPCContext, procedure } from "@tcsw/workspaces-instance/src/subsystems/trpcRouter";
+import { createTRPCContext, procedure } from "@tcsw/workspaces-instance/src/systems/trpcRouter";
 import { initTRPC } from "@trpc/server";
 import z from "zod";
 import path from "path";
@@ -23,7 +23,7 @@ const router = t.router({
                         }),
                     )
                     .query(async (opt) => {
-                        const db = instance.subSystems.database.postgres();
+                        const db = instance.sys.database.postgres();
 
                         const { forename, surname, username } = (
                             await db`SELECT forename, surname, username FROM tricolor_workspaces.public.users WHERE id = ${opt.ctx.userId}`
@@ -38,7 +38,7 @@ const router = t.router({
             },
         },
         welcomeMessage: procedure.output(z.string()).query(async (opt) => {
-            return `Hiya, ${(await (await opt.ctx.instance.subSystems.users.getUserById(opt.ctx.userId))?.getForename()) || "Anonymous"}!`;
+            return `Hiya, ${(await (await opt.ctx.instance.sys.users.getUserById(opt.ctx.userId))?.getForename()) || "Anonymous"}!`;
         }),
         getWallpaperOptions: procedure
             .output(
@@ -99,7 +99,7 @@ const router = t.router({
                         }
                     })();
 
-                    await instance.subSystems.image.resizeImage(
+                    await instance.sys.image.resizeImage(
                         rawWallpaperPath,
                         requiredResizedWallpaperPath,
                         { width: opt.input.width, height: opt.input.height },
@@ -114,7 +114,7 @@ const router = t.router({
 
                 return (
                     opt.ctx.rawRequest.destinationHostname +
-                    (await opt.ctx.instance.subSystems.image.serveImage(
+                    (await opt.ctx.instance.sys.image.serveImage(
                         opt.ctx.userId,
                         requiredResizedWallpaperPath,
                     ))
@@ -125,7 +125,7 @@ const router = t.router({
 
 export type TRPCRouter = typeof router;
 
-instance.subSystems.tRPC.registeredRouters.push({
+instance.sys.tRPC.registeredRouters.push({
     basePath: "/app/uk.tcsw.dashboard",
     router: router,
     createContext: createTRPCContext(instance),
