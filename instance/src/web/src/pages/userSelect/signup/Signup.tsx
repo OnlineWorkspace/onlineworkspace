@@ -248,6 +248,7 @@ const UserSelectPage: Component = () => {
                     setStage={setStage}
                     setTwoFactorTestCode={setTwoFactorTestCode}
                     twoFactorTestCode={twoFactorTestCode}
+                    requirements={requirements}
                 />
             </Match>
             <Match when={stage() === UserSelectStage.GuidePrompt}>

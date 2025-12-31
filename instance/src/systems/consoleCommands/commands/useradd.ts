@@ -25,53 +25,74 @@ export default class ExitCommand extends Command {
                     password = data.trim();
                     if (password !== "") {
                         log._internal_promptMessage("Full Name -> ");
-                        self.instance.sys.consoleCommands.currentCommandInterface.cb = async (data) => {
+                        self.instance.sys.consoleCommands.currentCommandInterface.cb = async (
+                            data,
+                        ) => {
                             fullName = data.trim();
                             if (fullName !== "") {
                                 log._internal_promptMessage("Email -> ");
-                                self.instance.sys.consoleCommands.currentCommandInterface.cb = async (data) => {
-                                    email = data.trim();
-                                    if (email !== "") {
-                                        log._internal_promptMessage("Gender -> ");
-                                        self.instance.sys.consoleCommands.currentCommandInterface.cb = async (data) => {
-                                            gender = data.trim();
-                                            if (gender !== "") {
-                                                if (gender === "male" || gender === "other" || gender === "female") {
-                                                    log.rawLog("\n");
-                                                    log.info("Creating user...");
+                                self.instance.sys.consoleCommands.currentCommandInterface.cb =
+                                    async (data) => {
+                                        email = data.trim();
+                                        if (email !== "") {
+                                            log._internal_promptMessage("Gender -> ");
+                                            self.instance.sys.consoleCommands.currentCommandInterface.cb =
+                                                async (data) => {
+                                                    gender = data.trim();
+                                                    if (gender !== "") {
+                                                        if (
+                                                            gender === "male" ||
+                                                            gender === "other" ||
+                                                            gender === "female"
+                                                        ) {
+                                                            log.rawLog("\n");
+                                                            log.info("Creating user...");
 
-                                                    let uid = await self.instance.sys.users.createUser(username);
+                                                            let uid =
+                                                                await self.instance.sys.users.createUser(
+                                                                    username,
+                                                                    password,
+                                                                );
 
-                                                    if (!uid) {
-                                                        log.error("Failed to create user");
-                                                        return;
+                                                            if (!uid) {
+                                                                log.error("Failed to create user");
+                                                                return;
+                                                            }
+
+                                                            let user =
+                                                                await self.instance.sys.users.getUserById(
+                                                                    uid,
+                                                                );
+
+                                                            if (!user) {
+                                                                log.error(
+                                                                    "Failed to get created user",
+                                                                );
+                                                                return;
+                                                            }
+
+                                                            await user.setGender(gender);
+                                                            let fullNameSplit = fullName.split(" ");
+                                                            await user.setFullName(
+                                                                fullNameSplit.shift() || "Unknown",
+                                                                fullNameSplit.join(" "),
+                                                            );
+                                                            await user.setEmail(email);
+
+                                                            return this.finishRun();
+                                                        } else {
+                                                            log._internal_promptMessage(
+                                                                "Gender -> ",
+                                                            );
+                                                        }
+                                                    } else {
+                                                        log._internal_promptMessage("Gender -> ");
                                                     }
-
-                                                    let user = await self.instance.sys.users.getUserById(uid);
-
-                                                    if (!user) {
-                                                        log.error("Failed to get created user");
-                                                        return;
-                                                    }
-
-                                                    await user.setGender(gender);
-                                                    let fullNameSplit = fullName.split(" ");
-                                                    await user.setFullName(fullNameSplit.shift() || "Unknown", fullNameSplit.join(" "));
-                                                    await user.setEmail(email);
-                                                    await self.instance.sys.authorization.setPassword(user.userId, password);
-
-                                                    return this.finishRun();
-                                                } else {
-                                                    log._internal_promptMessage("Gender -> ");
-                                                }
-                                            } else {
-                                                log._internal_promptMessage("Gender -> ");
-                                            }
-                                        };
-                                    } else {
-                                        log._internal_promptMessage("Email -> ");
-                                    }
-                                };
+                                                };
+                                        } else {
+                                            log._internal_promptMessage("Email -> ");
+                                        }
+                                    };
                             } else {
                                 log._internal_promptMessage("Full Name -> ");
                             }

@@ -9,6 +9,7 @@ import {
     type Accessor,
     type Component,
     createSignal,
+    type Resource,
 } from "solid-js";
 import { UserSelectStage } from "../../Signup";
 import clsx from "clsx";
@@ -21,6 +22,7 @@ const TwoFactorAuthentication: Component<{
     twoFactorTestCode: Accessor<string>;
     setTwoFactorTestCode(testCode: string): void;
     setStage(stage: UserSelectStage): void;
+    requirements: Resource<{ twoFactorAuthentication?: boolean }>;
 }> = (props) => {
     const [isTwoFactorCodeValid, setIsTwoFactorCodeValid] = createSignal<boolean>(false);
     const [twoFactorSecret] = createResource(() => trpc.authorization.enableTwoFactor.mutate());
@@ -93,16 +95,20 @@ const TwoFactorAuthentication: Component<{
                         supportingText={"*required"}
                         maximumCharacterCount={6}
                     />
-                    <UKDivider direction={"horizontal"} />
-                    <UKButton
-                        class={styles.skipButton}
-                        onClick={() => {
-                            props.setStage(UserSelectStage.GuidePrompt);
-                        }}
-                        color={"standard"}
-                    >
-                        Skip Two Factor Setup
-                    </UKButton>
+                    {!props.requirements()?.twoFactorAuthentication && (
+                        <>
+                            <UKDivider direction={"horizontal"} />
+                            <UKButton
+                                class={styles.skipButton}
+                                onClick={() => {
+                                    props.setStage(UserSelectStage.GuidePrompt);
+                                }}
+                                color={"standard"}
+                            >
+                                Skip Two Factor Setup
+                            </UKButton>
+                        </>
+                    )}
                 </UKCard>
             )}
         </>

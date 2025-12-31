@@ -111,6 +111,8 @@ A working environment for professionals and Home-Lab users.
         8. Logout from the postgres user -> `exit`
     - Windows
         1. Simply install postgreSQL with the setup file downloaded from the postgreSQL website
+        2. Open your database viewer of choice (DBeaver Community Edition is recommended)
+        3. Create the `tricolor_workspaces` table
     - MacOS
         1. Using Orbstack with Ubuntu follow the Ubuntu Linux instructions above
 2. Run `bun install` inside the project root directory to install all NPM dependencies

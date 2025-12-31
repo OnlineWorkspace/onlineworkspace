@@ -2,6 +2,7 @@ import type { Instance } from "../index.js";
 import System from "../system.js";
 import { WorkspacesNotificationPriority } from "./notifications.js";
 import utils from "node:util";
+import * as OTPAuth from "otpauth";
 
 export enum AuthorizedDeviceType {
     Desktop,
@@ -29,23 +30,43 @@ export default class AuthorizationSystem extends System {
         ipAddress?: string,
     ): Promise<string | undefined> {
         try {
-            const usersDb = this.instance.sys.database.postgres();
+            const db = this.instance.sys.database.postgres();
 
             if (
                 !(await Bun.password.verify(
                     password,
                     (
-                        await usersDb`SELECT hashed_password FROM tricolor_workspaces.public.users WHERE id = ${userId}`
+                        await db`SELECT hashed_password FROM tricolor_workspaces.public.users WHERE id = ${userId}`
                     )?.[0]?.hashed_password,
                 ))
-            )
+            ) {
                 return undefined;
+            }
 
-            const sessionsDb = this.instance.sys.database.postgres();
+            if (await this.instance.sys.authorization.hasTwoFactorAuthenticationSecret(userId)) {
+                if (!otpCode) {
+                    console.log("no otp code provided when creating session?");
+                    return undefined;
+                }
+
+                let totp = new OTPAuth.TOTP({
+                    issuer: this.instance.sys.configuration.webUrl,
+                    label: `${this.instance.sys.configuration.displayName} (Tricolor Workspaces)`,
+                    algorithm: "SHA1",
+                    digits: 6,
+                    secret: (
+                        await db`SELECT two_factor_secret FROM tricolor_workspaces.public.users WHERE id = ${userId}`
+                    )?.[0]?.two_factor_secret,
+                });
+
+                if (totp.validate({ token: otpCode }) === null) {
+                    return undefined;
+                }
+            }
 
             const sessionToken = crypto.getRandomValues(new Uint32Array(16)).join("");
 
-            await sessionsDb`INSERT INTO tricolor_workspaces.public.sessions (user_id, session_token, device_type, valid_until, ip_address) VALUES (${userId}, ${sessionToken}, ${deviceId}, ${Date.now() + SESSION_VALID_TERM_MS}, ${ipAddress || "Anonymous"})`;
+            await db`INSERT INTO tricolor_workspaces.public.sessions (user_id, session_token, device_type, valid_until, ip_address) VALUES (${userId}, ${sessionToken}, ${deviceId}, ${Date.now() + SESSION_VALID_TERM_MS}, ${ipAddress || "Anonymous"})`;
 
             const user = await this.instance.sys.users.getUserById(userId);
 
@@ -173,11 +194,13 @@ export default class AuthorizationSystem extends System {
             return false;
         }
 
-        let hashedPassword = (
-            await db`SELECT hashed_password FROM tricolor_workspaces.public.users WHERE id = ${userId}`
-        )?.[0]?.hashed_password;
+        let [{ exists }] = await db`
+            SELECT (hashed_password IS NOT NULL) as exists
+            FROM tricolor_workspaces.public.users
+            WHERE id = ${userId}
+        `;
 
-        return hashedPassword !== null;
+        return !!exists;
     }
 
     // Sets a user's two-factor authentication secret
@@ -209,11 +232,13 @@ export default class AuthorizationSystem extends System {
             return false;
         }
 
-        let twoFactorSecret = (
-            await db`SELECT two_factor_secret FROM tricolor_workspaces.public.users WHERE id = ${userId}`
-        )?.[0]?.hashed_password;
+        let [{ exists }] = await db`
+            SELECT (two_factor_secret IS NOT NULL) as exists
+            FROM tricolor_workspaces.public.users
+            WHERE id = ${userId}
+        `;
 
-        return twoFactorSecret !== null;
+        return !!exists;
     }
 
     async startup() {

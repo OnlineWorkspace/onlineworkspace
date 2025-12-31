@@ -14,6 +14,7 @@ const UserSelectPage: Component = () => {
 
     const [username, setUsername] = createSignal("");
     const [password, setPassword] = createSignal("");
+    const [showTwoFactor, setShowTwoFactor] = createSignal<boolean>(false);
 
     createEffect(async () => {
         if ((await trpc.authorization.isAuthenticated.query()).authenticated) {
@@ -27,67 +28,104 @@ const UserSelectPage: Component = () => {
                 Sign In
             </UKText>
             <UKDivider direction={DividerDirection.horizontal} />
-            <form>
-                <UKTextField
-                    color={"outlined"}
-                    label={"Username"}
-                    getValue={setUsername}
-                    autocomplete="username"
-                />
-                <UKTextField
-                    shouldMask={true}
-                    color={"outlined"}
-                    label={"Password"}
-                    autocomplete="password"
-                    getValue={setPassword}
-                />
-                <div class={styles.loginButtons}>
-                    <UKButton onClick={() => 0} disabled={username() === ""} color={"standard"}>
-                        Forgot password?
-                    </UKButton>
-                    <UKButton
-                        disabled={username() === "" || password() === ""}
-                        onClick={async () => {
-                            const resp = await trpc.authorization.signin.mutate({
-                                username: username(),
-                                password: password(),
-                            });
+            {showTwoFactor() ? (
+                <>
+                    <UKText size={"m"} role={"body"}>
+                        Please enter the 2FA code from your authenticator app.
+                    </UKText>
+                    <UKTextField
+                        color={"outlined"}
+                        getValue={async (val) => {
+                            if (val.length === 6) {
+                                let resp = await trpc.authorization.signin.mutate({
+                                    username: username(),
+                                    password: password(),
+                                    twoFactorCode: val,
+                                });
 
-                            if (resp.type === "success") {
-                                window.location.href = "/app";
+                                if (resp.type === "success") {
+                                    window.location.href = "/app";
+                                }
                             }
-
-                            // TODO: change to a toast when support is included in UIKit
-                            console.error("Failed to login");
                         }}
-                        color={"filled"}
+                        label={"Two Factor Code"}
+                    />
+                </>
+            ) : (
+                <>
+                    <form>
+                        <UKTextField
+                            color={"outlined"}
+                            label={"Username"}
+                            getValue={setUsername}
+                            autocomplete="username"
+                        />
+                        <UKTextField
+                            shouldMask={true}
+                            color={"outlined"}
+                            label={"Password"}
+                            autocomplete="password"
+                            getValue={setPassword}
+                        />
+                        <div class={styles.loginButtons}>
+                            <UKButton
+                                onClick={() => 0}
+                                disabled={username() === ""}
+                                color={"standard"}
+                            >
+                                Forgot password?
+                            </UKButton>
+                            <UKButton
+                                disabled={username() === "" || password() === ""}
+                                onClick={async () => {
+                                    const resp = await trpc.authorization.signin.mutate({
+                                        username: username(),
+                                        password: password(),
+                                    });
+
+                                    if (resp.type === "twofactor") {
+                                        setShowTwoFactor(true);
+                                        return;
+                                    }
+
+                                    if (resp.type === "success") {
+                                        window.location.href = "/app";
+                                        return;
+                                    }
+
+                                    // TODO: change to a toast when support is included in UIKit
+                                    console.error("Failed to login");
+                                }}
+                                color={"filled"}
+                            >
+                                Login
+                            </UKButton>
+                        </div>
+                    </form>
+                    <UKDivider direction={DividerDirection.horizontal} />
+                    {/* TODO: implement security key as a login method */}
+                    <UKButton
+                        class={styles.alternateLoginMethod}
+                        leadingIcon={"key"}
+                        color={"tonal"}
+                        disabled={true}
+                        onClick={() => {
+                            return 0;
+                        }}
                     >
-                        Login
+                        Use Security Key
                     </UKButton>
-                </div>
-            </form>
-            <UKDivider direction={DividerDirection.horizontal} />
-            {/* TODO: implement security key as a login method */}
-            <UKButton
-                class={styles.alternateLoginMethod}
-                leadingIcon={"key"}
-                color={"tonal"}
-                disabled={true}
-                onClick={() => {
-                    return 0;
-                }}
-            >
-                Use Security Key
-            </UKButton>
-            <UKDivider direction={DividerDirection.horizontal} />
-            <div class={styles.signupSegment}>
-                <UKText role={"body"} size={"m"}>
-                    Don't have an account?
-                </UKText>
-                <UKButton onClick={() => navigate("/signup")} color={"tonal"}>
-                    Signup
-                </UKButton>
-            </div>
+                    <UKDivider direction={DividerDirection.horizontal} />
+                    <div class={styles.signupSegment}>
+                        <UKText role={"body"} size={"m"}>
+                            Don't have an account?
+                        </UKText>
+                        <UKButton onClick={() => navigate("/signup")} color={"tonal"}>
+                            Signup
+                        </UKButton>
+                    </div>
+                </>
+            )}
         </UKCard>
     );
 };

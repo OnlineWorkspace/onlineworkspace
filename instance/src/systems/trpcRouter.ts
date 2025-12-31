@@ -214,7 +214,10 @@ export const workspacesRouter = t.router({
                         };
                 }
 
-                const uid = await opt.ctx.instance.sys.users.createUser(username);
+                const uid = await opt.ctx.instance.sys.users.createUser(
+                    username,
+                    opt.input.password,
+                );
 
                 if (uid === undefined)
                     return {
@@ -246,12 +249,8 @@ export const workspacesRouter = t.router({
                 )
                     await user.setGender(opt.input.gender);
 
+                // TODO: get default quota size from the instance config
                 await user.setQuota(20);
-
-                await opt.ctx.instance.sys.authorization.setPassword(
-                    user.userId,
-                    opt.input.password,
-                );
 
                 const session = await opt.ctx.instance.sys.authorization.createSession(
                     user.userId,
@@ -293,7 +292,7 @@ export const workspacesRouter = t.router({
                 }
 
                 let totp = new OTPAuth.TOTP({
-                    issuer: opt.ctx.rawRequest.destinationHostname,
+                    issuer: opt.ctx.instance.sys.configuration.webUrl,
                     label: `${opt.ctx.instance.sys.configuration.displayName} (Tricolor Workspaces)`,
                     algorithm: "SHA1",
                     digits: 6,
@@ -350,7 +349,7 @@ export const workspacesRouter = t.router({
                 }
 
                 let totp = new OTPAuth.TOTP({
-                    issuer: opt.ctx.rawRequest.destinationHostname,
+                    issuer: opt.ctx.instance.sys.configuration.webUrl,
                     label: `${opt.ctx.instance.sys.configuration.displayName} (Tricolor Workspaces)`,
                     algorithm: "SHA1",
                     digits: 6,
@@ -365,11 +364,18 @@ export const workspacesRouter = t.router({
                 };
             }),
         signin: publicProcedure
-            .input(z.object({ username: z.string(), password: z.string() }))
+            .input(
+                z.object({
+                    username: z.string(),
+                    password: z.string(),
+                    twoFactorCode: z.string().optional(),
+                }),
+            )
             .output(
                 z.union([
                     z.object({ type: z.literal("error"), message: z.string() }),
                     z.object({ type: z.literal("success"), sessionToken: z.string() }),
+                    z.object({ type: z.literal("twofactor") }),
                 ]),
             )
             .mutation(async (opt) => {
@@ -382,11 +388,22 @@ export const workspacesRouter = t.router({
                         message: "Failed to find the user",
                     };
 
+                if (
+                    await opt.ctx.instance.sys.authorization.hasTwoFactorAuthenticationSecret(
+                        user.userId,
+                    )
+                ) {
+                    if (opt.input.twoFactorCode === undefined)
+                        return {
+                            type: "twofactor",
+                        };
+                }
+
                 const session = await opt.ctx.instance.sys.authorization.createSession(
                     user.userId,
                     opt.input.password,
                     AuthorizedDeviceType.UnknownBrowser,
-                    undefined,
+                    opt.input.twoFactorCode,
                     opt.ctx.rawRequest.server.requestIP(opt.ctx.rawRequest.req)?.address,
                 );
 

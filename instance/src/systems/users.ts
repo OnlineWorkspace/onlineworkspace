@@ -465,7 +465,7 @@ export default class UsersSystem extends System {
             two_factor_secret - the user's secret string used to verify 2fa opt codes
             settings - a settings object
         */
-        await db`CREATE TABLE IF NOT EXISTS Users (
+        await db`CREATE TABLE IF NOT EXISTS users (
             id SERIAL PRIMARY KEY,
             username TEXT,
             forename TEXT,
@@ -518,7 +518,7 @@ export default class UsersSystem extends System {
         @returns number - the userId of the created user
         @returns undefined - the user already exists
     */
-    async createUser(username: string): Promise<number | undefined> {
+    async createUser(username: string, password?: string): Promise<number | undefined> {
         const db = this.instance.sys.database.postgres();
 
         if (
@@ -544,6 +544,8 @@ export default class UsersSystem extends System {
             this.log.error("Failed during the user creation process.");
             return undefined;
         }
+
+        if (password) await this.instance.sys.authorization.setPassword(id, password);
 
         await ubi.setAvatar(
             path.join(this.instance.sys.filesystem.SRC_ROOT, "assets/placeholder/avatar.png"),
