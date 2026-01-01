@@ -27,10 +27,10 @@
 
 .button {
     position: relative;
-    border: none;
     padding-left: 12px;
     padding-right: 12px;
     border-radius: 4px;
+    border: none;
     height: 48px;
     margin-bottom: 2px;
     background: transparent;
@@ -41,6 +41,7 @@
     justify-content: start;
     gap: 8px;
 
+
     .icon {
         --icon-size: 20px;
     }
@@ -49,7 +50,7 @@
         content: "";
         position: absolute;
         top: 0;
-        left: 0;
+        left: 1px;
         width: 100%;
         height: 100%;
         background-color: transparent;
@@ -76,6 +77,53 @@
         height: calc(100% + 2px);
         background: rgb(var(--uk-sys-color-surface-container-low));
         z-index: -1;
+        border-top-width: 0;
+        border-bottom-width: 0;
+        border-right-width: 1px;
+        border-left-width: 1px;
+        border-style: solid;
+        border-color: #fff1;
+    }
+
+    // is next element a spacer
+    &:has(+.spacer) {
+        &::before {
+            top: 0;
+            border-bottom-left-radius: 0.5rem;
+            border-bottom-right-radius: 0.5rem;
+            height: calc(100% + 4px);
+            border-bottom-width: 1px;
+        }
+
+        margin-bottom: 4px;
+        border-bottom-left-radius: 12px;
+        border-bottom-right-radius: 12px;
+
+        &::after {
+            border-bottom-left-radius: 12px;
+            border-bottom-right-radius: 12px;
+        }
+
+    }
+
+    // is previous element a spacer
+    .spacer + & {
+        &::before {
+            border-top-left-radius: 0.5rem;
+            border-top-right-radius: 0.5rem;
+            top: -4px;
+            height: calc(100% + 8px);
+            border-top-width: 1px;
+        }
+
+        margin-top: 4px;
+        border-top-left-radius: 12px;
+        border-top-right-radius: 12px;
+
+        &::after {
+            border-top-left-radius: 12px;
+            border-top-right-radius: 12px;
+        }
     }
 
     &:last-of-type {
@@ -84,10 +132,12 @@
             height: calc(100% + 4px);
             border-bottom-left-radius: 1rem;
             border-bottom-right-radius: 1rem;
+            border-bottom-width: 1px;
         }
 
         border-bottom-left-radius: 12px;
         border-bottom-right-radius: 12px;
+        margin-top: 6px;
 
         &::after {
             border-bottom-left-radius: 12px;
@@ -101,8 +151,10 @@
             height: calc(100% + 6px);
             border-top-left-radius: 1rem;
             border-top-right-radius: 1rem;
+            border-top-width: 1px;
         }
 
+        margin-bottom: 6px;
         border-top-left-radius: 12px;
         border-top-right-radius: 12px;
 
@@ -112,41 +164,11 @@
         }
     }
 
-    &:has(+.spacer) {
-        &::before {
-            border-bottom-left-radius: 0.5rem;
-            border-bottom-right-radius: 0.5rem;
-            top: 0;
-            height: calc(100% + 4px);
-        }
-
-        border-bottom-left-radius: 12px;
-        border-bottom-right-radius: 12px;
-
-        &::after {
-            border-bottom-left-radius: 12px;
-            border-bottom-right-radius: 12px;
-        }
-
-        margin-bottom: 4px;
-    }
-
-    .spacer + & {
-        &::before {
-            border-top-left-radius: 0.5rem;
-            border-top-right-radius: 0.5rem;
-            top: -4px;
-            height: calc(100% + 8px);
-        }
-
-        margin-top: 6px;
-        border-top-left-radius: 12px;
-        border-top-right-radius: 12px;
-
-        &::after {
-            border-top-left-radius: 12px;
-            border-top-right-radius: 12px;
-        }
+    .text {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
     }
 }
 

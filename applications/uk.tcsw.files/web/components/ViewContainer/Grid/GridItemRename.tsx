@@ -18,12 +18,17 @@ const GridItemRename: Component<{ name: string; path: string; refetchGrid: () =>
             onBlur={async (e) => {
                 viewCtx?.setRenameEntry(undefined);
 
-                await trpc.moveFile.mutate({
-                    path: props.path,
-                    newPath: path.join(props.path, "..", e.currentTarget.value),
-                });
+                const oldPath = props.path;
+                const newPath = path.join(props.path, "..", e.currentTarget.value);
 
-                props.refetchGrid();
+                if (oldPath !== newPath) {
+                    await trpc.move.mutate({
+                        path: oldPath,
+                        newPath: newPath,
+                    });
+
+                    props.refetchGrid();
+                }
             }}
             onSubmit={(e) => e.currentTarget.blur()}
             onKeyDown={(e) => {

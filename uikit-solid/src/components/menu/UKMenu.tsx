@@ -23,6 +23,7 @@ type MenuItem =
           label?: string;
           badge?: string;
           children?: MenuItem[];
+          onClick?(): void;
       }
     | {
           type: "divider";
@@ -89,15 +90,18 @@ const UKMenu: Component<
                         onContextMenu={(e) => {
                             e.preventDefault();
                             setShowMenu(false);
-                            let element = document.elementFromPoint(e.clientX, e.clientY);
-                            if (!element) return;
-                            if ("click" in element)
-                                if (typeof element.click === "function") element.click();
+                            // let element = document.elementFromPoint(e.clientX, e.clientY);
+                            // if (!element) return;
+                            //
+                            // element.dispatchEvent(
+                            //     new Event("contextmenu", { bubbles: true, cancelable: true }),
+                            // );
                         }}
                     ></div>
                     <div
                         data-vibrant={props.vibrant}
                         onContextMenu={(e) => e.preventDefault()}
+                        onClick={() => setShowMenu(false)}
                         class={clsx(styles.root, props.class)}
                         style={{
                             top: (showMenu() as { y: number }).y + "px",
@@ -116,15 +120,33 @@ const UKMenu: Component<
                                         )}
                                         {item.type === "spacer" && <div class={styles.spacer} />}
                                         {item.type === "button" && (
-                                            <button class={styles.button}>
+                                            <button
+                                                class={styles.button}
+                                                onClick={() => {
+                                                    item.onClick();
+                                                }}
+                                            >
                                                 {item.leadingIcon && (
                                                     <UKIcon class={styles.icon}>
                                                         {item.leadingIcon}
                                                     </UKIcon>
                                                 )}
-                                                <UKText role={"label"} size={"m"}>
-                                                    {item.label}
-                                                </UKText>
+                                                <div class={styles.text}>
+                                                    <UKText
+                                                        class={styles.label}
+                                                        role={"label"}
+                                                        size={"m"}
+                                                    >
+                                                        {item.label}
+                                                    </UKText>
+                                                    <UKText
+                                                        class={styles.supportingText}
+                                                        role={"label"}
+                                                        size={"s"}
+                                                    >
+                                                        {item.supportingText}
+                                                    </UKText>
+                                                </div>
                                             </button>
                                         )}
                                         {item.type === "category" && (
@@ -136,16 +158,32 @@ const UKMenu: Component<
                                                 // onMouseLeave={() => {
                                                 //     setSelected(undefined);
                                                 // }}
+                                                onClick={() => {
+                                                    item.onClick?.();
+                                                }}
                                             >
                                                 {item.leadingIcon && (
                                                     <UKIcon class={styles.icon}>
                                                         {item.leadingIcon}
                                                     </UKIcon>
                                                 )}
-                                                <UKText role={"label"} size={"m"}>
-                                                    {item.label}
-                                                </UKText>
-                                                <UKIcon>arrow_right</UKIcon>
+                                                <div class={styles.text}>
+                                                    <UKText
+                                                        class={styles.label}
+                                                        role={"label"}
+                                                        size={"m"}
+                                                    >
+                                                        {item.label}
+                                                    </UKText>
+                                                    <UKText
+                                                        class={styles.supportingText}
+                                                        role={"label"}
+                                                        size={"s"}
+                                                    >
+                                                        {item.supportingText}
+                                                    </UKText>
+                                                </div>
+                                                <UKIcon class={styles.icon}>arrow_right</UKIcon>
                                             </button>
                                         )}
                                     </>

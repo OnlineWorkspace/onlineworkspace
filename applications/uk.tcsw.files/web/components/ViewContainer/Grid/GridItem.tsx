@@ -6,7 +6,7 @@ import UKIcon from "@tcsw/uikit-solid/src/components/icon/UKIcon.tsx";
 import trpc from "../../../lib/trpc.ts";
 import { ViewContext } from "../ViewContext.ts";
 import GridItemRename from "./GridItemRename";
-import UKMenu from "@tcsw/uikit-solid/src/components/menu/UKMenu.tsx";
+import ItemMenu from "../ItemMenu.tsx";
 
 const GridItem: Component<{
     name: string;
@@ -20,85 +20,7 @@ const GridItem: Component<{
     const navigate = useNavigate();
 
     return (
-        <UKMenu
-            items={[
-                {
-                    type: "button",
-                    label: "Hello",
-                    supportingText: "Hello world",
-                    onClick() {
-                        console.log("0");
-                    },
-                },
-                {
-                    type: "button",
-                    label: "Hello",
-                    supportingText: "Hello world",
-                    onClick() {
-                        console.log("1");
-                    },
-                },
-                {
-                    type: "divider",
-                },
-                {
-                    type: "button",
-                    label: "Hello",
-                    supportingText: "Hello world",
-                    onClick() {
-                        console.log("2");
-                    },
-                },
-                {
-                    type: "spacer",
-                },
-                {
-                    type: "button",
-                    label: "Hello",
-                    supportingText: "Hello world",
-                    leadingIcon: "person",
-                    onClick() {
-                        console.log("3");
-                    },
-                },
-                {
-                    type: "button",
-                    label: "Hello",
-                    supportingText: "Hello world",
-                    leadingIcon: "person",
-                    onClick() {
-                        console.log("3");
-                    },
-                },
-                {
-                    type: "button",
-                    label: "Hello",
-                    supportingText: "Hello world",
-                    leadingIcon: "person",
-                    onClick() {
-                        console.log("3");
-                    },
-                },
-                {
-                    type: "category",
-                    label: "Hello",
-                    supportingText: "Hello world",
-                    leadingIcon: "person",
-                },
-                {
-                    type: "spacer",
-                },
-                {
-                    type: "button",
-                    label: "Hello",
-                    supportingText: "Hello world",
-                    leadingIcon: "person",
-                    onClick() {
-                        console.log("3");
-                    },
-                },
-            ]}
-        >
+        <ItemMenu>
             <div
                 class={styles.root}
                 data-selected={viewCtx?.selectedItems().includes(props.path)}
@@ -112,7 +34,7 @@ const GridItem: Component<{
                 onContextMenu={() => {
                     let selectedItems = viewCtx?.selectedItems() ?? [];
 
-                    if (selectedItems.length === 0) {
+                    if (!selectedItems.includes(props.path)) {
                         viewCtx?.setSelectedItems([props.path]);
                     }
                 }}
@@ -198,7 +120,7 @@ const GridItem: Component<{
                     </UKText>
                 )}
             </div>
-        </UKMenu>
+        </ItemMenu>
     );
 };
 
