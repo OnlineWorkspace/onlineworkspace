@@ -36,11 +36,9 @@ export default class ApplicationsSystem extends System {
     }
 
     getEnabledApplications(): AvailableWorkspacesApplication[] {
-        const apps = this.enabledApplications
+        return this.enabledApplications
             .map((a) => this.availableApplications.find((aa) => aa.manifest?.id === a))
             .filter((a) => a !== undefined);
-
-        return apps;
     }
 
     async updateWebRouter() {
@@ -51,10 +49,7 @@ export default class ApplicationsSystem extends System {
             if (this.enabledApplications.find((a) => a === app.manifest?.id)) {
                 if (app.manifest?.modules.web) {
                     applicationImportsInfill += `const App${ind}Router = lazy(() => import("${path.relative(path.join(this.instance.sys.filesystem.FS_ROOT), path.join(app.path, app.manifest.modules.web.path, "/App.tsx")).replaceAll("\\", "/")}"));`;
-                    applicationsInfill += `<Route path="${app.manifest.id}/*">
-                        <App${ind}Router/>
-                    </Route>
-`;
+                    applicationsInfill += `<Route path="${app.manifest.id}/*"><App${ind}Router/></Route>`;
                     ind++;
                 }
             }
@@ -64,19 +59,7 @@ export default class ApplicationsSystem extends System {
             applicationsInfill = `<Route path="*" component={() => <div style={{ "text-align": "center" }}>How peculiar. You have no applications installed, please ask an administrator to install some via the command-line interface.</div>}/>`;
         }
 
-        let applicationsWebRouterTemplate = `import { Route } from "@solidjs/router";
-import { type Component, lazy } from "solid-js";
-
-${applicationImportsInfill}
-
-const ApplicationsRouter: Component = () => {
-    return (
-        <>
-            ${applicationsInfill}       </>
-    );
-};
-
-export default ApplicationsRouter`;
+        let applicationsWebRouterTemplate = `import { Route } from "@solidjs/router";import { type Component, lazy } from "solid-js";${applicationImportsInfill};const ApplicationsRouter: Component = () => {return (<>${applicationsInfill}</>);};export default ApplicationsRouter`;
 
         await fs.writeFile(
             path.join(this.instance.sys.filesystem.FS_ROOT, "Applications.tsx"),
@@ -93,11 +76,9 @@ export default ApplicationsRouter`;
 
             // TODO: maybe check if the `applications.json` file is valid JSON?
 
-            let applicationsConfig = JSON.parse(
+            this.availableApplications = JSON.parse(
                 (await fs.readFile(APPLICATIONS_CONFIG_FILE_PATH(this))).toString(),
             );
-
-            this.availableApplications = applicationsConfig;
 
             for (const defaultApp of DEFAULT_APPLICATIONS) {
                 if (!this.availableApplications.find((aa) => aa.path.endsWith(defaultApp))) {
@@ -346,7 +327,7 @@ export default ApplicationsRouter`;
         return true;
     }
 
-    // Enable an application by it's id
+    // Enable an application by its id
     // Loads the specified backend and web frontend
     async enableApplication(applicationId: string): Promise<boolean> {
         let app = this.availableApplications.find((a) => a.manifest?.id === applicationId);

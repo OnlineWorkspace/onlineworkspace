@@ -9,14 +9,14 @@ const Layout: Component<ParentProps> = (props) => {
     return (
         <UKNavigationRail
             items={[
-                {
-                    icon: { type: "icon", value: "editor_choice" },
-                    label: "Promoted",
-                    onClick() {
-                        navigate("/app/uk.tcsw.store");
-                    },
-                    active: location.pathname === "/app/uk.tcsw.store",
-                },
+                // {
+                //     icon: { type: "icon", value: "editor_choice" },
+                //     label: "Promoted",
+                //     onClick() {
+                //         navigate("/app/uk.tcsw.store");
+                //     },
+                //     active: location.pathname === "/app/uk.tcsw.store",
+                // },
                 {
                     icon: { type: "icon", value: "search" },
                     label: "Search",

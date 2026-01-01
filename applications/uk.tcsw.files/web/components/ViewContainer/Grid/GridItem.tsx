@@ -6,6 +6,7 @@ import UKIcon from "@tcsw/uikit-solid/src/components/icon/UKIcon.tsx";
 import trpc from "../../../lib/trpc.ts";
 import { ViewContext } from "../ViewContext.ts";
 import GridItemRename from "./GridItemRename";
+import UKMenu from "@tcsw/uikit-solid/src/components/menu/UKMenu.tsx";
 
 const GridItem: Component<{
     name: string;
@@ -19,31 +20,150 @@ const GridItem: Component<{
     const navigate = useNavigate();
 
     return (
-        <div
-            class={styles.root}
-            data-selected={viewCtx?.selectedItems().includes(props.path)}
-            onDblClick={async () => {
-                if (props.type === "directory") {
-                    navigate(`/app/uk.tcsw.files/dir/${props.path}`);
-                } else {
-                    window.open(await trpc.getRawFile.query(props.path));
-                }
-            }}
-            onClick={(e) => {
-                e.stopPropagation();
-
-                let selectedItems = viewCtx?.selectedItems() ?? [];
-
-                if (e.ctrlKey) {
-                    if (selectedItems.includes(props.path)) {
-                        selectedItems = selectedItems.filter((fi) => fi !== props.path);
-                        viewCtx?.setSelectedItems(selectedItems);
+        <UKMenu
+            items={[
+                {
+                    type: "button",
+                    label: "Hello",
+                    supportingText: "Hello world",
+                    onClick() {
+                        console.log("0");
+                    },
+                },
+                {
+                    type: "button",
+                    label: "Hello",
+                    supportingText: "Hello world",
+                    onClick() {
+                        console.log("1");
+                    },
+                },
+                {
+                    type: "divider",
+                },
+                {
+                    type: "button",
+                    label: "Hello",
+                    supportingText: "Hello world",
+                    onClick() {
+                        console.log("2");
+                    },
+                },
+                {
+                    type: "spacer",
+                },
+                {
+                    type: "button",
+                    label: "Hello",
+                    supportingText: "Hello world",
+                    leadingIcon: "person",
+                    onClick() {
+                        console.log("3");
+                    },
+                },
+                {
+                    type: "button",
+                    label: "Hello",
+                    supportingText: "Hello world",
+                    leadingIcon: "person",
+                    onClick() {
+                        console.log("3");
+                    },
+                },
+                {
+                    type: "button",
+                    label: "Hello",
+                    supportingText: "Hello world",
+                    leadingIcon: "person",
+                    onClick() {
+                        console.log("3");
+                    },
+                },
+                {
+                    type: "category",
+                    label: "Hello",
+                    supportingText: "Hello world",
+                    leadingIcon: "person",
+                },
+                {
+                    type: "spacer",
+                },
+                {
+                    type: "button",
+                    label: "Hello",
+                    supportingText: "Hello world",
+                    leadingIcon: "person",
+                    onClick() {
+                        console.log("3");
+                    },
+                },
+            ]}
+        >
+            <div
+                class={styles.root}
+                data-selected={viewCtx?.selectedItems().includes(props.path)}
+                onDblClick={async () => {
+                    if (props.type === "directory") {
+                        navigate(`/app/uk.tcsw.files/dir/${props.path}`);
                     } else {
-                        viewCtx?.setSelectedItems([...selectedItems, props.path]);
+                        window.open(await trpc.getRawFile.query(props.path));
                     }
-                } else if (e.shiftKey) {
-                    const lastSelectionIndex = viewCtx?.lastSelectionIndex();
-                    if (lastSelectionIndex === props.index || lastSelectionIndex === undefined) {
+                }}
+                onContextMenu={() => {
+                    let selectedItems = viewCtx?.selectedItems() ?? [];
+
+                    if (selectedItems.length === 0) {
+                        viewCtx?.setSelectedItems([props.path]);
+                    }
+                }}
+                onClick={(e) => {
+                    e.stopPropagation();
+
+                    let selectedItems = viewCtx?.selectedItems() ?? [];
+
+                    if (e.ctrlKey) {
+                        if (selectedItems.includes(props.path)) {
+                            selectedItems = selectedItems.filter((fi) => fi !== props.path);
+                            viewCtx?.setSelectedItems(selectedItems);
+                        } else {
+                            viewCtx?.setSelectedItems([...selectedItems, props.path]);
+                        }
+                    } else if (e.shiftKey) {
+                        const lastSelectionIndex = viewCtx?.lastSelectionIndex();
+                        if (
+                            lastSelectionIndex === props.index ||
+                            lastSelectionIndex === undefined
+                        ) {
+                            viewCtx?.setLastSelectionIndex(props.index);
+                            if (selectedItems.includes(props.path)) {
+                                if (selectedItems.length === 1) {
+                                    viewCtx?.setSelectedItems([]);
+                                } else {
+                                    viewCtx?.setSelectedItems([props.path]);
+                                }
+                            } else {
+                                viewCtx?.setSelectedItems([props.path]);
+                            }
+                            return;
+                        }
+
+                        // select items between lastSelectionIndex and the props.index
+                        let itemsBetween: string[] = [];
+
+                        if (lastSelectionIndex < props.index) {
+                            for (let i = lastSelectionIndex; i < props.index + 1; i++) {
+                                let item = viewCtx?.viewItems()[i];
+                                if (item !== undefined) itemsBetween.push(item);
+                            }
+                        } else {
+                            for (let i = lastSelectionIndex; i > props.index - 1; i--) {
+                                let item = viewCtx?.viewItems()[i];
+                                if (item !== undefined) itemsBetween.push(item);
+                            }
+                        }
+
+                        viewCtx?.setSelectedItems(itemsBetween);
+                    } else {
                         viewCtx?.setLastSelectionIndex(props.index);
                         if (selectedItems.includes(props.path)) {
                             if (selectedItems.length === 1) {
@@ -54,60 +174,31 @@ const GridItem: Component<{
                         } else {
                             viewCtx?.setSelectedItems([props.path]);
                         }
-                        return;
                     }
-
-                    // select items between lastSelectionIndex and the props.index
-                    let itemsBetween: string[] = [];
-
-                    if (lastSelectionIndex < props.index) {
-                        for (let i = lastSelectionIndex; i < props.index + 1; i++) {
-                            let item = viewCtx?.viewItems()[i];
-                            if (item !== undefined) itemsBetween.push(item);
-                        }
-                    } else {
-                        for (let i = lastSelectionIndex; i > props.index - 1; i--) {
-                            let item = viewCtx?.viewItems()[i];
-                            if (item !== undefined) itemsBetween.push(item);
-                        }
-                    }
-
-                    viewCtx?.setSelectedItems(itemsBetween);
-                } else {
-                    viewCtx?.setLastSelectionIndex(props.index);
-                    if (selectedItems.includes(props.path)) {
-                        if (selectedItems.length === 1) {
-                            viewCtx?.setSelectedItems([]);
-                        } else {
-                            viewCtx?.setSelectedItems([props.path]);
-                        }
-                    } else {
-                        viewCtx?.setSelectedItems([props.path]);
-                    }
-                }
-            }}
-        >
-            {props.type === "file" ? (
-                props.icon ? (
-                    <img draggable={false} alt="" src={props.icon} loading={"lazy"} />
+                }}
+            >
+                {props.type === "file" ? (
+                    props.icon ? (
+                        <img draggable={false} alt="" src={props.icon} loading={"lazy"} />
+                    ) : (
+                        <UKIcon class={styles.icon}>article</UKIcon>
+                    )
                 ) : (
-                    <UKIcon class={styles.icon}>article</UKIcon>
-                )
-            ) : (
-                <UKIcon class={styles.icon}>folder</UKIcon>
-            )}
-            {viewCtx?.renameEntry() === props.path ? (
-                <GridItemRename
-                    path={props.path}
-                    name={props.name}
-                    refetchGrid={props.refetchGrid}
-                />
-            ) : (
-                <UKText align="center" role="label" size="m">
-                    {props.name}
-                </UKText>
-            )}
-        </div>
+                    <UKIcon class={styles.icon}>folder</UKIcon>
+                )}
+                {viewCtx?.renameEntry() === props.path ? (
+                    <GridItemRename
+                        path={props.path}
+                        name={props.name}
+                        refetchGrid={props.refetchGrid}
+                    />
+                ) : (
+                    <UKText align="center" role="label" size="m">
+                        {props.name}
+                    </UKText>
+                )}
+            </div>
+        </UKMenu>
     );
 };
 

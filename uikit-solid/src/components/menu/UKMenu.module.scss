@@ -1,3 +1,201 @@
+.background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    user-select: none;
+    background: transparent;
+}
+
 .root {
-    outline: 1px solid rebeccapurple;
+    position: fixed;
+    display: flex;
+    flex-direction: column;
+    transform-origin: top left;
+    animation: animateIn 100ms ease-in-out forwards;
+
+    @keyframes animateIn {
+        from {
+            transform: scaleY(90%) scaleX(90%);
+        }
+        to {
+            transform: scaleY(100%) scaleX(100%);
+        }
+    }
+}
+
+.button {
+    position: relative;
+    border: none;
+    padding-left: 12px;
+    padding-right: 12px;
+    border-radius: 4px;
+    height: 48px;
+    margin-bottom: 2px;
+    background: transparent;
+    color: rgb(var(--uk-sys-color-on-surface-container));
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: start;
+    gap: 8px;
+
+    .icon {
+        --icon-size: 20px;
+    }
+
+    &::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: transparent;
+        border-radius: 4px;
+    }
+
+    &:hover {
+        &::after {
+            background-color: rgb(var(--uk-sys-color-on-surface), var(--uk-sys-state-hover-state-layer-opacity));
+        }
+    }
+
+    .selected {
+        background-color: rgb(var(--uk-sys-color-tertiary));
+        color: rgb(var(--uk-sys-color-on-tertiary));
+    }
+
+    &::before {
+        content: "";
+        position: absolute;
+        left: -4px;
+        top: 0;
+        width: calc(100% + 8px);
+        height: calc(100% + 2px);
+        background: rgb(var(--uk-sys-color-surface-container-low));
+        z-index: -1;
+    }
+
+    &:last-of-type {
+        &::before {
+            top: 0;
+            height: calc(100% + 4px);
+            border-bottom-left-radius: 1rem;
+            border-bottom-right-radius: 1rem;
+        }
+
+        border-bottom-left-radius: 12px;
+        border-bottom-right-radius: 12px;
+
+        &::after {
+            border-bottom-left-radius: 12px;
+            border-bottom-right-radius: 12px;
+        }
+    }
+
+    &:first-of-type {
+        &::before {
+            top: -4px;
+            height: calc(100% + 6px);
+            border-top-left-radius: 1rem;
+            border-top-right-radius: 1rem;
+        }
+
+        border-top-left-radius: 12px;
+        border-top-right-radius: 12px;
+
+        &::after {
+            border-top-left-radius: 12px;
+            border-top-right-radius: 12px;
+        }
+    }
+
+    &:has(+.spacer) {
+        &::before {
+            border-bottom-left-radius: 0.5rem;
+            border-bottom-right-radius: 0.5rem;
+            top: 0;
+            height: calc(100% + 4px);
+        }
+
+        border-bottom-left-radius: 12px;
+        border-bottom-right-radius: 12px;
+
+        &::after {
+            border-bottom-left-radius: 12px;
+            border-bottom-right-radius: 12px;
+        }
+
+        margin-bottom: 4px;
+    }
+
+    .spacer + & {
+        &::before {
+            border-top-left-radius: 0.5rem;
+            border-top-right-radius: 0.5rem;
+            top: -4px;
+            height: calc(100% + 8px);
+        }
+
+        margin-top: 6px;
+        border-top-left-radius: 12px;
+        border-top-right-radius: 12px;
+
+        &::after {
+            border-top-left-radius: 12px;
+            border-top-right-radius: 12px;
+        }
+    }
+}
+
+.divider {
+    position: relative;
+    margin-bottom: 2px;
+    background-color: rgb(var(--uk-sys-color-on-surface));
+
+    &::before {
+        content: "";
+        position: absolute;
+        left: -4px;
+        top: 0;
+        width: calc(100% + 8px);
+        height: calc(100% + 2px);
+        background: rgb(var(--uk-sys-color-surface));
+        z-index: -1;
+    }
+}
+
+.root[data-vibrant="true"] {
+    .button {
+        color: rgb(var(--uk-sys-color-on-tertiary-container));
+
+        &::after {
+            background-color: transparent;
+        }
+
+        &:hover {
+            &::after {
+                background-color: rgb(var(--uk-sys-color-on-tertiary-container), var(--uk-sys-state-hover-state-layer-opacity));
+            }
+        }
+
+        .selected {
+            background-color: rgb(var(--uk-sys-color-tertiary));
+            color: rgb(var(--uk-sys-color-on-tertiary));
+        }
+
+        &::before {
+            background: rgb(var(--uk-sys-color-tertiary-container));
+        }
+    }
+
+    .divider {
+        background-color: rgb(var(--uk-sys-color-on-tertiary-container));
+
+        &::before {
+            background: rgb(var(--uk-sys-color-tertiary-container));
+        }
+    }
 }
