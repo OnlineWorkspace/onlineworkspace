@@ -69,22 +69,31 @@ export interface UKDesignTokens {
                 "neutral-variant80"(): string;
                 "neutral-variant90"(): string;
                 "neutral-variant95"(): string;
+                "neutral-variant98"(): string;
                 "neutral-variant99"(): string;
                 "neutral-variant100"(): string;
                 neutral0(): string;
+                neutral4(): string;
+                neutral6(): string;
                 neutral10(): string;
                 neutral12(): string;
+                neutral17(): string;
                 neutral20(): string;
                 neutral22(): string;
+                neutral24(): string;
                 neutral30(): string;
                 neutral40(): string;
                 neutral50(): string;
                 neutral60(): string;
                 neutral70(): string;
                 neutral80(): string;
+                neutral87(): string;
                 neutral90(): string;
+                neutral92(): string;
                 neutral94(): string;
                 neutral95(): string;
+                neutral96(): string;
+                neutral98(): string;
                 neutral99(): string;
                 neutral100(): string;
                 black(): string;
@@ -677,22 +686,31 @@ export interface UKDesignTokens {
             "neutral-variant80": string;
             "neutral-variant90": string;
             "neutral-variant95": string;
+            "neutral-variant98": string;
             "neutral-variant99": string;
             "neutral-variant100": string;
             neutral0: string;
+            neutral4: string;
+            neutral6: string;
             neutral10: string;
             neutral12: string;
+            neutral17: string;
             neutral20: string;
             neutral22: string;
+            neutral24: string;
             neutral30: string;
             neutral40: string;
             neutral50: string;
             neutral60: string;
             neutral70: string;
             neutral80: string;
+            neutral87: string;
             neutral90: string;
+            neutral92: string;
             neutral94: string;
             neutral95: string;
+            neutral96: string;
+            neutral98: string;
             neutral99: string;
             neutral100: string;
             black: string;
@@ -1760,22 +1778,31 @@ let tokens: UKDesignTokens = {
             "neutral-variant80": "var(--uk-ref-palette-neutral-variant80)",
             "neutral-variant90": "var(--uk-ref-palette-neutral-variant90)",
             "neutral-variant95": "var(--uk-ref-palette-neutral-variant95)",
+            "neutral-variant98": "var(--uk-ref-palette-neutral-variant98)",
             "neutral-variant99": "var(--uk-ref-palette-neutral-variant99)",
             "neutral-variant100": "var(--uk-ref-palette-neutral-variant100)",
             neutral0: "var(--uk-ref-palette-neutral0)",
+            neutral4: "var(--uk-ref-palette-neutral4)",
+            neutral6: "var(--uk-ref-palette-neutral6)",
             neutral10: "var(--uk-ref-palette-neutral10)",
             neutral12: "var(--uk-ref-palette-neutral12)",
+            neutral17: "var(--uk-ref-palette-neutral17)",
             neutral20: "var(--uk-ref-palette-neutral20)",
             neutral22: "var(--uk-ref-palette-neutral22)",
+            neutral24: "var(--uk-ref-palette-neutral24)",
             neutral30: "var(--uk-ref-palette-neutral30)",
             neutral40: "var(--uk-ref-palette-neutral40)",
             neutral50: "var(--uk-ref-palette-neutral50)",
             neutral60: "var(--uk-ref-palette-neutral60)",
             neutral70: "var(--uk-ref-palette-neutral70)",
             neutral80: "var(--uk-ref-palette-neutral80)",
+            neutral87: "var(--uk-ref-palette-neutral87)",
             neutral90: "var(--uk-ref-palette-neutral90)",
+            neutral92: "var(--uk-ref-palette-neutral92)",
             neutral94: "var(--uk-ref-palette-neutral94)",
             neutral95: "var(--uk-ref-palette-neutral95)",
+            neutral96: "var(--uk-ref-palette-neutral96)",
+            neutral98: "var(--uk-ref-palette-neutral98)",
             neutral99: "var(--uk-ref-palette-neutral99)",
             neutral100: "var(--uk-ref-palette-neutral100)",
             black: "var(--uk-ref-palette-black)",
@@ -1958,10 +1985,12 @@ let tokens: UKDesignTokens = {
             },
             emphasized: {
                 "label-small": {
-                    "text-transform": "var(--uk-sys-typescale-emphasized-label-small-text-transform)",
+                    "text-transform":
+                        "var(--uk-sys-typescale-emphasized-label-small-text-transform)",
                     "axis-value": "var(--uk-sys-typescale-emphasized-label-small-axis-value)",
                     "font-style": "var(--uk-sys-typescale-emphasized-label-small-font-style)",
-                    "text-decoration": "var(--uk-sys-typescale-emphasized-label-small-text-decoration)",
+                    "text-decoration":
+                        "var(--uk-sys-typescale-emphasized-label-small-text-decoration)",
                     "line-height": "var(--uk-sys-typescale-emphasized-label-small-line-height)",
                     tracking: "var(--uk-sys-typescale-emphasized-label-small-tracking)",
                     size: "var(--uk-sys-typescale-emphasized-label-small-size)",
@@ -1969,10 +1998,12 @@ let tokens: UKDesignTokens = {
                     font: "var(--uk-sys-typescale-emphasized-label-small-font)",
                 },
                 "label-medium": {
-                    "text-transform": "var(--uk-sys-typescale-emphasized-label-medium-text-transform)",
+                    "text-transform":
+                        "var(--uk-sys-typescale-emphasized-label-medium-text-transform)",
                     "axis-value": "var(--uk-sys-typescale-emphasized-label-medium-axis-value)",
                     "font-style": "var(--uk-sys-typescale-emphasized-label-medium-font-style)",
-                    "text-decoration": "var(--uk-sys-typescale-emphasized-label-medium-text-decoration)",
+                    "text-decoration":
+                        "var(--uk-sys-typescale-emphasized-label-medium-text-decoration)",
                     "line-height": "var(--uk-sys-typescale-emphasized-label-medium-line-height)",
                     tracking: "var(--uk-sys-typescale-emphasized-label-medium-tracking)",
                     size: "var(--uk-sys-typescale-emphasized-label-medium-size)",
@@ -1980,10 +2011,12 @@ let tokens: UKDesignTokens = {
                     font: "var(--uk-sys-typescale-emphasized-label-medium-font)",
                 },
                 "label-large": {
-                    "text-transform": "var(--uk-sys-typescale-emphasized-label-large-text-transform)",
+                    "text-transform":
+                        "var(--uk-sys-typescale-emphasized-label-large-text-transform)",
                     "axis-value": "var(--uk-sys-typescale-emphasized-label-large-axis-value)",
                     "font-style": "var(--uk-sys-typescale-emphasized-label-large-font-style)",
-                    "text-decoration": "var(--uk-sys-typescale-emphasized-label-large-text-decoration)",
+                    "text-decoration":
+                        "var(--uk-sys-typescale-emphasized-label-large-text-decoration)",
                     "line-height": "var(--uk-sys-typescale-emphasized-label-large-line-height)",
                     tracking: "var(--uk-sys-typescale-emphasized-label-large-tracking)",
                     size: "var(--uk-sys-typescale-emphasized-label-large-size)",
@@ -1991,10 +2024,12 @@ let tokens: UKDesignTokens = {
                     font: "var(--uk-sys-typescale-emphasized-label-large-font)",
                 },
                 "body-small": {
-                    "text-transform": "var(--uk-sys-typescale-emphasized-body-small-text-transform)",
+                    "text-transform":
+                        "var(--uk-sys-typescale-emphasized-body-small-text-transform)",
                     "axis-value": "var(--uk-sys-typescale-emphasized-body-small-axis-value)",
                     "font-style": "var(--uk-sys-typescale-emphasized-body-small-font-style)",
-                    "text-decoration": "var(--uk-sys-typescale-emphasized-body-small-text-decoration)",
+                    "text-decoration":
+                        "var(--uk-sys-typescale-emphasized-body-small-text-decoration)",
                     "line-height": "var(--uk-sys-typescale-emphasized-body-small-line-height)",
                     tracking: "var(--uk-sys-typescale-emphasized-body-small-tracking)",
                     size: "var(--uk-sys-typescale-emphasized-body-small-size)",
@@ -2002,10 +2037,12 @@ let tokens: UKDesignTokens = {
                     font: "var(--uk-sys-typescale-emphasized-body-small-font)",
                 },
                 "body-medium": {
-                    "text-transform": "var(--uk-sys-typescale-emphasized-body-medium-text-transform)",
+                    "text-transform":
+                        "var(--uk-sys-typescale-emphasized-body-medium-text-transform)",
                     "axis-value": "var(--uk-sys-typescale-emphasized-body-medium-axis-value)",
                     "font-style": "var(--uk-sys-typescale-emphasized-body-medium-font-style)",
-                    "text-decoration": "var(--uk-sys-typescale-emphasized-body-medium-text-decoration)",
+                    "text-decoration":
+                        "var(--uk-sys-typescale-emphasized-body-medium-text-decoration)",
                     "line-height": "var(--uk-sys-typescale-emphasized-body-medium-line-height)",
                     tracking: "var(--uk-sys-typescale-emphasized-body-medium-tracking)",
                     size: "var(--uk-sys-typescale-emphasized-body-medium-size)",
@@ -2013,10 +2050,12 @@ let tokens: UKDesignTokens = {
                     font: "var(--uk-sys-typescale-emphasized-body-medium-font)",
                 },
                 "body-large": {
-                    "text-transform": "var(--uk-sys-typescale-emphasized-body-large-text-transform)",
+                    "text-transform":
+                        "var(--uk-sys-typescale-emphasized-body-large-text-transform)",
                     "axis-value": "var(--uk-sys-typescale-emphasized-body-large-axis-value)",
                     "font-style": "var(--uk-sys-typescale-emphasized-body-large-font-style)",
-                    "text-decoration": "var(--uk-sys-typescale-emphasized-body-large-text-decoration)",
+                    "text-decoration":
+                        "var(--uk-sys-typescale-emphasized-body-large-text-decoration)",
                     "line-height": "var(--uk-sys-typescale-emphasized-body-large-line-height)",
                     tracking: "var(--uk-sys-typescale-emphasized-body-large-tracking)",
                     size: "var(--uk-sys-typescale-emphasized-body-large-size)",
@@ -2024,10 +2063,12 @@ let tokens: UKDesignTokens = {
                     font: "var(--uk-sys-typescale-emphasized-body-large-font)",
                 },
                 "title-small": {
-                    "text-transform": "var(--uk-sys-typescale-emphasized-title-small-text-transform)",
+                    "text-transform":
+                        "var(--uk-sys-typescale-emphasized-title-small-text-transform)",
                     "axis-value": "var(--uk-sys-typescale-emphasized-title-small-axis-value)",
                     "font-style": "var(--uk-sys-typescale-emphasized-title-small-font-style)",
-                    "text-decoration": "var(--uk-sys-typescale-emphasized-title-small-text-decoration)",
+                    "text-decoration":
+                        "var(--uk-sys-typescale-emphasized-title-small-text-decoration)",
                     "line-height": "var(--uk-sys-typescale-emphasized-title-small-line-height)",
                     tracking: "var(--uk-sys-typescale-emphasized-title-small-tracking)",
                     size: "var(--uk-sys-typescale-emphasized-title-small-size)",
@@ -2035,10 +2076,12 @@ let tokens: UKDesignTokens = {
                     font: "var(--uk-sys-typescale-emphasized-title-small-font)",
                 },
                 "title-medium": {
-                    "text-transform": "var(--uk-sys-typescale-emphasized-title-medium-text-transform)",
+                    "text-transform":
+                        "var(--uk-sys-typescale-emphasized-title-medium-text-transform)",
                     "axis-value": "var(--uk-sys-typescale-emphasized-title-medium-axis-value)",
                     "font-style": "var(--uk-sys-typescale-emphasized-title-medium-font-style)",
-                    "text-decoration": "var(--uk-sys-typescale-emphasized-title-medium-text-decoration)",
+                    "text-decoration":
+                        "var(--uk-sys-typescale-emphasized-title-medium-text-decoration)",
                     "line-height": "var(--uk-sys-typescale-emphasized-title-medium-line-height)",
                     tracking: "var(--uk-sys-typescale-emphasized-title-medium-tracking)",
                     size: "var(--uk-sys-typescale-emphasized-title-medium-size)",
@@ -2046,10 +2089,12 @@ let tokens: UKDesignTokens = {
                     font: "var(--uk-sys-typescale-emphasized-title-medium-font)",
                 },
                 "title-large": {
-                    "text-transform": "var(--uk-sys-typescale-emphasized-title-large-text-transform)",
+                    "text-transform":
+                        "var(--uk-sys-typescale-emphasized-title-large-text-transform)",
                     "axis-value": "var(--uk-sys-typescale-emphasized-title-large-axis-value)",
                     "font-style": "var(--uk-sys-typescale-emphasized-title-large-font-style)",
-                    "text-decoration": "var(--uk-sys-typescale-emphasized-title-large-text-decoration)",
+                    "text-decoration":
+                        "var(--uk-sys-typescale-emphasized-title-large-text-decoration)",
                     "line-height": "var(--uk-sys-typescale-emphasized-title-large-line-height)",
                     tracking: "var(--uk-sys-typescale-emphasized-title-large-tracking)",
                     size: "var(--uk-sys-typescale-emphasized-title-large-size)",
@@ -2057,10 +2102,12 @@ let tokens: UKDesignTokens = {
                     font: "var(--uk-sys-typescale-emphasized-title-large-font)",
                 },
                 "headline-small": {
-                    "text-transform": "var(--uk-sys-typescale-emphasized-headline-small-text-transform)",
+                    "text-transform":
+                        "var(--uk-sys-typescale-emphasized-headline-small-text-transform)",
                     "axis-value": "var(--uk-sys-typescale-emphasized-headline-small-axis-value)",
                     "font-style": "var(--uk-sys-typescale-emphasized-headline-small-font-style)",
-                    "text-decoration": "var(--uk-sys-typescale-emphasized-headline-small-text-decoration)",
+                    "text-decoration":
+                        "var(--uk-sys-typescale-emphasized-headline-small-text-decoration)",
                     "line-height": "var(--uk-sys-typescale-emphasized-headline-small-line-height)",
                     tracking: "var(--uk-sys-typescale-emphasized-headline-small-tracking)",
                     size: "var(--uk-sys-typescale-emphasized-headline-small-size)",
@@ -2068,10 +2115,12 @@ let tokens: UKDesignTokens = {
                     font: "var(--uk-sys-typescale-emphasized-headline-small-font)",
                 },
                 "headline-medium": {
-                    "text-transform": "var(--uk-sys-typescale-emphasized-headline-medium-text-transform)",
+                    "text-transform":
+                        "var(--uk-sys-typescale-emphasized-headline-medium-text-transform)",
                     "axis-value": "var(--uk-sys-typescale-emphasized-headline-medium-axis-value)",
                     "font-style": "var(--uk-sys-typescale-emphasized-headline-medium-font-style)",
-                    "text-decoration": "var(--uk-sys-typescale-emphasized-headline-medium-text-decoration)",
+                    "text-decoration":
+                        "var(--uk-sys-typescale-emphasized-headline-medium-text-decoration)",
                     "line-height": "var(--uk-sys-typescale-emphasized-headline-medium-line-height)",
                     tracking: "var(--uk-sys-typescale-emphasized-headline-medium-tracking)",
                     size: "var(--uk-sys-typescale-emphasized-headline-medium-size)",
@@ -2079,10 +2128,12 @@ let tokens: UKDesignTokens = {
                     font: "var(--uk-sys-typescale-emphasized-headline-medium-font)",
                 },
                 "headline-large": {
-                    "text-transform": "var(--uk-sys-typescale-emphasized-headline-large-text-transform)",
+                    "text-transform":
+                        "var(--uk-sys-typescale-emphasized-headline-large-text-transform)",
                     "axis-value": "var(--uk-sys-typescale-emphasized-headline-large-axis-value)",
                     "font-style": "var(--uk-sys-typescale-emphasized-headline-large-font-style)",
-                    "text-decoration": "var(--uk-sys-typescale-emphasized-headline-large-text-decoration)",
+                    "text-decoration":
+                        "var(--uk-sys-typescale-emphasized-headline-large-text-decoration)",
                     "line-height": "var(--uk-sys-typescale-emphasized-headline-large-line-height)",
                     tracking: "var(--uk-sys-typescale-emphasized-headline-large-tracking)",
                     size: "var(--uk-sys-typescale-emphasized-headline-large-size)",
@@ -2090,10 +2141,12 @@ let tokens: UKDesignTokens = {
                     font: "var(--uk-sys-typescale-emphasized-headline-large-font)",
                 },
                 "display-small": {
-                    "text-transform": "var(--uk-sys-typescale-emphasized-display-small-text-transform)",
+                    "text-transform":
+                        "var(--uk-sys-typescale-emphasized-display-small-text-transform)",
                     "axis-value": "var(--uk-sys-typescale-emphasized-display-small-axis-value)",
                     "font-style": "var(--uk-sys-typescale-emphasized-display-small-font-style)",
-                    "text-decoration": "var(--uk-sys-typescale-emphasized-display-small-text-decoration)",
+                    "text-decoration":
+                        "var(--uk-sys-typescale-emphasized-display-small-text-decoration)",
                     "line-height": "var(--uk-sys-typescale-emphasized-display-small-line-height)",
                     tracking: "var(--uk-sys-typescale-emphasized-display-small-tracking)",
                     size: "var(--uk-sys-typescale-emphasized-display-small-size)",
@@ -2101,10 +2154,12 @@ let tokens: UKDesignTokens = {
                     font: "var(--uk-sys-typescale-emphasized-display-small-font)",
                 },
                 "display-medium": {
-                    "text-transform": "var(--uk-sys-typescale-emphasized-display-medium-text-transform)",
+                    "text-transform":
+                        "var(--uk-sys-typescale-emphasized-display-medium-text-transform)",
                     "axis-value": "var(--uk-sys-typescale-emphasized-display-medium-axis-value)",
                     "font-style": "var(--uk-sys-typescale-emphasized-display-medium-font-style)",
-                    "text-decoration": "var(--uk-sys-typescale-emphasized-display-medium-text-decoration)",
+                    "text-decoration":
+                        "var(--uk-sys-typescale-emphasized-display-medium-text-decoration)",
                     "line-height": "var(--uk-sys-typescale-emphasized-display-medium-line-height)",
                     tracking: "var(--uk-sys-typescale-emphasized-display-medium-tracking)",
                     size: "var(--uk-sys-typescale-emphasized-display-medium-size)",
@@ -2112,10 +2167,12 @@ let tokens: UKDesignTokens = {
                     font: "var(--uk-sys-typescale-emphasized-display-medium-font)",
                 },
                 "display-large": {
-                    "text-transform": "var(--uk-sys-typescale-emphasized-display-large-text-transform)",
+                    "text-transform":
+                        "var(--uk-sys-typescale-emphasized-display-large-text-transform)",
                     "axis-value": "var(--uk-sys-typescale-emphasized-display-large-axis-value)",
                     "font-style": "var(--uk-sys-typescale-emphasized-display-large-font-style)",
-                    "text-decoration": "var(--uk-sys-typescale-emphasized-display-large-text-decoration)",
+                    "text-decoration":
+                        "var(--uk-sys-typescale-emphasized-display-large-text-decoration)",
                     "line-height": "var(--uk-sys-typescale-emphasized-display-large-line-height)",
                     tracking: "var(--uk-sys-typescale-emphasized-display-large-tracking)",
                     size: "var(--uk-sys-typescale-emphasized-display-large-size)",
@@ -2275,13 +2332,15 @@ function applyTheme(theme: UKDesignTheme, element: HTMLDivElement, mode: "light"
     for (const key of Object.keys(theme.sys.color.lightMode)) {
         let val = theme.sys.color.lightMode[key as keyof typeof theme.sys.color.lightMode]();
 
-        uk.raw.sys.color.lightMode[key as keyof typeof theme.sys.color.lightMode] = () => hexToRgb(val);
+        uk.raw.sys.color.lightMode[key as keyof typeof theme.sys.color.lightMode] = () =>
+            hexToRgb(val);
     }
 
     for (const key of Object.keys(theme.sys.color.darkMode)) {
         let val = theme.sys.color.darkMode[key as keyof typeof theme.sys.color.darkMode]();
 
-        uk.raw.sys.color.darkMode[key as keyof typeof theme.sys.color.darkMode] = () => hexToRgb(val);
+        uk.raw.sys.color.darkMode[key as keyof typeof theme.sys.color.darkMode] = () =>
+            hexToRgb(val);
     }
 
     tokens.raw.ref.palette = { ...tokens.raw.ref.palette, ...theme.ref.palette };
@@ -2358,22 +2417,31 @@ function applyTheme(theme: UKDesignTheme, element: HTMLDivElement, mode: "light"
     applyProperty(uk.ref.palette["neutral-variant80"], uk.raw.ref.palette["neutral-variant80"]);
     applyProperty(uk.ref.palette["neutral-variant90"], uk.raw.ref.palette["neutral-variant90"]);
     applyProperty(uk.ref.palette["neutral-variant95"], uk.raw.ref.palette["neutral-variant95"]);
+    applyProperty(uk.ref.palette["neutral-variant98"], uk.raw.ref.palette["neutral-variant98"]);
     applyProperty(uk.ref.palette["neutral-variant99"], uk.raw.ref.palette["neutral-variant99"]);
     applyProperty(uk.ref.palette["neutral-variant100"], uk.raw.ref.palette["neutral-variant100"]);
     applyProperty(uk.ref.palette.neutral0, uk.raw.ref.palette.neutral0);
+    applyProperty(uk.ref.palette.neutral4, uk.raw.ref.palette.neutral4);
+    applyProperty(uk.ref.palette.neutral6, uk.raw.ref.palette.neutral6);
     applyProperty(uk.ref.palette.neutral10, uk.raw.ref.palette.neutral10);
     applyProperty(uk.ref.palette.neutral12, uk.raw.ref.palette.neutral12);
+    applyProperty(uk.ref.palette.neutral17, uk.raw.ref.palette.neutral17);
     applyProperty(uk.ref.palette.neutral20, uk.raw.ref.palette.neutral20);
     applyProperty(uk.ref.palette.neutral22, uk.raw.ref.palette.neutral22);
+    applyProperty(uk.ref.palette.neutral24, uk.raw.ref.palette.neutral24);
     applyProperty(uk.ref.palette.neutral30, uk.raw.ref.palette.neutral30);
     applyProperty(uk.ref.palette.neutral40, uk.raw.ref.palette.neutral40);
     applyProperty(uk.ref.palette.neutral50, uk.raw.ref.palette.neutral50);
     applyProperty(uk.ref.palette.neutral60, uk.raw.ref.palette.neutral60);
     applyProperty(uk.ref.palette.neutral70, uk.raw.ref.palette.neutral70);
     applyProperty(uk.ref.palette.neutral80, uk.raw.ref.palette.neutral80);
+    applyProperty(uk.ref.palette.neutral87, uk.raw.ref.palette.neutral87);
     applyProperty(uk.ref.palette.neutral90, uk.raw.ref.palette.neutral90);
+    applyProperty(uk.ref.palette.neutral92, uk.raw.ref.palette.neutral92);
     applyProperty(uk.ref.palette.neutral94, uk.raw.ref.palette.neutral94);
     applyProperty(uk.ref.palette.neutral95, uk.raw.ref.palette.neutral95);
+    applyProperty(uk.ref.palette.neutral96, uk.raw.ref.palette.neutral96);
+    applyProperty(uk.ref.palette.neutral98, uk.raw.ref.palette.neutral98);
     applyProperty(uk.ref.palette.neutral99, uk.raw.ref.palette.neutral99);
     applyProperty(uk.ref.palette.neutral100, uk.raw.ref.palette.neutral100);
     applyProperty(uk.ref.palette.black, uk.raw.ref.palette.black);
@@ -2385,178 +2453,550 @@ function applyTheme(theme: UKDesignTheme, element: HTMLDivElement, mode: "light"
     applyProperty(uk.ref.typeface["weight-medium"], uk.raw.ref.typeface["weight-medium"]);
     applyProperty(uk.ref.typeface["weight-regular"], uk.raw.ref.typeface["weight-regular"]);
 
-    applyProperty(uk.sys.typescale["label-small"]["text-transform"], uk.raw.sys.typescale["label-small"]["text-transform"]);
-    applyProperty(uk.sys.typescale["label-small"]["axis-value"], uk.raw.sys.typescale["label-small"]["axis-value"]);
-    applyProperty(uk.sys.typescale["label-small"]["font-style"], uk.raw.sys.typescale["label-small"]["font-style"]);
-    applyProperty(uk.sys.typescale["label-small"]["text-decoration"], uk.raw.sys.typescale["label-small"]["text-decoration"]);
-    applyProperty(uk.sys.typescale["label-small"]["line-height"], uk.raw.sys.typescale["label-small"]["line-height"]);
-    applyProperty(uk.sys.typescale["label-small"].tracking, uk.raw.sys.typescale["label-small"].tracking);
+    applyProperty(
+        uk.sys.typescale["label-small"]["text-transform"],
+        uk.raw.sys.typescale["label-small"]["text-transform"],
+    );
+    applyProperty(
+        uk.sys.typescale["label-small"]["axis-value"],
+        uk.raw.sys.typescale["label-small"]["axis-value"],
+    );
+    applyProperty(
+        uk.sys.typescale["label-small"]["font-style"],
+        uk.raw.sys.typescale["label-small"]["font-style"],
+    );
+    applyProperty(
+        uk.sys.typescale["label-small"]["text-decoration"],
+        uk.raw.sys.typescale["label-small"]["text-decoration"],
+    );
+    applyProperty(
+        uk.sys.typescale["label-small"]["line-height"],
+        uk.raw.sys.typescale["label-small"]["line-height"],
+    );
+    applyProperty(
+        uk.sys.typescale["label-small"].tracking,
+        uk.raw.sys.typescale["label-small"].tracking,
+    );
     applyProperty(uk.sys.typescale["label-small"].size, uk.raw.sys.typescale["label-small"].size);
-    applyProperty(uk.sys.typescale["label-small"].weight, uk.raw.sys.typescale["label-small"].weight);
+    applyProperty(
+        uk.sys.typescale["label-small"].weight,
+        uk.raw.sys.typescale["label-small"].weight,
+    );
     applyProperty(uk.sys.typescale["label-small"].font, uk.raw.sys.typescale["label-small"].font);
 
-    applyProperty(uk.sys.typescale["label-medium"]["text-transform"], uk.raw.sys.typescale["label-medium"]["text-transform"]);
-    applyProperty(uk.sys.typescale["label-medium"]["axis-value"], uk.raw.sys.typescale["label-medium"]["axis-value"]);
-    applyProperty(uk.sys.typescale["label-medium"]["font-style"], uk.raw.sys.typescale["label-medium"]["font-style"]);
-    applyProperty(uk.sys.typescale["label-medium"]["text-decoration"], uk.raw.sys.typescale["label-medium"]["text-decoration"]);
-    applyProperty(uk.sys.typescale["label-medium"]["line-height"], uk.raw.sys.typescale["label-medium"]["line-height"]);
-    applyProperty(uk.sys.typescale["label-medium"].tracking, uk.raw.sys.typescale["label-medium"].tracking);
+    applyProperty(
+        uk.sys.typescale["label-medium"]["text-transform"],
+        uk.raw.sys.typescale["label-medium"]["text-transform"],
+    );
+    applyProperty(
+        uk.sys.typescale["label-medium"]["axis-value"],
+        uk.raw.sys.typescale["label-medium"]["axis-value"],
+    );
+    applyProperty(
+        uk.sys.typescale["label-medium"]["font-style"],
+        uk.raw.sys.typescale["label-medium"]["font-style"],
+    );
+    applyProperty(
+        uk.sys.typescale["label-medium"]["text-decoration"],
+        uk.raw.sys.typescale["label-medium"]["text-decoration"],
+    );
+    applyProperty(
+        uk.sys.typescale["label-medium"]["line-height"],
+        uk.raw.sys.typescale["label-medium"]["line-height"],
+    );
+    applyProperty(
+        uk.sys.typescale["label-medium"].tracking,
+        uk.raw.sys.typescale["label-medium"].tracking,
+    );
     applyProperty(uk.sys.typescale["label-medium"].size, uk.raw.sys.typescale["label-medium"].size);
-    applyProperty(uk.sys.typescale["label-medium"].weight, uk.raw.sys.typescale["label-medium"].weight);
+    applyProperty(
+        uk.sys.typescale["label-medium"].weight,
+        uk.raw.sys.typescale["label-medium"].weight,
+    );
     applyProperty(uk.sys.typescale["label-medium"].font, uk.raw.sys.typescale["label-medium"].font);
 
-    applyProperty(uk.sys.typescale["label-large"]["text-transform"], uk.raw.sys.typescale["label-large"]["text-transform"]);
-    applyProperty(uk.sys.typescale["label-large"]["axis-value"], uk.raw.sys.typescale["label-large"]["axis-value"]);
-    applyProperty(uk.sys.typescale["label-large"]["font-style"], uk.raw.sys.typescale["label-large"]["font-style"]);
-    applyProperty(uk.sys.typescale["label-large"]["text-decoration"], uk.raw.sys.typescale["label-large"]["text-decoration"]);
-    applyProperty(uk.sys.typescale["label-large"]["line-height"], uk.raw.sys.typescale["label-large"]["line-height"]);
-    applyProperty(uk.sys.typescale["label-large"].tracking, uk.raw.sys.typescale["label-large"].tracking);
+    applyProperty(
+        uk.sys.typescale["label-large"]["text-transform"],
+        uk.raw.sys.typescale["label-large"]["text-transform"],
+    );
+    applyProperty(
+        uk.sys.typescale["label-large"]["axis-value"],
+        uk.raw.sys.typescale["label-large"]["axis-value"],
+    );
+    applyProperty(
+        uk.sys.typescale["label-large"]["font-style"],
+        uk.raw.sys.typescale["label-large"]["font-style"],
+    );
+    applyProperty(
+        uk.sys.typescale["label-large"]["text-decoration"],
+        uk.raw.sys.typescale["label-large"]["text-decoration"],
+    );
+    applyProperty(
+        uk.sys.typescale["label-large"]["line-height"],
+        uk.raw.sys.typescale["label-large"]["line-height"],
+    );
+    applyProperty(
+        uk.sys.typescale["label-large"].tracking,
+        uk.raw.sys.typescale["label-large"].tracking,
+    );
     applyProperty(uk.sys.typescale["label-large"].size, uk.raw.sys.typescale["label-large"].size);
-    applyProperty(uk.sys.typescale["label-large"].weight, uk.raw.sys.typescale["label-large"].weight);
+    applyProperty(
+        uk.sys.typescale["label-large"].weight,
+        uk.raw.sys.typescale["label-large"].weight,
+    );
     applyProperty(uk.sys.typescale["label-large"].font, uk.raw.sys.typescale["label-large"].font);
 
-    applyProperty(uk.sys.typescale["body-small"]["text-transform"], uk.raw.sys.typescale["body-small"]["text-transform"]);
-    applyProperty(uk.sys.typescale["body-small"]["axis-value"], uk.raw.sys.typescale["body-small"]["axis-value"]);
-    applyProperty(uk.sys.typescale["body-small"]["font-style"], uk.raw.sys.typescale["body-small"]["font-style"]);
-    applyProperty(uk.sys.typescale["body-small"]["text-decoration"], uk.raw.sys.typescale["body-small"]["text-decoration"]);
-    applyProperty(uk.sys.typescale["body-small"]["line-height"], uk.raw.sys.typescale["body-small"]["line-height"]);
-    applyProperty(uk.sys.typescale["body-small"].tracking, uk.raw.sys.typescale["body-small"].tracking);
+    applyProperty(
+        uk.sys.typescale["body-small"]["text-transform"],
+        uk.raw.sys.typescale["body-small"]["text-transform"],
+    );
+    applyProperty(
+        uk.sys.typescale["body-small"]["axis-value"],
+        uk.raw.sys.typescale["body-small"]["axis-value"],
+    );
+    applyProperty(
+        uk.sys.typescale["body-small"]["font-style"],
+        uk.raw.sys.typescale["body-small"]["font-style"],
+    );
+    applyProperty(
+        uk.sys.typescale["body-small"]["text-decoration"],
+        uk.raw.sys.typescale["body-small"]["text-decoration"],
+    );
+    applyProperty(
+        uk.sys.typescale["body-small"]["line-height"],
+        uk.raw.sys.typescale["body-small"]["line-height"],
+    );
+    applyProperty(
+        uk.sys.typescale["body-small"].tracking,
+        uk.raw.sys.typescale["body-small"].tracking,
+    );
     applyProperty(uk.sys.typescale["body-small"].size, uk.raw.sys.typescale["body-small"].size);
     applyProperty(uk.sys.typescale["body-small"].weight, uk.raw.sys.typescale["body-small"].weight);
     applyProperty(uk.sys.typescale["body-small"].font, uk.raw.sys.typescale["body-small"].font);
 
-    applyProperty(uk.sys.typescale["body-medium"]["text-transform"], uk.raw.sys.typescale["body-medium"]["text-transform"]);
-    applyProperty(uk.sys.typescale["body-medium"]["axis-value"], uk.raw.sys.typescale["body-medium"]["axis-value"]);
-    applyProperty(uk.sys.typescale["body-medium"]["font-style"], uk.raw.sys.typescale["body-medium"]["font-style"]);
-    applyProperty(uk.sys.typescale["body-medium"]["text-decoration"], uk.raw.sys.typescale["body-medium"]["text-decoration"]);
-    applyProperty(uk.sys.typescale["body-medium"]["line-height"], uk.raw.sys.typescale["body-medium"]["line-height"]);
-    applyProperty(uk.sys.typescale["body-medium"].tracking, uk.raw.sys.typescale["body-medium"].tracking);
+    applyProperty(
+        uk.sys.typescale["body-medium"]["text-transform"],
+        uk.raw.sys.typescale["body-medium"]["text-transform"],
+    );
+    applyProperty(
+        uk.sys.typescale["body-medium"]["axis-value"],
+        uk.raw.sys.typescale["body-medium"]["axis-value"],
+    );
+    applyProperty(
+        uk.sys.typescale["body-medium"]["font-style"],
+        uk.raw.sys.typescale["body-medium"]["font-style"],
+    );
+    applyProperty(
+        uk.sys.typescale["body-medium"]["text-decoration"],
+        uk.raw.sys.typescale["body-medium"]["text-decoration"],
+    );
+    applyProperty(
+        uk.sys.typescale["body-medium"]["line-height"],
+        uk.raw.sys.typescale["body-medium"]["line-height"],
+    );
+    applyProperty(
+        uk.sys.typescale["body-medium"].tracking,
+        uk.raw.sys.typescale["body-medium"].tracking,
+    );
     applyProperty(uk.sys.typescale["body-medium"].size, uk.raw.sys.typescale["body-medium"].size);
-    applyProperty(uk.sys.typescale["body-medium"].weight, uk.raw.sys.typescale["body-medium"].weight);
+    applyProperty(
+        uk.sys.typescale["body-medium"].weight,
+        uk.raw.sys.typescale["body-medium"].weight,
+    );
     applyProperty(uk.sys.typescale["body-medium"].font, uk.raw.sys.typescale["body-medium"].font);
 
-    applyProperty(uk.sys.typescale["body-large"]["text-transform"], uk.raw.sys.typescale["body-large"]["text-transform"]);
-    applyProperty(uk.sys.typescale["body-large"]["axis-value"], uk.raw.sys.typescale["body-large"]["axis-value"]);
-    applyProperty(uk.sys.typescale["body-large"]["font-style"], uk.raw.sys.typescale["body-large"]["font-style"]);
-    applyProperty(uk.sys.typescale["body-large"]["text-decoration"], uk.raw.sys.typescale["body-large"]["text-decoration"]);
-    applyProperty(uk.sys.typescale["body-large"]["line-height"], uk.raw.sys.typescale["body-large"]["line-height"]);
-    applyProperty(uk.sys.typescale["body-large"].tracking, uk.raw.sys.typescale["body-large"].tracking);
+    applyProperty(
+        uk.sys.typescale["body-large"]["text-transform"],
+        uk.raw.sys.typescale["body-large"]["text-transform"],
+    );
+    applyProperty(
+        uk.sys.typescale["body-large"]["axis-value"],
+        uk.raw.sys.typescale["body-large"]["axis-value"],
+    );
+    applyProperty(
+        uk.sys.typescale["body-large"]["font-style"],
+        uk.raw.sys.typescale["body-large"]["font-style"],
+    );
+    applyProperty(
+        uk.sys.typescale["body-large"]["text-decoration"],
+        uk.raw.sys.typescale["body-large"]["text-decoration"],
+    );
+    applyProperty(
+        uk.sys.typescale["body-large"]["line-height"],
+        uk.raw.sys.typescale["body-large"]["line-height"],
+    );
+    applyProperty(
+        uk.sys.typescale["body-large"].tracking,
+        uk.raw.sys.typescale["body-large"].tracking,
+    );
     applyProperty(uk.sys.typescale["body-large"].size, uk.raw.sys.typescale["body-large"].size);
     applyProperty(uk.sys.typescale["body-large"].weight, uk.raw.sys.typescale["body-large"].weight);
     applyProperty(uk.sys.typescale["body-large"].font, uk.raw.sys.typescale["body-large"].font);
 
-    applyProperty(uk.sys.typescale["title-small"]["text-transform"], uk.raw.sys.typescale["title-small"]["text-transform"]);
-    applyProperty(uk.sys.typescale["title-small"]["axis-value"], uk.raw.sys.typescale["title-small"]["axis-value"]);
-    applyProperty(uk.sys.typescale["title-small"]["font-style"], uk.raw.sys.typescale["title-small"]["font-style"]);
-    applyProperty(uk.sys.typescale["title-small"]["text-decoration"], uk.raw.sys.typescale["title-small"]["text-decoration"]);
-    applyProperty(uk.sys.typescale["title-small"]["line-height"], uk.raw.sys.typescale["title-small"]["line-height"]);
-    applyProperty(uk.sys.typescale["title-small"].tracking, uk.raw.sys.typescale["title-small"].tracking);
+    applyProperty(
+        uk.sys.typescale["title-small"]["text-transform"],
+        uk.raw.sys.typescale["title-small"]["text-transform"],
+    );
+    applyProperty(
+        uk.sys.typescale["title-small"]["axis-value"],
+        uk.raw.sys.typescale["title-small"]["axis-value"],
+    );
+    applyProperty(
+        uk.sys.typescale["title-small"]["font-style"],
+        uk.raw.sys.typescale["title-small"]["font-style"],
+    );
+    applyProperty(
+        uk.sys.typescale["title-small"]["text-decoration"],
+        uk.raw.sys.typescale["title-small"]["text-decoration"],
+    );
+    applyProperty(
+        uk.sys.typescale["title-small"]["line-height"],
+        uk.raw.sys.typescale["title-small"]["line-height"],
+    );
+    applyProperty(
+        uk.sys.typescale["title-small"].tracking,
+        uk.raw.sys.typescale["title-small"].tracking,
+    );
     applyProperty(uk.sys.typescale["title-small"].size, uk.raw.sys.typescale["title-small"].size);
-    applyProperty(uk.sys.typescale["title-small"].weight, uk.raw.sys.typescale["title-small"].weight);
+    applyProperty(
+        uk.sys.typescale["title-small"].weight,
+        uk.raw.sys.typescale["title-small"].weight,
+    );
     applyProperty(uk.sys.typescale["title-small"].font, uk.raw.sys.typescale["title-small"].font);
 
-    applyProperty(uk.sys.typescale["title-medium"]["text-transform"], uk.raw.sys.typescale["title-medium"]["text-transform"]);
-    applyProperty(uk.sys.typescale["title-medium"]["axis-value"], uk.raw.sys.typescale["title-medium"]["axis-value"]);
-    applyProperty(uk.sys.typescale["title-medium"]["font-style"], uk.raw.sys.typescale["title-medium"]["font-style"]);
-    applyProperty(uk.sys.typescale["title-medium"]["text-decoration"], uk.raw.sys.typescale["title-medium"]["text-decoration"]);
-    applyProperty(uk.sys.typescale["title-medium"]["line-height"], uk.raw.sys.typescale["title-medium"]["line-height"]);
-    applyProperty(uk.sys.typescale["title-medium"].tracking, uk.raw.sys.typescale["title-medium"].tracking);
+    applyProperty(
+        uk.sys.typescale["title-medium"]["text-transform"],
+        uk.raw.sys.typescale["title-medium"]["text-transform"],
+    );
+    applyProperty(
+        uk.sys.typescale["title-medium"]["axis-value"],
+        uk.raw.sys.typescale["title-medium"]["axis-value"],
+    );
+    applyProperty(
+        uk.sys.typescale["title-medium"]["font-style"],
+        uk.raw.sys.typescale["title-medium"]["font-style"],
+    );
+    applyProperty(
+        uk.sys.typescale["title-medium"]["text-decoration"],
+        uk.raw.sys.typescale["title-medium"]["text-decoration"],
+    );
+    applyProperty(
+        uk.sys.typescale["title-medium"]["line-height"],
+        uk.raw.sys.typescale["title-medium"]["line-height"],
+    );
+    applyProperty(
+        uk.sys.typescale["title-medium"].tracking,
+        uk.raw.sys.typescale["title-medium"].tracking,
+    );
     applyProperty(uk.sys.typescale["title-medium"].size, uk.raw.sys.typescale["title-medium"].size);
-    applyProperty(uk.sys.typescale["title-medium"].weight, uk.raw.sys.typescale["title-medium"].weight);
+    applyProperty(
+        uk.sys.typescale["title-medium"].weight,
+        uk.raw.sys.typescale["title-medium"].weight,
+    );
     applyProperty(uk.sys.typescale["title-medium"].font, uk.raw.sys.typescale["title-medium"].font);
 
-    applyProperty(uk.sys.typescale["title-large"]["text-transform"], uk.raw.sys.typescale["title-large"]["text-transform"]);
-    applyProperty(uk.sys.typescale["title-large"]["axis-value"], uk.raw.sys.typescale["title-large"]["axis-value"]);
-    applyProperty(uk.sys.typescale["title-large"]["font-style"], uk.raw.sys.typescale["title-large"]["font-style"]);
-    applyProperty(uk.sys.typescale["title-large"]["text-decoration"], uk.raw.sys.typescale["title-large"]["text-decoration"]);
-    applyProperty(uk.sys.typescale["title-large"]["line-height"], uk.raw.sys.typescale["title-large"]["line-height"]);
-    applyProperty(uk.sys.typescale["title-large"].tracking, uk.raw.sys.typescale["title-large"].tracking);
+    applyProperty(
+        uk.sys.typescale["title-large"]["text-transform"],
+        uk.raw.sys.typescale["title-large"]["text-transform"],
+    );
+    applyProperty(
+        uk.sys.typescale["title-large"]["axis-value"],
+        uk.raw.sys.typescale["title-large"]["axis-value"],
+    );
+    applyProperty(
+        uk.sys.typescale["title-large"]["font-style"],
+        uk.raw.sys.typescale["title-large"]["font-style"],
+    );
+    applyProperty(
+        uk.sys.typescale["title-large"]["text-decoration"],
+        uk.raw.sys.typescale["title-large"]["text-decoration"],
+    );
+    applyProperty(
+        uk.sys.typescale["title-large"]["line-height"],
+        uk.raw.sys.typescale["title-large"]["line-height"],
+    );
+    applyProperty(
+        uk.sys.typescale["title-large"].tracking,
+        uk.raw.sys.typescale["title-large"].tracking,
+    );
     applyProperty(uk.sys.typescale["title-large"].size, uk.raw.sys.typescale["title-large"].size);
-    applyProperty(uk.sys.typescale["title-large"].weight, uk.raw.sys.typescale["title-large"].weight);
+    applyProperty(
+        uk.sys.typescale["title-large"].weight,
+        uk.raw.sys.typescale["title-large"].weight,
+    );
     applyProperty(uk.sys.typescale["title-large"].font, uk.raw.sys.typescale["title-large"].font);
 
-    applyProperty(uk.sys.typescale["headline-small"]["text-transform"], uk.raw.sys.typescale["headline-small"]["text-transform"]);
-    applyProperty(uk.sys.typescale["headline-small"]["axis-value"], uk.raw.sys.typescale["headline-small"]["axis-value"]);
-    applyProperty(uk.sys.typescale["headline-small"]["font-style"], uk.raw.sys.typescale["headline-small"]["font-style"]);
-    applyProperty(uk.sys.typescale["headline-small"]["text-decoration"], uk.raw.sys.typescale["headline-small"]["text-decoration"]);
-    applyProperty(uk.sys.typescale["headline-small"]["line-height"], uk.raw.sys.typescale["headline-small"]["line-height"]);
-    applyProperty(uk.sys.typescale["headline-small"].tracking, uk.raw.sys.typescale["headline-small"].tracking);
-    applyProperty(uk.sys.typescale["headline-small"].size, uk.raw.sys.typescale["headline-small"].size);
-    applyProperty(uk.sys.typescale["headline-small"].weight, uk.raw.sys.typescale["headline-small"].weight);
-    applyProperty(uk.sys.typescale["headline-small"].font, uk.raw.sys.typescale["headline-small"].font);
+    applyProperty(
+        uk.sys.typescale["headline-small"]["text-transform"],
+        uk.raw.sys.typescale["headline-small"]["text-transform"],
+    );
+    applyProperty(
+        uk.sys.typescale["headline-small"]["axis-value"],
+        uk.raw.sys.typescale["headline-small"]["axis-value"],
+    );
+    applyProperty(
+        uk.sys.typescale["headline-small"]["font-style"],
+        uk.raw.sys.typescale["headline-small"]["font-style"],
+    );
+    applyProperty(
+        uk.sys.typescale["headline-small"]["text-decoration"],
+        uk.raw.sys.typescale["headline-small"]["text-decoration"],
+    );
+    applyProperty(
+        uk.sys.typescale["headline-small"]["line-height"],
+        uk.raw.sys.typescale["headline-small"]["line-height"],
+    );
+    applyProperty(
+        uk.sys.typescale["headline-small"].tracking,
+        uk.raw.sys.typescale["headline-small"].tracking,
+    );
+    applyProperty(
+        uk.sys.typescale["headline-small"].size,
+        uk.raw.sys.typescale["headline-small"].size,
+    );
+    applyProperty(
+        uk.sys.typescale["headline-small"].weight,
+        uk.raw.sys.typescale["headline-small"].weight,
+    );
+    applyProperty(
+        uk.sys.typescale["headline-small"].font,
+        uk.raw.sys.typescale["headline-small"].font,
+    );
 
-    applyProperty(uk.sys.typescale["headline-medium"]["text-transform"], uk.raw.sys.typescale["headline-medium"]["text-transform"]);
-    applyProperty(uk.sys.typescale["headline-medium"]["axis-value"], uk.raw.sys.typescale["headline-medium"]["axis-value"]);
-    applyProperty(uk.sys.typescale["headline-medium"]["font-style"], uk.raw.sys.typescale["headline-medium"]["font-style"]);
-    applyProperty(uk.sys.typescale["headline-medium"]["text-decoration"], uk.raw.sys.typescale["headline-medium"]["text-decoration"]);
-    applyProperty(uk.sys.typescale["headline-medium"]["line-height"], uk.raw.sys.typescale["headline-medium"]["line-height"]);
-    applyProperty(uk.sys.typescale["headline-medium"].tracking, uk.raw.sys.typescale["headline-medium"].tracking);
-    applyProperty(uk.sys.typescale["headline-medium"].size, uk.raw.sys.typescale["headline-medium"].size);
-    applyProperty(uk.sys.typescale["headline-medium"].weight, uk.raw.sys.typescale["headline-medium"].weight);
-    applyProperty(uk.sys.typescale["headline-medium"].font, uk.raw.sys.typescale["headline-medium"].font);
+    applyProperty(
+        uk.sys.typescale["headline-medium"]["text-transform"],
+        uk.raw.sys.typescale["headline-medium"]["text-transform"],
+    );
+    applyProperty(
+        uk.sys.typescale["headline-medium"]["axis-value"],
+        uk.raw.sys.typescale["headline-medium"]["axis-value"],
+    );
+    applyProperty(
+        uk.sys.typescale["headline-medium"]["font-style"],
+        uk.raw.sys.typescale["headline-medium"]["font-style"],
+    );
+    applyProperty(
+        uk.sys.typescale["headline-medium"]["text-decoration"],
+        uk.raw.sys.typescale["headline-medium"]["text-decoration"],
+    );
+    applyProperty(
+        uk.sys.typescale["headline-medium"]["line-height"],
+        uk.raw.sys.typescale["headline-medium"]["line-height"],
+    );
+    applyProperty(
+        uk.sys.typescale["headline-medium"].tracking,
+        uk.raw.sys.typescale["headline-medium"].tracking,
+    );
+    applyProperty(
+        uk.sys.typescale["headline-medium"].size,
+        uk.raw.sys.typescale["headline-medium"].size,
+    );
+    applyProperty(
+        uk.sys.typescale["headline-medium"].weight,
+        uk.raw.sys.typescale["headline-medium"].weight,
+    );
+    applyProperty(
+        uk.sys.typescale["headline-medium"].font,
+        uk.raw.sys.typescale["headline-medium"].font,
+    );
 
-    applyProperty(uk.sys.typescale["headline-large"]["text-transform"], uk.raw.sys.typescale["headline-large"]["text-transform"]);
-    applyProperty(uk.sys.typescale["headline-large"]["axis-value"], uk.raw.sys.typescale["headline-large"]["axis-value"]);
-    applyProperty(uk.sys.typescale["headline-large"]["font-style"], uk.raw.sys.typescale["headline-large"]["font-style"]);
-    applyProperty(uk.sys.typescale["headline-large"]["text-decoration"], uk.raw.sys.typescale["headline-large"]["text-decoration"]);
-    applyProperty(uk.sys.typescale["headline-large"]["line-height"], uk.raw.sys.typescale["headline-large"]["line-height"]);
-    applyProperty(uk.sys.typescale["headline-large"].tracking, uk.raw.sys.typescale["headline-large"].tracking);
-    applyProperty(uk.sys.typescale["headline-large"].size, uk.raw.sys.typescale["headline-large"].size);
-    applyProperty(uk.sys.typescale["headline-large"].weight, uk.raw.sys.typescale["headline-large"].weight);
-    applyProperty(uk.sys.typescale["headline-large"].font, uk.raw.sys.typescale["headline-large"].font);
+    applyProperty(
+        uk.sys.typescale["headline-large"]["text-transform"],
+        uk.raw.sys.typescale["headline-large"]["text-transform"],
+    );
+    applyProperty(
+        uk.sys.typescale["headline-large"]["axis-value"],
+        uk.raw.sys.typescale["headline-large"]["axis-value"],
+    );
+    applyProperty(
+        uk.sys.typescale["headline-large"]["font-style"],
+        uk.raw.sys.typescale["headline-large"]["font-style"],
+    );
+    applyProperty(
+        uk.sys.typescale["headline-large"]["text-decoration"],
+        uk.raw.sys.typescale["headline-large"]["text-decoration"],
+    );
+    applyProperty(
+        uk.sys.typescale["headline-large"]["line-height"],
+        uk.raw.sys.typescale["headline-large"]["line-height"],
+    );
+    applyProperty(
+        uk.sys.typescale["headline-large"].tracking,
+        uk.raw.sys.typescale["headline-large"].tracking,
+    );
+    applyProperty(
+        uk.sys.typescale["headline-large"].size,
+        uk.raw.sys.typescale["headline-large"].size,
+    );
+    applyProperty(
+        uk.sys.typescale["headline-large"].weight,
+        uk.raw.sys.typescale["headline-large"].weight,
+    );
+    applyProperty(
+        uk.sys.typescale["headline-large"].font,
+        uk.raw.sys.typescale["headline-large"].font,
+    );
 
-    applyProperty(uk.sys.typescale["display-small"]["text-transform"], uk.raw.sys.typescale["display-small"]["text-transform"]);
-    applyProperty(uk.sys.typescale["display-small"]["axis-value"], uk.raw.sys.typescale["display-small"]["axis-value"]);
-    applyProperty(uk.sys.typescale["display-small"]["font-style"], uk.raw.sys.typescale["display-small"]["font-style"]);
-    applyProperty(uk.sys.typescale["display-small"]["text-decoration"], uk.raw.sys.typescale["display-small"]["text-decoration"]);
-    applyProperty(uk.sys.typescale["display-small"]["line-height"], uk.raw.sys.typescale["display-small"]["line-height"]);
-    applyProperty(uk.sys.typescale["display-small"].tracking, uk.raw.sys.typescale["display-small"].tracking);
-    applyProperty(uk.sys.typescale["display-small"].size, uk.raw.sys.typescale["display-small"].size);
-    applyProperty(uk.sys.typescale["display-small"].weight, uk.raw.sys.typescale["display-small"].weight);
-    applyProperty(uk.sys.typescale["display-small"].font, uk.raw.sys.typescale["display-small"].font);
+    applyProperty(
+        uk.sys.typescale["display-small"]["text-transform"],
+        uk.raw.sys.typescale["display-small"]["text-transform"],
+    );
+    applyProperty(
+        uk.sys.typescale["display-small"]["axis-value"],
+        uk.raw.sys.typescale["display-small"]["axis-value"],
+    );
+    applyProperty(
+        uk.sys.typescale["display-small"]["font-style"],
+        uk.raw.sys.typescale["display-small"]["font-style"],
+    );
+    applyProperty(
+        uk.sys.typescale["display-small"]["text-decoration"],
+        uk.raw.sys.typescale["display-small"]["text-decoration"],
+    );
+    applyProperty(
+        uk.sys.typescale["display-small"]["line-height"],
+        uk.raw.sys.typescale["display-small"]["line-height"],
+    );
+    applyProperty(
+        uk.sys.typescale["display-small"].tracking,
+        uk.raw.sys.typescale["display-small"].tracking,
+    );
+    applyProperty(
+        uk.sys.typescale["display-small"].size,
+        uk.raw.sys.typescale["display-small"].size,
+    );
+    applyProperty(
+        uk.sys.typescale["display-small"].weight,
+        uk.raw.sys.typescale["display-small"].weight,
+    );
+    applyProperty(
+        uk.sys.typescale["display-small"].font,
+        uk.raw.sys.typescale["display-small"].font,
+    );
 
-    applyProperty(uk.sys.typescale["display-medium"]["text-transform"], uk.raw.sys.typescale["display-medium"]["text-transform"]);
-    applyProperty(uk.sys.typescale["display-medium"]["axis-value"], uk.raw.sys.typescale["display-medium"]["axis-value"]);
-    applyProperty(uk.sys.typescale["display-medium"]["font-style"], uk.raw.sys.typescale["display-medium"]["font-style"]);
-    applyProperty(uk.sys.typescale["display-medium"]["text-decoration"], uk.raw.sys.typescale["display-medium"]["text-decoration"]);
-    applyProperty(uk.sys.typescale["display-medium"]["line-height"], uk.raw.sys.typescale["display-medium"]["line-height"]);
-    applyProperty(uk.sys.typescale["display-medium"].tracking, uk.raw.sys.typescale["display-medium"].tracking);
-    applyProperty(uk.sys.typescale["display-medium"].size, uk.raw.sys.typescale["display-medium"].size);
-    applyProperty(uk.sys.typescale["display-medium"].weight, uk.raw.sys.typescale["display-medium"].weight);
-    applyProperty(uk.sys.typescale["display-medium"].font, uk.raw.sys.typescale["display-medium"].font);
+    applyProperty(
+        uk.sys.typescale["display-medium"]["text-transform"],
+        uk.raw.sys.typescale["display-medium"]["text-transform"],
+    );
+    applyProperty(
+        uk.sys.typescale["display-medium"]["axis-value"],
+        uk.raw.sys.typescale["display-medium"]["axis-value"],
+    );
+    applyProperty(
+        uk.sys.typescale["display-medium"]["font-style"],
+        uk.raw.sys.typescale["display-medium"]["font-style"],
+    );
+    applyProperty(
+        uk.sys.typescale["display-medium"]["text-decoration"],
+        uk.raw.sys.typescale["display-medium"]["text-decoration"],
+    );
+    applyProperty(
+        uk.sys.typescale["display-medium"]["line-height"],
+        uk.raw.sys.typescale["display-medium"]["line-height"],
+    );
+    applyProperty(
+        uk.sys.typescale["display-medium"].tracking,
+        uk.raw.sys.typescale["display-medium"].tracking,
+    );
+    applyProperty(
+        uk.sys.typescale["display-medium"].size,
+        uk.raw.sys.typescale["display-medium"].size,
+    );
+    applyProperty(
+        uk.sys.typescale["display-medium"].weight,
+        uk.raw.sys.typescale["display-medium"].weight,
+    );
+    applyProperty(
+        uk.sys.typescale["display-medium"].font,
+        uk.raw.sys.typescale["display-medium"].font,
+    );
 
-    applyProperty(uk.sys.typescale["display-large"]["text-transform"], uk.raw.sys.typescale["display-large"]["text-transform"]);
-    applyProperty(uk.sys.typescale["display-large"]["axis-value"], uk.raw.sys.typescale["display-large"]["axis-value"]);
-    applyProperty(uk.sys.typescale["display-large"]["font-style"], uk.raw.sys.typescale["display-large"]["font-style"]);
-    applyProperty(uk.sys.typescale["display-large"]["text-decoration"], uk.raw.sys.typescale["display-large"]["text-decoration"]);
-    applyProperty(uk.sys.typescale["display-large"]["line-height"], uk.raw.sys.typescale["display-large"]["line-height"]);
-    applyProperty(uk.sys.typescale["display-large"].tracking, uk.raw.sys.typescale["display-large"].tracking);
-    applyProperty(uk.sys.typescale["display-large"].size, uk.raw.sys.typescale["display-large"].size);
-    applyProperty(uk.sys.typescale["display-large"].weight, uk.raw.sys.typescale["display-large"].weight);
-    applyProperty(uk.sys.typescale["display-large"].font, uk.raw.sys.typescale["display-large"].font);
+    applyProperty(
+        uk.sys.typescale["display-large"]["text-transform"],
+        uk.raw.sys.typescale["display-large"]["text-transform"],
+    );
+    applyProperty(
+        uk.sys.typescale["display-large"]["axis-value"],
+        uk.raw.sys.typescale["display-large"]["axis-value"],
+    );
+    applyProperty(
+        uk.sys.typescale["display-large"]["font-style"],
+        uk.raw.sys.typescale["display-large"]["font-style"],
+    );
+    applyProperty(
+        uk.sys.typescale["display-large"]["text-decoration"],
+        uk.raw.sys.typescale["display-large"]["text-decoration"],
+    );
+    applyProperty(
+        uk.sys.typescale["display-large"]["line-height"],
+        uk.raw.sys.typescale["display-large"]["line-height"],
+    );
+    applyProperty(
+        uk.sys.typescale["display-large"].tracking,
+        uk.raw.sys.typescale["display-large"].tracking,
+    );
+    applyProperty(
+        uk.sys.typescale["display-large"].size,
+        uk.raw.sys.typescale["display-large"].size,
+    );
+    applyProperty(
+        uk.sys.typescale["display-large"].weight,
+        uk.raw.sys.typescale["display-large"].weight,
+    );
+    applyProperty(
+        uk.sys.typescale["display-large"].font,
+        uk.raw.sys.typescale["display-large"].font,
+    );
 
     applyProperty(
         uk.sys.typescale.emphasized["label-small"]["text-transform"],
         uk.raw.sys.typescale.emphasized["label-small"]["text-transform"],
     );
-    applyProperty(uk.sys.typescale.emphasized["label-small"]["axis-value"], uk.raw.sys.typescale.emphasized["label-small"]["axis-value"]);
-    applyProperty(uk.sys.typescale.emphasized["label-small"]["font-style"], uk.raw.sys.typescale.emphasized["label-small"]["font-style"]);
+    applyProperty(
+        uk.sys.typescale.emphasized["label-small"]["axis-value"],
+        uk.raw.sys.typescale.emphasized["label-small"]["axis-value"],
+    );
+    applyProperty(
+        uk.sys.typescale.emphasized["label-small"]["font-style"],
+        uk.raw.sys.typescale.emphasized["label-small"]["font-style"],
+    );
     applyProperty(
         uk.sys.typescale.emphasized["label-small"]["text-decoration"],
         uk.raw.sys.typescale.emphasized["label-small"]["text-decoration"],
     );
-    applyProperty(uk.sys.typescale.emphasized["label-small"]["line-height"], uk.raw.sys.typescale.emphasized["label-small"]["line-height"]);
-    applyProperty(uk.sys.typescale.emphasized["label-small"].tracking, uk.raw.sys.typescale.emphasized["label-small"].tracking);
-    applyProperty(uk.sys.typescale.emphasized["label-small"].size, uk.raw.sys.typescale.emphasized["label-small"].size);
-    applyProperty(uk.sys.typescale.emphasized["label-small"].weight, uk.raw.sys.typescale.emphasized["label-small"].weight);
-    applyProperty(uk.sys.typescale.emphasized["label-small"].font, uk.raw.sys.typescale.emphasized["label-small"].font);
+    applyProperty(
+        uk.sys.typescale.emphasized["label-small"]["line-height"],
+        uk.raw.sys.typescale.emphasized["label-small"]["line-height"],
+    );
+    applyProperty(
+        uk.sys.typescale.emphasized["label-small"].tracking,
+        uk.raw.sys.typescale.emphasized["label-small"].tracking,
+    );
+    applyProperty(
+        uk.sys.typescale.emphasized["label-small"].size,
+        uk.raw.sys.typescale.emphasized["label-small"].size,
+    );
+    applyProperty(
+        uk.sys.typescale.emphasized["label-small"].weight,
+        uk.raw.sys.typescale.emphasized["label-small"].weight,
+    );
+    applyProperty(
+        uk.sys.typescale.emphasized["label-small"].font,
+        uk.raw.sys.typescale.emphasized["label-small"].font,
+    );
 
     applyProperty(
         uk.sys.typescale.emphasized["label-medium"]["text-transform"],
         uk.raw.sys.typescale.emphasized["label-medium"]["text-transform"],
     );
-    applyProperty(uk.sys.typescale.emphasized["label-medium"]["axis-value"], uk.raw.sys.typescale.emphasized["label-medium"]["axis-value"]);
-    applyProperty(uk.sys.typescale.emphasized["label-medium"]["font-style"], uk.raw.sys.typescale.emphasized["label-medium"]["font-style"]);
+    applyProperty(
+        uk.sys.typescale.emphasized["label-medium"]["axis-value"],
+        uk.raw.sys.typescale.emphasized["label-medium"]["axis-value"],
+    );
+    applyProperty(
+        uk.sys.typescale.emphasized["label-medium"]["font-style"],
+        uk.raw.sys.typescale.emphasized["label-medium"]["font-style"],
+    );
     applyProperty(
         uk.sys.typescale.emphasized["label-medium"]["text-decoration"],
         uk.raw.sys.typescale.emphasized["label-medium"]["text-decoration"],
@@ -2565,97 +3005,220 @@ function applyTheme(theme: UKDesignTheme, element: HTMLDivElement, mode: "light"
         uk.sys.typescale.emphasized["label-medium"]["line-height"],
         uk.raw.sys.typescale.emphasized["label-medium"]["line-height"],
     );
-    applyProperty(uk.sys.typescale.emphasized["label-medium"].tracking, uk.raw.sys.typescale.emphasized["label-medium"].tracking);
-    applyProperty(uk.sys.typescale.emphasized["label-medium"].size, uk.raw.sys.typescale.emphasized["label-medium"].size);
-    applyProperty(uk.sys.typescale.emphasized["label-medium"].weight, uk.raw.sys.typescale.emphasized["label-medium"].weight);
-    applyProperty(uk.sys.typescale.emphasized["label-medium"].font, uk.raw.sys.typescale.emphasized["label-medium"].font);
+    applyProperty(
+        uk.sys.typescale.emphasized["label-medium"].tracking,
+        uk.raw.sys.typescale.emphasized["label-medium"].tracking,
+    );
+    applyProperty(
+        uk.sys.typescale.emphasized["label-medium"].size,
+        uk.raw.sys.typescale.emphasized["label-medium"].size,
+    );
+    applyProperty(
+        uk.sys.typescale.emphasized["label-medium"].weight,
+        uk.raw.sys.typescale.emphasized["label-medium"].weight,
+    );
+    applyProperty(
+        uk.sys.typescale.emphasized["label-medium"].font,
+        uk.raw.sys.typescale.emphasized["label-medium"].font,
+    );
 
     applyProperty(
         uk.sys.typescale.emphasized["label-large"]["text-transform"],
         uk.raw.sys.typescale.emphasized["label-large"]["text-transform"],
     );
-    applyProperty(uk.sys.typescale.emphasized["label-large"]["axis-value"], uk.raw.sys.typescale.emphasized["label-large"]["axis-value"]);
-    applyProperty(uk.sys.typescale.emphasized["label-large"]["font-style"], uk.raw.sys.typescale.emphasized["label-large"]["font-style"]);
+    applyProperty(
+        uk.sys.typescale.emphasized["label-large"]["axis-value"],
+        uk.raw.sys.typescale.emphasized["label-large"]["axis-value"],
+    );
+    applyProperty(
+        uk.sys.typescale.emphasized["label-large"]["font-style"],
+        uk.raw.sys.typescale.emphasized["label-large"]["font-style"],
+    );
     applyProperty(
         uk.sys.typescale.emphasized["label-large"]["text-decoration"],
         uk.raw.sys.typescale.emphasized["label-large"]["text-decoration"],
     );
-    applyProperty(uk.sys.typescale.emphasized["label-large"]["line-height"], uk.raw.sys.typescale.emphasized["label-large"]["line-height"]);
-    applyProperty(uk.sys.typescale.emphasized["label-large"].tracking, uk.raw.sys.typescale.emphasized["label-large"].tracking);
-    applyProperty(uk.sys.typescale.emphasized["label-large"].size, uk.raw.sys.typescale.emphasized["label-large"].size);
-    applyProperty(uk.sys.typescale.emphasized["label-large"].weight, uk.raw.sys.typescale.emphasized["label-large"].weight);
-    applyProperty(uk.sys.typescale.emphasized["label-large"].font, uk.raw.sys.typescale.emphasized["label-large"].font);
+    applyProperty(
+        uk.sys.typescale.emphasized["label-large"]["line-height"],
+        uk.raw.sys.typescale.emphasized["label-large"]["line-height"],
+    );
+    applyProperty(
+        uk.sys.typescale.emphasized["label-large"].tracking,
+        uk.raw.sys.typescale.emphasized["label-large"].tracking,
+    );
+    applyProperty(
+        uk.sys.typescale.emphasized["label-large"].size,
+        uk.raw.sys.typescale.emphasized["label-large"].size,
+    );
+    applyProperty(
+        uk.sys.typescale.emphasized["label-large"].weight,
+        uk.raw.sys.typescale.emphasized["label-large"].weight,
+    );
+    applyProperty(
+        uk.sys.typescale.emphasized["label-large"].font,
+        uk.raw.sys.typescale.emphasized["label-large"].font,
+    );
 
     applyProperty(
         uk.sys.typescale.emphasized["body-small"]["text-transform"],
         uk.raw.sys.typescale.emphasized["body-small"]["text-transform"],
     );
-    applyProperty(uk.sys.typescale.emphasized["body-small"]["axis-value"], uk.raw.sys.typescale.emphasized["body-small"]["axis-value"]);
-    applyProperty(uk.sys.typescale.emphasized["body-small"]["font-style"], uk.raw.sys.typescale.emphasized["body-small"]["font-style"]);
+    applyProperty(
+        uk.sys.typescale.emphasized["body-small"]["axis-value"],
+        uk.raw.sys.typescale.emphasized["body-small"]["axis-value"],
+    );
+    applyProperty(
+        uk.sys.typescale.emphasized["body-small"]["font-style"],
+        uk.raw.sys.typescale.emphasized["body-small"]["font-style"],
+    );
     applyProperty(
         uk.sys.typescale.emphasized["body-small"]["text-decoration"],
         uk.raw.sys.typescale.emphasized["body-small"]["text-decoration"],
     );
-    applyProperty(uk.sys.typescale.emphasized["body-small"]["line-height"], uk.raw.sys.typescale.emphasized["body-small"]["line-height"]);
-    applyProperty(uk.sys.typescale.emphasized["body-small"].tracking, uk.raw.sys.typescale.emphasized["body-small"].tracking);
-    applyProperty(uk.sys.typescale.emphasized["body-small"].size, uk.raw.sys.typescale.emphasized["body-small"].size);
-    applyProperty(uk.sys.typescale.emphasized["body-small"].weight, uk.raw.sys.typescale.emphasized["body-small"].weight);
-    applyProperty(uk.sys.typescale.emphasized["body-small"].font, uk.raw.sys.typescale.emphasized["body-small"].font);
+    applyProperty(
+        uk.sys.typescale.emphasized["body-small"]["line-height"],
+        uk.raw.sys.typescale.emphasized["body-small"]["line-height"],
+    );
+    applyProperty(
+        uk.sys.typescale.emphasized["body-small"].tracking,
+        uk.raw.sys.typescale.emphasized["body-small"].tracking,
+    );
+    applyProperty(
+        uk.sys.typescale.emphasized["body-small"].size,
+        uk.raw.sys.typescale.emphasized["body-small"].size,
+    );
+    applyProperty(
+        uk.sys.typescale.emphasized["body-small"].weight,
+        uk.raw.sys.typescale.emphasized["body-small"].weight,
+    );
+    applyProperty(
+        uk.sys.typescale.emphasized["body-small"].font,
+        uk.raw.sys.typescale.emphasized["body-small"].font,
+    );
 
     applyProperty(
         uk.sys.typescale.emphasized["body-medium"]["text-transform"],
         uk.raw.sys.typescale.emphasized["body-medium"]["text-transform"],
     );
-    applyProperty(uk.sys.typescale.emphasized["body-medium"]["axis-value"], uk.raw.sys.typescale.emphasized["body-medium"]["axis-value"]);
-    applyProperty(uk.sys.typescale.emphasized["body-medium"]["font-style"], uk.raw.sys.typescale.emphasized["body-medium"]["font-style"]);
+    applyProperty(
+        uk.sys.typescale.emphasized["body-medium"]["axis-value"],
+        uk.raw.sys.typescale.emphasized["body-medium"]["axis-value"],
+    );
+    applyProperty(
+        uk.sys.typescale.emphasized["body-medium"]["font-style"],
+        uk.raw.sys.typescale.emphasized["body-medium"]["font-style"],
+    );
     applyProperty(
         uk.sys.typescale.emphasized["body-medium"]["text-decoration"],
         uk.raw.sys.typescale.emphasized["body-medium"]["text-decoration"],
     );
-    applyProperty(uk.sys.typescale.emphasized["body-medium"]["line-height"], uk.raw.sys.typescale.emphasized["body-medium"]["line-height"]);
-    applyProperty(uk.sys.typescale.emphasized["body-medium"].tracking, uk.raw.sys.typescale.emphasized["body-medium"].tracking);
-    applyProperty(uk.sys.typescale.emphasized["body-medium"].size, uk.raw.sys.typescale.emphasized["body-medium"].size);
-    applyProperty(uk.sys.typescale.emphasized["body-medium"].weight, uk.raw.sys.typescale.emphasized["body-medium"].weight);
-    applyProperty(uk.sys.typescale.emphasized["body-medium"].font, uk.raw.sys.typescale.emphasized["body-medium"].font);
+    applyProperty(
+        uk.sys.typescale.emphasized["body-medium"]["line-height"],
+        uk.raw.sys.typescale.emphasized["body-medium"]["line-height"],
+    );
+    applyProperty(
+        uk.sys.typescale.emphasized["body-medium"].tracking,
+        uk.raw.sys.typescale.emphasized["body-medium"].tracking,
+    );
+    applyProperty(
+        uk.sys.typescale.emphasized["body-medium"].size,
+        uk.raw.sys.typescale.emphasized["body-medium"].size,
+    );
+    applyProperty(
+        uk.sys.typescale.emphasized["body-medium"].weight,
+        uk.raw.sys.typescale.emphasized["body-medium"].weight,
+    );
+    applyProperty(
+        uk.sys.typescale.emphasized["body-medium"].font,
+        uk.raw.sys.typescale.emphasized["body-medium"].font,
+    );
 
     applyProperty(
         uk.sys.typescale.emphasized["body-large"]["text-transform"],
         uk.raw.sys.typescale.emphasized["body-large"]["text-transform"],
     );
-    applyProperty(uk.sys.typescale.emphasized["body-large"]["axis-value"], uk.raw.sys.typescale.emphasized["body-large"]["axis-value"]);
-    applyProperty(uk.sys.typescale.emphasized["body-large"]["font-style"], uk.raw.sys.typescale.emphasized["body-large"]["font-style"]);
+    applyProperty(
+        uk.sys.typescale.emphasized["body-large"]["axis-value"],
+        uk.raw.sys.typescale.emphasized["body-large"]["axis-value"],
+    );
+    applyProperty(
+        uk.sys.typescale.emphasized["body-large"]["font-style"],
+        uk.raw.sys.typescale.emphasized["body-large"]["font-style"],
+    );
     applyProperty(
         uk.sys.typescale.emphasized["body-large"]["text-decoration"],
         uk.raw.sys.typescale.emphasized["body-large"]["text-decoration"],
     );
-    applyProperty(uk.sys.typescale.emphasized["body-large"]["line-height"], uk.raw.sys.typescale.emphasized["body-large"]["line-height"]);
-    applyProperty(uk.sys.typescale.emphasized["body-large"].tracking, uk.raw.sys.typescale.emphasized["body-large"].tracking);
-    applyProperty(uk.sys.typescale.emphasized["body-large"].size, uk.raw.sys.typescale.emphasized["body-large"].size);
-    applyProperty(uk.sys.typescale.emphasized["body-large"].weight, uk.raw.sys.typescale.emphasized["body-large"].weight);
-    applyProperty(uk.sys.typescale.emphasized["body-large"].font, uk.raw.sys.typescale.emphasized["body-large"].font);
+    applyProperty(
+        uk.sys.typescale.emphasized["body-large"]["line-height"],
+        uk.raw.sys.typescale.emphasized["body-large"]["line-height"],
+    );
+    applyProperty(
+        uk.sys.typescale.emphasized["body-large"].tracking,
+        uk.raw.sys.typescale.emphasized["body-large"].tracking,
+    );
+    applyProperty(
+        uk.sys.typescale.emphasized["body-large"].size,
+        uk.raw.sys.typescale.emphasized["body-large"].size,
+    );
+    applyProperty(
+        uk.sys.typescale.emphasized["body-large"].weight,
+        uk.raw.sys.typescale.emphasized["body-large"].weight,
+    );
+    applyProperty(
+        uk.sys.typescale.emphasized["body-large"].font,
+        uk.raw.sys.typescale.emphasized["body-large"].font,
+    );
 
     applyProperty(
         uk.sys.typescale.emphasized["title-small"]["text-transform"],
         uk.raw.sys.typescale.emphasized["title-small"]["text-transform"],
     );
-    applyProperty(uk.sys.typescale.emphasized["title-small"]["axis-value"], uk.raw.sys.typescale.emphasized["title-small"]["axis-value"]);
-    applyProperty(uk.sys.typescale.emphasized["title-small"]["font-style"], uk.raw.sys.typescale.emphasized["title-small"]["font-style"]);
+    applyProperty(
+        uk.sys.typescale.emphasized["title-small"]["axis-value"],
+        uk.raw.sys.typescale.emphasized["title-small"]["axis-value"],
+    );
+    applyProperty(
+        uk.sys.typescale.emphasized["title-small"]["font-style"],
+        uk.raw.sys.typescale.emphasized["title-small"]["font-style"],
+    );
     applyProperty(
         uk.sys.typescale.emphasized["title-small"]["text-decoration"],
         uk.raw.sys.typescale.emphasized["title-small"]["text-decoration"],
     );
-    applyProperty(uk.sys.typescale.emphasized["title-small"]["line-height"], uk.raw.sys.typescale.emphasized["title-small"]["line-height"]);
-    applyProperty(uk.sys.typescale.emphasized["title-small"].tracking, uk.raw.sys.typescale.emphasized["title-small"].tracking);
-    applyProperty(uk.sys.typescale.emphasized["title-small"].size, uk.raw.sys.typescale.emphasized["title-small"].size);
-    applyProperty(uk.sys.typescale.emphasized["title-small"].weight, uk.raw.sys.typescale.emphasized["title-small"].weight);
-    applyProperty(uk.sys.typescale.emphasized["title-small"].font, uk.raw.sys.typescale.emphasized["title-small"].font);
+    applyProperty(
+        uk.sys.typescale.emphasized["title-small"]["line-height"],
+        uk.raw.sys.typescale.emphasized["title-small"]["line-height"],
+    );
+    applyProperty(
+        uk.sys.typescale.emphasized["title-small"].tracking,
+        uk.raw.sys.typescale.emphasized["title-small"].tracking,
+    );
+    applyProperty(
+        uk.sys.typescale.emphasized["title-small"].size,
+        uk.raw.sys.typescale.emphasized["title-small"].size,
+    );
+    applyProperty(
+        uk.sys.typescale.emphasized["title-small"].weight,
+        uk.raw.sys.typescale.emphasized["title-small"].weight,
+    );
+    applyProperty(
+        uk.sys.typescale.emphasized["title-small"].font,
+        uk.raw.sys.typescale.emphasized["title-small"].font,
+    );
 
     applyProperty(
         uk.sys.typescale.emphasized["title-medium"]["text-transform"],
         uk.raw.sys.typescale.emphasized["title-medium"]["text-transform"],
     );
-    applyProperty(uk.sys.typescale.emphasized["title-medium"]["axis-value"], uk.raw.sys.typescale.emphasized["title-medium"]["axis-value"]);
-    applyProperty(uk.sys.typescale.emphasized["title-medium"]["font-style"], uk.raw.sys.typescale.emphasized["title-medium"]["font-style"]);
+    applyProperty(
+        uk.sys.typescale.emphasized["title-medium"]["axis-value"],
+        uk.raw.sys.typescale.emphasized["title-medium"]["axis-value"],
+    );
+    applyProperty(
+        uk.sys.typescale.emphasized["title-medium"]["font-style"],
+        uk.raw.sys.typescale.emphasized["title-medium"]["font-style"],
+    );
     applyProperty(
         uk.sys.typescale.emphasized["title-medium"]["text-decoration"],
         uk.raw.sys.typescale.emphasized["title-medium"]["text-decoration"],
@@ -2664,26 +3227,59 @@ function applyTheme(theme: UKDesignTheme, element: HTMLDivElement, mode: "light"
         uk.sys.typescale.emphasized["title-medium"]["line-height"],
         uk.raw.sys.typescale.emphasized["title-medium"]["line-height"],
     );
-    applyProperty(uk.sys.typescale.emphasized["title-medium"].tracking, uk.raw.sys.typescale.emphasized["title-medium"].tracking);
-    applyProperty(uk.sys.typescale.emphasized["title-medium"].size, uk.raw.sys.typescale.emphasized["title-medium"].size);
-    applyProperty(uk.sys.typescale.emphasized["title-medium"].weight, uk.raw.sys.typescale.emphasized["title-medium"].weight);
-    applyProperty(uk.sys.typescale.emphasized["title-medium"].font, uk.raw.sys.typescale.emphasized["title-medium"].font);
+    applyProperty(
+        uk.sys.typescale.emphasized["title-medium"].tracking,
+        uk.raw.sys.typescale.emphasized["title-medium"].tracking,
+    );
+    applyProperty(
+        uk.sys.typescale.emphasized["title-medium"].size,
+        uk.raw.sys.typescale.emphasized["title-medium"].size,
+    );
+    applyProperty(
+        uk.sys.typescale.emphasized["title-medium"].weight,
+        uk.raw.sys.typescale.emphasized["title-medium"].weight,
+    );
+    applyProperty(
+        uk.sys.typescale.emphasized["title-medium"].font,
+        uk.raw.sys.typescale.emphasized["title-medium"].font,
+    );
 
     applyProperty(
         uk.sys.typescale.emphasized["title-large"]["text-transform"],
         uk.raw.sys.typescale.emphasized["title-large"]["text-transform"],
     );
-    applyProperty(uk.sys.typescale.emphasized["title-large"]["axis-value"], uk.raw.sys.typescale.emphasized["title-large"]["axis-value"]);
-    applyProperty(uk.sys.typescale.emphasized["title-large"]["font-style"], uk.raw.sys.typescale.emphasized["title-large"]["font-style"]);
+    applyProperty(
+        uk.sys.typescale.emphasized["title-large"]["axis-value"],
+        uk.raw.sys.typescale.emphasized["title-large"]["axis-value"],
+    );
+    applyProperty(
+        uk.sys.typescale.emphasized["title-large"]["font-style"],
+        uk.raw.sys.typescale.emphasized["title-large"]["font-style"],
+    );
     applyProperty(
         uk.sys.typescale.emphasized["title-large"]["text-decoration"],
         uk.raw.sys.typescale.emphasized["title-large"]["text-decoration"],
     );
-    applyProperty(uk.sys.typescale.emphasized["title-large"]["line-height"], uk.raw.sys.typescale.emphasized["title-large"]["line-height"]);
-    applyProperty(uk.sys.typescale.emphasized["title-large"].tracking, uk.raw.sys.typescale.emphasized["title-large"].tracking);
-    applyProperty(uk.sys.typescale.emphasized["title-large"].size, uk.raw.sys.typescale.emphasized["title-large"].size);
-    applyProperty(uk.sys.typescale.emphasized["title-large"].weight, uk.raw.sys.typescale.emphasized["title-large"].weight);
-    applyProperty(uk.sys.typescale.emphasized["title-large"].font, uk.raw.sys.typescale.emphasized["title-large"].font);
+    applyProperty(
+        uk.sys.typescale.emphasized["title-large"]["line-height"],
+        uk.raw.sys.typescale.emphasized["title-large"]["line-height"],
+    );
+    applyProperty(
+        uk.sys.typescale.emphasized["title-large"].tracking,
+        uk.raw.sys.typescale.emphasized["title-large"].tracking,
+    );
+    applyProperty(
+        uk.sys.typescale.emphasized["title-large"].size,
+        uk.raw.sys.typescale.emphasized["title-large"].size,
+    );
+    applyProperty(
+        uk.sys.typescale.emphasized["title-large"].weight,
+        uk.raw.sys.typescale.emphasized["title-large"].weight,
+    );
+    applyProperty(
+        uk.sys.typescale.emphasized["title-large"].font,
+        uk.raw.sys.typescale.emphasized["title-large"].font,
+    );
 
     applyProperty(
         uk.sys.typescale.emphasized["headline-small"]["text-transform"],
@@ -2705,10 +3301,22 @@ function applyTheme(theme: UKDesignTheme, element: HTMLDivElement, mode: "light"
         uk.sys.typescale.emphasized["headline-small"]["line-height"],
         uk.raw.sys.typescale.emphasized["headline-small"]["line-height"],
     );
-    applyProperty(uk.sys.typescale.emphasized["headline-small"].tracking, uk.raw.sys.typescale.emphasized["headline-small"].tracking);
-    applyProperty(uk.sys.typescale.emphasized["headline-small"].size, uk.raw.sys.typescale.emphasized["headline-small"].size);
-    applyProperty(uk.sys.typescale.emphasized["headline-small"].weight, uk.raw.sys.typescale.emphasized["headline-small"].weight);
-    applyProperty(uk.sys.typescale.emphasized["headline-small"].font, uk.raw.sys.typescale.emphasized["headline-small"].font);
+    applyProperty(
+        uk.sys.typescale.emphasized["headline-small"].tracking,
+        uk.raw.sys.typescale.emphasized["headline-small"].tracking,
+    );
+    applyProperty(
+        uk.sys.typescale.emphasized["headline-small"].size,
+        uk.raw.sys.typescale.emphasized["headline-small"].size,
+    );
+    applyProperty(
+        uk.sys.typescale.emphasized["headline-small"].weight,
+        uk.raw.sys.typescale.emphasized["headline-small"].weight,
+    );
+    applyProperty(
+        uk.sys.typescale.emphasized["headline-small"].font,
+        uk.raw.sys.typescale.emphasized["headline-small"].font,
+    );
 
     applyProperty(
         uk.sys.typescale.emphasized["headline-medium"]["text-transform"],
@@ -2730,10 +3338,22 @@ function applyTheme(theme: UKDesignTheme, element: HTMLDivElement, mode: "light"
         uk.sys.typescale.emphasized["headline-medium"]["line-height"],
         uk.raw.sys.typescale.emphasized["headline-medium"]["line-height"],
     );
-    applyProperty(uk.sys.typescale.emphasized["headline-medium"].tracking, uk.raw.sys.typescale.emphasized["headline-medium"].tracking);
-    applyProperty(uk.sys.typescale.emphasized["headline-medium"].size, uk.raw.sys.typescale.emphasized["headline-medium"].size);
-    applyProperty(uk.sys.typescale.emphasized["headline-medium"].weight, uk.raw.sys.typescale.emphasized["headline-medium"].weight);
-    applyProperty(uk.sys.typescale.emphasized["headline-medium"].font, uk.raw.sys.typescale.emphasized["headline-medium"].font);
+    applyProperty(
+        uk.sys.typescale.emphasized["headline-medium"].tracking,
+        uk.raw.sys.typescale.emphasized["headline-medium"].tracking,
+    );
+    applyProperty(
+        uk.sys.typescale.emphasized["headline-medium"].size,
+        uk.raw.sys.typescale.emphasized["headline-medium"].size,
+    );
+    applyProperty(
+        uk.sys.typescale.emphasized["headline-medium"].weight,
+        uk.raw.sys.typescale.emphasized["headline-medium"].weight,
+    );
+    applyProperty(
+        uk.sys.typescale.emphasized["headline-medium"].font,
+        uk.raw.sys.typescale.emphasized["headline-medium"].font,
+    );
 
     applyProperty(
         uk.sys.typescale.emphasized["headline-large"]["text-transform"],
@@ -2755,10 +3375,22 @@ function applyTheme(theme: UKDesignTheme, element: HTMLDivElement, mode: "light"
         uk.sys.typescale.emphasized["headline-large"]["line-height"],
         uk.raw.sys.typescale.emphasized["headline-large"]["line-height"],
     );
-    applyProperty(uk.sys.typescale.emphasized["headline-large"].tracking, uk.raw.sys.typescale.emphasized["headline-large"].tracking);
-    applyProperty(uk.sys.typescale.emphasized["headline-large"].size, uk.raw.sys.typescale.emphasized["headline-large"].size);
-    applyProperty(uk.sys.typescale.emphasized["headline-large"].weight, uk.raw.sys.typescale.emphasized["headline-large"].weight);
-    applyProperty(uk.sys.typescale.emphasized["headline-large"].font, uk.raw.sys.typescale.emphasized["headline-large"].font);
+    applyProperty(
+        uk.sys.typescale.emphasized["headline-large"].tracking,
+        uk.raw.sys.typescale.emphasized["headline-large"].tracking,
+    );
+    applyProperty(
+        uk.sys.typescale.emphasized["headline-large"].size,
+        uk.raw.sys.typescale.emphasized["headline-large"].size,
+    );
+    applyProperty(
+        uk.sys.typescale.emphasized["headline-large"].weight,
+        uk.raw.sys.typescale.emphasized["headline-large"].weight,
+    );
+    applyProperty(
+        uk.sys.typescale.emphasized["headline-large"].font,
+        uk.raw.sys.typescale.emphasized["headline-large"].font,
+    );
 
     applyProperty(
         uk.sys.typescale.emphasized["display-small"]["text-transform"],
@@ -2780,10 +3412,22 @@ function applyTheme(theme: UKDesignTheme, element: HTMLDivElement, mode: "light"
         uk.sys.typescale.emphasized["display-small"]["line-height"],
         uk.raw.sys.typescale.emphasized["display-small"]["line-height"],
     );
-    applyProperty(uk.sys.typescale.emphasized["display-small"].tracking, uk.raw.sys.typescale.emphasized["display-small"].tracking);
-    applyProperty(uk.sys.typescale.emphasized["display-small"].size, uk.raw.sys.typescale.emphasized["display-small"].size);
-    applyProperty(uk.sys.typescale.emphasized["display-small"].weight, uk.raw.sys.typescale.emphasized["display-small"].weight);
-    applyProperty(uk.sys.typescale.emphasized["display-small"].font, uk.raw.sys.typescale.emphasized["display-small"].font);
+    applyProperty(
+        uk.sys.typescale.emphasized["display-small"].tracking,
+        uk.raw.sys.typescale.emphasized["display-small"].tracking,
+    );
+    applyProperty(
+        uk.sys.typescale.emphasized["display-small"].size,
+        uk.raw.sys.typescale.emphasized["display-small"].size,
+    );
+    applyProperty(
+        uk.sys.typescale.emphasized["display-small"].weight,
+        uk.raw.sys.typescale.emphasized["display-small"].weight,
+    );
+    applyProperty(
+        uk.sys.typescale.emphasized["display-small"].font,
+        uk.raw.sys.typescale.emphasized["display-small"].font,
+    );
 
     applyProperty(
         uk.sys.typescale.emphasized["display-medium"]["text-transform"],
@@ -2805,10 +3449,22 @@ function applyTheme(theme: UKDesignTheme, element: HTMLDivElement, mode: "light"
         uk.sys.typescale.emphasized["display-medium"]["line-height"],
         uk.raw.sys.typescale.emphasized["display-medium"]["line-height"],
     );
-    applyProperty(uk.sys.typescale.emphasized["display-medium"].tracking, uk.raw.sys.typescale.emphasized["display-medium"].tracking);
-    applyProperty(uk.sys.typescale.emphasized["display-medium"].size, uk.raw.sys.typescale.emphasized["display-medium"].size);
-    applyProperty(uk.sys.typescale.emphasized["display-medium"].weight, uk.raw.sys.typescale.emphasized["display-medium"].weight);
-    applyProperty(uk.sys.typescale.emphasized["display-medium"].font, uk.raw.sys.typescale.emphasized["display-medium"].font);
+    applyProperty(
+        uk.sys.typescale.emphasized["display-medium"].tracking,
+        uk.raw.sys.typescale.emphasized["display-medium"].tracking,
+    );
+    applyProperty(
+        uk.sys.typescale.emphasized["display-medium"].size,
+        uk.raw.sys.typescale.emphasized["display-medium"].size,
+    );
+    applyProperty(
+        uk.sys.typescale.emphasized["display-medium"].weight,
+        uk.raw.sys.typescale.emphasized["display-medium"].weight,
+    );
+    applyProperty(
+        uk.sys.typescale.emphasized["display-medium"].font,
+        uk.raw.sys.typescale.emphasized["display-medium"].font,
+    );
 
     applyProperty(
         uk.sys.typescale.emphasized["display-large"]["text-transform"],
@@ -2830,33 +3486,86 @@ function applyTheme(theme: UKDesignTheme, element: HTMLDivElement, mode: "light"
         uk.sys.typescale.emphasized["display-large"]["line-height"],
         uk.raw.sys.typescale.emphasized["display-large"]["line-height"],
     );
-    applyProperty(uk.sys.typescale.emphasized["display-large"].tracking, uk.raw.sys.typescale.emphasized["display-large"].tracking);
-    applyProperty(uk.sys.typescale.emphasized["display-large"].size, uk.raw.sys.typescale.emphasized["display-large"].size);
-    applyProperty(uk.sys.typescale.emphasized["display-large"].weight, uk.raw.sys.typescale.emphasized["display-large"].weight);
-    applyProperty(uk.sys.typescale.emphasized["display-large"].font, uk.raw.sys.typescale.emphasized["display-large"].font);
+    applyProperty(
+        uk.sys.typescale.emphasized["display-large"].tracking,
+        uk.raw.sys.typescale.emphasized["display-large"].tracking,
+    );
+    applyProperty(
+        uk.sys.typescale.emphasized["display-large"].size,
+        uk.raw.sys.typescale.emphasized["display-large"].size,
+    );
+    applyProperty(
+        uk.sys.typescale.emphasized["display-large"].weight,
+        uk.raw.sys.typescale.emphasized["display-large"].weight,
+    );
+    applyProperty(
+        uk.sys.typescale.emphasized["display-large"].font,
+        uk.raw.sys.typescale.emphasized["display-large"].font,
+    );
 
-    applyProperty(uk.sys.elevation.surface["tint-color"], uk.raw.sys.elevation.surface["tint-color"]);
+    applyProperty(
+        uk.sys.elevation.surface["tint-color"],
+        uk.raw.sys.elevation.surface["tint-color"],
+    );
 
-    applyProperty(uk.sys.state.dragged["state-layer-opacity"], () => uk.raw.sys.state.dragged["state-layer-opacity"]().toString());
-    applyProperty(uk.sys.state.pressed["state-layer-opacity"], () => uk.raw.sys.state.pressed["state-layer-opacity"]().toString());
-    applyProperty(uk.sys.state.focus["state-layer-opacity"], () => uk.raw.sys.state.focus["state-layer-opacity"]().toString());
-    applyProperty(uk.sys.state.hover["state-layer-opacity"], () => uk.raw.sys.state.hover["state-layer-opacity"]().toString());
-    applyProperty(uk.sys.state["focus-indicator"]["outer-offset"], uk.raw.sys.state["focus-indicator"]["outer-offset"]);
-    applyProperty(uk.sys.state["focus-indicator"]["thickness"], uk.raw.sys.state["focus-indicator"]["thickness"]);
+    applyProperty(uk.sys.state.dragged["state-layer-opacity"], () =>
+        uk.raw.sys.state.dragged["state-layer-opacity"]().toString(),
+    );
+    applyProperty(uk.sys.state.pressed["state-layer-opacity"], () =>
+        uk.raw.sys.state.pressed["state-layer-opacity"]().toString(),
+    );
+    applyProperty(uk.sys.state.focus["state-layer-opacity"], () =>
+        uk.raw.sys.state.focus["state-layer-opacity"]().toString(),
+    );
+    applyProperty(uk.sys.state.hover["state-layer-opacity"], () =>
+        uk.raw.sys.state.hover["state-layer-opacity"]().toString(),
+    );
+    applyProperty(
+        uk.sys.state["focus-indicator"]["outer-offset"],
+        uk.raw.sys.state["focus-indicator"]["outer-offset"],
+    );
+    applyProperty(
+        uk.sys.state["focus-indicator"]["thickness"],
+        uk.raw.sys.state["focus-indicator"]["thickness"],
+    );
 
-    applyProperty(uk.sys.shape.corner["extra-large"].top.size, uk.raw.sys.shape.corner["extra-large"].top.size);
-    applyProperty(uk.sys.shape.corner["extra-large"].top["top-left"], uk.raw.sys.shape.corner["extra-large"].top["top-left"]);
-    applyProperty(uk.sys.shape.corner["extra-large"].top["top-right"], uk.raw.sys.shape.corner["extra-large"].top["top-right"]);
+    applyProperty(
+        uk.sys.shape.corner["extra-large"].top.size,
+        uk.raw.sys.shape.corner["extra-large"].top.size,
+    );
+    applyProperty(
+        uk.sys.shape.corner["extra-large"].top["top-left"],
+        uk.raw.sys.shape.corner["extra-large"].top["top-left"],
+    );
+    applyProperty(
+        uk.sys.shape.corner["extra-large"].top["top-right"],
+        uk.raw.sys.shape.corner["extra-large"].top["top-right"],
+    );
 
-    applyProperty(uk.sys.shape.corner["extra-large"].size, uk.raw.sys.shape.corner["extra-large"].size);
+    applyProperty(
+        uk.sys.shape.corner["extra-large"].size,
+        uk.raw.sys.shape.corner["extra-large"].size,
+    );
 
     applyProperty(uk.sys.shape.corner["large"].top.size, uk.raw.sys.shape.corner["large"].top.size);
-    applyProperty(uk.sys.shape.corner["large"].top["top-left"], uk.raw.sys.shape.corner["large"].top["top-left"]);
-    applyProperty(uk.sys.shape.corner["large"].top["top-right"], uk.raw.sys.shape.corner["large"].top["top-right"]);
+    applyProperty(
+        uk.sys.shape.corner["large"].top["top-left"],
+        uk.raw.sys.shape.corner["large"].top["top-left"],
+    );
+    applyProperty(
+        uk.sys.shape.corner["large"].top["top-right"],
+        uk.raw.sys.shape.corner["large"].top["top-right"],
+    );
 
     applyProperty(uk.sys.shape.corner["large"].end.size, uk.raw.sys.shape.corner["large"].end.size);
-    applyProperty(uk.sys.shape.corner["large"].end["top-right"], uk.raw.sys.shape.corner["large"].end["top-right"]);
-    applyProperty(uk.sys.shape.corner["large"].end["bottom-right"], uk.raw.sys.shape.corner["large"].end["bottom-right"]);
+    applyProperty(
+        uk.sys.shape.corner["large"].end["top-right"],
+        uk.raw.sys.shape.corner["large"].end["top-right"],
+    );
+    applyProperty(
+        uk.sys.shape.corner["large"].end["bottom-right"],
+        uk.raw.sys.shape.corner["large"].end["bottom-right"],
+    );
 
     applyProperty(uk.sys.shape.corner["large"].size, uk.raw.sys.shape.corner["large"].size);
 
@@ -2864,23 +3573,50 @@ function applyTheme(theme: UKDesignTheme, element: HTMLDivElement, mode: "light"
 
     applyProperty(uk.sys.shape.corner["small"], uk.raw.sys.shape.corner["small"]);
 
-    applyProperty(uk.sys.shape.corner["extra-small"].top.size, uk.raw.sys.shape.corner["extra-small"].top.size);
-    applyProperty(uk.sys.shape.corner["extra-small"].top["top-left"], uk.raw.sys.shape.corner["extra-small"].top["top-left"]);
-    applyProperty(uk.sys.shape.corner["extra-small"].top["top-right"], uk.raw.sys.shape.corner["extra-small"].top["top-right"]);
+    applyProperty(
+        uk.sys.shape.corner["extra-small"].top.size,
+        uk.raw.sys.shape.corner["extra-small"].top.size,
+    );
+    applyProperty(
+        uk.sys.shape.corner["extra-small"].top["top-left"],
+        uk.raw.sys.shape.corner["extra-small"].top["top-left"],
+    );
+    applyProperty(
+        uk.sys.shape.corner["extra-small"].top["top-right"],
+        uk.raw.sys.shape.corner["extra-small"].top["top-right"],
+    );
 
-    applyProperty(uk.sys.shape.corner["extra-small"].size, uk.raw.sys.shape.corner["extra-small"].size);
+    applyProperty(
+        uk.sys.shape.corner["extra-small"].size,
+        uk.raw.sys.shape.corner["extra-small"].size,
+    );
 
     applyProperty(uk.sys.shape.corner["none"], uk.raw.sys.shape.corner["none"]);
 
     applyProperty(uk.sys.shape.corner["full"], uk.raw.sys.shape.corner["full"]);
 
-    applyProperty(uk.sys.motion.easing.emphasized.normal, uk.raw.sys.motion.easing.emphasized.normal);
-    applyProperty(uk.sys.motion.easing.emphasized.accelerate, uk.raw.sys.motion.easing.emphasized.accelerate);
-    applyProperty(uk.sys.motion.easing.emphasized.decelerate, uk.raw.sys.motion.easing.emphasized.decelerate);
+    applyProperty(
+        uk.sys.motion.easing.emphasized.normal,
+        uk.raw.sys.motion.easing.emphasized.normal,
+    );
+    applyProperty(
+        uk.sys.motion.easing.emphasized.accelerate,
+        uk.raw.sys.motion.easing.emphasized.accelerate,
+    );
+    applyProperty(
+        uk.sys.motion.easing.emphasized.decelerate,
+        uk.raw.sys.motion.easing.emphasized.decelerate,
+    );
 
     applyProperty(uk.sys.motion.easing.standard.normal, uk.raw.sys.motion.easing.standard.normal);
-    applyProperty(uk.sys.motion.easing.standard.accelerate, uk.raw.sys.motion.easing.standard.accelerate);
-    applyProperty(uk.sys.motion.easing.standard.decelerate, uk.raw.sys.motion.easing.standard.decelerate);
+    applyProperty(
+        uk.sys.motion.easing.standard.accelerate,
+        uk.raw.sys.motion.easing.standard.accelerate,
+    );
+    applyProperty(
+        uk.sys.motion.easing.standard.decelerate,
+        uk.raw.sys.motion.easing.standard.decelerate,
+    );
 
     applyProperty(uk.sys.motion.easing.linear, uk.raw.sys.motion.easing.linear);
 
@@ -2904,70 +3640,172 @@ function applyTheme(theme: UKDesignTheme, element: HTMLDivElement, mode: "light"
 
     if (mode === "light") {
         applyProperty(uk.sys.color["surface-tint"], uk.raw.sys.color.lightMode["surface-tint"]);
-        applyProperty(uk.sys.color["surface-tint-color"], uk.raw.sys.color.lightMode["surface-tint-color"]);
-        applyProperty(uk.sys.color["on-error-container"], uk.raw.sys.color.lightMode["on-error-container"]);
+        applyProperty(
+            uk.sys.color["surface-tint-color"],
+            uk.raw.sys.color.lightMode["surface-tint-color"],
+        );
+        applyProperty(
+            uk.sys.color["on-error-container"],
+            uk.raw.sys.color.lightMode["on-error-container"],
+        );
         applyProperty(uk.sys.color["on-error"], uk.raw.sys.color.lightMode["on-error"]);
-        applyProperty(uk.sys.color["error-container"], uk.raw.sys.color.lightMode["error-container"]);
-        applyProperty(uk.sys.color["on-tertiary-container"], uk.raw.sys.color.lightMode["on-tertiary-container"]);
+        applyProperty(
+            uk.sys.color["error-container"],
+            uk.raw.sys.color.lightMode["error-container"],
+        );
+        applyProperty(
+            uk.sys.color["on-tertiary-container"],
+            uk.raw.sys.color.lightMode["on-tertiary-container"],
+        );
         applyProperty(uk.sys.color["on-tertiary"], uk.raw.sys.color.lightMode["on-tertiary"]);
-        applyProperty(uk.sys.color["tertiary-container"], uk.raw.sys.color.lightMode["tertiary-container"]);
+        applyProperty(
+            uk.sys.color["tertiary-container"],
+            uk.raw.sys.color.lightMode["tertiary-container"],
+        );
         applyProperty(uk.sys.color["tertiary"], uk.raw.sys.color.lightMode["tertiary"]);
         applyProperty(uk.sys.color["shadow"], uk.raw.sys.color.lightMode["shadow"]);
         applyProperty(uk.sys.color["error"], uk.raw.sys.color.lightMode["error"]);
         applyProperty(uk.sys.color["outline"], uk.raw.sys.color.lightMode["outline"]);
-        applyProperty(uk.sys.color["outline-variant"], uk.raw.sys.color.lightMode["outline-variant"]);
+        applyProperty(
+            uk.sys.color["outline-variant"],
+            uk.raw.sys.color.lightMode["outline-variant"],
+        );
         applyProperty(uk.sys.color["on-background"], uk.raw.sys.color.lightMode["on-background"]);
         applyProperty(uk.sys.color["background"], uk.raw.sys.color.lightMode["background"]);
-        applyProperty(uk.sys.color["inverse-on-surface"], uk.raw.sys.color.lightMode["inverse-on-surface"]);
-        applyProperty(uk.sys.color["inverse-surface"], uk.raw.sys.color.lightMode["inverse-surface"]);
-        applyProperty(uk.sys.color["on-surface-variant"], uk.raw.sys.color.lightMode["on-surface-variant"]);
+        applyProperty(
+            uk.sys.color["inverse-on-surface"],
+            uk.raw.sys.color.lightMode["inverse-on-surface"],
+        );
+        applyProperty(
+            uk.sys.color["inverse-surface"],
+            uk.raw.sys.color.lightMode["inverse-surface"],
+        );
+        applyProperty(
+            uk.sys.color["on-surface-variant"],
+            uk.raw.sys.color.lightMode["on-surface-variant"],
+        );
         applyProperty(uk.sys.color["on-surface"], uk.raw.sys.color.lightMode["on-surface"]);
-        applyProperty(uk.sys.color["surface-variant"], uk.raw.sys.color.lightMode["surface-variant"]);
+        applyProperty(
+            uk.sys.color["surface-variant"],
+            uk.raw.sys.color.lightMode["surface-variant"],
+        );
         applyProperty(uk.sys.color["surface"], uk.raw.sys.color.lightMode["surface"]);
-        applyProperty(uk.sys.color["surface-container"], uk.raw.sys.color.lightMode["surface-container"]);
-        applyProperty(uk.sys.color["surface-container-low"], uk.raw.sys.color.lightMode["surface-container-low"]);
-        applyProperty(uk.sys.color["surface-container-highest"], uk.raw.sys.color.lightMode["surface-container-highest"]);
-        applyProperty(uk.sys.color["on-secondary-container"], uk.raw.sys.color.lightMode["on-secondary-container"]);
+        applyProperty(
+            uk.sys.color["surface-container"],
+            uk.raw.sys.color.lightMode["surface-container"],
+        );
+        applyProperty(
+            uk.sys.color["surface-container-low"],
+            uk.raw.sys.color.lightMode["surface-container-low"],
+        );
+        applyProperty(
+            uk.sys.color["surface-container-highest"],
+            uk.raw.sys.color.lightMode["surface-container-highest"],
+        );
+        applyProperty(
+            uk.sys.color["on-secondary-container"],
+            uk.raw.sys.color.lightMode["on-secondary-container"],
+        );
         applyProperty(uk.sys.color["on-secondary"], uk.raw.sys.color.lightMode["on-secondary"]);
-        applyProperty(uk.sys.color["secondary-container"], uk.raw.sys.color.lightMode["secondary-container"]);
+        applyProperty(
+            uk.sys.color["secondary-container"],
+            uk.raw.sys.color.lightMode["secondary-container"],
+        );
         applyProperty(uk.sys.color["secondary"], uk.raw.sys.color.lightMode["secondary"]);
-        applyProperty(uk.sys.color["inverse-primary"], uk.raw.sys.color.lightMode["inverse-primary"]);
-        applyProperty(uk.sys.color["on-primary-container"], uk.raw.sys.color.lightMode["on-primary-container"]);
+        applyProperty(
+            uk.sys.color["inverse-primary"],
+            uk.raw.sys.color.lightMode["inverse-primary"],
+        );
+        applyProperty(
+            uk.sys.color["on-primary-container"],
+            uk.raw.sys.color.lightMode["on-primary-container"],
+        );
         applyProperty(uk.sys.color["on-primary"], uk.raw.sys.color.lightMode["on-primary"]);
-        applyProperty(uk.sys.color["primary-container"], uk.raw.sys.color.lightMode["primary-container"]);
+        applyProperty(
+            uk.sys.color["primary-container"],
+            uk.raw.sys.color.lightMode["primary-container"],
+        );
         applyProperty(uk.sys.color["primary"], uk.raw.sys.color.lightMode["primary"]);
     }
 
     if (mode === "dark") {
         applyProperty(uk.sys.color["on-error"], uk.raw.sys.color.darkMode["on-error"]);
-        applyProperty(uk.sys.color["error-container"], uk.raw.sys.color.darkMode["error-container"]);
-        applyProperty(uk.sys.color["on-tertiary-container"], uk.raw.sys.color.darkMode["on-tertiary-container"]);
+        applyProperty(
+            uk.sys.color["error-container"],
+            uk.raw.sys.color.darkMode["error-container"],
+        );
+        applyProperty(
+            uk.sys.color["on-tertiary-container"],
+            uk.raw.sys.color.darkMode["on-tertiary-container"],
+        );
         applyProperty(uk.sys.color["on-tertiary"], uk.raw.sys.color.darkMode["on-tertiary"]);
-        applyProperty(uk.sys.color["tertiary-container"], uk.raw.sys.color.darkMode["tertiary-container"]);
+        applyProperty(
+            uk.sys.color["tertiary-container"],
+            uk.raw.sys.color.darkMode["tertiary-container"],
+        );
         applyProperty(uk.sys.color["tertiary"], uk.raw.sys.color.darkMode["tertiary"]);
         applyProperty(uk.sys.color["shadow"], uk.raw.sys.color.darkMode["shadow"]);
         applyProperty(uk.sys.color["error"], uk.raw.sys.color.darkMode["error"]);
         applyProperty(uk.sys.color["outline"], uk.raw.sys.color.darkMode["outline"]);
-        applyProperty(uk.sys.color["outline-variant"], uk.raw.sys.color.darkMode["outline-variant"]);
+        applyProperty(
+            uk.sys.color["outline-variant"],
+            uk.raw.sys.color.darkMode["outline-variant"],
+        );
         applyProperty(uk.sys.color["on-background"], uk.raw.sys.color.darkMode["on-background"]);
         applyProperty(uk.sys.color["background"], uk.raw.sys.color.darkMode["background"]);
-        applyProperty(uk.sys.color["inverse-on-surface"], uk.raw.sys.color.darkMode["inverse-on-surface"]);
-        applyProperty(uk.sys.color["inverse-surface"], uk.raw.sys.color.darkMode["inverse-surface"]);
-        applyProperty(uk.sys.color["on-surface-variant"], uk.raw.sys.color.darkMode["on-surface-variant"]);
+        applyProperty(
+            uk.sys.color["inverse-on-surface"],
+            uk.raw.sys.color.darkMode["inverse-on-surface"],
+        );
+        applyProperty(
+            uk.sys.color["inverse-surface"],
+            uk.raw.sys.color.darkMode["inverse-surface"],
+        );
+        applyProperty(
+            uk.sys.color["on-surface-variant"],
+            uk.raw.sys.color.darkMode["on-surface-variant"],
+        );
         applyProperty(uk.sys.color["on-surface"], uk.raw.sys.color.darkMode["on-surface"]);
-        applyProperty(uk.sys.color["surface-variant"], uk.raw.sys.color.darkMode["surface-variant"]);
+        applyProperty(
+            uk.sys.color["surface-variant"],
+            uk.raw.sys.color.darkMode["surface-variant"],
+        );
         applyProperty(uk.sys.color["surface"], uk.raw.sys.color.darkMode["surface"]);
-        applyProperty(uk.sys.color["surface-container"], uk.raw.sys.color.darkMode["surface-container"]);
-        applyProperty(uk.sys.color["surface-container-low"], uk.raw.sys.color.darkMode["surface-container-low"]);
-        applyProperty(uk.sys.color["surface-container-highest"], uk.raw.sys.color.darkMode["surface-container-highest"]);
-        applyProperty(uk.sys.color["on-secondary-container"], uk.raw.sys.color.darkMode["on-secondary-container"]);
+        applyProperty(
+            uk.sys.color["surface-container"],
+            uk.raw.sys.color.darkMode["surface-container"],
+        );
+        applyProperty(
+            uk.sys.color["surface-container-low"],
+            uk.raw.sys.color.darkMode["surface-container-low"],
+        );
+        applyProperty(
+            uk.sys.color["surface-container-highest"],
+            uk.raw.sys.color.darkMode["surface-container-highest"],
+        );
+        applyProperty(
+            uk.sys.color["on-secondary-container"],
+            uk.raw.sys.color.darkMode["on-secondary-container"],
+        );
         applyProperty(uk.sys.color["on-secondary"], uk.raw.sys.color.darkMode["on-secondary"]);
-        applyProperty(uk.sys.color["secondary-container"], uk.raw.sys.color.darkMode["secondary-container"]);
+        applyProperty(
+            uk.sys.color["secondary-container"],
+            uk.raw.sys.color.darkMode["secondary-container"],
+        );
         applyProperty(uk.sys.color["secondary"], uk.raw.sys.color.darkMode["secondary"]);
-        applyProperty(uk.sys.color["inverse-primary"], uk.raw.sys.color.darkMode["inverse-primary"]);
-        applyProperty(uk.sys.color["on-primary-container"], uk.raw.sys.color.darkMode["on-primary-container"]);
+        applyProperty(
+            uk.sys.color["inverse-primary"],
+            uk.raw.sys.color.darkMode["inverse-primary"],
+        );
+        applyProperty(
+            uk.sys.color["on-primary-container"],
+            uk.raw.sys.color.darkMode["on-primary-container"],
+        );
         applyProperty(uk.sys.color["on-primary"], uk.raw.sys.color.darkMode["on-primary"]);
-        applyProperty(uk.sys.color["primary-container"], uk.raw.sys.color.darkMode["primary-container"]);
+        applyProperty(
+            uk.sys.color["primary-container"],
+            uk.raw.sys.color.darkMode["primary-container"],
+        );
         applyProperty(uk.sys.color["primary"], uk.raw.sys.color.darkMode["primary"]);
     }
 

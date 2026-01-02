@@ -15,6 +15,7 @@ type MenuItem =
           supportingText?: string;
           badge?: string;
           onClick(): void;
+          selected?: boolean;
       }
     | {
           type: "category";
@@ -24,6 +25,7 @@ type MenuItem =
           badge?: string;
           children?: MenuItem[];
           onClick?(): void;
+          selected?: boolean;
       }
     | {
           type: "divider";
@@ -121,7 +123,10 @@ const UKMenu: Component<
                                         {item.type === "spacer" && <div class={styles.spacer} />}
                                         {item.type === "button" && (
                                             <button
-                                                class={styles.button}
+                                                class={clsx(
+                                                    styles.button,
+                                                    item.selected && styles.selected,
+                                                )}
                                                 onClick={() => {
                                                     item.onClick();
                                                 }}
@@ -151,7 +156,10 @@ const UKMenu: Component<
                                         )}
                                         {item.type === "category" && (
                                             <button
-                                                class={styles.button}
+                                                class={clsx(
+                                                    styles.button,
+                                                    item.selected && styles.selected,
+                                                )}
                                                 // onMouseEnter={() => {
                                                 //     setSelected(index());
                                                 // }}

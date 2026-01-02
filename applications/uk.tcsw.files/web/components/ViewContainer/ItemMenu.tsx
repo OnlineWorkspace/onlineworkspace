@@ -38,7 +38,10 @@ const ItemMenu: Component<ParentProps> = (props) => {
                 {
                     type: "button",
                     label: /*viewCtx!.selectedItems().length > 1 ? "Bulk Rename" : */ "Rename",
-                    supportingText: "(Only the first selected item)",
+                    supportingText:
+                        viewCtx!.selectedItems().length > 1
+                            ? "(Only the first selected item)"
+                            : undefined,
                     leadingIcon: "edit",
                     onClick() {
                         let selectedItems = viewCtx?.selectedItems();
@@ -55,6 +58,7 @@ const ItemMenu: Component<ParentProps> = (props) => {
                     type: "button",
                     label: "Sharing",
                     leadingIcon: "share",
+                    selected: true,
                     onClick() {
                         console.log("3");
                     },
