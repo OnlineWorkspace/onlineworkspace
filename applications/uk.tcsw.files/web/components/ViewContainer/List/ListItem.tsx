@@ -52,10 +52,7 @@ const ListItem: Component<{
                         }
                     } else if (e.shiftKey) {
                         const lastSelectionIndex = viewCtx?.lastSelectionIndex();
-                        if (
-                            lastSelectionIndex === props.index ||
-                            lastSelectionIndex === undefined
-                        ) {
+                        if (lastSelectionIndex === props.index || lastSelectionIndex === undefined) {
                             viewCtx?.setLastSelectionIndex(props.index);
                             if (selectedItems.includes(props.path)) {
                                 if (selectedItems.length === 1) {
@@ -75,12 +72,12 @@ const ListItem: Component<{
                         if (lastSelectionIndex < props.index) {
                             for (let i = lastSelectionIndex; i < props.index + 1; i++) {
                                 let item = viewCtx?.viewItems()[i];
-                                if (item !== undefined) itemsBetween.push(item);
+                                if (item !== undefined) itemsBetween.push(item.path);
                             }
                         } else {
                             for (let i = lastSelectionIndex; i > props.index - 1; i--) {
                                 let item = viewCtx?.viewItems()[i];
-                                if (item !== undefined) itemsBetween.push(item);
+                                if (item !== undefined) itemsBetween.push(item.path);
                             }
                         }
 
@@ -99,7 +96,9 @@ const ListItem: Component<{
                     }
                 }}
             >
-                {props.type === "file" ? (
+                {viewCtx?.cutItems().includes(props.path) ? (
+                    <UKIcon class={styles.icon}>content_cut</UKIcon>
+                ) : props.type === "file" ? (
                     props.icon ? (
                         <img draggable={false} alt="" src={props.icon} loading={"lazy"} />
                     ) : (

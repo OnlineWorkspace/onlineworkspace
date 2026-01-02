@@ -52,10 +52,7 @@ const GridItem: Component<{
                         }
                     } else if (e.shiftKey) {
                         const lastSelectionIndex = viewCtx?.lastSelectionIndex();
-                        if (
-                            lastSelectionIndex === props.index ||
-                            lastSelectionIndex === undefined
-                        ) {
+                        if (lastSelectionIndex === props.index || lastSelectionIndex === undefined) {
                             viewCtx?.setLastSelectionIndex(props.index);
                             if (selectedItems.includes(props.path)) {
                                 if (selectedItems.length === 1) {
@@ -75,12 +72,12 @@ const GridItem: Component<{
                         if (lastSelectionIndex < props.index) {
                             for (let i = lastSelectionIndex; i < props.index + 1; i++) {
                                 let item = viewCtx?.viewItems()[i];
-                                if (item !== undefined) itemsBetween.push(item);
+                                if (item !== undefined) itemsBetween.push(item.path);
                             }
                         } else {
                             for (let i = lastSelectionIndex; i > props.index - 1; i--) {
                                 let item = viewCtx?.viewItems()[i];
-                                if (item !== undefined) itemsBetween.push(item);
+                                if (item !== undefined) itemsBetween.push(item.path);
                             }
                         }
 
@@ -99,7 +96,9 @@ const GridItem: Component<{
                     }
                 }}
             >
-                {props.type === "file" ? (
+                {viewCtx?.cutItems().includes(props.path) ? (
+                    <UKIcon class={styles.icon}>content_cut</UKIcon>
+                ) : props.type === "file" ? (
                     props.icon ? (
                         <img draggable={false} alt="" src={props.icon} loading={"lazy"} />
                     ) : (
@@ -109,11 +108,7 @@ const GridItem: Component<{
                     <UKIcon class={styles.icon}>folder</UKIcon>
                 )}
                 {viewCtx?.renameEntry() === props.path ? (
-                    <GridItemRename
-                        path={props.path}
-                        name={props.name}
-                        refetchGrid={props.refetchGrid}
-                    />
+                    <GridItemRename path={props.path} name={props.name} refetchGrid={props.refetchGrid} />
                 ) : (
                     <UKText align="center" role="label" size="m">
                         {props.name}

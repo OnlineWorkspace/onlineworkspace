@@ -1,4 +1,4 @@
-import { type Component, createEffect, createSignal } from "solid-js";
+import { type Component, createEffect, createResource, createSignal } from "solid-js";
 import UKCard from "@tcsw/uikit-solid/src/components/card/UKCard.tsx";
 import UKButton from "@tcsw/uikit-solid/src/components/button/UKButton.tsx";
 import UKDivider from "@tcsw/uikit-solid/src/components/divider/UKDivider.tsx";
@@ -15,6 +15,7 @@ const UserSelectPage: Component = () => {
     const [username, setUsername] = createSignal("");
     const [password, setPassword] = createSignal("");
     const [showTwoFactor, setShowTwoFactor] = createSignal<boolean>(false);
+    const [canSignup] = createResource(() => trpc.authorization.canSignup.query());
 
     createEffect(async () => {
         if ((await trpc.authorization.isAuthenticated.query()).authenticated) {
@@ -68,11 +69,7 @@ const UserSelectPage: Component = () => {
                             getValue={setPassword}
                         />
                         <div class={styles.loginButtons}>
-                            <UKButton
-                                onClick={() => 0}
-                                disabled={username() === ""}
-                                color={"standard"}
-                            >
+                            <UKButton onClick={() => 0} disabled={username() === ""} color={"standard"}>
                                 Forgot password?
                             </UKButton>
                             <UKButton
@@ -115,15 +112,19 @@ const UserSelectPage: Component = () => {
                     >
                         Use Security Key
                     </UKButton>
-                    <UKDivider direction={DividerDirection.horizontal} />
-                    <div class={styles.signupSegment}>
-                        <UKText role={"body"} size={"m"}>
-                            Don't have an account?
-                        </UKText>
-                        <UKButton onClick={() => navigate("/signup")} color={"tonal"}>
-                            Signup
-                        </UKButton>
-                    </div>
+                    {canSignup() ? (
+                        <>
+                            <UKDivider direction={DividerDirection.horizontal} />
+                            <div class={styles.signupSegment}>
+                                <UKText role={"body"} size={"m"}>
+                                    Don't have an account?
+                                </UKText>
+                                <UKButton onClick={() => navigate("/signup")} color={"tonal"}>
+                                    Signup
+                                </UKButton>
+                            </div>
+                        </>
+                    ) : null}
                 </>
             )}
         </UKCard>

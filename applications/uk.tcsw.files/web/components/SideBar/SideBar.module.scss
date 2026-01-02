@@ -1,6 +1,7 @@
 .root {
-    grid-row-start: 2;
-    grid-row-end: 4;
+    user-select: none;
+    grid-row-start: 1;
+    grid-row-end: 3;
     background-color: rgb(var(--uk-sys-color-surface-container));
 
     display: flex;

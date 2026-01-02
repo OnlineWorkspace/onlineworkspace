@@ -9,7 +9,7 @@ export default class ExitCommand extends Command {
     async run(parameters: ICommandRuntimeParameters) {
         await this.instance.shutdown();
 
-        // Note: do not remove this line of code or Typescript will complain
+        // Note: do not remove this line of code or TypeScript will complain
         return this.finishRun();
     }
 }

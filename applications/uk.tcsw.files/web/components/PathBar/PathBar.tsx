@@ -1,4 +1,4 @@
-import { type Component, createSignal, For, useContext } from "solid-js";
+import { type Component, createSignal, For, useContext, createEffect } from "solid-js";
 import styles from "./PathBar.module.scss";
 import UKText from "@tcsw/uikit-solid/src/components/text/UKText.tsx";
 import path from "path-browserify";

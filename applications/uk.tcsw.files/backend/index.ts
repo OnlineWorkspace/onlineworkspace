@@ -20,14 +20,14 @@ const router = t.router({
                 name: string;
                 path: string;
                 icon?: string;
-                type: "directory" | "file";
+                type: "directory" | "file" | "alias";
             }[] = [];
 
             const finalPath = path.join(instance.sys.filesystem.FS_ROOT, opt.input.path);
 
             if (!(await fs.exists(finalPath))) {
                 return {
-                    type: "error",
+                    type: "error" as const,
                     message: "This directory does not exist!",
                     icon: "folder_limited",
                 };
@@ -94,13 +94,13 @@ const router = t.router({
 
             if (output.length < 1) {
                 return {
-                    type: "info",
+                    type: "info" as const,
                     message: "This directory is empty",
                     icon: "folder",
                 };
             }
 
-            return { type: "success", items: output };
+            return { type: "success" as const, items: output };
         }),
     getRawFile: procedure.input(z.string()).query(async (opt) => {
         const finalPath = path.join(instance.sys.filesystem.FS_ROOT, opt.input);

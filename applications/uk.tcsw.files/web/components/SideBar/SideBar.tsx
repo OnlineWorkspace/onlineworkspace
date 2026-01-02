@@ -1,5 +1,5 @@
 import type { Component } from "solid-js";
-import styles from "./SideBar.module.scss"
+import styles from "./SideBar.module.scss";
 import UKButton from "@tcsw/uikit-solid/src/components/button/UKButton.tsx";
 import UKDivider from "@tcsw/uikit-solid/src/components/divider/UKDivider.tsx";
 import { DividerDirection } from "@tcsw/uikit-solid/src/components/divider/lib/direction.ts";
@@ -10,7 +10,12 @@ const SideBar: Component = () => {
 
     return (
         <div class={styles.root}>
-            <img class={styles.headerImage} alt={""} src={"/assets/tricolor/tricolor_transparent_dark_background.svg"}/>
+            <img
+                draggable={false}
+                class={styles.headerImage}
+                alt={""}
+                src={"/assets/tricolor/tricolor_transparent_dark_background.svg"}
+            />
             <UKButton
                 color={"filled"}
                 size={"s"}
@@ -54,6 +59,6 @@ const SideBar: Component = () => {
             </UKButton>
         </div>
     );
-}
+};
 
 export default SideBar;

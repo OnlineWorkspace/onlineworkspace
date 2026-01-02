@@ -1,14 +1,4 @@
-import {
-    type Component,
-    createResource,
-    For,
-    Match,
-    onCleanup,
-    onMount,
-    Suspense,
-    Switch,
-    useContext,
-} from "solid-js";
+import { type Component, createResource, For, Match, onCleanup, onMount, Suspense, Switch, useContext } from "solid-js";
 import styles from "./Grid.module.scss";
 import { useNavigate, useParams } from "@solidjs/router";
 import trpc from "../../../lib/trpc";
@@ -33,8 +23,7 @@ const GridView: Component = () => {
             viewCtx?.setSelectedItems([]);
             const items = await trpc.getFileGrid.query({ path: pth, sortBy: "name" });
             if (items.type === "success") {
-                // @ts-ignore
-                viewCtx?.setViewItems(items.items.map((i) => i.path));
+                viewCtx?.setViewItems(items.items.map((i) => i));
             } else {
                 viewCtx?.setViewItems([]);
             }
@@ -43,35 +32,45 @@ const GridView: Component = () => {
     );
 
     const keydownListener = (e: KeyboardEvent) => {
-        if (e.key === "ArrowLeft") {
+        if (e.key === "ArrowUp") {
             if (viewCtx?.selectedItems().length === 0) {
-                if (viewCtx.viewItems().length !== 0)
-                    viewCtx?.setSelectedItems([viewCtx.viewItems()[0]]);
+                if (viewCtx.viewItems().length !== 0) viewCtx?.setSelectedItems([viewCtx.viewItems()[0].path]);
             } else {
                 if (viewCtx?.selectedItems().length === 1) {
                     let previousSelection = viewCtx
                         .viewItems()
-                        .indexOf(viewCtx?.selectedItems()[0]);
+                        .findIndex((i) => i.path === viewCtx?.selectedItems()[0]);
                     if (viewCtx.viewItems()[previousSelection - 1]) {
-                        viewCtx?.setSelectedItems([viewCtx.viewItems()[previousSelection - 1]]);
+                        viewCtx?.setSelectedItems([viewCtx.viewItems()[previousSelection - 1].path]);
                     }
                 }
             }
         }
-        if (e.key === "ArrowRight") {
+        if (e.key === "ArrowDown") {
             if (viewCtx?.selectedItems().length === 0) {
-                if (viewCtx.viewItems().length !== 0)
-                    viewCtx?.setSelectedItems([viewCtx.viewItems()[0]]);
+                if (viewCtx.viewItems().length !== 0) viewCtx?.setSelectedItems([viewCtx.viewItems()[0].path]);
             } else {
                 if (viewCtx?.selectedItems().length === 1) {
                     let previousSelection = viewCtx
                         .viewItems()
-                        .indexOf(viewCtx?.selectedItems()[0]);
+                        .findIndex((i) => i.path === viewCtx?.selectedItems()[0]);
                     if (viewCtx.viewItems()[previousSelection + 1]) {
-                        viewCtx?.setSelectedItems([viewCtx.viewItems()[previousSelection + 1]]);
+                        viewCtx?.setSelectedItems([viewCtx.viewItems()[previousSelection + 1].path]);
                     }
                 }
             }
+        }
+        if (e.key === "x" && e.ctrlKey) {
+            let selectedItems = viewCtx!.selectedItems();
+            viewCtx!.setCutItems(selectedItems);
+            viewCtx!.setCopyItems([]);
+            viewCtx!.setSelectedItems([]);
+        }
+        if (e.key === "c" && e.ctrlKey) {
+            let selectedItems = viewCtx!.selectedItems();
+            viewCtx!.setCopyItems(selectedItems);
+            viewCtx!.setCutItems([]);
+            viewCtx!.setSelectedItems([]);
         }
     };
 
@@ -130,9 +129,7 @@ const GridView: Component = () => {
                         {/* @ts-ignore */}
                         <For each={gridResource()?.items}>
                             {(i, index) => {
-                                return (
-                                    <GridItem {...i} index={index()} refetchGrid={refetchGrid} />
-                                );
+                                return <GridItem {...i} index={index()} refetchGrid={refetchGrid} />;
                             }}
                         </For>
                     </Match>

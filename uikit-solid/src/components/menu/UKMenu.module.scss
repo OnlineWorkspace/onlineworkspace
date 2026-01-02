@@ -157,6 +157,14 @@
         display: flex;
         flex-direction: column;
         justify-content: center;
+
+        .label {
+
+        }
+
+        .supportingText {
+            color: rgb(var(--uk-sys-color-on-surface-variant));
+        }
     }
 }
 

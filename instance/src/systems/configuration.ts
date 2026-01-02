@@ -6,11 +6,13 @@ import { promises as fs } from "fs";
 export enum WorkspacesFeatureFlags {
     SlashCommands = "slash_commands",
     ShootYourselfInTheFoot = "shoot_yourself_in_the_foot",
+    AllowUserSignups = "allow_user_signups",
 }
 
 export const FEATURE_FLAG_DESCRIPTIONS = {
     [WorkspacesFeatureFlags.ShootYourselfInTheFoot]:
         "Allow administrators to alter settings / configuration options which may cause the instance to malfunction. (Only enable this if you are sure you know what you are doing!)",
+    [WorkspacesFeatureFlags.AllowUserSignups]: "Allow new users to create accounts from the instance user login page",
 };
 
 export default class ConfigurationSystem extends System {
@@ -119,10 +121,7 @@ export default class ConfigurationSystem extends System {
     }
 
     async saveConfiguration(): Promise<boolean> {
-        const CONFIGURATION_FILE_PATH = path.join(
-            this.instance.sys.filesystem.FS_ROOT,
-            "configuration.json",
-        );
+        const CONFIGURATION_FILE_PATH = path.join(this.instance.sys.filesystem.FS_ROOT, "configuration.json");
 
         await fs.writeFile(
             CONFIGURATION_FILE_PATH,
@@ -146,26 +145,19 @@ export default class ConfigurationSystem extends System {
     }
 
     async startup(): Promise<boolean> {
-        const CONFIGURATION_FILE_PATH = path.join(
-            this.instance.sys.filesystem.FS_ROOT,
-            "configuration.json",
-        );
+        const CONFIGURATION_FILE_PATH = path.join(this.instance.sys.filesystem.FS_ROOT, "configuration.json");
 
         if (!(await fs.exists(CONFIGURATION_FILE_PATH))) {
             await this.saveConfiguration();
         }
 
-        const configurationFile = JSON.parse(
-            (await fs.readFile(CONFIGURATION_FILE_PATH)).toString(),
-        );
+        const configurationFile = JSON.parse((await fs.readFile(CONFIGURATION_FILE_PATH)).toString());
 
-        if (configurationFile.enabledFeatures)
-            this.enabledFeatures = configurationFile.enabledFeatures;
+        if (configurationFile.enabledFeatures) this.enabledFeatures = configurationFile.enabledFeatures;
         if (configurationFile.databases) this.databases = configurationFile.databases;
         if (configurationFile.backendUrl) this.backendUrl = configurationFile.backendUrl;
         if (configurationFile.webUrl) this.webUrl = configurationFile.webUrl;
-        if (configurationFile.signupRequirements)
-            this.signupRequirements = configurationFile.signupRequirements;
+        if (configurationFile.signupRequirements) this.signupRequirements = configurationFile.signupRequirements;
         if (configurationFile.displayName) this.displayName = configurationFile.displayName;
         if (configurationFile.mailserver) this.mailserver = configurationFile.mailserver;
         if (configurationFile.termsOfUse) this.termsOfUse = configurationFile.termsOfUse;

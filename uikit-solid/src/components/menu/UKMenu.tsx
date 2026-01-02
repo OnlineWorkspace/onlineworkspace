@@ -36,16 +36,14 @@ type MenuItem =
 
 const UKMenu: Component<
     ParentProps<{
-        items: MenuItem[];
+        items: (MenuItem | undefined)[];
         class?: string;
         showMenu?: { x: number; y: number } | false;
         vibrant?: boolean;
     }>
 > = (props) => {
     const [ref, setRef] = createSignal<Element | undefined>();
-    const [showMenu, setShowMenu] = createSignal<{ x: number; y: number } | false>(
-        props.showMenu || false,
-    );
+    const [showMenu, setShowMenu] = createSignal<{ x: number; y: number } | false>(props.showMenu || false);
     const [selected, setSelected] = createSignal<number | undefined>(undefined);
 
     createEffect(() => {
@@ -55,12 +53,12 @@ const UKMenu: Component<
 
         element.addEventListener("contextmenu", (e) => {
             e.preventDefault();
-            // e.stopPropagation();
 
-            setShowMenu({
-                x: (e as unknown as MouseEvent).clientX,
-                y: (e as unknown as MouseEvent).clientY,
-            });
+            if (e.target === element)
+                setShowMenu({
+                    x: (e as unknown as MouseEvent).clientX,
+                    y: (e as unknown as MouseEvent).clientY,
+                });
         });
     });
 
@@ -71,10 +69,7 @@ const UKMenu: Component<
                 <UKMenu
                     vibrant={props.vibrant}
                     showMenu={{ x: ref()!.clientLeft, y: ref()!.clientTop }}
-                    items={
-                        (props.items[selected() as number] as { children: MenuItem[] }).children ||
-                        []
-                    }
+                    items={(props.items[selected() as number] as { children: MenuItem[] }).children || []}
                 />
             )}
             {showMenu() !== false && (
@@ -86,8 +81,7 @@ const UKMenu: Component<
                             setShowMenu(false);
                             let element = document.elementFromPoint(e.clientX, e.clientY);
                             if (!element) return;
-                            if ("click" in element)
-                                if (typeof element.click === "function") element.click();
+                            if ("click" in element) if (typeof element.click === "function") element.click();
                         }}
                         onContextMenu={(e) => {
                             e.preventDefault();
@@ -112,43 +106,29 @@ const UKMenu: Component<
                     >
                         <For each={props.items}>
                             {(item, index) => {
+                                if (item === undefined) return null;
+
                                 return (
                                     <>
                                         {item.type === "divider" && (
-                                            <UKDivider
-                                                class={styles.divider}
-                                                direction={"horizontal"}
-                                            />
+                                            <UKDivider class={styles.divider} direction={"horizontal"} />
                                         )}
                                         {item.type === "spacer" && <div class={styles.spacer} />}
                                         {item.type === "button" && (
                                             <button
-                                                class={clsx(
-                                                    styles.button,
-                                                    item.selected && styles.selected,
-                                                )}
+                                                class={clsx(styles.button, item.selected && styles.selected)}
                                                 onClick={() => {
                                                     item.onClick();
                                                 }}
                                             >
                                                 {item.leadingIcon && (
-                                                    <UKIcon class={styles.icon}>
-                                                        {item.leadingIcon}
-                                                    </UKIcon>
+                                                    <UKIcon class={styles.icon}>{item.leadingIcon}</UKIcon>
                                                 )}
                                                 <div class={styles.text}>
-                                                    <UKText
-                                                        class={styles.label}
-                                                        role={"label"}
-                                                        size={"m"}
-                                                    >
+                                                    <UKText class={styles.label} role={"label"} size={"m"}>
                                                         {item.label}
                                                     </UKText>
-                                                    <UKText
-                                                        class={styles.supportingText}
-                                                        role={"label"}
-                                                        size={"s"}
-                                                    >
+                                                    <UKText class={styles.supportingText} role={"label"} size={"s"}>
                                                         {item.supportingText}
                                                     </UKText>
                                                 </div>
@@ -156,10 +136,7 @@ const UKMenu: Component<
                                         )}
                                         {item.type === "category" && (
                                             <button
-                                                class={clsx(
-                                                    styles.button,
-                                                    item.selected && styles.selected,
-                                                )}
+                                                class={clsx(styles.button, item.selected && styles.selected)}
                                                 // onMouseEnter={() => {
                                                 //     setSelected(index());
                                                 // }}
@@ -171,23 +148,13 @@ const UKMenu: Component<
                                                 }}
                                             >
                                                 {item.leadingIcon && (
-                                                    <UKIcon class={styles.icon}>
-                                                        {item.leadingIcon}
-                                                    </UKIcon>
+                                                    <UKIcon class={styles.icon}>{item.leadingIcon}</UKIcon>
                                                 )}
                                                 <div class={styles.text}>
-                                                    <UKText
-                                                        class={styles.label}
-                                                        role={"label"}
-                                                        size={"m"}
-                                                    >
+                                                    <UKText class={styles.label} role={"label"} size={"m"}>
                                                         {item.label}
                                                     </UKText>
-                                                    <UKText
-                                                        class={styles.supportingText}
-                                                        role={"label"}
-                                                        size={"s"}
-                                                    >
+                                                    <UKText class={styles.supportingText} role={"label"} size={"s"}>
                                                         {item.supportingText}
                                                     </UKText>
                                                 </div>
