@@ -1,4 +1,4 @@
-import { type Component, createSignal, For, useContext, createEffect } from "solid-js";
+import { type Component, createSignal, For, useContext } from "solid-js";
 import styles from "./PathBar.module.scss";
 import UKText from "@tcsw/uikit-solid/src/components/text/UKText.tsx";
 import path from "path-browserify";
@@ -18,7 +18,7 @@ const PathBar: Component = () => {
             <UKIconButton
                 disabled={params.currentPath === undefined}
                 onClick={() => {
-                    let split = `/${params.currentPath || ""}`.split("/");
+                    let split = `/${decodeURI(params.currentPath || "")}`.split("/");
                     let output = "/";
 
                     for (let i = 0; i < split.length - 1; i++) {
@@ -35,17 +35,6 @@ const PathBar: Component = () => {
                 width="default"
             />
             <UKIconButton
-                disabled={params.currentPath === "users"}
-                onClick={() => {
-                    navigate(`/app/uk.tcsw.files/dir/users`);
-                }}
-                size={"xs"}
-                color={"standard"}
-                alt={"go to home"}
-                icon={"house"}
-                width="default"
-            />
-            <UKIconButton
                 onClick={() => {
                     viewCtx?.setViewType(viewCtx.viewType() === "grid" ? "list" : "grid");
                 }}
@@ -59,7 +48,7 @@ const PathBar: Component = () => {
                 <div class={styles.textField}>
                     <UKTextField
                         label={"Path"}
-                        defaultValue={`/${params.currentPath || ""}`}
+                        defaultValue={`/${decodeURI(params.currentPath || "")}`}
                         getValue={(val) => {
                             if (val[0] === "/") navigate(`/app/uk.tcsw.files/dir${val}`);
                         }}
@@ -71,11 +60,10 @@ const PathBar: Component = () => {
             ) : (
                 <>
                     <div class={styles.segmentContainer} onDblClick={() => setShowTextField(true)}>
-                        <For each={`/${params.currentPath || ""}`.split("/")}>
+                        <For each={`/${decodeURI(params.currentPath || "")}`.split("/")}>
                             {(segment, index) => {
                                 if (
-                                    index() ===
-                                        `/${params.currentPath || ""}`.split("/").length - 1 &&
+                                    index() === `/${decodeURI(params.currentPath || "")}`.split("/").length - 1 &&
                                     segment === ""
                                 )
                                     return null;
@@ -86,9 +74,7 @@ const PathBar: Component = () => {
                                             onClick={(e) => {
                                                 e.stopPropagation();
 
-                                                let split = `/${params.currentPath || ""}`.split(
-                                                    "/",
-                                                );
+                                                let split = `/${decodeURI(params.currentPath || "")}`.split("/");
                                                 let output = "/";
 
                                                 for (let i = 0; i < index() + 1; i++) {
@@ -103,8 +89,9 @@ const PathBar: Component = () => {
                                         >
                                             {segment !== "" ? <span>{segment}</span> : null}
                                             {index() !==
-                                                `/${params.currentPath || ""}`.split("/").length -
-                                                    1 && <span class={styles.slash}>/</span>}
+                                                `/${decodeURI(params.currentPath || "")}`.split("/").length - 1 && (
+                                                <span class={styles.slash}>/</span>
+                                            )}
                                         </UKText>
                                     </>
                                 );

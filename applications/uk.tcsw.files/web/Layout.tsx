@@ -15,6 +15,7 @@ const Layout: Component<ParentProps> = (props) => {
     const [renameEntry, setRenameEntry] = createSignal<string | undefined>(undefined);
     const [cutItems, setCutItems] = createSignal<string[]>([]);
     const [copyItems, setCopyItems] = createSignal<string[]>([]);
+    const [reload, setReload] = createSignal<number>(0);
 
     return (
         <ViewContext.Provider
@@ -33,6 +34,8 @@ const Layout: Component<ParentProps> = (props) => {
                 setCutItems: setCutItems,
                 copyItems: copyItems,
                 setCopyItems: setCopyItems,
+                reload: reload,
+                setReload: () => setReload((pv) => pv + 1),
             }}
         >
             <div class={styles.root}>

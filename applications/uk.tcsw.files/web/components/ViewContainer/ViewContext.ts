@@ -15,4 +15,6 @@ export const ViewContext = createContext<{
     setCutItems(items: string[]): void;
     copyItems: Accessor<string[]>;
     setCopyItems(items: string[]): void;
+    reload: Accessor<number>;
+    setReload(): void;
 }>();

@@ -18,20 +18,18 @@ const User: Component<{
             initialValue: "",
         },
     );
-    const [email, { mutate: setEmail }] = createResource(
-        () => trpc.instance.user.getEmail.query(props.userId),
-        { initialValue: "" },
-    );
+    const [email, { mutate: setEmail }] = createResource(() => trpc.instance.user.getEmail.query(props.userId), {
+        initialValue: "",
+    });
     const [forename, { mutate: setForename }] = createResource(
         () => trpc.instance.user.getForename.query(props.userId),
         {
             initialValue: "",
         },
     );
-    const [surname, { mutate: setSurname }] = createResource(
-        () => trpc.instance.user.getSurname.query(props.userId),
-        { initialValue: "" },
-    );
+    const [surname, { mutate: setSurname }] = createResource(() => trpc.instance.user.getSurname.query(props.userId), {
+        initialValue: "",
+    });
     const [isAdministrator, { mutate: setIsAdministrator }] = createResource(
         () => trpc.instance.user.getIsAdministrator.query(props.userId),
         { initialValue: false },
@@ -110,10 +108,10 @@ const User: Component<{
                         />
                     </div>
                     <UKButtonGroup size={"s"} align={"end"}>
-                        <UKButton color={"tonal"} onClick={() => 0}>
+                        <UKButton color={"tonal"} disabled={true} onClick={() => 0}>
                             Invalidate all sessions
                         </UKButton>
-                        <UKButton color={"tonal"} onClick={() => 0}>
+                        <UKButton color={"tonal"} disabled={true} onClick={() => 0}>
                             Force password reset
                         </UKButton>
                         <UKButton

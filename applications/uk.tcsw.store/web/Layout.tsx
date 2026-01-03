@@ -23,7 +23,8 @@ const Layout: Component<ParentProps> = (props) => {
                     onClick() {
                         navigate("/app/uk.tcsw.store/search");
                     },
-                    active: location.pathname === "/app/uk.tcsw.store/search",
+                    active:
+                        location.pathname === "/app/uk.tcsw.store/search" || location.pathname === "/app/uk.tcsw.store",
                 },
                 // {
                 //     icon: {type: "icon", value: "category"},

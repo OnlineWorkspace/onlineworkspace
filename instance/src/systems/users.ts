@@ -38,9 +38,8 @@ export class WorkspacesUser {
 
         try {
             if (
-                (
-                    await db`SELECT username FROM tricolor_workspaces.public.users WHERE username = ${username}`
-                ).count !== 0
+                (await db`SELECT username FROM tricolor_workspaces.public.users WHERE username = ${username}`).count !==
+                0
             )
                 return false;
 
@@ -60,10 +59,7 @@ export class WorkspacesUser {
     async getUsername(): Promise<string | undefined> {
         const db = this.instance.sys.database.postgres();
 
-        return (
-            (await db`SELECT username FROM users WHERE id = ${this.userId}`)?.[0]?.username ||
-            undefined
-        );
+        return (await db`SELECT username FROM users WHERE id = ${this.userId}`)?.[0]?.username || undefined;
     }
 
     /**
@@ -92,10 +88,7 @@ export class WorkspacesUser {
     async getForename(): Promise<string | undefined> {
         const db = this.instance.sys.database.postgres();
 
-        return (
-            (await db`SELECT forename FROM users WHERE id = ${this.userId}`)?.[0]?.forename ||
-            undefined
-        );
+        return (await db`SELECT forename FROM users WHERE id = ${this.userId}`)?.[0]?.forename || undefined;
     }
 
     /**
@@ -125,9 +118,8 @@ export class WorkspacesUser {
         const db = this.instance.sys.database.postgres();
 
         return (
-            (
-                await db`SELECT surname FROM tricolor_workspaces.public.users WHERE id = ${this.userId}`
-            )?.[0]?.surname || undefined
+            (await db`SELECT surname FROM tricolor_workspaces.public.users WHERE id = ${this.userId}`)?.[0]?.surname ||
+            undefined
         );
     }
 
@@ -179,9 +171,8 @@ export class WorkspacesUser {
         const db = this.instance.sys.database.postgres();
 
         return (
-            (
-                await db`SELECT storage_quota FROM tricolor_workspaces.public.users WHERE id = ${this.userId}`
-            )?.[0]?.storage_quota || undefined
+            (await db`SELECT storage_quota FROM tricolor_workspaces.public.users WHERE id = ${this.userId}`)?.[0]
+                ?.storage_quota || undefined
         );
     }
 
@@ -211,9 +202,8 @@ export class WorkspacesUser {
         const db = this.instance.sys.database.postgres();
 
         return (
-            (
-                await db`SELECT bio FROM tricolor_workspaces.public.users WHERE id = ${this.userId}`
-            )?.[0]?.bio || undefined
+            (await db`SELECT bio FROM tricolor_workspaces.public.users WHERE id = ${this.userId}`)?.[0]?.bio ||
+            undefined
         );
     }
 
@@ -242,9 +232,8 @@ export class WorkspacesUser {
         const db = this.instance.sys.database.postgres();
 
         return (
-            (
-                await db`SELECT email FROM tricolor_workspaces.public.users WHERE id = ${this.userId}`
-            )?.[0]?.email || undefined
+            (await db`SELECT email FROM tricolor_workspaces.public.users WHERE id = ${this.userId}`)?.[0]?.email ||
+            undefined
         );
     }
 
@@ -274,23 +263,89 @@ export class WorkspacesUser {
         const db = this.instance.sys.database.postgres();
 
         return (
-            (
-                await db`SELECT gender FROM tricolor_workspaces.public.users WHERE id = ${this.userId}`
-            )?.[0]?.gender || undefined
+            (await db`SELECT gender FROM tricolor_workspaces.public.users WHERE id = ${this.userId}`)?.[0]?.gender ||
+            undefined
+        );
+    }
+
+    /**
+        Join a specified group for the user.
+        @returns `true` - if successfully joined the group
+        @returns `false` - if already a member or an error occurred.
+    */
+    async joinGroup(groupId: string): Promise<boolean> {
+        const db = this.instance.sys.database.postgres();
+
+        try {
+            const existingGroups = await this.getGroups();
+
+            if (existingGroups.includes(groupId)) {
+                return false;
+            }
+
+            await db`
+            UPDATE tricolor_workspaces.public.users 
+            SET groups = array_append(groups, ${groupId}) 
+            WHERE id = ${this.userId}
+        `;
+
+            return true;
+        } catch (error) {
+            console.error("Error joining group:", error);
+            return false;
+        }
+    }
+
+    /**
+        Leave a specified group for the user.
+        @returns `true` - if successfully left the group
+        @returns `false` - if not a member or an error occurred.
+    */
+    async leaveGroup(groupId: string): Promise<boolean> {
+        const db = this.instance.sys.database.postgres();
+
+        try {
+            const existingGroups = await this.getGroups();
+
+            if (!existingGroups.includes(groupId)) {
+                return false;
+            }
+
+            await db`
+            UPDATE tricolor_workspaces.public.users 
+            SET groups = array_remove(groups, ${groupId}) 
+            WHERE id = ${this.userId}
+        `;
+
+            return true;
+        } catch (error) {
+            console.error("Error leaving group:", error);
+            return false;
+        }
+    }
+
+    /**
+        Returns an array of groups the user belongs to.
+        @returns `string[]` - An array of group IDs the user is a member of, or an empty array if none.
+    */
+    async getGroups(): Promise<string[]> {
+        const db = this.instance.sys.database.postgres();
+
+        return (
+            (await db`SELECT groups FROM tricolor_workspaces.public.users WHERE id = ${this.userId}`)?.[0].groups || []
         );
     }
 
     /**
         Get if the user is an administrator
-        @returns `boolean` - is the user an administrator
+        @returns `boolean` - if the user an administrator
     */
     async isAdministrator(): Promise<boolean | undefined> {
         const db = this.instance.sys.database.postgres();
 
         return (
-            (
-                await db`SELECT is_administrator FROM tricolor_workspaces.public.users WHERE id = ${this.userId}`
-            )?.[0]?.is_administrator || false
+            (await db`SELECT is_administrator FROM tricolor_workspaces.public.users WHERE id = ${this.userId}`)?.[0]
+                ?.is_administrator || false
         );
     }
 
@@ -321,9 +376,7 @@ export class WorkspacesUser {
             await fs.cp(avatarFile, path.join(this.getPath(), "assets/avatar/avatar.png"));
             return true;
         } catch (err) {
-            this.instance.sys.users.log.error(
-                `Failed to set avatar for ${this.userId} to ${avatarFile}`,
-            );
+            this.instance.sys.users.log.error(`Failed to set avatar for ${this.userId} to ${avatarFile}`);
             return false;
         }
     }
@@ -344,19 +397,12 @@ export class WorkspacesUser {
 
         try {
             for (const size of AVATAR_SIZES) {
-                if (
-                    override ||
-                    !(await fs.exists(path.join(this.getPath(), `assets/avatar/${size.name}.png`)))
-                ) {
-                    this.instance.sys.users.log.info(
-                        `Generating avatar for user '${this.userId}' @ ${size.name}`,
-                    );
+                if (override || !(await fs.exists(path.join(this.getPath(), `assets/avatar/${size.name}.png`)))) {
+                    this.instance.sys.users.log.info(`Generating avatar for user '${this.userId}' @ ${size.name}`);
                     await sharp(path.join(this.getPath(), "assets/avatar/avatar.png"))
                         .resize(size.width, size.height)
                         .toFile(path.join(this.getPath(), `assets/avatar/${size.name}.png`));
-                    this.instance.sys.users.log.success(
-                        `Generated avatar for user '${this.userId}' @ ${size.name}`,
-                    );
+                    this.instance.sys.users.log.success(`Generated avatar for user '${this.userId}' @ ${size.name}`);
                 }
             }
         } catch (err) {
@@ -399,9 +445,7 @@ export class WorkspacesUser {
         }
 
         if (!(await fs.exists(path.join(this.getPath(), "assets/avatar/avatar.png")))) {
-            await this.setAvatar(
-                path.join(this.instance.sys.filesystem.SRC_ROOT, "assets/placeholder/avatar.png"),
-            );
+            await this.setAvatar(path.join(this.instance.sys.filesystem.SRC_ROOT, "assets/placeholder/avatar.png"));
         }
 
         await this.generateAvatars();
@@ -464,6 +508,7 @@ export default class UsersSystem extends System {
             hashed_password - the user's password after it has been hashed by bun (string)
             two_factor_secret - the user's secret string used to verify 2fa opt codes
             settings - a settings object
+            groups - a list of the group ids which this user is a member of
         */
         await db`CREATE TABLE IF NOT EXISTS users (
             id SERIAL PRIMARY KEY,
@@ -479,7 +524,8 @@ export default class UsersSystem extends System {
             socials TEXT[] DEFAULT '{}',
             hashed_password TEXT,
             two_factor_secret TEXT,
-            settings JSONB DEFAULT '{}'::JSONB
+            settings JSONB DEFAULT '{}'::JSONB,
+            groups TEXT[]
         )`;
 
         let administratorUserId = await this.createUser("admin");
@@ -496,10 +542,7 @@ export default class UsersSystem extends System {
 
                 const defaultPassword = "password";
 
-                await this.instance.sys.authorization.setPassword(
-                    adminUser.userId,
-                    defaultPassword,
-                );
+                await this.instance.sys.authorization.setPassword(adminUser.userId, defaultPassword);
                 this.log.info(`The default admin user has a password of '${defaultPassword}'`);
             }
         }
@@ -521,11 +564,7 @@ export default class UsersSystem extends System {
     async createUser(username: string, password?: string): Promise<number | undefined> {
         const db = this.instance.sys.database.postgres();
 
-        if (
-            (
-                await db`SELECT username FROM tricolor_workspaces.public.users WHERE username = ${username}`
-            ).count !== 0
-        )
+        if ((await db`SELECT username FROM tricolor_workspaces.public.users WHERE username = ${username}`).count !== 0)
             return undefined;
 
         let user = {
@@ -534,9 +573,7 @@ export default class UsersSystem extends System {
             surname: "Doe",
         };
 
-        let id = (
-            await db`INSERT INTO tricolor_workspaces.public.users ${sql(user)} RETURNING id`
-        )?.[0]?.id;
+        let id = (await db`INSERT INTO tricolor_workspaces.public.users ${sql(user)} RETURNING id`)?.[0]?.id;
 
         const ubi = await this.getUserById(id);
 
@@ -547,9 +584,7 @@ export default class UsersSystem extends System {
 
         if (password) await this.instance.sys.authorization.setPassword(id, password);
 
-        await ubi.setAvatar(
-            path.join(this.instance.sys.filesystem.SRC_ROOT, "assets/placeholder/avatar.png"),
-        );
+        await ubi.setAvatar(path.join(this.instance.sys.filesystem.SRC_ROOT, "assets/placeholder/avatar.png"));
 
         await ubi.verify();
 
@@ -564,10 +599,7 @@ export default class UsersSystem extends System {
     async doesUserExist(userId: number): Promise<boolean> {
         const db = this.instance.sys.database.postgres();
 
-        return (
-            (await db`SELECT username FROM tricolor_workspaces.public.users WHERE id = ${userId}`)
-                .count === 1
-        );
+        return (await db`SELECT username FROM tricolor_workspaces.public.users WHERE id = ${userId}`).count === 1;
     }
 
     /**
@@ -607,9 +639,8 @@ export default class UsersSystem extends System {
     async getUserByUsername(username: string): Promise<WorkspacesUser | undefined> {
         const db = this.instance.sys.database.postgres();
 
-        const userId = (
-            await db`SELECT id FROM tricolor_workspaces.public.users WHERE username = ${username}`
-        )?.[0]?.id;
+        const userId = (await db`SELECT id FROM tricolor_workspaces.public.users WHERE username = ${username}`)?.[0]
+            ?.id;
 
         if (!(await this.doesUserExist(userId))) return undefined;
 

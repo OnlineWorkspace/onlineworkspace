@@ -9,10 +9,7 @@ export default class FilesystemSystem extends System {
     readonly FS_ROOT = path.resolve("./fs/");
     readonly CACHE_PATH = path.join(this.FS_ROOT, "cache");
 
-    _internalAssets: Map<
-        string,
-        { userId: number; path: string; validUntil: number; public?: boolean }
-    >;
+    _internalAssets: Map<string, { userId: number; path: string; validUntil: number; public?: boolean }>;
     _internalAssetPaths: Map<string, string>;
 
     constructor(instance: Instance) {
@@ -50,14 +47,10 @@ export default class FilesystemSystem extends System {
 
     getApplicationSrc(applicationId: string) {
         console.log(
-            this.instance.sys.applications.availableApplications.find(
-                (a) => a.manifest?.id === applicationId,
-            )?.path,
+            this.instance.sys.applications.availableApplications.find((a) => a.manifest?.id === applicationId)?.path,
         );
 
-        return this.instance.sys.applications.availableApplications.find(
-            (a) => a.manifest?.id === applicationId,
-        )?.path;
+        return this.instance.sys.applications.availableApplications.find((a) => a.manifest?.id === applicationId)?.path;
     }
 
     // Create a directory if it does not already exist
@@ -116,13 +109,13 @@ export default class FilesystemSystem extends System {
     // defaults to 3hrs validity
     serveFile(
         userId: number,
-        path: string,
+        fsPath: string,
         isPublic: boolean = false,
         dontCachePath = false,
         validMs: number = 21600000,
     ): string {
         if (!dontCachePath) {
-            const existingAsset = this._internalAssetPaths.get(path);
+            const existingAsset = this._internalAssetPaths.get(fsPath);
 
             if (existingAsset) {
                 this._internalAssets.get(existingAsset)!.validUntil = Date.now() + validMs;
@@ -134,15 +127,81 @@ export default class FilesystemSystem extends System {
         const assetId = randomUUIDv7();
 
         this._internalAssets.set(assetId, {
-            path: path,
+            path: fsPath,
             userId: userId,
             validUntil: Date.now() + validMs,
             public: isPublic,
         });
-        this._internalAssetPaths.set(path, assetId);
+        this._internalAssetPaths.set(fsPath, assetId);
 
-        this.log.info(`Serving asset at '${path}' as '${assetId}'`);
+        this.log.info(`Serving asset at '${fsPath}' as '${assetId}'`);
 
         return `/api/asset/raw/${assetId}`;
+    }
+
+    async getUserPermissions(userId: number, fsPath: string): Promise<{ read: boolean; write: boolean }> {
+        const user = (await this.instance.sys.users.getUserById(userId))!;
+
+        if (await user.isAdministrator())
+            return {
+                read: true,
+                write: true,
+            };
+
+        if (fsPath.startsWith(path.join(this.FS_ROOT, `/users/${userId}`)))
+            return {
+                read: true,
+                write: true,
+            };
+
+        const db = this.instance.sys.database.postgres();
+
+        const userGroups = (await user.getGroups()) || [];
+        const userIdArray = userId ? [userId.toString()] : [];
+
+        const validUserGroups = userGroups.filter(Boolean);
+
+        return {
+            read: false,
+            write: false,
+        };
+
+        // const permissions = await db`
+        //     SELECT
+        //         EXISTS(
+        //             SELECT 1
+        //             FROM tricolor_workspaces.public.filesystem_permission_overrides
+        //             WHERE file_path = ${fsPath}
+        //                 AND read_permission_groups && ${validUserGroups}::TEXT[]
+        //                OR read_permission_users @> ARRAY[${userIdArray}::TEXT]
+        //         ) AS read_permission,
+        //         EXISTS(
+        //             SELECT 1
+        //             FROM tricolor_workspaces.public.filesystem_permission_overrides
+        //             WHERE file_path = ${fsPath}
+        //                 AND write_permission_groups && ${validUserGroups}::TEXT[]
+        //                OR write_permission_users @> ARRAY[${userIdArray}::TEXT]
+        //         ) AS write_permission
+        // `;
+        // return {
+        //     read: permissions[0].read_permission,
+        //     write: permissions[0].write_permission,
+        // };
+    }
+
+    async startup(): Promise<boolean> {
+        const db = this.instance.sys.database.postgres();
+
+        await db`CREATE TABLE IF NOT EXISTS filesystem_permission_overrides (
+                file_path TEXT,
+                recursive BOOL,
+                read_permission_groups TEXT[],
+                read_permission_users TEXT[],
+                write_permission_groups TEXT[],
+                write_permission_users TEXT[],
+                owner TEXT[]
+        )`;
+
+        return true;
     }
 }

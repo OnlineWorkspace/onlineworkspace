@@ -1,10 +1,13 @@
 import { useNavigate } from "@solidjs/router";
-import type { Component } from "solid-js";
+import { onMount, type Component } from "solid-js";
+import trpc from "../lib/trpc.ts";
 
 const Redirect: Component = () => {
     const navigate = useNavigate();
 
-    navigate("/app/uk.tcsw.files/dir/users/");
+    onMount(async () => {
+        navigate(`/app/uk.tcsw.files/dir${await trpc.getHome.query()}`);
+    });
 
     return <></>;
 };

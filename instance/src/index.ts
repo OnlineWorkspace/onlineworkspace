@@ -10,10 +10,7 @@ import AuthorizationSystem from "./systems/authorization.js";
 // https://github.com/cah4a/trpc-bun-adapter/blob/main/src/createBunHttpHandler.ts TODO: patch this and merge into the instance package
 import type { BunWSClientCtx } from "trpc-bun-adapter";
 import type { AnyRouter } from "@trpc/server";
-import {
-    createTRPCContext as createWorkspacesTRPCContext,
-    workspacesRouter,
-} from "./systems/trpcRouter.js";
+import { createTRPCContext as createWorkspacesTRPCContext, workspacesRouter } from "./systems/trpcRouter.js";
 import { type BunRequest, file } from "bun";
 import ApplicationsSystem from "./systems/applications.js";
 import path from "path";
@@ -64,9 +61,7 @@ class Instance {
     }
 
     async startup() {
-        this.log.system.info(
-            `--------------------------------------------------------------------------`,
-        );
+        this.log.system.info(`--------------------------------------------------------------------------`);
         this.log.system.info(
             `   ${chalk.hex("FF002E")(/XXX/)}${chalk.hex("70FF00")(/XXX/)}${chalk.hex("0066FF")(/XXX/)}`,
         );
@@ -76,9 +71,7 @@ class Instance {
         this.log.system.info(
             ` ${chalk.hex("FF002E")(/XXX/)}${chalk.hex("70FF00")(/XXX/)}${chalk.hex("0066FF")(/XXX/)}`,
         );
-        this.log.system.info(
-            `--------------------------------------------------------------------------`,
-        );
+        this.log.system.info(`--------------------------------------------------------------------------`);
         this.log.system.info(`Starting up...`);
 
         if (this.status !== InstanceStatus.Offline) {
@@ -89,7 +82,7 @@ class Instance {
         for (const sys of Object.values(this.sys)) {
             let subSystemState = await sys.startup();
 
-            if (subSystemState === true) {
+            if (subSystemState) {
                 sys.log.success(`Startup Complete...`);
             } else {
                 sys.log.error(`Startup Failed!`);
@@ -105,24 +98,14 @@ class Instance {
                     "/api/instance/login/banner": {
                         GET: async (req: BunRequest) => {
                             return new Response(
-                                file(
-                                    path.join(
-                                        self.sys.filesystem.FS_ROOT,
-                                        "assets/login/banner.png",
-                                    ),
-                                ),
+                                file(path.join(self.sys.filesystem.FS_ROOT, "assets/login/banner.png")),
                             );
                         },
                     },
                     "/api/instance/login/background": {
                         GET: async (req: BunRequest) => {
                             return new Response(
-                                file(
-                                    path.join(
-                                        self.sys.filesystem.FS_ROOT,
-                                        "assets/login/background.png",
-                                    ),
-                                ),
+                                file(path.join(self.sys.filesystem.FS_ROOT, "assets/login/background.png")),
                             );
                         },
                     },
@@ -133,7 +116,7 @@ class Instance {
                             const cookieString = req.headers?.get("cookie");
 
                             if (cookieString === null) {
-                                throw Response.json({
+                                return Response.json({
                                     code: "UNAUTHORIZED",
                                     message: "missing auth cookie",
                                 });
@@ -146,7 +129,7 @@ class Instance {
                             );
 
                             if (userId === undefined) {
-                                throw Response.json({
+                                return Response.json({
                                     code: "UNAUTHORIZED",
                                     message: "invalid session",
                                 });
@@ -173,10 +156,7 @@ class Instance {
 
                             return new Response(
                                 file(
-                                    path.join(
-                                        self.sys.filesystem.FS_ROOT,
-                                        `users/${userId}/assets/avatar/${size}.png`,
-                                    ),
+                                    path.join(self.sys.filesystem.FS_ROOT, `users/${userId}/assets/avatar/${size}.png`),
                                 ),
                             );
                         },
@@ -188,7 +168,7 @@ class Instance {
                             const cookieString = req.headers?.get("cookie");
 
                             if (cookieString === null) {
-                                throw Response.json({
+                                return Response.json({
                                     code: "UNAUTHORIZED",
                                     message: "missing auth cookie",
                                 });
@@ -201,7 +181,7 @@ class Instance {
                             );
 
                             if (userId === undefined) {
-                                throw Response.json({
+                                return Response.json({
                                     code: "UNAUTHORIZED",
                                     message: "invalid session",
                                 });
@@ -240,7 +220,7 @@ class Instance {
                                 const cookieString = req.headers?.get("cookie");
 
                                 if (cookieString === null) {
-                                    throw Response.json({
+                                    return Response.json({
                                         code: "UNAUTHORIZED",
                                         message: "missing auth cookie",
                                     });
@@ -253,7 +233,7 @@ class Instance {
                                 );
 
                                 if (userId === undefined) {
-                                    throw Response.json({
+                                    return Response.json({
                                         code: "UNAUTHORIZED",
                                         message: "invalid session",
                                     });
@@ -266,7 +246,7 @@ class Instance {
                             let sourceImage = image[resolutionParam];
 
                             if (!sourceImage) {
-                                throw Response.json({
+                                return Response.json({
                                     code: "NOT_FOUND",
                                     message: "missing image",
                                 });
@@ -280,8 +260,7 @@ class Instance {
                                     headers: {
                                         "Access-Control-Allow-Origin": "http://localhost:5173", // TODO: change this according to a config file
                                         "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-                                        "Access-Control-Allow-Headers":
-                                            "Content-Type, Authorization",
+                                        "Access-Control-Allow-Headers": "Content-Type, Authorization",
                                         "Access-Control-Allow-Credentials": "true",
                                     },
                                 });
@@ -289,6 +268,7 @@ class Instance {
                                 const outputPath = path.join(
                                     this.sys.filesystem.CACHE_PATH,
                                     sourceImage.path,
+                                    resolutionParam,
                                 );
 
                                 // FIXME!: IF THE IMAGE AT THE SOURCE PATH IS REPLACED WITH ANOTHER, IT WILL CONTINUE TO SEND THE OLD IMAGE
@@ -300,8 +280,7 @@ class Instance {
                                         headers: {
                                             "Access-Control-Allow-Origin": "http://localhost:5173", // TODO: change this according to a config file
                                             "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-                                            "Access-Control-Allow-Headers":
-                                                "Content-Type, Authorization",
+                                            "Access-Control-Allow-Headers": "Content-Type, Authorization",
                                             "Access-Control-Allow-Credentials": "true",
                                         },
                                     });
@@ -327,8 +306,7 @@ class Instance {
                                     headers: {
                                         "Access-Control-Allow-Origin": "http://localhost:5173", // TODO: change this according to a config file
                                         "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-                                        "Access-Control-Allow-Headers":
-                                            "Content-Type, Authorization",
+                                        "Access-Control-Allow-Headers": "Content-Type, Authorization",
                                         "Access-Control-Allow-Credentials": "true",
                                     },
                                 });
@@ -350,7 +328,7 @@ class Instance {
                                 const cookieString = req.headers?.get("cookie");
 
                                 if (cookieString === null) {
-                                    throw Response.json({
+                                    return Response.json({
                                         code: "UNAUTHORIZED",
                                         message: "missing auth cookie",
                                     });
@@ -363,7 +341,7 @@ class Instance {
                                 );
 
                                 if (userId === undefined) {
-                                    throw Response.json({
+                                    return Response.json({
                                         code: "UNAUTHORIZED",
                                         message: "invalid session",
                                     });

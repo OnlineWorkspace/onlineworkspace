@@ -3,9 +3,13 @@ import styles from "./index.module.scss";
 import ViewContainer from "../../components/ViewContainer/ViewContainer";
 import UKMenu from "@tcsw/uikit-solid/src/components/menu/UKMenu.tsx";
 import { ViewContext } from "../../components/ViewContainer/ViewContext.ts";
+import trpc from "../../lib/trpc.ts";
+import path from "path-browserify";
+import { useParams } from "@solidjs/router";
 
 const RootPage: Component = () => {
     const viewCtx = useContext(ViewContext);
+    let params = useParams<{ currentPath: string }>();
 
     return (
         <div class={styles.root}>
@@ -16,11 +20,78 @@ const RootPage: Component = () => {
                               type: "button",
                               label: "Paste",
                               leadingIcon: "content_paste",
-                              onClick() {
-                                  // do tRPC to paste here
+                              async onClick() {
+                                  let copyItems = viewCtx!.copyItems();
+
+                                  if (copyItems.length > 0) {
+                                      await trpc.batchCopy.mutate(
+                                          copyItems.map((item) => {
+                                              let newPath = path.join(params.currentPath || "", path.basename(item));
+
+                                              if (path.join(item, "..") === params.currentPath || "") {
+                                                  newPath = path.join(
+                                                      params.currentPath || "",
+                                                      path.basename(item) +
+                                                          ` (${
+                                                              viewCtx!
+                                                                  .viewItems()
+                                                                  .filter((i) =>
+                                                                      i.path.startsWith(
+                                                                          path.join(
+                                                                              params.currentPath,
+                                                                              path.basename(item),
+                                                                          ),
+                                                                      ),
+                                                                  ).length
+                                                          })`,
+                                                  );
+                                              }
+
+                                              return {
+                                                  path: item,
+                                                  newPath: newPath,
+                                              };
+                                          }),
+                                      );
+                                  }
+
+                                  let cutItems = viewCtx!.cutItems();
+
+                                  if (cutItems.length > 0) {
+                                      await trpc.batchMove.mutate(
+                                          cutItems.map((item) => {
+                                              let newPath = path.join(params.currentPath || "", path.basename(item));
+
+                                              if (path.join(item, "..") === params.currentPath || "") {
+                                                  newPath = path.join(
+                                                      params.currentPath || "",
+                                                      path.basename(item) +
+                                                          ` (${
+                                                              viewCtx!
+                                                                  .viewItems()
+                                                                  .filter((i) =>
+                                                                      i.path.startsWith(
+                                                                          path.join(
+                                                                              params.currentPath,
+                                                                              path.basename(item),
+                                                                          ),
+                                                                      ),
+                                                                  ).length
+                                                          })`,
+                                                  );
+                                              }
+
+                                              return {
+                                                  path: item,
+                                                  newPath: newPath,
+                                              };
+                                          }),
+                                      );
+                                  }
+
                                   viewCtx!.setSelectedItems([]);
-                                  viewCtx!.setCopyItems([]);
                                   viewCtx!.setCutItems([]);
+                                  viewCtx!.setReload();
                               },
                           }
                         : undefined,
@@ -49,7 +120,7 @@ const RootPage: Component = () => {
                         label: "Refresh",
                         leadingIcon: "refresh",
                         onClick() {
-                            window.location.reload();
+                            viewCtx!.setReload();
                         },
                     },
                 ]}

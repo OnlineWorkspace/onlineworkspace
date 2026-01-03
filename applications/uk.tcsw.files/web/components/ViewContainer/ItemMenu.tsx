@@ -15,7 +15,11 @@ const ItemMenu: Component<ParentProps> = (props) => {
                     ? {
                           type: "category",
                           label: "Open",
-                          supportingText: "Default: Current Tab",
+                          supportingText:
+                              viewCtx!.viewItems().find((i) => i.path === viewCtx!.selectedItems()?.[0])?.type ===
+                              "file"
+                                  ? "Default: New Tab"
+                                  : "Default: Current Tab",
                           async onClick() {
                               let selectedItems = viewCtx!.selectedItems();
                               const viewItem = viewCtx!.viewItems().find((i) => i.path === selectedItems[0]);
@@ -59,23 +63,29 @@ const ItemMenu: Component<ParentProps> = (props) => {
                 },
                 {
                     type: "button",
-                    label: "Paste",
-                    leadingIcon: "content_paste",
-                    onClick() {
-                        // check if copy or cut items, then send the relevant tRPC request
-                    },
-                },
-                {
-                    type: "button",
                     label: /*viewCtx!.selectedItems().length > 1 ? "Bulk Rename" : */ "Rename",
                     supportingText: viewCtx!.selectedItems().length > 1 ? "(Only the first selected item)" : undefined,
                     leadingIcon: "edit",
                     onClick() {
-                        let selectedItems = viewCtx?.selectedItems();
+                        let selectedItems = viewCtx!.selectedItems();
 
                         if (!selectedItems) return;
 
-                        viewCtx?.setRenameEntry(selectedItems[0]);
+                        viewCtx!.setRenameEntry(selectedItems[0]);
+                    },
+                },
+                {
+                    type: "button",
+                    label: "Delete",
+                    leadingIcon: "delete_forever",
+                    async onClick() {
+                        let selectedItems = viewCtx!.selectedItems();
+
+                        if (!selectedItems) return;
+
+                        await trpc.batchDelete.mutate(selectedItems);
+                        viewCtx!.setSelectedItems([]);
+                        viewCtx!.setReload();
                     },
                 },
                 {
@@ -86,6 +96,7 @@ const ItemMenu: Component<ParentProps> = (props) => {
                     label: "Sharing",
                     leadingIcon: "share",
                     selected: true,
+                    disabled: true,
                     onClick() {
                         console.log("3");
                     },
@@ -94,6 +105,7 @@ const ItemMenu: Component<ParentProps> = (props) => {
                     type: "button",
                     label: "Permissions",
                     leadingIcon: "admin_panel_settings",
+                    disabled: true,
                     onClick() {
                         console.log("3");
                     },

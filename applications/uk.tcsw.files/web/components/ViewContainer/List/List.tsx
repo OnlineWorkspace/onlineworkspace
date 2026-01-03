@@ -1,4 +1,15 @@
-import { type Component, createResource, For, Match, onCleanup, onMount, Suspense, Switch, useContext } from "solid-js";
+import {
+    type Component,
+    createEffect,
+    createResource,
+    For,
+    Match,
+    onCleanup,
+    onMount,
+    Suspense,
+    Switch,
+    useContext,
+} from "solid-js";
 import styles from "./List.module.scss";
 import { useNavigate, useParams } from "@solidjs/router";
 import trpc from "../../../lib/trpc";
@@ -17,11 +28,11 @@ const ListView: Component = () => {
     const viewCtx = useContext(ViewContext);
 
     const [listResource, { refetch: refetchList }] = createResource(
-        () => `/${params.currentPath || ""}`,
+        () => `/${decodeURI(params.currentPath || "")}`,
         async (pth) => {
             viewCtx?.setLastSelectionIndex(undefined);
             viewCtx?.setSelectedItems([]);
-            const items = await trpc.getFileGrid.query({ path: pth, sortBy: "name" });
+            const items = await trpc.getFileList.query({ path: pth, sortBy: "name" });
             if (items.type === "success") {
                 viewCtx?.setViewItems(items.items.map((i) => i));
             } else {
@@ -82,6 +93,11 @@ const ListView: Component = () => {
         window.removeEventListener("keydown", keydownListener);
     });
 
+    createEffect(() => {
+        viewCtx!.reload();
+        refetchList();
+    });
+
     return (
         <div
             class={styles.root}
@@ -111,16 +127,6 @@ const ListView: Component = () => {
                                 >
                                     Upload File
                                 </UKButton>
-                                <UKButton
-                                    color={"tonal"}
-                                    size={"s"}
-                                    leadingIcon={"add"}
-                                    onClick={() => {
-                                        alert("Implement me!");
-                                    }}
-                                >
-                                    Create File
-                                </UKButton>
                             </UKButtonGroup>
                         </div>
                     }
@@ -146,8 +152,8 @@ const ListView: Component = () => {
                                 color={"filled"}
                                 size={"m"}
                                 leadingIcon={"house"}
-                                onClick={() => {
-                                    navigate("/app/uk.tcsw.files/dir/");
+                                onClick={async () => {
+                                    navigate(`/app/uk.tcsw.files/dir${await trpc.getHome.query()}`);
                                 }}
                             >
                                 Go Home
