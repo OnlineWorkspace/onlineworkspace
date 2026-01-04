@@ -23,6 +23,7 @@ const GridItem: Component<{
         <ItemMenu>
             <div
                 class={styles.root}
+                data-path={props.path}
                 data-selected={viewCtx?.selectedItems().includes(props.path)}
                 onDblClick={async () => {
                     if (props.type === "directory") {

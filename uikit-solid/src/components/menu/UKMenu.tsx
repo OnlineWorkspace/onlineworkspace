@@ -80,6 +80,7 @@ const UKMenu: Component<
                         class={styles.background}
                         onClick={(e) => {
                             e.preventDefault();
+                            e.stopPropagation();
                             setShowMenu(false);
                             let element = document.elementFromPoint(e.clientX, e.clientY);
                             if (!element) return;
@@ -94,6 +95,15 @@ const UKMenu: Component<
                             // element.dispatchEvent(
                             //     new Event("contextmenu", { bubbles: true, cancelable: true }),
                             // );
+                        }}
+                        onMouseDown={(e) => {
+                            e.stopPropagation();
+                        }}
+                        onMouseUp={(e) => {
+                            e.stopPropagation();
+                        }}
+                        onMouseMove={(e) => {
+                            e.stopPropagation();
                         }}
                     ></div>
                     <div

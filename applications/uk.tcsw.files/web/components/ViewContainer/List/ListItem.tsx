@@ -22,6 +22,7 @@ const ListItem: Component<{
         <ItemMenu>
             <div
                 class={styles.root}
+                data-path={props.path}
                 data-multiple-of-two={props.index % 2 === 0}
                 data-selected={viewCtx?.selectedItems().includes(props.path)}
                 onDblClick={async () => {

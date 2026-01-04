@@ -99,12 +99,7 @@ const ListView: Component = () => {
     });
 
     return (
-        <div
-            class={styles.root}
-            onClick={() => {
-                viewCtx?.setSelectedItems([]);
-            }}
-        >
+        <div class={styles.root}>
             <Suspense>
                 <Switch
                     fallback={

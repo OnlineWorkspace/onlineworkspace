@@ -7,11 +7,15 @@ import { useNavigate, useParams } from "@solidjs/router";
 import trpc from "../../lib/trpc.ts";
 import path from "path-browserify";
 import { ViewContext } from "../ViewContainer/ViewContext.ts";
+import { createFileUploader } from "@solid-primitives/upload";
 
 const SideBar: Component = () => {
     const navigate = useNavigate();
     const viewCtx = useContext(ViewContext);
     let params = useParams<{ currentPath: string }>();
+    const { selectFiles: selectFilesForUpload } = createFileUploader({
+        multiple: true,
+    });
 
     const [places] = createResource(() => trpc.getPlaces.query());
 
@@ -28,7 +32,20 @@ const SideBar: Component = () => {
                 size={"s"}
                 leadingIcon={"upload"}
                 onClick={() => {
-                    alert("Implement me!");
+                    selectFilesForUpload(async (files) => {
+                        for (const file of files) {
+                            console.log(file.file);
+                            let uuid = (await trpc.uploadFile.mutate(file.file)).id;
+
+                            await trpc.setUploadMetadata.mutate({
+                                id: uuid,
+                                path: path.join(`/${decodeURI(params.currentPath || "")}`, file.name),
+                                lastModified: file.file.lastModified,
+                            });
+                        }
+
+                        viewCtx!.setReload();
+                    });
                 }}
             >
                 Upload File

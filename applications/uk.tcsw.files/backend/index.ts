@@ -5,6 +5,8 @@ import { initTRPC } from "@trpc/server";
 import z from "zod";
 import * as path from "node:path";
 import { promises as fs } from "fs";
+import { octetInputParser } from "@trpc/server/http";
+import { randomUUIDv7 } from "bun";
 
 const log = instance.log.createLogger("uk.tcsw.files");
 
@@ -314,13 +316,13 @@ const router = t.router({
         return true;
     }),
     getHome: procedure.query(async (opt) => {
-        return `/users/${opt.ctx.userId}`;
+        return `/users/${opt.ctx.userId}/fs`;
     }),
     getPlaces: procedure.query(async (opt) => {
         return [
             {
                 icon: "house",
-                path: `/users/${opt.ctx.userId}`,
+                path: `/users/${opt.ctx.userId}/fs`,
                 name: "Home",
             },
             {
@@ -330,6 +332,34 @@ const router = t.router({
             },
         ];
     }),
+    uploadFile: procedure.input(octetInputParser).mutation(async (opt) => {
+        const uuid = randomUUIDv7();
+        const uploadFilePath = path.join((await opt.ctx.user()).getPath(), `system/temp/${uuid}`);
+
+        await fs.writeFile(uploadFilePath, await opt.input.bytes());
+
+        return { id: uuid };
+    }),
+    setUploadMetadata: procedure
+        .input(z.object({ id: z.string(), path: z.string(), lastModified: z.number() }))
+        .mutation(async (opt) => {
+            const uploadFilePath = path.join((await opt.ctx.user()).getPath(), `system/temp/${opt.input.id}`);
+            const actualFilePath = path.join(instance.sys.filesystem.FS_ROOT, `${opt.input.path}`);
+            const actualFilePathParentDir = path.join(actualFilePath, "..");
+
+            if (!(await instance.sys.filesystem.getUserPermissions(opt.ctx.userId, actualFilePath)).write) {
+                return false;
+            }
+
+            if (!(await fs.exists(actualFilePathParentDir))) {
+                await fs.mkdir(actualFilePathParentDir, { recursive: true });
+            }
+
+            await fs.rename(uploadFilePath, actualFilePath);
+            await fs.utimes(actualFilePath, 0, opt.input.lastModified);
+
+            return true;
+        }),
 });
 
 export type TRPCRouter = typeof router;

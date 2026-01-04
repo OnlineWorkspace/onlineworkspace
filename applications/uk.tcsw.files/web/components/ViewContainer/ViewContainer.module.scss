@@ -6,3 +6,11 @@
     overflow-y: auto;
     height: 100%;
 }
+
+.dragSelection {
+    position: fixed;
+    background: rgb(var(--uk-sys-color-primary), 0.25);
+    border: 1px solid rgb(var(--uk-sys-color-primary), 0.25);
+    border-radius: var(--uk-sys-shape-corner-small);
+    pointer-events: none;
+}

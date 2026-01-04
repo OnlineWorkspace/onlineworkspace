@@ -5,6 +5,7 @@ import UKText from "@tcsw/uikit-solid/src/components/text/UKText.jsx";
 import trpc from "../../lib/trpc";
 import UKIndeterminateSpinner from "@tcsw/uikit-solid/src/components/indeterminateSpinner/UKIndeterminateSpinner.jsx";
 import clsx from "clsx";
+import PLACEHOLDER_WALLPAPER from "./../../assets/placeholder_wallpaper.png";
 
 const RootPage: Component = () => {
     const [wallpaper] = createResource(() =>
@@ -18,7 +19,7 @@ const RootPage: Component = () => {
             <Suspense fallback={<UKIndeterminateSpinner class={styles.wallpaperSpinner} />}>
                 <img
                     alt={""}
-                    src={wallpaper() || "/assets/tricolor/tricolor.svg"}
+                    src={wallpaper() || PLACEHOLDER_WALLPAPER}
                     style={{
                         // @ts-ignore
                         "object-fit": wallpaperOptions()?.fit || "cover",
