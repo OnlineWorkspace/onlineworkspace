@@ -4,6 +4,7 @@ import { baselineTheme } from "../core/design/themes/baseline.ts";
 import { createMediaQuery } from "@solid-primitives/media";
 import styles from "./Root.module.scss";
 import clsx from "clsx";
+import { RootContext } from "../rootContext.ts";
 
 const UIKitRoot: Component<{ children?: JSX.Element; class?: string }> = (props) => {
     const isLightMode = createMediaQuery("(prefers-color-scheme: light)");
@@ -18,7 +19,13 @@ const UIKitRoot: Component<{ children?: JSX.Element; class?: string }> = (props)
     return (
         <div class={clsx(styles.root, props.class)} ref={elem} data-uikit-root={true}>
             <style data-uikit-styles></style>
-            {props.children}
+            <RootContext.Provider
+                value={{
+                    root: elem,
+                }}
+            >
+                {props.children}
+            </RootContext.Provider>
         </div>
     );
 };

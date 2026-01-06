@@ -1514,7 +1514,7 @@ rxjs@^7.4.0:
 
 sass-embedded-all-unknown@1.93.0:
   version "1.93.0"
-  resolved "https://registry.yarnpkg.com/sass-embedded-all-unknown/-/sass-embedded-all-unknown-1.93.0.tgz#a8ee7d40989c64b85576641735127f9107653146"
+  resolved "https://registry.yarnpkg.com/sass-embedded-all-unknown/-/sass-embedded-all-unknown-1.93.0.tgz#a8ee7d40989c64b85576651735127f9107653146"
   integrity sha512-fBTnh5qgOyw0CGVaF2iPsIIRj40D9Mnf19WerixjmWwmYKaGhxd62STsuMt6t1dWS5lkUZWRgrJ+2biQiEcCBg==
   dependencies:
     sass "1.93.0"

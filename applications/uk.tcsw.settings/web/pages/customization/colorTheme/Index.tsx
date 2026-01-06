@@ -9,9 +9,7 @@ import UKTopAppBar from "@tcsw/uikit-solid/src/components/topAppBar/UKTopAppBar.
 
 const ColorThemePage: Component = () => {
     const navigate = useNavigate();
-    const [wallpaperSrc] = createResource(() =>
-        trpc.customization.wallpaper.currentWallpaper.query(),
-    );
+    const [wallpaperSrc] = createResource(() => trpc.customization.wallpaper.currentWallpaper.query());
 
     createEffect(async () => {
         if (wallpaperSrc() === undefined) return;

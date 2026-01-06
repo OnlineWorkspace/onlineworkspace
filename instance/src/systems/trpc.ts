@@ -27,10 +27,7 @@ export default class TRPCSystem extends System {
         return true;
     }
 
-    private attemptTRPCRequest(
-        req: BunRequest,
-        server: Server<ReturnType<typeof createTRPCContext>>,
-    ) {
+    private attemptTRPCRequest(req: BunRequest, server: Server<ReturnType<typeof createTRPCContext>>) {
         const url = new URL(req.url);
 
         for (const router of this.registeredRouters) {
@@ -85,18 +82,9 @@ export default class TRPCSystem extends System {
                     let trpcResponse = await self.attemptTRPCRequest(req, server);
 
                     if (trpcResponse) {
-                        trpcResponse.headers.set(
-                            "Access-Control-Allow-Origin",
-                            "http://localhost:5173",
-                        );
-                        trpcResponse.headers.set(
-                            "Access-Control-Allow-Methods",
-                            "GET, POST, OPTIONS",
-                        );
-                        trpcResponse.headers.set(
-                            "Access-Control-Allow-Headers",
-                            "Content-Type, Authorization",
-                        );
+                        trpcResponse.headers.set("Access-Control-Allow-Origin", "http://localhost:5173");
+                        trpcResponse.headers.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+                        trpcResponse.headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
                         trpcResponse.headers.set("Access-Control-Allow-Credentials", "true");
                         return trpcResponse;
                     }
