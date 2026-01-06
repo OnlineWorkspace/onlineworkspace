@@ -3,9 +3,7 @@ import { ViewContext } from "../ViewContext";
 import trpc from "../../../lib/trpc";
 import path from "path-browserify";
 
-const GridItemRename: Component<{ name: string; path: string; refetchGrid: () => void }> = (
-    props,
-) => {
+const GridItemRename: Component<{ name: string; path: string; refetchGrid: () => void }> = (props) => {
     const viewCtx = useContext(ViewContext);
     let ref!: HTMLInputElement;
 
@@ -22,10 +20,12 @@ const GridItemRename: Component<{ name: string; path: string; refetchGrid: () =>
                 const newPath = path.join(props.path, "..", e.currentTarget.value);
 
                 if (oldPath !== newPath) {
-                    await trpc.move.mutate({
-                        path: oldPath,
-                        newPath: newPath,
-                    });
+                    await trpc.batchMove.mutate([
+                        {
+                            path: oldPath,
+                            newPath: newPath,
+                        },
+                    ]);
 
                     props.refetchGrid();
                 }

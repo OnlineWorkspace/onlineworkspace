@@ -136,15 +136,8 @@ const ViewContainer: Component = () => {
             }}
             onMouseUp={(e) => {
                 if (e.button === 0) {
-                    if (
-                        dragRegion()?.currentPosition.x === dragRegion()?.initialPosition.x &&
-                        dragRegion()?.currentPosition.y === dragRegion()?.initialPosition.y
-                    ) {
-                        viewCtx?.setSelectedItems([]);
-                    }
+                    setDragRegion(undefined);
                 }
-
-                setDragRegion(undefined);
             }}
             onMouseEnter={(e) => {
                 // if the left mouse button is not pressed
@@ -152,16 +145,21 @@ const ViewContainer: Component = () => {
                     setDragRegion(undefined);
                 }
             }}
+            onDblClick={() => {
+                viewCtx!.setSelectedItems([]);
+            }}
         >
-            <div
-                class={styles.dragSelection}
-                style={{
-                    top: (dragRegion()?.region.start.y || 0) + "px",
-                    left: (dragRegion()?.region.start.x || 0) + "px",
-                    height: (dragRegion()?.region.end.y || 0) - (dragRegion()?.region.start.y || 0) + "px",
-                    width: (dragRegion()?.region.end.x || 0) - (dragRegion()?.region.start.x || 0) + "px",
-                }}
-            ></div>
+            {!!dragRegion()?.region ? (
+                <div
+                    class={styles.dragSelection}
+                    style={{
+                        top: (dragRegion()?.region.start.y || 0) + "px",
+                        left: (dragRegion()?.region.start.x || 0) + "px",
+                        height: (dragRegion()?.region.end.y || 0) - (dragRegion()?.region.start.y || 0) + "px",
+                        width: (dragRegion()?.region.end.x || 0) - (dragRegion()?.region.start.x || 0) + "px",
+                    }}
+                ></div>
+            ) : null}
             <UKMenu
                 items={[
                     viewCtx!.cutItems().length > 0 || viewCtx!.copyItems().length > 0

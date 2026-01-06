@@ -13,4 +13,5 @@
     border: 1px solid rgb(var(--uk-sys-color-primary), 0.25);
     border-radius: var(--uk-sys-shape-corner-small);
     pointer-events: none;
+    z-index: 10;
 }

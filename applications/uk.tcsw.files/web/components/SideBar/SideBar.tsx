@@ -8,6 +8,7 @@ import trpc from "../../lib/trpc.ts";
 import path from "path-browserify";
 import { ViewContext } from "../ViewContainer/ViewContext.ts";
 import { createFileUploader } from "@solid-primitives/upload";
+import backend from "@tcsw/workspaces-instance-web/src/lib/backend";
 
 const SideBar: Component = () => {
     const navigate = useNavigate();
@@ -21,12 +22,7 @@ const SideBar: Component = () => {
 
     return (
         <div class={styles.root}>
-            <img
-                draggable={false}
-                class={styles.headerImage}
-                alt={""}
-                src={"/assets/tricolor/tricolor_transparent_dark_background.svg"}
-            />
+            <img draggable={false} class={styles.headerImage} alt={""} src={backend("/api/instance/login/banner")} />
             <UKButton
                 color={"filled"}
                 size={"s"}

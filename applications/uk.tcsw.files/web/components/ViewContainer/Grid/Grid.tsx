@@ -21,11 +21,17 @@ import UKText from "@tcsw/uikit-solid/src/components/text/UKText.tsx";
 import UKButton from "@tcsw/uikit-solid/src/components/button/UKButton.tsx";
 import UKButtonGroup from "@tcsw/uikit-solid/src/components/buttonGroup/UKButtonGroup.tsx";
 import { ViewContext } from "../ViewContext";
+import { onViewKeyPressEvent } from "../keyboard";
+import path from "path-browserify";
+import { createFileUploader } from "@solid-primitives/upload";
 
 const GridView: Component = () => {
     const params = useParams();
     const navigate = useNavigate();
     const viewCtx = useContext(ViewContext);
+    const { selectFiles: selectFilesForUpload } = createFileUploader({
+        multiple: true,
+    });
 
     const [gridResource, { refetch: refetchGrid }] = createResource(
         () => `/${decodeURI(params.currentPath || "")}`,
@@ -42,48 +48,7 @@ const GridView: Component = () => {
         },
     );
 
-    const keydownListener = (e: KeyboardEvent) => {
-        if (e.key === "ArrowUp") {
-            if (viewCtx?.selectedItems().length === 0) {
-                if (viewCtx.viewItems().length !== 0) viewCtx?.setSelectedItems([viewCtx.viewItems()[0].path]);
-            } else {
-                if (viewCtx?.selectedItems().length === 1) {
-                    let previousSelection = viewCtx
-                        .viewItems()
-                        .findIndex((i) => i.path === viewCtx?.selectedItems()[0]);
-                    if (viewCtx.viewItems()[previousSelection - 1]) {
-                        viewCtx?.setSelectedItems([viewCtx.viewItems()[previousSelection - 1].path]);
-                    }
-                }
-            }
-        }
-        if (e.key === "ArrowDown") {
-            if (viewCtx?.selectedItems().length === 0) {
-                if (viewCtx.viewItems().length !== 0) viewCtx?.setSelectedItems([viewCtx.viewItems()[0].path]);
-            } else {
-                if (viewCtx?.selectedItems().length === 1) {
-                    let previousSelection = viewCtx
-                        .viewItems()
-                        .findIndex((i) => i.path === viewCtx?.selectedItems()[0]);
-                    if (viewCtx.viewItems()[previousSelection + 1]) {
-                        viewCtx?.setSelectedItems([viewCtx.viewItems()[previousSelection + 1].path]);
-                    }
-                }
-            }
-        }
-        if (e.key === "x" && e.ctrlKey) {
-            let selectedItems = viewCtx!.selectedItems();
-            viewCtx!.setCutItems(selectedItems);
-            viewCtx!.setCopyItems([]);
-            viewCtx!.setSelectedItems([]);
-        }
-        if (e.key === "c" && e.ctrlKey) {
-            let selectedItems = viewCtx!.selectedItems();
-            viewCtx!.setCopyItems(selectedItems);
-            viewCtx!.setCutItems([]);
-            viewCtx!.setSelectedItems([]);
-        }
-    };
+    const keydownListener = onViewKeyPressEvent(params, viewCtx);
 
     onMount(() => {
         window.addEventListener("keydown", keydownListener);
@@ -117,7 +82,23 @@ const GridView: Component = () => {
                                     size={"s"}
                                     leadingIcon={"upload"}
                                     onClick={() => {
-                                        alert("Implement me!");
+                                        selectFilesForUpload(async (files) => {
+                                            for (const file of files) {
+                                                console.log(file.file);
+                                                let uuid = (await trpc.uploadFile.mutate(file.file)).id;
+
+                                                await trpc.setUploadMetadata.mutate({
+                                                    id: uuid,
+                                                    path: path.join(
+                                                        `/${decodeURI(params.currentPath || "")}`,
+                                                        file.name,
+                                                    ),
+                                                    lastModified: file.file.lastModified,
+                                                });
+                                            }
+
+                                            viewCtx!.setReload();
+                                        });
                                     }}
                                 >
                                     Upload File
