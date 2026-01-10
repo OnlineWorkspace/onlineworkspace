@@ -9,11 +9,7 @@ import { WorkspacesNotificationPriority } from "./notifications.js";
 const APPLICATIONS_CONFIG_FILE_PATH = (subsystem: System) =>
     path.join(subsystem.instance.sys.filesystem.FS_ROOT, "applications.json");
 
-export const DEFAULT_APPLICATIONS: string[] = [
-    "uk.tcsw.store",
-    "uk.tcsw.dashboard",
-    "uk.tcsw.settings",
-];
+export const DEFAULT_APPLICATIONS: string[] = ["uk.tcsw.store", "uk.tcsw.dashboard", "uk.tcsw.settings"];
 
 interface AvailableWorkspacesApplication {
     path: string;
@@ -82,9 +78,7 @@ export default class ApplicationsSystem extends System {
 
             for (const defaultApp of DEFAULT_APPLICATIONS) {
                 if (!this.availableApplications.find((aa) => aa.path.endsWith(defaultApp))) {
-                    this.log.info(
-                        `The instance is missing default application '${defaultApp}', installing from local`,
-                    );
+                    this.log.info(`The instance is missing default application '${defaultApp}', installing from local`);
                     await this.installApplication(`local:${defaultApp}`);
                     await this.enableApplication(defaultApp);
                 }
@@ -99,16 +93,12 @@ export default class ApplicationsSystem extends System {
             }
 
             for (const app of this.availableApplications) {
-                this.log.info(
-                    `application '${app.manifest?.id}' is ${app.enabled ? "enabled" : "disabled"}`,
-                );
+                this.log.info(`application '${app.manifest?.id}' is ${app.enabled ? "enabled" : "disabled"}`);
             }
 
             await this.updateWebRouter();
 
-            if (
-                !(await fs.exists(path.join(this.instance.sys.filesystem.FS_ROOT, "package.json")))
-            ) {
+            if (!(await fs.exists(path.join(this.instance.sys.filesystem.FS_ROOT, "package.json")))) {
                 await fs.writeFile(
                     path.join(this.instance.sys.filesystem.FS_ROOT, "package.json"),
                     `{
@@ -137,9 +127,7 @@ export default class ApplicationsSystem extends System {
 
                 // @ts-ignore
                 for await (const msg of child.stderr) {
-                    this.log.error(
-                        "Applications Initial Startup -> " + Buffer.from(msg).toString(),
-                    );
+                    this.log.error("Applications Initial Startup -> " + Buffer.from(msg).toString());
                 }
 
                 await fs.cp(
@@ -148,11 +136,7 @@ export default class ApplicationsSystem extends System {
                 );
                 await fs.writeFile(
                     path.join(this.instance.sys.filesystem.FS_ROOT, "tsconfig.json"),
-                    (
-                        await fs.readFile(
-                            path.join(this.instance.sys.filesystem.FS_ROOT, "tsconfig.json"),
-                        )
-                    )
+                    (await fs.readFile(path.join(this.instance.sys.filesystem.FS_ROOT, "tsconfig.json")))
                         .toString()
                         .replace(`"include": ["src"]`, `"include": ["./Applications.tsx"]`),
                 );
@@ -184,10 +168,7 @@ export default class ApplicationsSystem extends System {
     // ssh - clones as a git repository to /fs/applicatons & adds to /fs/applications.json
     // https - downloads as a zip file and extracts to /fs/applications & adds to /fs/applications.json
     async installApplication(applicationURI: string): Promise<boolean> {
-        let applicationPath: string = path.join(
-            this.instance.sys.filesystem.FS_ROOT,
-            "application-failed-to-install",
-        );
+        let applicationPath: string = path.join(this.instance.sys.filesystem.FS_ROOT, "application-failed-to-install");
 
         if (applicationURI.startsWith("local:")) {
             applicationPath = path.join(
@@ -212,9 +193,7 @@ export default class ApplicationsSystem extends System {
         }
 
         if (this.availableApplications.find((a) => a.path === applicationPath)) {
-            this.log.warning(
-                `Cannot install application at path -> '${applicationPath}' as it is already installed!`,
-            );
+            this.log.warning(`Cannot install application at path -> '${applicationPath}' as it is already installed!`);
             return false;
         }
 
@@ -224,9 +203,7 @@ export default class ApplicationsSystem extends System {
 
         await this.saveApplicationsConfig();
 
-        for (const administrator of (await this.instance.sys.users.getAllUsers()).filter((u) =>
-            u.isAdministrator(),
-        )) {
+        for (const administrator of (await this.instance.sys.users.getAllUsers()).filter((u) => u.isAdministrator())) {
             this.instance.sys.notifications.send(
                 administrator.userId,
                 "instance.system.application.install",
@@ -251,11 +228,9 @@ export default class ApplicationsSystem extends System {
         return true;
     }
 
-    // Uninstall an application by it's applicationId
+    // Uninstall an application by its applicationId
     async uninstallApplication(applicationId: string): Promise<boolean> {
-        const application = this.availableApplications.find(
-            (a) => a.manifest?.id === applicationId,
-        );
+        const application = this.availableApplications.find((a) => a.manifest?.id === applicationId);
 
         if (!application) {
             this.log.error(`Cannot find application '${applicationId}' to uninstall.`);
@@ -263,15 +238,11 @@ export default class ApplicationsSystem extends System {
             return false;
         }
 
-        this.availableApplications = this.availableApplications.filter(
-            (a) => a.manifest?.id !== applicationId,
-        );
+        this.availableApplications = this.availableApplications.filter((a) => a.manifest?.id !== applicationId);
 
         await this.saveApplicationsConfig();
 
-        for (const administrator of (await this.instance.sys.users.getAllUsers()).filter((u) =>
-            u.isAdministrator(),
-        )) {
+        for (const administrator of (await this.instance.sys.users.getAllUsers()).filter((u) => u.isAdministrator())) {
             this.instance.sys.notifications.send(
                 administrator.userId,
                 "instance.system.application.uninstall",
@@ -301,13 +272,9 @@ export default class ApplicationsSystem extends System {
     async loadApplication(applicationPath: string): Promise<boolean> {
         const APPLICATION_MANIFEST_PATH = path.join(applicationPath, "manifest.json");
 
-        let applicationManifest = JSON.parse(
-            (await fs.readFile(APPLICATION_MANIFEST_PATH)).toString(),
-        );
+        let applicationManifest = JSON.parse((await fs.readFile(APPLICATION_MANIFEST_PATH)).toString());
 
-        let alreadyRegisteredApplication = this.availableApplications.find(
-            (a) => a.path === applicationPath,
-        );
+        let alreadyRegisteredApplication = this.availableApplications.find((a) => a.path === applicationPath);
 
         if (alreadyRegisteredApplication) {
             alreadyRegisteredApplication.manifest = applicationManifest;
@@ -392,9 +359,7 @@ export default class ApplicationsSystem extends System {
             }
         }
 
-        for (const administrator of (await this.instance.sys.users.getAllUsers()).filter((u) =>
-            u.isAdministrator(),
-        )) {
+        for (const administrator of (await this.instance.sys.users.getAllUsers()).filter((u) => u.isAdministrator())) {
             this.instance.sys.notifications.send(
                 administrator.userId,
                 "instance.system.application.enable",
@@ -444,9 +409,7 @@ export default class ApplicationsSystem extends System {
             app.enabled = false;
             this.log.info(`Disabled application '${applicationId}'`);
             await this.instance.promptForRestart(`Disable application '${applicationId}'`);
-            this.enabledApplications = this.enabledApplications.filter(
-                (a) => a !== app.manifest?.id,
-            );
+            this.enabledApplications = this.enabledApplications.filter((a) => a !== app.manifest?.id);
         } else {
             this.log.error(`Couldn't find application with id '${applicationId}'`);
         }
@@ -456,9 +419,7 @@ export default class ApplicationsSystem extends System {
 
         const self = this;
 
-        for (const administrator of (await this.instance.sys.users.getAllUsers()).filter((u) =>
-            u.isAdministrator(),
-        ))
+        for (const administrator of (await this.instance.sys.users.getAllUsers()).filter((u) => u.isAdministrator()))
             this.instance.sys.notifications.send(
                 administrator.userId,
                 "instance.system.application.disable",

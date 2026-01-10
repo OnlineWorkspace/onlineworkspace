@@ -14,4 +14,10 @@ export default defineConfig({
     server: {
         host: true,
     },
+    resolve: {
+        alias: {
+            "@solidjs/router": "/../../../node_modules/@solidjs/router",
+            "@tcsw/uikit-solid": "/../../../uikit-solid",
+        },
+    },
 });

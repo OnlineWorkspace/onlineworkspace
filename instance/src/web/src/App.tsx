@@ -13,20 +13,14 @@ const App: Component = () => {
             <Suspense fallback={<UKIndeterminateSpinner class={styles.spinner} />}>
                 <Router>
                     <Route component={lazy(() => import("./pages/userSelect/Layout.tsx"))}>
-                        <Route
-                            path={"/"}
-                            component={lazy(() => import("./pages/userSelect/login/Login.tsx"))}
-                        />
+                        <Route path={"/"} component={lazy(() => import("./pages/userSelect/login/Login.tsx"))} />
                         <Route
                             path={"/signup"}
                             component={lazy(() => import("./pages/userSelect/signup/Signup.tsx"))}
                         />
                         <Route
                             path={"/forgot-password"}
-                            component={lazy(
-                                () =>
-                                    import("./pages/userSelect/forgotPassword/ForgotPassword.tsx"),
-                            )}
+                            component={lazy(() => import("./pages/userSelect/forgotPassword/ForgotPassword.tsx"))}
                         />
                     </Route>
                     <Route component={lazy(() => import("./pages/app/AuthCheck.tsx"))}>
@@ -37,16 +31,10 @@ const App: Component = () => {
                                     <ApplicationsRouter />
                                 </Suspense>
                             </Route>
-                            <Route
-                                path={"*"}
-                                component={lazy(() => import("./pages/notFound/Index.tsx"))}
-                            />
+                            <Route path={"*"} component={lazy(() => import("./pages/notFound/Index.tsx"))} />
                         </Route>
                     </Route>
-                    <Route
-                        path={"*"}
-                        component={lazy(() => import("./pages/notFound/Index.tsx"))}
-                    />
+                    <Route path={"*"} component={lazy(() => import("./pages/notFound/Index.tsx"))} />
                 </Router>
             </Suspense>
         </UIKitRoot>
