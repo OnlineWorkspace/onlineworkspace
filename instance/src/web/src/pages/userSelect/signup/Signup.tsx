@@ -141,24 +141,14 @@ const UserSelectPage: Component = () => {
                         username={username()}
                         avatar={"/assets/placeholder/avatar.png"}
                     />
-                    <UKText
-                        class={styles.displayName}
-                        role={"headline"}
-                        align={"center"}
-                        size={"l"}
-                        emphasized={true}
-                    >
+                    <UKText class={styles.displayName} role={"headline"} align={"center"} size={"l"} emphasized={true}>
                         {displayName() || username()}
                     </UKText>
                     <UKText class={styles.username} role={"body"} align={"center"} size={"m"}>
                         {`@${username()}`}
                     </UKText>
                     <UKText class={styles.pronouns} role={"label"} align={"center"} size={"s"}>
-                        {gender() === "female"
-                            ? "she/her"
-                            : gender() === "male"
-                              ? "he/him"
-                              : "they/them"}
+                        {gender() === "female" ? "she/her" : gender() === "male" ? "he/him" : "they/them"}
                     </UKText>
                     <UKTextField
                         color={"outlined"}
@@ -262,7 +252,7 @@ const UserSelectPage: Component = () => {
                     </UKText>
                     <UKDivider direction={DividerDirection.horizontal} />
                     <div class={styles.continueSegment}>
-                        <UKButton onClick={() => navigate("/app")} color={"tonal"}>
+                        <UKButton onClick={() => (window.location.href = "/app")} color={"tonal"}>
                             Skip guide
                         </UKButton>
                         <UKButton onClick={() => setStage(UserSelectStage.Guide)} color={"filled"}>
@@ -282,7 +272,7 @@ const UserSelectPage: Component = () => {
                     </UKText>
                     <UKDivider direction={DividerDirection.horizontal} />
                     <div class={styles.continueSegment}>
-                        <UKButton onClick={() => navigate("/app")} color={"filled"}>
+                        <UKButton onClick={() => (window.location.href = "/app")} color={"filled"}>
                             Skip guide and continue
                         </UKButton>
                     </div>

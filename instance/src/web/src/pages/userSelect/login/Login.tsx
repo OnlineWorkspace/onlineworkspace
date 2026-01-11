@@ -19,7 +19,7 @@ const UserSelectPage: Component = () => {
 
     createEffect(async () => {
         if ((await trpc.authorization.isAuthenticated.query()).authenticated) {
-            navigate("/app");
+            window.location.href = "/app";
         }
     });
 
