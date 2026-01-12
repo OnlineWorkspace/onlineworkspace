@@ -1,7 +1,8 @@
 import path from "path";
 import type { Instance } from "../index.js";
 import System from "../system.js";
-import { createServer as createViteServer, type ViteDevServer } from "vite";
+import { createServer as createViteServer, LogErrorOptions, LogOptions, LogType, type ViteDevServer } from "vite";
+import { RollupError } from "rollup";
 
 export default class WebFrontendSystem extends System {
     viteServer!: ViteDevServer;

@@ -252,7 +252,7 @@ const UserSelectPage: Component = () => {
                     </UKText>
                     <UKDivider direction={DividerDirection.horizontal} />
                     <div class={styles.continueSegment}>
-                        <UKButton onClick={() => (window.location.href = "/app")} color={"tonal"}>
+                        <UKButton onClick={() => navigate("/app")} color={"tonal"}>
                             Skip guide
                         </UKButton>
                         <UKButton onClick={() => setStage(UserSelectStage.Guide)} color={"filled"}>
@@ -272,7 +272,7 @@ const UserSelectPage: Component = () => {
                     </UKText>
                     <UKDivider direction={DividerDirection.horizontal} />
                     <div class={styles.continueSegment}>
-                        <UKButton onClick={() => (window.location.href = "/app")} color={"filled"}>
+                        <UKButton onClick={() => navigate("/app")} color={"filled"}>
                             Skip guide and continue
                         </UKButton>
                     </div>

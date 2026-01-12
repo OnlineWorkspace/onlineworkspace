@@ -4,8 +4,7 @@ import { UIKitRoot } from "@tcsw/uikit-solid/src/index.tsx";
 import AppIndex from "./pages/app/App.tsx";
 import UKIndeterminateSpinner from "@tcsw/uikit-solid/src/components/indeterminateSpinner/UKIndeterminateSpinner.tsx";
 import styles from "./App.module.scss";
-
-const ApplicationsRouter = lazy(() => import("../../../../fs/Applications.tsx"));
+import ApplicationsRouter from "../../../../fs/Applications.tsx";
 
 const App: Component = () => {
     return (

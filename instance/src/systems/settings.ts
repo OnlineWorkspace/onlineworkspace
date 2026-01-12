@@ -15,9 +15,19 @@ export default class SettingsSystem extends System {
 
     async getUser(userId: number): Promise<Record<string, any>> {
         const db = this.instance.sys.database.postgres();
-        const settings = (await db`SELECT settings FROM users WHERE id = ${userId}`)?.[0]
-            ?.settings as Record<string, any>;
+        const settings = (await db`SELECT settings FROM users WHERE id = ${userId}`)?.[0]?.settings as Record<
+            string,
+            any
+        >;
 
         return settings;
+    }
+
+    async setUser(userId: number, settings: Record<string, any>): Promise<boolean> {
+        const db = this.instance.sys.database.postgres();
+
+        await db`UPDATE users SET settings = ${settings} WHERE id = ${userId}`;
+
+        return true;
     }
 }

@@ -19,7 +19,7 @@ const UserSelectPage: Component = () => {
 
     createEffect(async () => {
         if ((await trpc.authorization.isAuthenticated.query()).authenticated) {
-            window.location.href = "/app";
+            navigate("/app");
         }
     });
 
@@ -45,7 +45,7 @@ const UserSelectPage: Component = () => {
                                 });
 
                                 if (resp.type === "success") {
-                                    window.location.href = "/app";
+                                    navigate("/app");
                                 }
                             }
                         }}
@@ -86,7 +86,7 @@ const UserSelectPage: Component = () => {
                                     }
 
                                     if (resp.type === "success") {
-                                        window.location.href = "/app";
+                                        navigate("/app");
                                         return;
                                     }
 
