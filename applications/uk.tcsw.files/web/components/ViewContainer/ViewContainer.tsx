@@ -30,6 +30,7 @@ const ViewContainer: Component = () => {
           }
         | undefined
     >(undefined);
+    const [mouseDownAt, setMouseDownAt] = createSignal<number>(0);
 
     createEffect(() => {
         const region = dragRegion();
@@ -68,7 +69,7 @@ const ViewContainer: Component = () => {
         <div
             class={styles.root}
             onMouseDown={(e) => {
-                if (e.button === 0)
+                if (e.button === 0) {
                     setDragRegion({
                         currentPosition: {
                             x: e.clientX,
@@ -89,6 +90,8 @@ const ViewContainer: Component = () => {
                             y: e.clientY,
                         },
                     });
+                    setMouseDownAt(Date.now());
+                }
             }}
             onMouseMove={(e) => {
                 setDragRegion((dr) => {
@@ -138,15 +141,17 @@ const ViewContainer: Component = () => {
                 if (e.button === 0) {
                     setDragRegion(undefined);
                 }
+
+                if (mouseDownAt() + 75 > Date.now()) {
+                    setDragRegion(undefined);
+                    viewCtx!.setSelectedItems([]);
+                }
             }}
             onMouseEnter={(e) => {
                 // if the left mouse button is not pressed
                 if (!Boolean(e.buttons & (1 << 0))) {
                     setDragRegion(undefined);
                 }
-            }}
-            onDblClick={() => {
-                viewCtx!.setSelectedItems([]);
             }}
         >
             {!!dragRegion()?.region ? (
