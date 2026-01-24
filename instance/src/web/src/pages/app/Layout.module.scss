@@ -16,4 +16,9 @@
 
 .rail {
     border-right: 1px solid rgb(var(--uk-sys-color-outline-variant));
+
+    *[data-navigation-rail-mobile-mode="true"] > & {
+        border-top: 1px solid rgb(var(--uk-sys-color-outline-variant));
+        border-right: none;
+    }
 }
