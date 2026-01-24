@@ -35,9 +35,8 @@ export default class AuthorizationSystem extends System {
             if (
                 !(await Bun.password.verify(
                     password,
-                    (
-                        await db`SELECT hashed_password FROM tricolor_workspaces.public.users WHERE id = ${userId}`
-                    )?.[0]?.hashed_password,
+                    (await db`SELECT hashed_password FROM tricolor_workspaces.public.users WHERE id = ${userId}`)?.[0]
+                        ?.hashed_password,
                 ))
             ) {
                 return undefined;
@@ -50,7 +49,7 @@ export default class AuthorizationSystem extends System {
                 }
 
                 let totp = new OTPAuth.TOTP({
-                    issuer: this.instance.sys.configuration.webUrl,
+                    issuer: this.instance.sys.configuration.webUrl[0],
                     label: `${this.instance.sys.configuration.displayName} (Tricolor Workspaces)`,
                     algorithm: "SHA1",
                     digits: 6,

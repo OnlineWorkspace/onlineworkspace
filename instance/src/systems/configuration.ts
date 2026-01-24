@@ -28,7 +28,7 @@ export default class ConfigurationSystem extends System {
     // http://localhost:3563
     backendUrl: string;
     // http://localhost:5173
-    webUrl: string;
+    webUrl: string[];
     enabledFeatures: (WorkspacesFeatureFlags | string)[];
     signupRequirements: {
         email: boolean;
@@ -60,7 +60,7 @@ export default class ConfigurationSystem extends System {
             },
         };
         this.backendUrl = "http://localhost:3563";
-        this.webUrl = "http://localhost:5173";
+        this.webUrl = ["http://localhost:5173", "http://192.168.1.118:5173"];
         this.signupRequirements = {
             email: false,
             twoFactorAuthentication: false,

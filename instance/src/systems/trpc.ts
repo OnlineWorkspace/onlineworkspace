@@ -67,10 +67,17 @@ export default class TRPCSystem extends System {
             port: 3563,
             hostname: "0.0.0.0",
             async fetch(req: BunRequest, server: Server<ReturnType<typeof createTRPCContext>>) {
+                let requestOriginDomain = req.headers.get("Origin");
+
+                if (!requestOriginDomain) return new Response("Invalid request");
+
+                if (!self.instance.sys.configuration.webUrl.includes(requestOriginDomain))
+                    return new Response("Invalid request");
+
                 if (req.method === "OPTIONS") {
                     return new Response("TricolorSoftware", {
                         headers: {
-                            "Access-Control-Allow-Origin": "http://localhost:5173", // TODO: change this according to a config file
+                            "Access-Control-Allow-Origin": requestOriginDomain,
                             "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
                             "Access-Control-Allow-Headers": "Content-Type, Authorization",
                             "Access-Control-Allow-Credentials": "true",
@@ -82,7 +89,7 @@ export default class TRPCSystem extends System {
                     let trpcResponse = await self.attemptTRPCRequest(req, server);
 
                     if (trpcResponse) {
-                        trpcResponse.headers.set("Access-Control-Allow-Origin", "http://localhost:5173");
+                        trpcResponse.headers.set("Access-Control-Allow-Origin", requestOriginDomain);
                         trpcResponse.headers.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
                         trpcResponse.headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
                         trpcResponse.headers.set("Access-Control-Allow-Credentials", "true");
@@ -96,7 +103,7 @@ export default class TRPCSystem extends System {
 
                 try {
                     const resp = options?.fetch?.call(server, req, server);
-                    resp.headers.set("Access-Control-Allow-Origin", "http://localhost:5173");
+                    resp.headers.set("Access-Control-Allow-Origin", requestOriginDomain);
                     resp.headers.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
                     resp.headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
                     resp.headers.set("Access-Control-Allow-Credentials", "true");

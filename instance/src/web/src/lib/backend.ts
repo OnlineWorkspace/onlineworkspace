@@ -3,5 +3,5 @@ export default function backend(path: string): string {
         return `http://${window.location.hostname}:3563${path}`;
     }
 
-    return `https://${window.location.hostname}${path}`;
+    return `http://${window.location.hostname}:3563${path}`;
 }

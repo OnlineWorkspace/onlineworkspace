@@ -4,15 +4,17 @@ import UKNavigationRail from "@tcsw/uikit-solid/src/components/navigationRail/UK
 import { createResource, Suspense, type Component, type ParentProps } from "solid-js";
 import styles from "./Layout.module.scss";
 import trpc from "./lib/trpc";
+import useIsMobile from "@tcsw/uikit-solid/src/core/useIsMobile.ts";
 
 const Layout: Component<ParentProps> = (props) => {
     const [isAdministrator] = createResource(() => trpc.instance.isUserAdministrator.query());
     const location = useLocation();
     const navigate = useNavigate();
+    const isMobile = useIsMobile();
 
     return (
         <UKNavigationRail
-            expanded={true}
+            expanded={!isMobile()}
             items={[
                 {
                     icon: { type: "icon", value: "home" },

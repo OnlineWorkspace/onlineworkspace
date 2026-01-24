@@ -12,14 +12,14 @@ import Email from "./components/Email/Email";
 import Bio from "./components/Bio/Bio.tsx";
 import UKTopAppBar from "@tcsw/uikit-solid/src/components/topAppBar/UKTopAppBar.jsx";
 import { useNavigate } from "@solidjs/router";
+import UKStackItem from "@tcsw/uikit-solid/src/components/stack/UKStackItem.tsx";
+import webInstanceTRPC from "@tcsw/workspaces-instance-web/src/lib/trpc.ts";
 
 const ProfilePage: Component = () => {
     const navigate = useNavigate();
     const [name, { refetch: refetchName }] = createResource(() => trpc.profile.getName.query());
     const [role] = createResource(() => trpc.profile.getRole.query());
-    const [avatar, { refetch: refetchAvatar }] = createResource(() =>
-        trpc.profile.getProfilePicture.query(),
-    );
+    const [avatar, { refetch: refetchAvatar }] = createResource(() => trpc.profile.getProfilePicture.query());
 
     return (
         <>
@@ -38,11 +38,7 @@ const ProfilePage: Component = () => {
                 <div class={styles.header}>
                     <UKAvatar
                         username="username"
-                        avatar={
-                            avatar()
-                                ? `${avatar()}?t=${Date.now()}`
-                                : "/assets/placeholder/avatar.png"
-                        }
+                        avatar={avatar() ? `${avatar()}?t=${Date.now()}` : "/assets/placeholder/avatar.png"}
                         size="l"
                     />
                     <div>
@@ -69,6 +65,19 @@ const ProfilePage: Component = () => {
                 </UKText>
                 <UKStack>
                     <Email />
+                </UKStack>
+                <UKText class={styles.subheading} role="title" size="m" align="start">
+                    Session
+                </UKText>
+                <UKStack>
+                    <UKStackItem
+                        labelText={"Logout"}
+                        leading={{ type: "icon", value: "logout" }}
+                        onClick={() => {
+                            webInstanceTRPC.authorization.logout.mutate();
+                            navigate("/");
+                        }}
+                    />
                 </UKStack>
             </div>
         </>
