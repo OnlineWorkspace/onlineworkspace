@@ -1,6 +1,6 @@
-import { createResource, createSignal, Suspense, type Component } from "solid-js";
+import { type Component, createResource, createSignal, Show, Suspense } from "solid-js";
 import styles from "./Layout.module.scss";
-import { useLocation, useNavigate, type RouteSectionProps } from "@solidjs/router";
+import { type RouteSectionProps, useLocation, useNavigate } from "@solidjs/router";
 import UKIndeterminateSpinner from "@tcsw/uikit-solid/src/components/indeterminateSpinner/UKIndeterminateSpinner.jsx";
 import UKNavigationRail from "@tcsw/uikit-solid/src/components/navigationRail/UKNavigationRail.jsx";
 import NavigationRailAvatar from "./navigationRailAvatar/NavigationRailAvatar";
@@ -9,18 +9,20 @@ import NavigationRailClock from "./navigationRailClock/NavigationRailClock.tsx";
 import UKText from "@tcsw/uikit-solid/src/components/text/UKText.tsx";
 import NavigationRailNotifications from "./navigationRailNotifications/NavigationRailNotifications.tsx";
 import NavigationRailApplications from "./navigationRailApplications/NavigationRailApplications.tsx";
+import useIsMobile from "@tcsw/uikit-solid/src/core/useIsMobile.ts";
 
 const AppLayout: Component<RouteSectionProps<unknown>> = (props) => {
     const location = useLocation();
     const navigate = useNavigate();
+    const isMobile = useIsMobile();
 
     const [quickShortcuts] = createResource(() => trpc.app.navigation.getApplications.query());
     const [expanded, setExpanded] = createSignal<boolean>(false);
+    const [toggledDrawer, setToggledDrawer] = createSignal<"applications" | "notifications" | false>(false);
 
     return (
         <>
-            {window.localStorage.getItem("tricolor_workspaces_no_app_navigation_rail") !==
-            "true" ? (
+            {window.localStorage.getItem("tricolor_workspaces_no_app_navigation_rail") !== "true" ? (
                 <UKNavigationRail
                     class={styles.rail}
                     expanded={expanded()}
@@ -54,7 +56,9 @@ const AppLayout: Component<RouteSectionProps<unknown>> = (props) => {
                     anchorPoints={{
                         topMost: (
                             <>
-                                <NavigationRailClock expanded={expanded()} />
+                                <Show when={!isMobile()}>
+                                    <NavigationRailClock expanded={expanded()} />
+                                </Show>
                             </>
                         ),
                         top: (
@@ -64,17 +68,39 @@ const AppLayout: Component<RouteSectionProps<unknown>> = (props) => {
                         ),
                         bottom: (
                             <>
-                                <NavigationRailApplications expanded={expanded()} />
-                                <UKText
-                                    class={styles.versionLabel}
-                                    role={"label"}
-                                    size={"s"}
-                                    emphasized={true}
-                                    align={"center"}
-                                >
-                                    Dev Build
-                                </UKText>
-                                <NavigationRailNotifications expanded={expanded()} />
+                                <NavigationRailApplications
+                                    isToggled={toggledDrawer() === "applications"}
+                                    toggle={(str) => {
+                                        if (toggledDrawer() === "applications") {
+                                            setToggledDrawer(false);
+                                        } else {
+                                            setToggledDrawer(str);
+                                        }
+                                    }}
+                                    expanded={expanded()}
+                                />
+                                <Show when={!isMobile()}>
+                                    <UKText
+                                        class={styles.versionLabel}
+                                        role={"label"}
+                                        size={"s"}
+                                        emphasized={true}
+                                        align={"center"}
+                                    >
+                                        Dev Build
+                                    </UKText>
+                                </Show>
+                                <NavigationRailNotifications
+                                    isToggled={toggledDrawer() === "notifications"}
+                                    toggle={(str) => {
+                                        if (toggledDrawer() === "notifications") {
+                                            setToggledDrawer(false);
+                                        } else {
+                                            setToggledDrawer(str);
+                                        }
+                                    }}
+                                    expanded={expanded()}
+                                />
                             </>
                         ),
                     }}

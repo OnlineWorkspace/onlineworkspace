@@ -1,8 +1,9 @@
-import { Index, type Component, type JSX, type ParentProps } from "solid-js";
+import { type Component, Index, type JSX, type ParentProps, Show } from "solid-js";
 import styles from "./UKNavigationRail.module.scss";
 import UKNavigationRailItem from "./item/UKNavigationRailItem";
 import UKNavigationRailMenuButton from "./menuButton/UKNavigationRailMenuButton";
 import clsx from "clsx";
+import useIsMobile from "../../core/useIsMobile";
 
 const UKNavigationRail: Component<
     ParentProps<{
@@ -34,11 +35,22 @@ const UKNavigationRail: Component<
         class?: string;
     }>
 > = (props) => {
+    const isMobile = useIsMobile();
+
     return (
-        <div class={styles.layout}>
-            <div class={clsx(styles.root, props.class)} data-type={props.type || "modal"} data-expanded={props.expanded || false}>
+        <div class={styles.layout} data-navigation-rail-mobile-mode={isMobile()}>
+            <Show when={isMobile()}>
+                <div class={styles.pageRoot}>{props.children}</div>
+            </Show>
+            <div
+                class={clsx(styles.root, props.class)}
+                data-type={props.type || "modal"}
+                data-expanded={props.expanded || false}
+            >
                 {props.anchorPoints?.topMost}
-                {props.setExpanded && <UKNavigationRailMenuButton setExpanded={props.setExpanded} expanded={props.expanded || false} />}
+                {props.setExpanded && (
+                    <UKNavigationRailMenuButton setExpanded={props.setExpanded} expanded={props.expanded || false} />
+                )}
                 {props.anchorPoints?.top}
                 {props.items ? (
                     <Index each={props.items.filter((i) => i !== undefined)}>
@@ -47,7 +59,9 @@ const UKNavigationRail: Component<
                 ) : null}
                 {props.anchorPoints?.bottom}
             </div>
-            <div class={styles.pageRoot}>{props.children}</div>
+            <Show when={!isMobile()}>
+                <div class={styles.pageRoot}>{props.children}</div>
+            </Show>
         </div>
     );
 };

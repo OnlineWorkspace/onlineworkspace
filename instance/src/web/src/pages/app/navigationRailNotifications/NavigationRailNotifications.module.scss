@@ -19,6 +19,35 @@
             left: 6rem;
         }
     }
+
+    *[data-navigation-rail-mobile-mode="true"] > div > & {
+        justify-content: unset;
+        width: unset;
+        padding-bottom: unset;
+
+        > .notifications,
+        > .flyoutNotifications {
+            position: fixed;
+            left: 1rem;
+            bottom: 5.5rem;
+            height: unset;
+            width: calc(100vw - 2rem);
+
+            animation: fadeInBottom var(--uk-sys-motion-duration-250) var(--uk-sys-motion-easing-emphasized-decelerate);
+            transition: bottom var(--uk-sys-motion-duration-250) var(--uk-sys-motion-easing-emphasized-decelerate);
+
+            @keyframes fadeInBottom {
+                from {
+                    opacity: 0;
+                    transform: translateY(1rem);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+        }
+    }
 }
 
 .notifications {
@@ -38,9 +67,9 @@
 
     transition: left var(--uk-sys-motion-duration-250) var(--uk-sys-motion-easing-emphasized-decelerate);
 
-    animation: fadeIn var(--uk-sys-motion-duration-250) var(--uk-sys-motion-easing-emphasized-decelerate);
+    animation: fadeInLeft var(--uk-sys-motion-duration-250) var(--uk-sys-motion-easing-emphasized-decelerate);
 
-    @keyframes fadeIn {
+    @keyframes fadeInLeft {
         from {
             opacity: 0;
             transform: translateX(-1rem);

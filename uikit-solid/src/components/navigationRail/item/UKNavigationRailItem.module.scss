@@ -164,6 +164,12 @@
         outline-offset: var(--uk-sys-state-focus-indicator-outer-offset);
         outline-color: rgb(var(--uk-sys-color-secondary));
     }
+
+    *[data-navigation-rail-mobile-mode="true"] > div > & {
+        margin-bottom: unset;
+        margin-top: unset;
+        height: max-content;
+    }
 }
 
 @keyframes label-fade-in-expanded {

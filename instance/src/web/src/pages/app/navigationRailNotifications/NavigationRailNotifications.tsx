@@ -1,4 +1,4 @@
-import { createEffect, createSignal, For, onCleanup, onMount, type Component } from "solid-js";
+import { createSignal, For, type Component } from "solid-js";
 import trpc from "../../../lib/trpc";
 import { type WorkspacesNotification } from "../../../../../systems/notifications";
 import Notification from "./notification/Notification";
@@ -8,17 +8,17 @@ import UKText from "@tcsw/uikit-solid/src/components/text/UKText.jsx";
 import UKDivider from "@tcsw/uikit-solid/src/components/divider/UKDivider.jsx";
 import { DividerDirection } from "@tcsw/uikit-solid/src/components/divider/lib/direction.js";
 import { useNavigate } from "@solidjs/router";
-import type { Unsubscribable } from "@trpc/server/observable";
 
-const FLYOUT_NOTIFICATION_TIMEOUT = 10_000;
+// const FLYOUT_NOTIFICATION_TIMEOUT = 10_000;
 
-const NavigationRailNotifications: Component<{ expanded: boolean }> = (props) => {
+const NavigationRailNotifications: Component<{
+    expanded: boolean;
+    toggle: (text: "notifications") => void;
+    isToggled: boolean;
+}> = (props) => {
     const navigate = useNavigate();
-    const [toggled, setToggled] = createSignal<boolean>(false);
     const [notifications, setNotifications] = createSignal<WorkspacesNotification[]>([]);
-    const [flyoutNotifications, setFlyoutNotifications] = createSignal<WorkspacesNotification[]>(
-        [],
-    );
+    const [flyoutNotifications, setFlyoutNotifications] = createSignal<WorkspacesNotification[]>([]);
     // let subscription: Unsubscribable;
     //
     // onMount(() => {
@@ -51,12 +51,12 @@ const NavigationRailNotifications: Component<{ expanded: boolean }> = (props) =>
     return (
         <div class={styles.root} data-expanded={props.expanded}>
             <UKIconButton
-                color={toggled() ? "filled" : "standard"}
-                shape={toggled() ? "square" : "round"}
+                color={props.isToggled ? "filled" : "standard"}
+                shape={props.isToggled ? "square" : "round"}
                 icon={flyoutNotifications().length !== 0 ? "notifications_unread" : "notifications"}
                 alt="notifications"
                 onClick={() => {
-                    setToggled((toggled) => !toggled);
+                    props.toggle("notifications");
                 }}
             />
             <div class={styles.flyoutNotifications}>
@@ -101,7 +101,7 @@ const NavigationRailNotifications: Component<{ expanded: boolean }> = (props) =>
                     )}
                 </For>
             </div>
-            {toggled() && (
+            {props.isToggled && (
                 <>
                     <div class={styles.notifications}>
                         {notifications().length > 0 ? (
@@ -109,12 +109,11 @@ const NavigationRailNotifications: Component<{ expanded: boolean }> = (props) =>
                                 {(notification) => (
                                     <Notification
                                         respond={async (type, value) => {
-                                            let responseAction =
-                                                await trpc.app.notifications.respond.mutate({
-                                                    uuid: notification.uuid,
-                                                    responseType: type as "button",
-                                                    value: value,
-                                                });
+                                            let responseAction = await trpc.app.notifications.respond.mutate({
+                                                uuid: notification.uuid,
+                                                responseType: type as "button",
+                                                value: value,
+                                            });
 
                                             if (responseAction.action?.type === "navigate") {
                                                 navigate(responseAction.action.value);
@@ -125,14 +124,10 @@ const NavigationRailNotifications: Component<{ expanded: boolean }> = (props) =>
                                             }
 
                                             setNotifications((notifications) =>
-                                                notifications.filter(
-                                                    (n) => n.uuid !== notification.uuid,
-                                                ),
+                                                notifications.filter((n) => n.uuid !== notification.uuid),
                                             );
                                             setFlyoutNotifications((notifications) =>
-                                                notifications.filter(
-                                                    (n) => n.uuid !== notification.uuid,
-                                                ),
+                                                notifications.filter((n) => n.uuid !== notification.uuid),
                                             );
                                         }}
                                         notification={notification}
@@ -144,13 +139,9 @@ const NavigationRailNotifications: Component<{ expanded: boolean }> = (props) =>
                                 <UKText role="title" size="l" align="center">
                                     Nothing here
                                 </UKText>
-                                <UKDivider
-                                    width="middle-inset"
-                                    direction={DividerDirection.horizontal}
-                                />
+                                <UKDivider width="middle-inset" direction={DividerDirection.horizontal} />
                                 <UKText role="body" size="m" align="center">
-                                    You have no notifications, when you have a notification it will
-                                    show up here.
+                                    You have no notifications, when you have a notification it will show up here.
                                 </UKText>
                             </div>
                         )}

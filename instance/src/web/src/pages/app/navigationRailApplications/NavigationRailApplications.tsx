@@ -1,4 +1,4 @@
-import { createResource, createSignal, For, type Component } from "solid-js";
+import { createResource, For, type Component } from "solid-js";
 import styles from "./NavigationRailApplications.module.scss";
 import UKIconButton from "@tcsw/uikit-solid/src/components/iconButton/UKIconButton.jsx";
 import UKText from "@tcsw/uikit-solid/src/components/text/UKText.jsx";
@@ -9,9 +9,12 @@ import trpc from "../../../lib/trpc";
 import UKListItem from "@tcsw/uikit-solid/src/components/list/UKListItem.jsx";
 import { useNavigate } from "@solidjs/router";
 
-const NavigationRailApplications: Component<{ expanded: boolean }> = (props) => {
+const NavigationRailApplications: Component<{
+    expanded: boolean;
+    toggle: (text: "applications") => void;
+    isToggled: boolean;
+}> = (props) => {
     const navigate = useNavigate();
-    const [showApplicationDrawer, setShowApplicationDrawer] = createSignal<boolean>(false);
     const [applications] = createResource(() => trpc.app.navigation.getApplications.query());
 
     return (
@@ -19,12 +22,13 @@ const NavigationRailApplications: Component<{ expanded: boolean }> = (props) => 
             <UKIconButton
                 alt={"Toggle Applications"}
                 icon={"apps"}
-                color={"standard"}
+                color={props.isToggled ? "filled" : "standard"}
+                shape={props.isToggled ? "square" : "round"}
                 onClick={() => {
-                    setShowApplicationDrawer((sad) => !sad);
+                    props.toggle("applications");
                 }}
             />
-            {showApplicationDrawer() && (
+            {props.isToggled && (
                 <div class={styles.drawer}>
                     <UKText role={"title"} size="l">
                         Applications
@@ -40,6 +44,7 @@ const NavigationRailApplications: Component<{ expanded: boolean }> = (props) => 
                                             onClick={() => {
                                                 if (app.location.type === "local") {
                                                     navigate(app.location.value);
+                                                    props.toggle("applications");
                                                 } else if (app.location.type === "remote") {
                                                     window.location.href = app.location.value;
                                                 }

@@ -1,5 +1,4 @@
 import type { Accessor, Component } from "solid-js";
-import styles from "./Email.module.scss";
 import modalStyles from "../../Signup.module.scss";
 import { UserSelectStage } from "../../Signup";
 import UKText from "@tcsw/uikit-solid/src/components/text/UKText.jsx";
@@ -7,8 +6,8 @@ import UKCard from "@tcsw/uikit-solid/src/components/card/UKCard.jsx";
 import UKTextField from "@tcsw/uikit-solid/src/components/textField/UKTextField.jsx";
 import UKDivider from "@tcsw/uikit-solid/src/components/divider/UKDivider.jsx";
 import UKButton from "@tcsw/uikit-solid/src/components/button/UKButton.jsx";
-import isEmail from "@tcsw/uikit-solid/src/core/validation/isEmail.js";
 import trpc from "../../../../../lib/trpc";
+import z from "zod";
 
 const Email: Component<{
     setStage(stage: UserSelectStage): void;
@@ -29,7 +28,7 @@ const Email: Component<{
                     defaultValue={props.emailAddress()}
                     getValue={props.setEmailAddress}
                     supportingText={"*required"}
-                    error={props.emailAddress() !== "" && !isEmail(props.emailAddress())}
+                    error={props.emailAddress() !== "" && !z.safeParse(z.email(), props.emailAddress()).data}
                 />
                 <div class={modalStyles.stageButtons}>
                     <UKButton
@@ -41,7 +40,7 @@ const Email: Component<{
                         Back
                     </UKButton>
                     <UKButton
-                        disabled={props.emailAddress() === "" || !isEmail(props.emailAddress())}
+                        disabled={props.emailAddress() === "" || !z.safeParse(z.email(), props.emailAddress()).data}
                         onClick={async () => {
                             await trpc.authorization.checkEmailAddressOwnership.mutate({
                                 emailAddress: props.emailAddress(),

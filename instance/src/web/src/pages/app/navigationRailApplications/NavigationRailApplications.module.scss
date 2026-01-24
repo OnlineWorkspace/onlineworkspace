@@ -18,6 +18,20 @@
             left: 6rem;
         }
     }
+
+    *[data-navigation-rail-mobile-mode="true"] > div > & {
+        justify-content: unset;
+        width: unset;
+        padding-bottom: unset;
+        margin-top: unset;
+
+        > .drawer {
+            position: fixed;
+            width: calc(100vw - 2rem);
+            left: 1rem;
+            bottom: 5.5rem;
+        }
+    }
 }
 
 .drawer {
