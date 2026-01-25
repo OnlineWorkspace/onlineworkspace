@@ -56,9 +56,6 @@ const NavigationRailApplications: Component<{
                                 }}
                             </For>
                         </UKList>
-                        <UKText role={"label"} size={"m"}>
-                            This is a work in progress
-                        </UKText>
                     </div>
                 </div>
             )}

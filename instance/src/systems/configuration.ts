@@ -35,7 +35,7 @@ export default class ConfigurationSystem extends System {
         twoFactorAuthentication: boolean;
     };
     displayName: string;
-    mailserver: {
+    mailServer: {
         host: string;
         port: number;
         secure: boolean;
@@ -66,7 +66,7 @@ export default class ConfigurationSystem extends System {
             twoFactorAuthentication: false,
         };
         this.displayName = "Tricolor Workspaces";
-        this.mailserver = {
+        this.mailServer = {
             host: "smtp.example.com",
             port: 587,
             secure: true,
@@ -133,7 +133,7 @@ export default class ConfigurationSystem extends System {
                     webUrl: this.webUrl,
                     signupRequirements: this.signupRequirements,
                     displayName: this.displayName,
-                    mailserver: this.mailserver,
+                    mailserver: this.mailServer,
                     termsOfUse: this.termsOfUse,
                 },
                 null,
@@ -159,7 +159,7 @@ export default class ConfigurationSystem extends System {
         if (configurationFile.webUrl) this.webUrl = configurationFile.webUrl;
         if (configurationFile.signupRequirements) this.signupRequirements = configurationFile.signupRequirements;
         if (configurationFile.displayName) this.displayName = configurationFile.displayName;
-        if (configurationFile.mailserver) this.mailserver = configurationFile.mailserver;
+        if (configurationFile.mailserver) this.mailServer = configurationFile.mailserver;
         if (configurationFile.termsOfUse) this.termsOfUse = configurationFile.termsOfUse;
 
         for (const feature of Object.keys(WorkspacesFeatureFlags)) {

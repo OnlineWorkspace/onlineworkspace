@@ -12,7 +12,7 @@ export default class EmailSystem extends System {
     }
 
     async startup(): Promise<boolean> {
-        this.transporter = nm.createTransport(this.instance.sys.configuration.mailserver);
+        this.transporter = nm.createTransport(this.instance.sys.configuration.mailServer);
 
         try {
             await this.transporter.verify();

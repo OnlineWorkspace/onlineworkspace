@@ -1,9 +1,15 @@
+.paddingContainer {
+    padding-left: 1rem;
+    padding-right: 1rem;
+    width: 100%;
+    max-width: 64rem;
+}
+
 .root {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
     width: 100%;
-    max-width: 64rem;
 }
 
 .bar {

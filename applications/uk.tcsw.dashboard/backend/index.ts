@@ -48,78 +48,69 @@ const router = t.router({
                 }),
             )
             .query(async (opt) => {
-                const wallpaperPath = path.join(
-                    (await opt.ctx.user()).getPath(),
-                    "assets/wallpapers",
-                );
+                const wallpaperPath = path.join((await opt.ctx.user()).getPath(), "assets/wallpapers");
 
                 if (await fs.exists(path.join(wallpaperPath, "config.json"))) {
-                    let options = JSON.parse(
-                        (await fs.readFile(path.join(wallpaperPath, "config.json"))).toString(),
-                    );
+                    let options = JSON.parse((await fs.readFile(path.join(wallpaperPath, "config.json"))).toString());
 
                     options.position = options.position.split(" ");
 
                     return options;
                 } else {
-                    return { fit: "cover", position: ["center"] };
+                    return {
+                        fit: "cover",
+                        position: ["center"],
+                    };
                 }
             }),
-        getWallpaper: procedure
-            .input(z.object({ width: z.number(), height: z.number() }))
-            .query(async (opt) => {
-                const wallpapersRootPath = path.join(
-                    (await opt.ctx.user()).getPath(),
-                    "assets/wallpapers",
+        getWallpaper: procedure.input(z.object({ width: z.number(), height: z.number() })).query(async (opt) => {
+            const wallpapersRootPath = path.join((await opt.ctx.user()).getPath(), "assets/wallpapers");
+            const rawWallpaperPath = path.join(wallpapersRootPath, "current.png");
+            const resizedWallpapersPath = path.join(wallpapersRootPath, "resized");
+            const requiredResizedWallpaperPath = path.join(
+                resizedWallpapersPath,
+                `${opt.input.width}x${opt.input.height}.png`,
+            );
+
+            if (!(await fs.exists(rawWallpaperPath))) {
+                return "/assets/tricolor/tricolor.svg";
+            }
+
+            if (!(await fs.exists(requiredResizedWallpaperPath))) {
+                const options = await (async () => {
+                    if (await fs.exists(path.join(wallpapersRootPath, "config.json"))) {
+                        let options = JSON.parse(
+                            (await fs.readFile(path.join(wallpapersRootPath, "config.json"))).toString(),
+                        );
+
+                        options.position = options.position.split(" ");
+                        return options;
+                    } else {
+                        return { fit: "cover", position: "center" };
+                    }
+                })();
+
+                await instance.sys.image.resizeImage(
+                    rawWallpaperPath,
+                    requiredResizedWallpaperPath,
+                    {
+                        width: opt.input.width,
+                        height: opt.input.height,
+                    },
+                    {
+                        changeFormatTo: "png",
+                        fit: options.fit,
+                        position: options.position,
+                        background: options.background,
+                    },
                 );
-                const rawWallpaperPath = path.join(wallpapersRootPath, "current.png");
-                const resizedWallpapersPath = path.join(wallpapersRootPath, "resized");
-                const requiredResizedWallpaperPath = path.join(
-                    resizedWallpapersPath,
-                    `${opt.input.width}x${opt.input.height}.png`,
-                );
+            }
 
-                if (!(await fs.exists(rawWallpaperPath))) {
-                    return "/assets/tricolor/tricolor.svg";
-                }
-
-                if (!(await fs.exists(requiredResizedWallpaperPath))) {
-                    const options = await (async () => {
-                        if (await fs.exists(path.join(wallpapersRootPath, "config.json"))) {
-                            let options = JSON.parse(
-                                (
-                                    await fs.readFile(path.join(wallpapersRootPath, "config.json"))
-                                ).toString(),
-                            );
-
-                            options.position = options.position.split(" ");
-                            return options;
-                        } else {
-                            return { fit: "cover", position: "center" };
-                        }
-                    })();
-
-                    await instance.sys.image.resizeImage(
-                        rawWallpaperPath,
-                        requiredResizedWallpaperPath,
-                        { width: opt.input.width, height: opt.input.height },
-                        {
-                            changeFormatTo: "png",
-                            fit: options.fit,
-                            position: options.position,
-                            background: options.background,
-                        },
-                    );
-                }
-
-                return (
-                    opt.ctx.rawRequest.destinationHostname +
-                    (await opt.ctx.instance.sys.image.serveImage(
-                        opt.ctx.userId,
-                        requiredResizedWallpaperPath,
-                    ))
-                );
-            }),
+            return (
+                opt.ctx.rawRequest.destinationHostname +
+                (await opt.ctx.instance.sys.image.serveImage(opt.ctx.userId, requiredResizedWallpaperPath))
+            );
+        }),
     },
 });
 
