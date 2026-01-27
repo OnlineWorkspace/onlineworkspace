@@ -21,6 +21,7 @@ import SettingsSystem from "./systems/settings.js";
 import WebFrontendSystem from "./systems/webFrontend.js";
 import { promises as fs } from "fs";
 import EmailSystem from "./systems/email.js";
+import EventSystem, { WorkspacesEvent } from "./systems/events.js";
 
 export enum InstanceStatus {
     Online,
@@ -41,6 +42,7 @@ class Instance {
         // @ts-ignore Don't know, don't care
         this.sys = {};
 
+        this.sys.event = new EventSystem(this);
         this.sys.filesystem = new FilesystemSystem(this);
         this.sys.configuration = new ConfigurationSystem(this);
         this.sys.notifications = new NotificationsSystem(this);
@@ -88,6 +90,8 @@ class Instance {
                 sys.log.error(`Startup Failed!`);
             }
         }
+
+        this.sys.event.invoke(WorkspacesEvent.BeforeStartupComplete);
 
         const self = this;
 

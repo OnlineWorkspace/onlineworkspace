@@ -13,6 +13,7 @@ import ImageSubsystem from "./systems/image.js";
 import type SettingsSubsystem from "./systems/settings.js";
 import type WebFrontendSubsystem from "./systems/webFrontend.js";
 import EmailSystem from "./systems/email.js";
+import EventSystem from "./systems/events.js";
 
 export type Sys = {
     users: UsersSubsystem;
@@ -28,6 +29,7 @@ export type Sys = {
     settings: SettingsSubsystem;
     webFrontend: WebFrontendSubsystem;
     email: EmailSystem;
+    event: EventSystem;
 } & { [key: string]: System };
 
 export default abstract class System {

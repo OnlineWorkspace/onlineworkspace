@@ -5,6 +5,7 @@ import { initTRPC } from "@trpc/server";
 import z from "zod";
 import path from "path";
 import fs from "fs/promises";
+import { WorkspacesEvent } from "@tcsw/workspaces-instance/src/systems/events";
 
 const log = instance.log.createLogger("uk.tcsw.dashboard");
 
@@ -120,4 +121,8 @@ instance.sys.tRPC.registeredRouters.push({
     basePath: "/app/uk.tcsw.dashboard",
     router: router,
     createContext: createTRPCContext(instance),
+});
+
+instance.sys.event.on(WorkspacesEvent.BeforeStartupComplete, () => {
+    instance.sys.settings;
 });
