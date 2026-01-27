@@ -85,9 +85,9 @@ class Instance {
             let subSystemState = await sys.startup();
 
             if (subSystemState) {
-                sys.log.success(`Startup Complete...`);
+                sys.log.success(`System Startup Complete!`);
             } else {
-                sys.log.error(`Startup Failed!`);
+                sys.log.error(`System Startup Failed!`);
             }
         }
 

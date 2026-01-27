@@ -6,6 +6,7 @@ import z from "zod";
 import path from "path";
 import fs from "fs/promises";
 import { WorkspacesEvent } from "@tcsw/workspaces-instance/src/systems/events";
+import BooleanApplicationSetting from "../../../instance/src/systems/settings/applicationSetting/booleanSetting";
 
 const log = instance.log.createLogger("uk.tcsw.dashboard");
 
@@ -124,5 +125,8 @@ instance.sys.tRPC.registeredRouters.push({
 });
 
 instance.sys.event.on(WorkspacesEvent.BeforeStartupComplete, () => {
-    instance.sys.settings;
+    instance.sys.settings.registerApplicationSetting(
+        "uk.tcsw.dashboard",
+        new BooleanApplicationSetting("show_greeting", false),
+    );
 });
