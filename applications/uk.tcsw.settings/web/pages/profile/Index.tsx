@@ -14,9 +14,11 @@ import UKTopAppBar from "@tcsw/uikit-solid/src/components/topAppBar/UKTopAppBar.
 import { useNavigate } from "@solidjs/router";
 import UKStackItem from "@tcsw/uikit-solid/src/components/stack/UKStackItem.tsx";
 import webInstanceTRPC from "@tcsw/workspaces-instance-web/src/lib/trpc.ts";
+import useIsMobile from "@tcsw/uikit-solid/src/core/useIsMobile.js";
 
 const ProfilePage: Component = () => {
     const navigate = useNavigate();
+    const isMobile = useIsMobile();
     const [name, { refetch: refetchName }] = createResource(() => trpc.profile.getName.query());
     const [role] = createResource(() => trpc.profile.getRole.query());
     const [avatar, { refetch: refetchAvatar }] = createResource(() => trpc.profile.getProfilePicture.query());
@@ -66,19 +68,23 @@ const ProfilePage: Component = () => {
                 <UKStack>
                     <Email />
                 </UKStack>
-                <UKText class={styles.subheading} role="title" size="m" align="start">
-                    Session
-                </UKText>
-                <UKStack>
-                    <UKStackItem
-                        labelText={"Logout"}
-                        leading={{ type: "icon", value: "logout" }}
-                        onClick={() => {
-                            webInstanceTRPC.authorization.logout.mutate();
-                            navigate("/");
-                        }}
-                    />
-                </UKStack>
+                {isMobile() ? (
+                    <>
+                        <UKText class={styles.subheading} role="title" size="m" align="start">
+                            Session
+                        </UKText>
+                        <UKStack>
+                            <UKStackItem
+                                labelText={"Logout"}
+                                leading={{ type: "icon", value: "logout" }}
+                                onClick={() => {
+                                    webInstanceTRPC.authorization.logout.mutate();
+                                    navigate("/");
+                                }}
+                            />
+                        </UKStack>
+                    </>
+                ) : null}
             </div>
         </>
     );
