@@ -13,11 +13,6 @@ export default class SettingsSystem extends System {
         return this;
     }
 
-    getInstance(): Record<string, any> {
-        console.error("TODO: implement me!");
-        return {};
-    }
-
     async getUserSettings(userId: number): Promise<Record<string, any>> {
         const db = this.instance.sys.database.postgres();
         const settings = (await db`SELECT settings FROM tricolor_workspaces.public.users WHERE id = ${userId}`)?.[0]
@@ -34,6 +29,33 @@ export default class SettingsSystem extends System {
         return true;
     }
 
+    async getGlobalSetting(settingId: string): Promise<string | undefined> {
+        const db = this.instance.sys.database.postgres();
+        const setting = (
+            await db`SELECT value FROM tricolor_workspaces.public.global_settings WHERE key = ${settingId}`
+        )?.[0]?.value;
+
+        return setting;
+    }
+
+    async setGlobalSetting(settingId: string, value: string): Promise<boolean> {
+        const db = this.instance.sys.database.postgres();
+
+        await db`INSERT INTO tricolor_workspaces.public.global_settings (key, value) VALUES (${settingId}, ${value}) ON CONFLICT (key) DO UPDATE SET value = ${value};`;
+
+        return true;
+    }
+
+    async getGlobalSettings(): Promise<Record<string, string>> {
+        const db = this.instance.sys.database.postgres();
+        const settings = (await db`SELECT * FROM tricolor_workspaces.public.global_settings`)?.[0]?.settings as Record<
+            string,
+            string
+        >;
+
+        return settings;
+    }
+
     registerApplicationSetting<Setting extends ApplicationSetting<any, boolean>>(
         applicationId: string,
         setting: Setting,
@@ -46,5 +68,18 @@ export default class SettingsSystem extends System {
         this.applicationSettings[applicationId].push(setting);
 
         return this;
+    }
+
+    async startup(): Promise<boolean> {
+        super.startup();
+
+        const db = this.instance.sys.database.postgres();
+
+        await db`CREATE TABLE IF NOT EXISTS global_settings (
+            key TEXT,
+            value TEXT
+        )`;
+
+        return true;
     }
 }
