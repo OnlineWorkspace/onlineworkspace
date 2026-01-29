@@ -30,6 +30,12 @@ export class BooleanApplicationSetting extends ApplicationSetting<boolean> {
 
         return settingValue === "true";
     }
+
+    setDisplayName(displayName: string): this {
+        this.displayName = displayName;
+
+        return this;
+    }
 }
 
 export class GlobalBooleanApplicationSetting extends ApplicationSetting<boolean> {
@@ -56,5 +62,11 @@ export class GlobalBooleanApplicationSetting extends ApplicationSetting<boolean>
         if (settingValue === undefined) return this.defaultValue;
 
         return settingValue === "true";
+    }
+
+    setDisplayName(displayName: string): this {
+        this.displayName = displayName;
+
+        return this;
     }
 }

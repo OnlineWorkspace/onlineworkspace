@@ -126,6 +126,6 @@ instance.sys.tRPC.registeredRouters.push({
 
 instance.sys.event.on(WorkspacesEvent.BeforeStartupComplete, () => {
     instance.sys.settings.registerApplicationSetting(
-        new BooleanApplicationSetting("uk.tcsw.dashboard", "show_greeting", true),
+        new BooleanApplicationSetting("uk.tcsw.dashboard", "show_greeting", true).setDisplayName("Show Greeting"),
     );
 });

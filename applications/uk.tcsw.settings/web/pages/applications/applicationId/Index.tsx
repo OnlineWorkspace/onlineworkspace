@@ -6,6 +6,7 @@ import { useNavigate, useParams } from "@solidjs/router";
 import trpc from "../../../lib/trpc.ts";
 import UKStackItem from "@tcsw/uikit-solid/src/components/stack/UKStackItem.tsx";
 import UKStack from "@tcsw/uikit-solid/src/components/stack/UKStack.tsx";
+import BooleanSetting from "./components/BooleanSetting/BooleanSetting";
 
 const ApplicationPage: Component = () => {
     const navigate = useNavigate();
@@ -32,7 +33,19 @@ const ApplicationPage: Component = () => {
                 <UKStack>
                     <For each={data()?.settings}>
                         {(setting) => {
-                            return <UKStackItem labelText={setting.displayName} supportingText={setting.id} />;
+                            switch (setting.type) {
+                                case "boolean":
+                                    return (
+                                        <BooleanSetting
+                                            id={setting.id}
+                                            currentValue={false}
+                                            defaultValue={setting.defaultValue === "true"}
+                                            displayName={setting.displayName}
+                                        />
+                                    );
+                                default:
+                                    return <UKStackItem labelText={setting.displayName} supportingText={setting.id} />;
+                            }
                         }}
                     </For>
                 </UKStack>
