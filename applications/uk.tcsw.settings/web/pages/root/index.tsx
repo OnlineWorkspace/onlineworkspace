@@ -27,11 +27,7 @@ const RootPage: Component = () => {
                             navigate("/app/uk.tcsw.settings/profile");
                         }}
                     >
-                        <UKAvatar
-                            username="username"
-                            avatar={avatar() || "/assets/placeholder/avatar.png"}
-                            size="l"
-                        />
+                        <UKAvatar username="username" avatar={avatar() || "/assets/placeholder/avatar.png"} size="l" />
                         <div>
                             <UKText role="display" size="l" emphasized class={styles.fullName}>
                                 {fullName() || "Unknown"}
@@ -41,11 +37,7 @@ const RootPage: Component = () => {
                             </UKText>
                         </div>
                     </div>
-                    <UKDivider
-                        class={styles.divider}
-                        direction={DividerDirection.horizontal}
-                        width="middle-inset"
-                    />
+                    <UKDivider class={styles.divider} direction={DividerDirection.horizontal} width="middle-inset" />
                     <UKStack>
                         <Shortcut
                             title="Profile"
@@ -70,6 +62,12 @@ const RootPage: Component = () => {
                             description="Choose a wallpaper and color theme"
                             icon="wallpaper"
                             path="/app/uk.tcsw.settings/customization"
+                        />
+                        <Shortcut
+                            title="Applications"
+                            description="Manage application settings"
+                            icon="apps"
+                            path="/app/uk.tcsw.settings/applications"
                         />
                         {role() === "Administrator" && (
                             <Shortcut

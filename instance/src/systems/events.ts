@@ -31,8 +31,8 @@ export default class EventSystem extends System {
             return this;
         }
 
-        for (const evnt of events) {
-            evnt();
+        for (const event of events) {
+            event();
         }
 
         return this;

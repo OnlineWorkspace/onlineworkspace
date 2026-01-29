@@ -1,4 +1,11 @@
-import { createTRPCClient, httpLink, httpSubscriptionLink, isNonJsonSerializable, splitLink } from "@trpc/client";
+import {
+    createTRPCClient,
+    httpBatchLink,
+    httpLink,
+    httpSubscriptionLink,
+    isNonJsonSerializable,
+    splitLink,
+} from "@trpc/client";
 import type { TRPCRouter } from "../../backend/index";
 
 const ENDPOINT_URL = "http://localhost:3563/app/uk.tcsw.files";
@@ -21,7 +28,7 @@ const trpc = createTRPCClient<TRPCRouter>({
                         withCredentials: true,
                     },
                 }),
-                false: httpLink({
+                false: httpBatchLink({
                     url: ENDPOINT_URL,
                     fetch(input, init) {
                         return fetch(input, { credentials: "include", ...init });

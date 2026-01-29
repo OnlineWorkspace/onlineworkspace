@@ -160,6 +160,7 @@
     outline-color: transparent;
 
     &:focus-visible {
+        z-index: 11;
         outline-width: var(--uk-sys-state-focus-indicator-thickness);
         outline-offset: var(--uk-sys-state-focus-indicator-outer-offset);
         outline-color: rgb(var(--uk-sys-color-secondary));

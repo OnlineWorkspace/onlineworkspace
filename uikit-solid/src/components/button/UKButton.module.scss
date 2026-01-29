@@ -17,6 +17,10 @@
         border-radius var(--border-radius-duration, var(--uk-sys-motion-duration-50))
             var(--uk-sys-motion-easing-linear);
 
+    &:focus {
+        z-index: 11;
+    }
+
     &:focus,
     &:hover {
         --border-radius-duration: var(--uk-sys-motion-duration-200);

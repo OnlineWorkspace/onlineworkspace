@@ -721,6 +721,53 @@ const router = t.router({
                 return output;
             }),
     },
+    application: {
+        getApplications: procedure
+            .output(z.object({ displayName: z.string(), id: z.string() }).array())
+            .query(async (opt) => {
+                return instance.sys.applications.enabledApplications.map((a) => {
+                    return {
+                        displayName:
+                            instance.sys.applications.availableApplications.find((aa) => aa.manifest?.id === a)
+                                ?.manifest?.displayName || `Failed to find application '${a}'`,
+                        id: a,
+                    };
+                });
+            }),
+        getApplication: procedure
+            .input(z.object({ id: z.string() }))
+            .output(
+                z.object({
+                    displayName: z.string(),
+                    settings: z
+                        .object({
+                            displayName: z.string(),
+                            defaultValue: z.string(),
+                            type: z.string(),
+                            id: z.string(),
+                        })
+                        .array(),
+                }),
+            )
+            .query(async (opt) => {
+                const application = instance.sys.applications.availableApplications.find(
+                    (aa) => aa.manifest?.id === opt.input.id,
+                );
+
+                return {
+                    displayName: application?.manifest?.displayName || opt.input.id,
+                    settings:
+                        instance.sys.settings.applicationSettings[opt.input.id]?.map((a) => {
+                            return {
+                                displayName: a.displayName,
+                                defaultValue: a.defaultValue.toString() as string,
+                                type: a.type,
+                                id: a.id,
+                            };
+                        }) || [],
+                };
+            }),
+    },
 });
 
 export type TRPCRouter = typeof router;

@@ -336,6 +336,8 @@ const router = t.router({
         const uuid = randomUUIDv7();
         const uploadFilePath = path.join((await opt.ctx.user()).getPath(), `system/temp/${uuid}`);
 
+        log.info(`Uploading file ${uuid}`);
+
         await fs.writeFile(uploadFilePath, await opt.input.bytes());
 
         return { id: uuid };
@@ -354,6 +356,8 @@ const router = t.router({
             if (!(await fs.exists(actualFilePathParentDir))) {
                 await fs.mkdir(actualFilePathParentDir, { recursive: true });
             }
+
+            log.info(`Applying metadata to file (${opt.input.id}) '${actualFilePath}'`);
 
             await fs.rename(uploadFilePath, actualFilePath);
             await fs.utimes(actualFilePath, 0, opt.input.lastModified);

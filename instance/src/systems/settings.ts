@@ -3,7 +3,7 @@ import System from "../system.js";
 import ApplicationSetting from "./settings/applicationSetting/applicationSetting.js";
 
 export default class SettingsSystem extends System {
-    applicationSettings: { [applicationId: string]: ApplicationSetting<any, boolean>[] };
+    applicationSettings: { [applicationId: string]: ApplicationSetting<any>[] };
 
     constructor(instance: Instance) {
         super("settings", instance);
@@ -31,11 +31,9 @@ export default class SettingsSystem extends System {
 
     async getGlobalSetting(settingId: string): Promise<string | undefined> {
         const db = this.instance.sys.database.postgres();
-        const setting = (
-            await db`SELECT value FROM tricolor_workspaces.public.global_settings WHERE key = ${settingId}`
-        )?.[0]?.value;
 
-        return setting;
+        return (await db`SELECT value FROM tricolor_workspaces.public.global_settings WHERE key = ${settingId}`)?.[0]
+            ?.value;
     }
 
     async setGlobalSetting(settingId: string, value: string): Promise<boolean> {
@@ -48,30 +46,26 @@ export default class SettingsSystem extends System {
 
     async getGlobalSettings(): Promise<Record<string, string>> {
         const db = this.instance.sys.database.postgres();
-        const settings = (await db`SELECT * FROM tricolor_workspaces.public.global_settings`)?.[0]?.settings as Record<
+
+        return (await db`SELECT * FROM tricolor_workspaces.public.global_settings`)?.[0]?.settings as Record<
             string,
             string
         >;
-
-        return settings;
     }
 
-    registerApplicationSetting<Setting extends ApplicationSetting<any, boolean>>(
-        applicationId: string,
-        setting: Setting,
-    ) {
-        if (!this.applicationSettings[applicationId]) {
-            this.applicationSettings[applicationId] = [];
+    registerApplicationSetting<Setting extends ApplicationSetting<any>>(setting: Setting) {
+        if (!this.applicationSettings[setting.applicationId]) {
+            this.applicationSettings[setting.applicationId] = [];
         }
 
-        this.log.info(`Setting '${setting.id}' was registered for application '${applicationId}'`);
-        this.applicationSettings[applicationId].push(setting);
+        this.log.info(`Setting '${setting.id}' was registered for application '${setting.applicationId}'`);
+        this.applicationSettings[setting.applicationId].push(setting);
 
         return this;
     }
 
     async startup(): Promise<boolean> {
-        super.startup();
+        await super.startup();
 
         const db = this.instance.sys.database.postgres();
 

@@ -56,6 +56,14 @@ const Layout: Component<ParentProps> = (props) => {
                     },
                     active: location.pathname.startsWith("/app/uk.tcsw.settings/customization"),
                 },
+                {
+                    icon: { type: "icon", value: "apps" },
+                    label: "Applications",
+                    onClick() {
+                        navigate("/app/uk.tcsw.settings/applications");
+                    },
+                    active: location.pathname.startsWith("/app/uk.tcsw.settings/applications"),
+                },
                 isAdministrator()
                     ? {
                           icon: { type: "icon", value: "settings_applications" },
