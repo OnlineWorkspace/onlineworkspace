@@ -745,6 +745,7 @@ const router = t.router({
                             defaultValue: z.string(),
                             type: z.string(),
                             id: z.string(),
+                            global: z.boolean(),
                         })
                         .array(),
                 }),
@@ -763,10 +764,16 @@ const router = t.router({
                                 defaultValue: a.defaultValue.toString() as string,
                                 type: a.type,
                                 id: a.id,
+                                global: a.global,
                             };
                         }) || [],
                 };
             }),
+        setSettingValue: procedure.input({ id: z.string(), value: z.string() }).mutation(async (opt) => {
+            instance.sys.settings.setUserSettings(opt.ctx.userId);
+
+            return true;
+        }),
     },
 });
 
