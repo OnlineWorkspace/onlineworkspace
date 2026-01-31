@@ -42,7 +42,13 @@ const ApplicationPage: Component = () => {
                             ({params.applicationId})
                         </UKText>
                         <UKButtonGroup size={"s"} align={"start"}>
-                            <UKButton onClick={() => {}} color={"tonal"}>
+                            <UKButton
+                                onClick={() => {
+                                    // Fixme: somehow we need to figure out what repo the app is hosted on? maybe the store is in need of a redesigned path for applications
+                                    navigate(`/app/uk.tcsw.store/app/local/${params.applicationId}`);
+                                }}
+                                color={"tonal"}
+                            >
                                 Open in Store
                             </UKButton>
                         </UKButtonGroup>
