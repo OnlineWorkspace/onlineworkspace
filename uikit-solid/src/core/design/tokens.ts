@@ -3387,6 +3387,27 @@ function applyTheme(theme: UKDesignTheme, element: HTMLDivElement, mode: "light"
             return `${v[0]}:${v[1]}`;
         })
         .join(";")}
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .${randomClassName} {
+        --uk-sys-motion-duration-1000: 0ms;
+        --uk-sys-motion-duration-900: 0ms;
+        --uk-sys-motion-duration-800: 0ms;
+        --uk-sys-motion-duration-700: 0ms;
+        --uk-sys-motion-duration-600: 0ms;
+        --uk-sys-motion-duration-550: 0ms;
+        --uk-sys-motion-duration-500: 0ms;
+        --uk-sys-motion-duration-450: 0ms;
+        --uk-sys-motion-duration-400: 0ms;
+        --uk-sys-motion-duration-350: 0ms;
+        --uk-sys-motion-duration-300: 0ms;
+        --uk-sys-motion-duration-250: 0ms;
+        --uk-sys-motion-duration-200: 0ms;
+        --uk-sys-motion-duration-150: 0ms;
+        --uk-sys-motion-duration-100: 0ms;
+        --uk-sys-motion-duration-50: 0ms;
+    }
 }`;
     element.classList.add(randomClassName);
 }
