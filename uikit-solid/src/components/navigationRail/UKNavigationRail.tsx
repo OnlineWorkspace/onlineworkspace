@@ -1,4 +1,4 @@
-import { type Component, Index, type JSX, type ParentProps, Show } from "solid-js";
+import { type Component, Index, type JSX, type ParentProps } from "solid-js";
 import styles from "./UKNavigationRail.module.scss";
 import UKNavigationRailItem from "./item/UKNavigationRailItem";
 import UKNavigationRailMenuButton from "./menuButton/UKNavigationRailMenuButton";
@@ -39,10 +39,8 @@ const UKNavigationRail: Component<
 
     return (
         <div class={styles.layout} data-navigation-rail-mobile-mode={isMobile()}>
-            <Show when={isMobile()}>
-                <div class={styles.pageRoot}>{props.children}</div>
-            </Show>
             <div
+                style={{ order: 0 }}
                 class={clsx(styles.root, props.class)}
                 data-type={props.type || "modal"}
                 data-expanded={props.expanded || false}
@@ -59,9 +57,9 @@ const UKNavigationRail: Component<
                 ) : null}
                 {props.anchorPoints?.bottom}
             </div>
-            <Show when={!isMobile()}>
-                <div class={styles.pageRoot}>{props.children}</div>
-            </Show>
+            <div class={styles.pageRoot} style={{ ...(isMobile() ? { order: -1 } : { order: 1 }) }}>
+                {props.children}
+            </div>
         </div>
     );
 };

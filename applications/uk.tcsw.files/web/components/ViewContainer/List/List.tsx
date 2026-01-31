@@ -108,8 +108,7 @@ const ListView: Component = () => {
                     }
                 >
                     <Match when={listResource()?.type === "success"}>
-                        {/* @ts-ignore */}
-                        <For each={listResource()?.items}>
+                        <For each={viewCtx!.viewItems()}>
                             {(i, index) => {
                                 return <ListItem {...i} index={index()} refetchGrid={refetchList} />;
                             }}

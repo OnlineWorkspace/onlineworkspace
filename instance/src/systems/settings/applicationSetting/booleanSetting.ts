@@ -1,6 +1,8 @@
 import ApplicationSetting from "./applicationSetting.js";
 
 export class BooleanApplicationSetting extends ApplicationSetting<boolean> {
+    global = false;
+
     constructor(applicationId: string, id: string, defaultValue: boolean) {
         super();
 
@@ -9,6 +11,7 @@ export class BooleanApplicationSetting extends ApplicationSetting<boolean> {
         this.defaultValue = defaultValue;
         this.displayName = id;
         this.type = "boolean";
+        this.description = "No description provided";
     }
 
     async setValue(value: boolean, userId: number) {
@@ -36,15 +39,25 @@ export class BooleanApplicationSetting extends ApplicationSetting<boolean> {
 
         return this;
     }
+
+    setDescription(description: string): this {
+        this.description = description;
+
+        return this;
+    }
 }
 
 export class GlobalBooleanApplicationSetting extends ApplicationSetting<boolean> {
+    global = true;
+
     constructor(applicationId: string, id: string, defaultValue: boolean) {
         super();
 
         this.applicationId = applicationId;
         this.id = id;
         this.defaultValue = defaultValue;
+        this.type = "boolean";
+        this.description = "No description provided";
     }
 
     async setValue(value: boolean) {
@@ -66,6 +79,12 @@ export class GlobalBooleanApplicationSetting extends ApplicationSetting<boolean>
 
     setDisplayName(displayName: string): this {
         this.displayName = displayName;
+
+        return this;
+    }
+
+    setDescription(description: string): this {
+        this.description = description;
 
         return this;
     }

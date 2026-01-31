@@ -7,6 +7,7 @@ import path from "path";
 import fs from "fs/promises";
 import { WorkspacesEvent } from "@tcsw/workspaces-instance/src/systems/events";
 import { BooleanApplicationSetting } from "../../../instance/src/systems/settings/applicationSetting/booleanSetting";
+import { StringApplicationSetting } from "../../../instance/src/systems/settings/applicationSetting/stringSetting";
 
 const log = instance.log.createLogger("uk.tcsw.dashboard");
 
@@ -39,8 +40,26 @@ const router = t.router({
                     }),
             },
         },
-        welcomeMessage: procedure.output(z.string()).query(async (opt) => {
-            return `Hiya, ${(await (await opt.ctx.instance.sys.users.getUserById(opt.ctx.userId))?.getForename()) || "Anonymous"}!`;
+        getWidgets: procedure.output(z.string().array()).query(async (opt) => {
+            const widgets = await opt.ctx.instance.sys.settings.getUserApplicationSetting(
+                opt.ctx.userId,
+                "uk.tcsw.dashboard",
+                "widgets",
+            );
+
+            return JSON.parse(widgets);
+        }),
+        welcomeMessage: procedure.output(z.string().or(z.undefined())).query(async (opt) => {
+            if (
+                (await opt.ctx.instance.sys.settings.getUserApplicationSetting(
+                    opt.ctx.userId,
+                    "uk.tcsw.dashboard",
+                    "show_greeting",
+                )) === "true"
+            )
+                return `Hiya, ${(await (await opt.ctx.instance.sys.users.getUserById(opt.ctx.userId))?.getForename()) || "Anonymous"}!`;
+
+            return undefined;
         }),
         getWallpaperOptions: procedure
             .output(
@@ -127,5 +146,10 @@ instance.sys.tRPC.registeredRouters.push({
 instance.sys.event.on(WorkspacesEvent.BeforeStartupComplete, () => {
     instance.sys.settings.registerApplicationSetting(
         new BooleanApplicationSetting("uk.tcsw.dashboard", "show_greeting", true).setDisplayName("Show Greeting"),
+    );
+    instance.sys.settings.registerApplicationSetting(
+        new StringApplicationSetting("uk.tcsw.dashboard", "widgets", `["user.profile"]`).setDisplayName(
+            "Enabled Widgets",
+        ),
     );
 });

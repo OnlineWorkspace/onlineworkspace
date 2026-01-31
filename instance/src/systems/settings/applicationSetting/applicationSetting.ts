@@ -7,4 +7,6 @@ export default abstract class ApplicationSetting<T> {
     defaultValue!: T;
     type!: string;
     instance!: Instance;
+    description!: string;
+    abstract global: boolean;
 }

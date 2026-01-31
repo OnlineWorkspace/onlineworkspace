@@ -25,6 +25,7 @@ const UKTextField: Component<{
     as?: "textarea" | "input";
     error?: boolean;
     class?: string;
+    containerClass?: string;
     autocomplete?: string;
 }> = (props) => {
     const [characterLength, setCharacterLength] = createSignal<number>(0);
@@ -81,7 +82,7 @@ const UKTextField: Component<{
     }, [props.setValue]);
 
     return (
-        <div class={styles.container}>
+        <div class={clsx(styles.container, props.containerClass)}>
             <div
                 class={styles.root}
                 data-error={props.error}

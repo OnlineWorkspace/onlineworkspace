@@ -4,6 +4,10 @@
     align-items: center;
     gap: 1rem;
     padding-top: 2rem;
+    max-width: 64rem;
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .subheading {
@@ -11,4 +15,36 @@
     max-width: 64rem;
     padding-left: 1.5rem;
     padding-right: 1.5rem;
+
+    &:first-of-type {
+        margin-bottom: -1rem;
+    }
 }
+
+.pageHeader {
+    width: 100%;
+    max-width: 64rem;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+    gap: 1rem;
+    display: flex;
+    flex-direction: row;
+
+    .image {
+        aspect-ratio: 1 / 1;
+        height: 8rem;
+        margin-top: auto;
+        margin-bottom: auto;
+    }
+
+    .headerContent {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+
+        .id {
+          margin-top: -0.5rem;
+        }
+    }
+}
+

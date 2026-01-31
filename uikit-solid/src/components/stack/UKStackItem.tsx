@@ -3,6 +3,20 @@ import styles from "./UKStackItem.module.scss";
 import UKIcon from "../icon/UKIcon";
 import UKText from "../text/UKText";
 import clsx from "clsx";
+import UKIconButton from "../iconButton/UKIconButton.tsx";
+
+interface LeadingIconOrImage {
+    type: "image" | "icon";
+    value: string;
+    alt: string;
+}
+
+interface LeadingIconButton {
+    type: "iconButton";
+    value: string;
+    alt: string;
+    onClick: () => void;
+}
 
 const UKStackItem: Component<{
     onClick?: () => void;
@@ -10,11 +24,7 @@ const UKStackItem: Component<{
     onCollapse?: () => void;
     inlineComponent?: JSXElement;
     expandedComponent?: JSXElement;
-    leading?: {
-        type: "image" | "icon";
-        value: string;
-        alt?: string;
-    };
+    leading?: LeadingIconOrImage | LeadingIconButton;
     labelText?: string;
     supportingText?: string;
 }> = (props) => {
@@ -57,7 +67,16 @@ const UKStackItem: Component<{
                                 : props.onClick
                         }
                     >
-                        {props.leading?.type === "icon" && <UKIcon class={styles.leadingIcon}>{props.leading.value}</UKIcon>}
+                        {props.leading?.type === "iconButton" && (
+                            <UKIconButton
+                                alt={props.leading.alt}
+                                onClick={props.leading.onClick}
+                                icon={props.leading.value}
+                            />
+                        )}
+                        {props.leading?.type === "icon" && (
+                            <UKIcon class={styles.leadingIcon}>{props.leading.value}</UKIcon>
+                        )}
                         {props.leading?.type === "image" && (
                             <img class={styles.leadingImage} src={props.leading.value} alt={props.leading.alt || ""} />
                         )}
@@ -92,21 +111,26 @@ const UKStackItem: Component<{
                             </div>
                         )}
                         <Suspense>
-                            {props.inlineComponent ? (
-                                props.inlineComponent
-                            ) : !!props.expandedComponent && (
-                                <UKIcon
-                                    class={clsx(expanded() ? styles.indicatorExpanded : styles.indicatorCollapsed, styles.toggleIndicator)}
-                                >
-                                    chevron_right
-                                </UKIcon>
-                            )}
+                            {props.inlineComponent
+                                ? props.inlineComponent
+                                : !!props.expandedComponent && (
+                                      <UKIcon
+                                          class={clsx(
+                                              expanded() ? styles.indicatorExpanded : styles.indicatorCollapsed,
+                                              styles.toggleIndicator,
+                                          )}
+                                      >
+                                          chevron_right
+                                      </UKIcon>
+                                  )}
                         </Suspense>
                     </button>
                 </Match>
                 <Match when={!props.onClick}>
                     <div class={styles.collapsedArea} data-clickable={false}>
-                        {props.leading?.type === "icon" && <UKIcon class={styles.leadingIcon}>{props.leading.value}</UKIcon>}
+                        {props.leading?.type === "icon" && (
+                            <UKIcon class={styles.leadingIcon}>{props.leading.value}</UKIcon>
+                        )}
                         {props.leading?.type === "image" && (
                             <img class={styles.leadingImage} src={props.leading.value} alt={props.leading.alt || ""} />
                         )}

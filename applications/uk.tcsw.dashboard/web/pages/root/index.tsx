@@ -1,4 +1,4 @@
-import { createResource, Suspense, type Component } from "solid-js";
+import { createResource, For, Suspense, type Component } from "solid-js";
 import Widgets from "../../widgets/widgets";
 import styles from "./index.module.scss";
 import UKText from "@tcsw/uikit-solid/src/components/text/UKText.jsx";
@@ -11,6 +11,7 @@ const RootPage: Component = () => {
     const [wallpaper] = createResource(() =>
         trpc.dashboard.getWallpaper.query({ width: screen.width, height: screen.height }),
     );
+    const [widgets] = createResource(() => trpc.dashboard.getWidgets.query());
     const [wallpaperOptions] = createResource(() => trpc.dashboard.getWallpaperOptions.query());
     const [welcomeMessage] = createResource(() => trpc.dashboard.welcomeMessage.query());
 
@@ -31,14 +32,27 @@ const RootPage: Component = () => {
                     )}
                 />
             </Suspense>
-            <UKText emphasized role="display" size="l" align="center" class={styles.welcomeMessage}>
-                {welcomeMessage() || ""}
-            </UKText>
-            <div class={styles.widgets}>
-                <Widgets.user.profile />
-                <UKText role={"body"} size="l" align={"center"} emphasized>
-                    Place Widgets Here!
+            {welcomeMessage() && (
+                <UKText emphasized role="display" size="l" align="center" class={styles.welcomeMessage}>
+                    {welcomeMessage()}
                 </UKText>
+            )}
+            <div class={styles.widgets}>
+                <For each={widgets()}>
+                    {(widgetId) => {
+                        // @ts-ignore
+                        const Widget = Widgets[widgetId];
+
+                        if (!Widget)
+                            return (
+                                <UKText role={"body"} size="l" align={"center"} emphasized>
+                                    Invalid WidgetId
+                                </UKText>
+                            );
+
+                        return <Widget />;
+                    }}
+                </For>
             </div>
         </div>
     );

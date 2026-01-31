@@ -108,8 +108,7 @@ const GridView: Component = () => {
                     }
                 >
                     <Match when={gridResource()?.type === "success"}>
-                        {/* @ts-ignore */}
-                        <For each={gridResource()?.items}>
+                        <For each={viewCtx!.viewItems()}>
                             {(i, index) => {
                                 return <GridItem {...i} index={index()} refetchGrid={refetchGrid} />;
                             }}

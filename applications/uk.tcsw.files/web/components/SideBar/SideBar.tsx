@@ -38,6 +38,15 @@ const SideBar: Component = () => {
                                 path: path.join(`/${decodeURI(params.currentPath || "")}`, file.name),
                                 lastModified: file.file.lastModified,
                             });
+
+                            viewCtx!.setViewItems([
+                                ...viewCtx!.viewItems(),
+                                {
+                                    name: file.name,
+                                    path: path.join(`/${decodeURI(params.currentPath || "")}`, file.name),
+                                    type: "ghost",
+                                },
+                            ]);
                         }
 
                         viewCtx!.setReload();

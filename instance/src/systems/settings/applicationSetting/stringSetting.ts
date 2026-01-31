@@ -1,6 +1,8 @@
 import ApplicationSetting from "./applicationSetting.js";
 
 export class StringApplicationSetting extends ApplicationSetting<string> {
+    global = false;
+
     constructor(applicationId: string, id: string, defaultValue: string) {
         super();
 
@@ -9,6 +11,7 @@ export class StringApplicationSetting extends ApplicationSetting<string> {
         this.defaultValue = defaultValue;
         this.displayName = id;
         this.type = "string";
+        this.description = "No description provided";
     }
 
     async setValue(value: string, userId: number) {
@@ -24,17 +27,37 @@ export class StringApplicationSetting extends ApplicationSetting<string> {
     async getValue(userId: number): Promise<string> {
         let userSettings = await this.instance.sys.settings.getUserSettings(userId);
 
-        return userSettings[`${this.applicationId}:${this.id}`] || this.defaultValue;
+        const settingValue = userSettings[`${this.applicationId}:${this.id}`];
+
+        if (settingValue === undefined) return this.defaultValue;
+
+        return settingValue;
+    }
+
+    setDisplayName(displayName: string): this {
+        this.displayName = displayName;
+
+        return this;
+    }
+
+    setDescription(description: string): this {
+        this.description = description;
+
+        return this;
     }
 }
 
 export class GlobalStringApplicationSetting extends ApplicationSetting<string> {
+    global = true;
+
     constructor(applicationId: string, id: string, defaultValue: string) {
         super();
 
         this.applicationId = applicationId;
         this.id = id;
         this.defaultValue = defaultValue;
+        this.type = "string";
+        this.description = "No description provided";
     }
 
     async setValue(value: string) {
@@ -44,8 +67,22 @@ export class GlobalStringApplicationSetting extends ApplicationSetting<string> {
     }
 
     async getValue(): Promise<string> {
-        return (
-            (await this.instance.sys.settings.getGlobalSetting(`${this.applicationId}:${this.id}`)) || this.defaultValue
-        );
+        const settingValue = await this.instance.sys.settings.getGlobalSetting(`${this.applicationId}:${this.id}`);
+
+        if (settingValue === undefined) return this.defaultValue;
+
+        return settingValue;
+    }
+
+    setDisplayName(displayName: string): this {
+        this.displayName = displayName;
+
+        return this;
+    }
+
+    setDescription(description: string): this {
+        this.description = description;
+
+        return this;
     }
 }

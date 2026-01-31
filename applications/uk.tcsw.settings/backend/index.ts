@@ -743,6 +743,7 @@ const router = t.router({
                         .object({
                             displayName: z.string(),
                             defaultValue: z.string(),
+                            currentValue: z.string().or(z.undefined()),
                             type: z.string(),
                             id: z.string(),
                             global: z.boolean(),
@@ -755,25 +756,41 @@ const router = t.router({
                     (aa) => aa.manifest?.id === opt.input.id,
                 );
 
+                const userApplicationSettings = await instance.sys.settings.getUserSettings(opt.ctx.userId);
+
                 return {
                     displayName: application?.manifest?.displayName || opt.input.id,
                     settings:
-                        instance.sys.settings.applicationSettings[opt.input.id]?.map((a) => {
-                            return {
-                                displayName: a.displayName,
-                                defaultValue: a.defaultValue.toString() as string,
-                                type: a.type,
-                                id: a.id,
-                                global: a.global,
-                            };
-                        }) || [],
+                        instance.sys.settings.applicationSettings[opt.input.id]
+                            ?.map((a) => {
+                                if (!a.global) {
+                                    return {
+                                        displayName: a.displayName,
+                                        defaultValue: a.defaultValue.toString() as string,
+                                        currentValue: userApplicationSettings[`${a.applicationId}:${a.id}`],
+                                        type: a.type,
+                                        id: a.id,
+                                        global: false,
+                                    };
+                                }
+
+                                console.log("HANDLE GLOBAL SETTINGS!!!");
+                            })
+                            .filter((a) => a !== undefined) || [],
                 };
             }),
-        setSettingValue: procedure.input({ id: z.string(), value: z.string() }).mutation(async (opt) => {
-            instance.sys.settings.setUserSettings(opt.ctx.userId);
+        setApplicationSettingValue: procedure
+            .input(z.object({ applicationId: z.string(), id: z.string(), value: z.string() }))
+            .mutation(async (opt) => {
+                await instance.sys.settings.setUserApplicationSetting(
+                    opt.ctx.userId,
+                    opt.input.applicationId,
+                    opt.input.id,
+                    opt.input.value,
+                );
 
-            return true;
-        }),
+                return true;
+            }),
     },
 });
 

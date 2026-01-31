@@ -1,6 +1,8 @@
 import ApplicationSetting from "./applicationSetting.js";
 
 export class NumberApplicationSetting extends ApplicationSetting<number> {
+    global = false;
+
     constructor(applicationId: string, id: string, defaultValue: number) {
         super();
 
@@ -9,6 +11,7 @@ export class NumberApplicationSetting extends ApplicationSetting<number> {
         this.defaultValue = defaultValue;
         this.displayName = id;
         this.type = "number";
+        this.description = "No description provided";
     }
 
     async setValue(value: number, userId: number) {
@@ -29,15 +32,31 @@ export class NumberApplicationSetting extends ApplicationSetting<number> {
 
         return Number(settingValue);
     }
+
+    setDisplayName(displayName: string): this {
+        this.displayName = displayName;
+
+        return this;
+    }
+
+    setDescription(description: string): this {
+        this.description = description;
+
+        return this;
+    }
 }
 
 export class GlobalNumberApplicationSetting extends ApplicationSetting<number> {
+    global = true;
+
     constructor(applicationId: string, id: string, defaultValue: number) {
         super();
 
         this.applicationId = applicationId;
         this.id = id;
         this.defaultValue = defaultValue;
+        this.type = "number";
+        this.description = "No description provided";
     }
 
     async setValue(value: number) {
@@ -52,5 +71,17 @@ export class GlobalNumberApplicationSetting extends ApplicationSetting<number> {
         if (settingValue === undefined) return this.defaultValue;
 
         return Number(settingValue);
+    }
+
+    setDisplayName(displayName: string): this {
+        this.displayName = displayName;
+
+        return this;
+    }
+
+    setDescription(description: string): this {
+        this.description = description;
+
+        return this;
     }
 }

@@ -7,15 +7,14 @@ import trpc from "../../../lib/trpc.ts";
 import { ViewContext } from "../ViewContext.ts";
 import GridItemRename from "./GridItemRename";
 import ItemMenu from "../ItemMenu.tsx";
+import type { ViewItem } from "../viewItem.ts";
 
-const GridItem: Component<{
-    name: string;
-    path: string;
-    type: "file" | "directory";
-    icon: string;
-    index: number;
-    refetchGrid: () => void;
-}> = (props) => {
+const GridItem: Component<
+    ViewItem & {
+        index: number;
+        refetchGrid: () => void;
+    }
+> = (props) => {
     const viewCtx = useContext(ViewContext);
     const navigate = useNavigate();
 
@@ -29,6 +28,8 @@ const GridItem: Component<{
                     if (props.type === "directory") {
                         navigate(`/app/uk.tcsw.files/dir/${props.path}`);
                     } else {
+                        if (props.type === "ghost") return;
+
                         window.open(await trpc.getRawFile.query(props.path));
                     }
                 }}
@@ -41,6 +42,7 @@ const GridItem: Component<{
                 }}
                 onClick={(e) => {
                     e.stopPropagation();
+                    if (props.type === "ghost") return;
 
                     let selectedItems = viewCtx?.selectedItems() ?? [];
 
@@ -105,6 +107,8 @@ const GridItem: Component<{
                     ) : (
                         <UKIcon class={styles.icon}>article</UKIcon>
                     )
+                ) : props.type === "ghost" ? (
+                    <UKIcon class={styles.icon}>ghost</UKIcon>
                 ) : (
                     <UKIcon class={styles.icon}>folder</UKIcon>
                 )}

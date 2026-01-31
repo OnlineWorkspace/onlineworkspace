@@ -1,12 +1,13 @@
 import { createContext, type Accessor } from "solid-js";
+import type { ViewItem } from "./viewItem.ts";
 
 export const ViewContext = createContext<{
     selectedItems: Accessor<string[]>;
     setSelectedItems(items: string[]): void;
     lastSelectionIndex: Accessor<number | undefined>;
     setLastSelectionIndex(index: number | undefined): void;
-    viewItems: Accessor<{ name: string; path: string; type: "directory" | "file" | "alias" }[]>;
-    setViewItems(items: { name: string; path: string; type: "directory" | "file" | "alias" }[]): void;
+    viewItems: Accessor<ViewItem[]>;
+    setViewItems(items: ViewItem[]): void;
     renameEntry: Accessor<string | undefined>;
     setRenameEntry(path: string | undefined): void;
     viewType: Accessor<"grid" | "list">;

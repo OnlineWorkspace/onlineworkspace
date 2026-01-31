@@ -6,15 +6,14 @@ import UKIcon from "@tcsw/uikit-solid/src/components/icon/UKIcon.tsx";
 import trpc from "../../../lib/trpc.ts";
 import { ViewContext } from "../ViewContext.ts";
 import ItemMenu from "../ItemMenu.tsx";
+import type { ViewItem } from "../viewItem.ts";
 
-const ListItem: Component<{
-    name: string;
-    path: string;
-    type: "file" | "directory";
-    icon: string;
-    index: number;
-    refetchGrid: () => void;
-}> = (props) => {
+const ListItem: Component<
+    ViewItem & {
+        index: number;
+        refetchGrid: () => void;
+    }
+> = (props) => {
     const viewCtx = useContext(ViewContext);
     const navigate = useNavigate();
 
@@ -29,6 +28,8 @@ const ListItem: Component<{
                     if (props.type === "directory") {
                         navigate(`/app/uk.tcsw.files/dir/${props.path}`);
                     } else {
+                        if (props.type === "ghost") return;
+
                         window.open(await trpc.getRawFile.query(props.path));
                     }
                 }}
@@ -41,6 +42,7 @@ const ListItem: Component<{
                 }}
                 onClick={(e) => {
                     e.stopPropagation();
+                    if (props.type === "ghost") return;
 
                     let selectedItems = viewCtx?.selectedItems() ?? [];
 
@@ -105,6 +107,8 @@ const ListItem: Component<{
                     ) : (
                         <UKIcon class={styles.icon}>article</UKIcon>
                     )
+                ) : props.type === "ghost" ? (
+                    <UKIcon class={styles.icon}>ghost</UKIcon>
                 ) : (
                     <UKIcon class={styles.icon}>folder</UKIcon>
                 )}

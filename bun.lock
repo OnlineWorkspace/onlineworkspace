@@ -5,7 +5,7 @@
     "": {
       "name": "@tcsw/workspaces",
       "dependencies": {
-        "@typescript/native-preview": "^7.0.0-dev.20260124.1",
+        "@typescript/native-preview": "^7.0.0-dev.20260129.1",
         "prettier": "^3.8.1",
       },
     },

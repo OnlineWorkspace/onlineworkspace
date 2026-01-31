@@ -15,10 +15,33 @@ export default class SettingsSystem extends System {
 
     async getUserSettings(userId: number): Promise<Record<string, any>> {
         const db = this.instance.sys.database.postgres();
-        const settings = (await db`SELECT settings FROM tricolor_workspaces.public.users WHERE id = ${userId}`)?.[0]
-            ?.settings as Record<string, any>;
 
-        return settings;
+        return (await db`SELECT settings FROM tricolor_workspaces.public.users WHERE id = ${userId}`)?.[0]
+            ?.settings as Record<string, any>;
+    }
+
+    async getUserApplicationSetting(userId: number, applicationId: string, settingId: string): Promise<string> {
+        const settings = await this.getUserSettings(userId);
+
+        return (
+            settings[`${applicationId}:${settingId}`] ??
+            this.applicationSettings[applicationId].find((s) => s.id === settingId)?.defaultValue
+        );
+    }
+
+    async setUserApplicationSetting(
+        userId: number,
+        applicationId: string,
+        settingId: string,
+        value: string,
+    ): Promise<boolean> {
+        const settings = await this.getUserSettings(userId);
+
+        settings[`${applicationId}:${settingId}`] = value;
+
+        await this.setUserSettings(userId, settings);
+
+        return true;
     }
 
     async setUserSettings(userId: number, settings: Record<string, any>): Promise<boolean> {
