@@ -33,9 +33,7 @@ const router = t.router({
         getPromotedApplication: procedure
             .input(z.object({ applicationId: z.string(), repository: z.string() }))
             .query(async (opt) => {
-                let repository = applicationRepositories.find(
-                    (repo) => repo.id === opt.input.repository,
-                );
+                let repository = applicationRepositories.find((repo) => repo.id === opt.input.repository);
 
                 if (!repository) return undefined;
 
@@ -57,6 +55,7 @@ const router = t.router({
                     applications: z
                         .object({
                             id: z.string(),
+                            repository: z.string(),
                             displayName: z.string(),
                             version: z.string(),
                             icon: z.object({
@@ -98,13 +97,13 @@ const router = t.router({
                                 version: app.manifest.version || "rolling",
                                 icon: icon,
                                 description: app.manifest.description || "Description not supplied",
+                                // Todo: use the actual repo not just local
+                                repository: "local",
                             };
                         })
                         .filter((a) => a !== undefined),
                     enabledApplications: instance.sys.applications.enabledApplications,
-                    cannotDisable: instance.sys.configuration.hasFeature(
-                        WorkspacesFeatureFlags.ShootYourselfInTheFoot,
-                    )
+                    cannotDisable: instance.sys.configuration.hasFeature(WorkspacesFeatureFlags.ShootYourselfInTheFoot)
                         ? []
                         : DEFAULT_APPLICATIONS,
                 };
@@ -130,17 +129,15 @@ const router = t.router({
                     success: true,
                 };
             }),
-        uninstallApplications: procedure
-            .input(z.object({ applications: z.string().array() }))
-            .mutation(async (opt) => {
-                for (const app of opt.input.applications) {
-                    await opt.ctx.instance.sys.applications.uninstallApplication(app);
-                }
+        uninstallApplications: procedure.input(z.object({ applications: z.string().array() })).mutation(async (opt) => {
+            for (const app of opt.input.applications) {
+                await opt.ctx.instance.sys.applications.uninstallApplication(app);
+            }
 
-                return {
-                    success: true,
-                };
-            }),
+            return {
+                success: true,
+            };
+        }),
     },
     categories: {},
     search: {
@@ -164,9 +161,7 @@ const router = t.router({
         getResult: procedure
             .input(z.object({ applicationId: z.string(), repository: z.string() }))
             .query(async (opt) => {
-                let repository = applicationRepositories.find(
-                    (repo) => repo.id === opt.input.repository,
-                );
+                let repository = applicationRepositories.find((repo) => repo.id === opt.input.repository);
 
                 if (!repository) return undefined;
 
@@ -182,46 +177,36 @@ const router = t.router({
             }),
     },
     app: {
-        get: procedure
-            .input(z.object({ applicationId: z.string(), repository: z.string() }))
-            .query(async (opt) => {
-                let repository = applicationRepositories.find(
-                    (repo) => repo.id === opt.input.repository,
-                );
+        get: procedure.input(z.object({ applicationId: z.string(), repository: z.string() })).query(async (opt) => {
+            let repository = applicationRepositories.find((repo) => repo.id === opt.input.repository);
 
-                if (!repository) return undefined;
+            if (!repository) return undefined;
 
-                let app = await repository.getApplicationById(opt.input.applicationId);
+            let app = await repository.getApplicationById(opt.input.applicationId);
 
-                if (!app) return undefined;
+            if (!app) return undefined;
 
-                if (app.icon.type === "image") {
-                    app.icon.value = `${opt.ctx.rawRequest.destinationHostname}${await instance.sys.image.serveImage(opt.ctx.userId, app.icon.value)}`;
-                }
+            if (app.icon.type === "image") {
+                app.icon.value = `${opt.ctx.rawRequest.destinationHostname}${await instance.sys.image.serveImage(opt.ctx.userId, app.icon.value)}`;
+            }
 
-                if (app.bannerImage) {
-                    app.bannerImage = `${opt.ctx.rawRequest.destinationHostname}${await instance.sys.image.serveImage(opt.ctx.userId, app.bannerImage)}`;
-                }
+            if (app.bannerImage) {
+                app.bannerImage = `${opt.ctx.rawRequest.destinationHostname}${await instance.sys.image.serveImage(opt.ctx.userId, app.bannerImage)}`;
+            }
 
-                return {
-                    ...app,
-                    isUserAdministrator: await (await opt.ctx.user())?.isAdministrator(),
-                    canBeUninstalled: DEFAULT_APPLICATIONS.includes(app.id)
-                        ? instance.sys.configuration.hasFeature(
-                              WorkspacesFeatureFlags.ShootYourselfInTheFoot,
-                          )
-                        : true,
-                    isInstalled: opt.ctx.instance.sys.applications.enabledApplications.includes(
-                        app.id,
-                    ),
-                };
-            }),
+            return {
+                ...app,
+                isUserAdministrator: await (await opt.ctx.user())?.isAdministrator(),
+                canBeUninstalled: DEFAULT_APPLICATIONS.includes(app.id)
+                    ? instance.sys.configuration.hasFeature(WorkspacesFeatureFlags.ShootYourselfInTheFoot)
+                    : true,
+                isInstalled: opt.ctx.instance.sys.applications.enabledApplications.includes(app.id),
+            };
+        }),
         install: procedure
             .input(z.object({ applicationId: z.string(), repository: z.string() }))
             .mutation(async (opt) => {
-                let repository = applicationRepositories.find(
-                    (repo) => repo.id === opt.input.repository,
-                );
+                let repository = applicationRepositories.find((repo) => repo.id === opt.input.repository);
 
                 if (!repository) return undefined;
 
@@ -232,36 +217,26 @@ const router = t.router({
                 // the user must be administrator
                 if (!(await (await opt.ctx.user())?.isAdministrator())) return false;
 
-                await opt.ctx.instance.sys.applications.installApplication(
-                    await repository.getInstallPath(app.id),
-                );
+                await opt.ctx.instance.sys.applications.installApplication(await repository.getInstallPath(app.id));
                 await opt.ctx.instance.sys.applications.enableApplication(app.id);
 
                 return true;
             }),
-        uninstall: procedure
-            .input(z.object({ applicationId: z.string() }))
-            .mutation(async (opt) => {
-                // the user must be administrator
-                if (!(await (await opt.ctx.user())?.isAdministrator())) return false;
-                // the application must not be protected if without ShootYourselfInTheFoot
-                if (DEFAULT_APPLICATIONS.includes(opt.input.applicationId)) {
-                    if (
-                        !instance.sys.configuration.hasFeature(
-                            WorkspacesFeatureFlags.ShootYourselfInTheFoot,
-                        )
-                    ) {
-                        return false;
-                    }
+        uninstall: procedure.input(z.object({ applicationId: z.string() })).mutation(async (opt) => {
+            // the user must be administrator
+            if (!(await (await opt.ctx.user())?.isAdministrator())) return false;
+            // the application must not be protected if without ShootYourselfInTheFoot
+            if (DEFAULT_APPLICATIONS.includes(opt.input.applicationId)) {
+                if (!instance.sys.configuration.hasFeature(WorkspacesFeatureFlags.ShootYourselfInTheFoot)) {
+                    return false;
                 }
+            }
 
-                await opt.ctx.instance.sys.applications.disableApplication(opt.input.applicationId);
-                await opt.ctx.instance.sys.applications.uninstallApplication(
-                    opt.input.applicationId,
-                );
+            await opt.ctx.instance.sys.applications.disableApplication(opt.input.applicationId);
+            await opt.ctx.instance.sys.applications.uninstallApplication(opt.input.applicationId);
 
-                return true;
-            }),
+            return true;
+        }),
     },
 });
 

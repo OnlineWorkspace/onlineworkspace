@@ -1,12 +1,5 @@
 import UKText from "@tcsw/uikit-solid/src/components/text/UKText.jsx";
-import {
-    createEffect,
-    createResource,
-    createSignal,
-    For,
-    Suspense,
-    type Component,
-} from "solid-js";
+import { createEffect, createResource, createSignal, For, Suspense, type Component } from "solid-js";
 import styles from "./Index.module.scss";
 import UKIconButton from "@tcsw/uikit-solid/src/components/iconButton/UKIconButton.jsx";
 import trpc from "../../lib/trpc";
@@ -16,8 +9,10 @@ import UKSwitch from "@tcsw/uikit-solid/src/components/switch/UKSwitch.jsx";
 import UKStackItem from "@tcsw/uikit-solid/src/components/stack/UKStackItem.jsx";
 import UKIcon from "@tcsw/uikit-solid/src/components/icon/UKIcon.jsx";
 import UKTopAppBar from "@tcsw/uikit-solid/src/components/topAppBar/UKTopAppBar.jsx";
+import { useNavigate } from "@solidjs/router";
 
 const ManageInstalledPage: Component = () => {
+    const navigate = useNavigate();
     const [selectionMode, setSelectionMode] = createSignal<boolean>(false);
     const [selectedApplicationIds, setSelectedApplicationIds] = createSignal<string[]>([]);
     const [installedApplications, { refetch: refetchInstalledApplications }] = createResource(() =>
@@ -58,10 +53,7 @@ const ManageInstalledPage: Component = () => {
                             </>
                         )}
                         {selectionMode() && (
-                            <UKText
-                                role={"label"}
-                                size={"m"}
-                            >{`Selected: ${selectedApplicationIds().length}`}</UKText>
+                            <UKText role={"label"} size={"m"}>{`Selected: ${selectedApplicationIds().length}`}</UKText>
                         )}
                         <UKIconButton
                             color={"standard"}
@@ -93,97 +85,95 @@ const ManageInstalledPage: Component = () => {
                     <For each={installedApplications()?.applications || []}>
                         {(app) => {
                             return (
-                                <UKStackItem
-                                    leading={
-                                        app.icon.type === "icon"
-                                            ? { type: "icon" as const, value: app.icon.value }
-                                            : {
-                                                  type: "image" as const,
-                                                  value: app.icon.value,
-                                                  alt: "",
-                                              }
-                                    }
-                                    supportingText={`(${app.id}) - ${app.description}`}
-                                    labelText={app.displayName}
-                                    inlineComponent={
-                                        !selectionMode() ? (
-                                            installedApplications()?.cannotDisable.includes(
-                                                app.id,
-                                            ) ? (
-                                                <></>
-                                            ) : (
-                                                <UKSwitch
-                                                    icon={true}
-                                                    class={styles.stackSwitch}
-                                                    getValue={(val) => {
-                                                        if (val) {
-                                                            setEnabledApplications((prev) => [
-                                                                ...prev,
-                                                                app.id,
-                                                            ]);
-                                                            return;
-                                                        }
-
-                                                        setEnabledApplications((prev) =>
-                                                            prev.filter((i) => i !== app.id),
-                                                        );
-                                                    }}
-                                                    value={enabledApplications().includes(app.id)}
-                                                />
-                                            )
-                                        ) : installedApplications()?.cannotDisable.includes(
-                                              app.id,
-                                          ) ? (
-                                            <></>
-                                        ) : (
-                                            <UKIcon class={styles.stackSelect}>
-                                                {selectedApplicationIds().includes(app.id)
-                                                    ? "check"
-                                                    : "check_indeterminate_small"}
-                                            </UKIcon>
-                                        )
-                                    }
-                                    onClick={
-                                        selectionMode()
-                                            ? installedApplications()?.cannotDisable.includes(
-                                                  app.id,
-                                              )
-                                                ? undefined
-                                                : () => {
-                                                      if (
-                                                          !selectedApplicationIds().includes(app.id)
-                                                      ) {
-                                                          setSelectedApplicationIds((prev) => [
-                                                              ...prev,
-                                                              app.id,
-                                                          ]);
-                                                      } else {
-                                                          setSelectedApplicationIds((prev) =>
-                                                              prev.filter((i) => i !== app.id),
-                                                          );
-                                                      }
+                                <Suspense>
+                                    <UKStackItem
+                                        leading={
+                                            app.icon.type === "icon"
+                                                ? { type: "icon" as const, value: app.icon.value, alt: "" }
+                                                : {
+                                                      type: "image" as const,
+                                                      value: app.icon.value,
+                                                      alt: "",
                                                   }
-                                            : undefined
-                                    }
-                                />
+                                        }
+                                        supportingText={`(${app.id}) - ${app.description}`}
+                                        labelText={app.displayName}
+                                        inlineComponent={
+                                            <>
+                                                {!selectionMode() ? (
+                                                    <>
+                                                        <UKIconButton
+                                                            class={styles.openInStoreButton}
+                                                            icon={"store"}
+                                                            alt={"go to store page"}
+                                                            color={"standard"}
+                                                            onClick={() =>
+                                                                navigate(
+                                                                    `/app/uk.tcsw.store/app/${app.repository}/${app.id}`,
+                                                                )
+                                                            }
+                                                        />
+                                                        {installedApplications()?.cannotDisable.includes(app.id) ? (
+                                                            <></>
+                                                        ) : (
+                                                            <UKSwitch
+                                                                icon={true}
+                                                                class={styles.stackSwitch}
+                                                                getValue={async (val) => {
+                                                                    if (val) {
+                                                                        setEnabledApplications((prev) => [
+                                                                            ...prev,
+                                                                            app.id,
+                                                                        ]);
+                                                                    } else {
+                                                                        setEnabledApplications((prev) =>
+                                                                            prev.filter((i) => i !== app.id),
+                                                                        );
+                                                                    }
+
+                                                                    await trpc.manageInstalled.setEnabledApplications.mutate(
+                                                                        {
+                                                                            enabledApplications: enabledApplications(),
+                                                                        },
+                                                                    );
+                                                                }}
+                                                                value={enabledApplications().includes(app.id)}
+                                                            />
+                                                        )}
+                                                    </>
+                                                ) : installedApplications()?.cannotDisable.includes(app.id) ? (
+                                                    <></>
+                                                ) : (
+                                                    <UKIcon class={styles.stackSelect}>
+                                                        {selectedApplicationIds().includes(app.id)
+                                                            ? "check"
+                                                            : "check_indeterminate_small"}
+                                                    </UKIcon>
+                                                )}
+                                            </>
+                                        }
+                                        onClick={
+                                            selectionMode()
+                                                ? installedApplications()?.cannotDisable.includes(app.id)
+                                                    ? undefined
+                                                    : async () => {
+                                                          if (!selectedApplicationIds().includes(app.id)) {
+                                                              setSelectedApplicationIds((prev) => [...prev, app.id]);
+                                                          } else {
+                                                              setSelectedApplicationIds((prev) =>
+                                                                  prev.filter((i) => i !== app.id),
+                                                              );
+                                                          }
+                                                      }
+                                                : undefined
+                                        }
+                                    />
+                                </Suspense>
                             );
                         }}
                     </For>
                 </UKStack>
             </Suspense>
-            <div class={styles.actions}>
-                <UKButton
-                    onClick={async () => {
-                        await trpc.manageInstalled.setEnabledApplications.mutate({
-                            enabledApplications: enabledApplications(),
-                        });
-                    }}
-                    color={"filled"}
-                    size={"s"}
-                >
-                    Apply Changes
-                </UKButton>
-            </div>
         </div>
     );
 };

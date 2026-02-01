@@ -30,20 +30,13 @@
     user-select: none;
 }
 
-.actions {
-    display: flex;
-    flex-direction: row;
-    width: 100%;
-    max-width: 64rem;
+.openInStoreButton {
     margin-left: auto;
-    margin-right: auto;
-    padding: 1rem;
-    align-items: center;
-    justify-content: end;
+    margin-top: auto;
+    margin-bottom: auto;
 }
 
 .stackSwitch {
-    margin-left: auto;
     margin-top: auto;
     margin-bottom: auto;
 }
