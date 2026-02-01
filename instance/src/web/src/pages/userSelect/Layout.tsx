@@ -14,7 +14,7 @@ const UserSelectLayout: Component<RouteSectionProps<unknown>> = (props) => {
             <Suspense fallback={<UKIndeterminateSpinner />}>{props.children}</Suspense>
             <UKCard color={"outlined"} class={styles.copyrightContainer}>
                 <UKText role={"title"} size={"m"} emphasized={true}>
-                    Tricolor Workspaces Alpha
+                    Workspace Alpha
                 </UKText>
                 <UKText href="https://tcsw.uk" role={"body"} size={"s"} emphasized={true}>
                     © Copyright Tricolor Software 2026

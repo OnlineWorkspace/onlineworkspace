@@ -1,7 +1,7 @@
 {
     "name": "@tcsw/uikit-solid",
     "version": "1.0.0",
-    "description": "The Tricolor Workspaces UI framework for solid.js",
+    "description": "The Workspace UI framework for solid.js",
     "repository": {
         "type": "git",
         "url": "https://github.com/tricolorsoftware/workspaces"

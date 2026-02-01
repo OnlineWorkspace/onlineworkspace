@@ -280,7 +280,7 @@ export const workspacesRouter = t.router({
 
             let totp = new OTPAuth.TOTP({
                 issuer: opt.ctx.instance.sys.configuration.webUrl,
-                label: `${opt.ctx.instance.sys.configuration.displayName} (Tricolor Workspaces)`,
+                label: `${opt.ctx.instance.sys.configuration.displayName} (Workspace)`,
                 algorithm: "SHA1",
                 digits: 6,
                 secret: secretString,
@@ -326,7 +326,7 @@ export const workspacesRouter = t.router({
 
                 let totp = new OTPAuth.TOTP({
                     issuer: opt.ctx.instance.sys.configuration.webUrl,
-                    label: `${opt.ctx.instance.sys.configuration.displayName} (Tricolor Workspaces)`,
+                    label: `${opt.ctx.instance.sys.configuration.displayName} (Workspace)`,
                     algorithm: "SHA1",
                     digits: 6,
                     secret: secretString,

@@ -65,7 +65,7 @@ export default class ConfigurationSystem extends System {
             email: false,
             twoFactorAuthentication: false,
         };
-        this.displayName = "Tricolor Workspaces";
+        this.displayName = "Workspace";
         this.mailServer = {
             host: "smtp.example.com",
             port: 587,

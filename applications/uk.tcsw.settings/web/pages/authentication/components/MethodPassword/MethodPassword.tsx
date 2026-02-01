@@ -19,9 +19,7 @@ const MethodPassword: Component = () => {
             }}
             labelText="Login with Password"
             supportingText={
-                hasPassword()
-                    ? "You have password authentication enabled"
-                    : "Setup password authentication"
+                hasPassword() ? "You have password authentication enabled" : "Setup password authentication"
             }
             onCollapse={() => {
                 refetchHasPassword();
@@ -31,7 +29,7 @@ const MethodPassword: Component = () => {
                 <Suspense>
                     <div class={styles.expanded}>
                         <UKText role="body" size="m">
-                            Use a password to login to your Tricolor Workspaces account.
+                            Use a password to login to your Workspace account.
                         </UKText>
                         <UKButton
                             class={styles.button}

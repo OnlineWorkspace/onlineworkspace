@@ -50,7 +50,7 @@ export default class AuthorizationSystem extends System {
 
                 let totp = new OTPAuth.TOTP({
                     issuer: this.instance.sys.configuration.webUrl[0],
-                    label: `${this.instance.sys.configuration.displayName} (Tricolor Workspaces)`,
+                    label: `${this.instance.sys.configuration.displayName} (Workspace)`,
                     algorithm: "SHA1",
                     digits: 6,
                     secret: (

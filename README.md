@@ -1,8 +1,11 @@
-# Tricolor Workspaces
+# Workspace (To be renamed)
 
 ---
 
-A working environment for professionals and Home-Lab users.
+A working environment for the Home-Lab.
+
+> [!INFO]
+> Workspace is in need of a permanent name, any suggestions would be appreciated in the discord.
 
 > [!WARNING]
 > Workspaces is not yet intended for production use. Although early adoption for testing purposes is appreciated.
@@ -14,17 +17,46 @@ A working environment for professionals and Home-Lab users.
 
 ### Showcase
 
-- Sign In Page
-    - ![sign in](metaAssets/signIn.png)
+<details>
+  <summary><b>View Screenshots</b></summary>
 
-- Create Profile
-    - ![create profile](metaAssets/create_profile.png)
+Login Page
 
-- Dashboard (Work in progress)
-    - ![dashboard](metaAssets/dashboard.png)
+![login.png](metaAssets/preview_screenshots/login.png)
 
-- App Navigation Rail
-    - ![app navigation rail](metaAssets/app_navigation_rail.avif)
+Signup Page
+
+![signup.png](metaAssets/preview_screenshots/signup.png)
+
+App Navigation Rail
+
+![app navigation rail](metaAssets/app_navigation_rail.avif)
+
+Dashboard
+
+![dashboard.png](metaAssets/preview_screenshots/dashboard.png)
+
+Files Grid
+
+![files_grid.png](metaAssets/preview_screenshots/files_grid.png)
+
+Settings Profile Page (Mobile mode)
+
+![mobile_settings_profile.png](metaAssets/preview_screenshots/mobile_settings_profile.png)
+
+Settings Overview Page
+
+![settings_overview.png](metaAssets/preview_screenshots/settings_overview.png)
+
+Settings Customize Wallpaper Page
+
+![settings_wallpaper.png](metaAssets/preview_screenshots/settings_wallpaper.png)
+
+Store Application Page
+
+![store_application.png](metaAssets/preview_screenshots/store_application.png)
+
+</details>
 
 <!--
 ## Installation Guide for Production Environments (Docker)
