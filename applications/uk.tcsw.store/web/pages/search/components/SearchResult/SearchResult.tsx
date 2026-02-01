@@ -19,7 +19,11 @@ const SearchResult: Component<{ applicationId: string; repository: string }> = (
             color={"filled"}
             class={styles.root}
         >
-            <img class={styles.headerImage} draggable={false} src={result()?.bannerImage || "/assets/tricolor/tricolor.svg"} />
+            <img
+                class={styles.headerImage}
+                draggable={false}
+                src={result()?.bannerImage || "/assets/generic_background.svg"}
+            />
             <UKText class={styles.title} role={"title"} size={"l"}>
                 {result()?.displayName}
             </UKText>

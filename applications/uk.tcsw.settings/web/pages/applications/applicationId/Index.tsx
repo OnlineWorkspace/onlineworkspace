@@ -22,7 +22,7 @@ const ApplicationPage: Component = () => {
         <>
             <UKTopAppBar
                 type="small"
-                headline={"Applications"}
+                headline={data()?.displayName}
                 leadingButton={{
                     icon: "chevron_left",
                     onClick() {

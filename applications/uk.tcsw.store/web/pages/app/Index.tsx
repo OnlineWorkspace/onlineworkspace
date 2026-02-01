@@ -32,7 +32,7 @@ const ApplicationPage: Component = () => {
                 <img
                     alt={""}
                     class={styles.headerImage}
-                    src={application()?.bannerImage || "/assets/tricolor/tricolor.svg"}
+                    src={application()?.bannerImage || "/assets/generic_background.svg"}
                 />
             </div>
             <div class={styles.headerContent}>
@@ -40,7 +40,7 @@ const ApplicationPage: Component = () => {
                     <img
                         alt={""}
                         class={styles.iconImage}
-                        src={application()?.icon.value || "/assets/tricolor/tricolor.svg"}
+                        src={application()?.icon.value || "/assets/tricolor/tricolor_icon.svg"}
                     />
                 ) : (
                     <UKIcon class={styles.iconIcon}>{application()?.icon.value || ""}</UKIcon>
@@ -49,9 +49,7 @@ const ApplicationPage: Component = () => {
                     {application()?.displayName}
                 </UKText>
                 <UKButton
-                    disabled={
-                        !application()?.isUserAdministrator || !application()?.canBeUninstalled
-                    }
+                    disabled={!application()?.isUserAdministrator || !application()?.canBeUninstalled}
                     class={styles.headerContentButton}
                     leadingIcon={application()?.isInstalled ? "delete" : "download"}
                     onClick={async () => {
@@ -106,11 +104,7 @@ const ApplicationPage: Component = () => {
                     }
                 />
             </UKStack>
-            <UKDivider
-                direction={DividerDirection.horizontal}
-                width="middle-inset"
-                class={styles.divider}
-            />
+            <UKDivider direction={DividerDirection.horizontal} width="middle-inset" class={styles.divider} />
             <UKCard color="filled" class={styles.author}>
                 <UKText role="title" size="m">
                     Created by
@@ -125,11 +119,7 @@ const ApplicationPage: Component = () => {
                     }}
                 </For>
             </UKCard>
-            <UKDivider
-                direction={DividerDirection.horizontal}
-                width="middle-inset"
-                class={styles.divider}
-            />
+            <UKDivider direction={DividerDirection.horizontal} width="middle-inset" class={styles.divider} />
             <UKCard color="filled" class={styles.repository}>
                 <UKText role="label" size="m">
                     Repository: {repository}

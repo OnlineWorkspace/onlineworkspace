@@ -7,7 +7,10 @@ import { useNavigate } from "@solidjs/router";
 
 const PromotedApplication: Component<{ repository: string; applicationId: string }> = (props) => {
     const [result] = createResource(() =>
-        trpc.homepage.getPromotedApplication.query({ applicationId: props.applicationId, repository: props.repository }),
+        trpc.homepage.getPromotedApplication.query({
+            applicationId: props.applicationId,
+            repository: props.repository,
+        }),
     );
     const navigate = useNavigate();
 
@@ -20,7 +23,7 @@ const PromotedApplication: Component<{ repository: string; applicationId: string
                     navigate(`/app/uk.tcsw.store/app/${props.repository}/${props.applicationId}`);
                 }}
             >
-                <img src={result()?.bannerImage || "/assets/tricolor/tricolor.svg"} class={styles.backgroundImage} />
+                <img src={result()?.bannerImage || "/assets/generic_background.svg"} class={styles.backgroundImage} />
                 <div class={styles.footer}>
                     <UKText size="l" emphasized role="title">
                         {result()?.displayName}
