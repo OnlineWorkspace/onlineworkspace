@@ -84,7 +84,11 @@ const GridView: Component = () => {
                                     onClick={() => {
                                         selectFilesForUpload(async (files) => {
                                             for (const file of files) {
-                                                console.log(file.file);
+                                                let taskUUID = crypto.randomUUID();
+                                                viewCtx!.setActiveTasks([
+                                                    ...viewCtx!.activeTasks(),
+                                                    { taskId: taskUUID, message: `Uploading file '${file.name}'` },
+                                                ]);
                                                 let uuid = (await trpc.uploadFile.mutate(file.file)).id;
 
                                                 await trpc.setUploadMetadata.mutate({
@@ -95,6 +99,21 @@ const GridView: Component = () => {
                                                     ),
                                                     lastModified: file.file.lastModified,
                                                 });
+                                                viewCtx!.setActiveTasks(
+                                                    viewCtx!.activeTasks().filter((t) => t.taskId !== taskUUID),
+                                                );
+
+                                                viewCtx!.setViewItems([
+                                                    ...viewCtx!.viewItems(),
+                                                    {
+                                                        name: file.name,
+                                                        path: path.join(
+                                                            `/${decodeURI(params.currentPath || "")}`,
+                                                            file.name,
+                                                        ),
+                                                        type: "ghost",
+                                                    },
+                                                ]);
                                             }
 
                                             viewCtx!.setReload();

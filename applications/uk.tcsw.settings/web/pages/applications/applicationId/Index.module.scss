@@ -37,6 +37,13 @@
         margin-bottom: auto;
     }
 
+    .icon {
+        --icon-size: 8rem;
+        aspect-ratio: 1 / 1;
+        margin-top: auto;
+        margin-bottom: auto;
+    }
+
     .headerContent {
         display: flex;
         flex-direction: column;

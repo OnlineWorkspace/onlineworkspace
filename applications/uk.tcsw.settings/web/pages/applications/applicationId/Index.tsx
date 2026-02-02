@@ -12,6 +12,7 @@ import UKCard from "@tcsw/uikit-solid/src/components/card/UKCard.tsx";
 import UKDivider from "@tcsw/uikit-solid/src/components/divider/UKDivider.tsx";
 import UKButtonGroup from "@tcsw/uikit-solid/src/components/buttonGroup/UKButtonGroup.tsx";
 import UKButton from "@tcsw/uikit-solid/src/components/button/UKButton.jsx";
+import UKIcon from "@tcsw/uikit-solid/src/components/icon/UKIcon.tsx";
 
 const ApplicationPage: Component = () => {
     const navigate = useNavigate();
@@ -33,7 +34,15 @@ const ApplicationPage: Component = () => {
             />
             <div class={styles.page}>
                 <div class={styles.pageHeader}>
-                    <img class={styles.image} alt={""} src={"/assets/tricolor/tricolor_icon@4x.png"} />
+                    {data()?.icon.type === "icon" ? (
+                        <UKIcon class={styles.icon}>{data()?.icon.value || "error"}</UKIcon>
+                    ) : (
+                        <img
+                            class={styles.image}
+                            alt={""}
+                            src={data()?.icon.value || "/assets/tricolor/tricolor_icon@4x.png"}
+                        />
+                    )}
                     <div class={styles.headerContent}>
                         <UKText role={"display"} size={"l"}>
                             {data()?.displayName}

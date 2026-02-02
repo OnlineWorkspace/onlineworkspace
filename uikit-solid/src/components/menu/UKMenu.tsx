@@ -66,7 +66,7 @@ const UKMenu: Component<
 
     return (
         <>
-            <Ref ref={setRef}>{props.children || <div />}</Ref>
+            <Ref ref={setRef}>{props.children || <div>no menu content provided?</div>}</Ref>
             {selected() !== undefined && (
                 <UKMenu
                     vibrant={props.vibrant}

@@ -18,6 +18,6 @@ export const ViewContext = createContext<{
     setCopyItems(items: string[]): void;
     reload: Accessor<number>;
     setReload(): void;
-    activeTasks: Accessor<{ [id: string]: string }>;
-    setActiveTasks(tasks: { [id: string]: string }): void;
+    activeTasks: Accessor<{ taskId: string; message: string }[]>;
+    setActiveTasks(tasks: { taskId: string; message: string }[]): void;
 }>();

@@ -739,6 +739,10 @@ const router = t.router({
             .output(
                 z.object({
                     displayName: z.string(),
+                    icon: z.object({
+                        type: z.literal("icon").or(z.literal("image")),
+                        value: z.string(),
+                    }),
                     settings: z
                         .object({
                             displayName: z.string(),
@@ -756,10 +760,29 @@ const router = t.router({
                     (aa) => aa.manifest?.id === opt.input.id,
                 );
 
+                if (!application) throw { error: true };
+
+                let icon = {
+                    type: "icon" as "icon" | "image",
+                    value: "indeterminate_question_box",
+                };
+
+                if (application.manifest?.icon) {
+                    if (application.manifest.icon.type === "image") {
+                        icon = {
+                            type: "image",
+                            value: `${opt.ctx.rawRequest.destinationHostname}/api/application/${application.manifest.id}/icon/`,
+                        };
+                    } else {
+                        icon = application.manifest.icon;
+                    }
+                }
+
                 const userApplicationSettings = await instance.sys.settings.getUserSettings(opt.ctx.userId);
 
                 return {
                     displayName: application?.manifest?.displayName || opt.input.id,
+                    icon: icon,
                     settings:
                         instance.sys.settings.applicationSettings[opt.input.id]
                             ?.map((a) => {

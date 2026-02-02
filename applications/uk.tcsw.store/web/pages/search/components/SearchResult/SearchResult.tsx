@@ -22,7 +22,7 @@ const SearchResult: Component<{ applicationId: string; repository: string }> = (
             <img
                 class={styles.headerImage}
                 draggable={false}
-                src={result()?.bannerImage || "/assets/generic_background.svg"}
+                src={result()?.bannerImage || "/assets/generic_background.png"}
             />
             <UKText class={styles.title} role={"title"} size={"l"}>
                 {result()?.displayName}

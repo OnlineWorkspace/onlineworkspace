@@ -16,7 +16,7 @@ const Layout: Component<ParentProps> = (props) => {
     const [cutItems, setCutItems] = createSignal<string[]>([]);
     const [copyItems, setCopyItems] = createSignal<string[]>([]);
     const [reload, setReload] = createSignal<number>(0);
-    const [activeTasks, setActiveTasks] = createSignal<{ [id: string]: string }>({});
+    const [activeTasks, setActiveTasks] = createSignal<{ taskId: string; message: string }[]>([]);
 
     return (
         <ViewContext.Provider

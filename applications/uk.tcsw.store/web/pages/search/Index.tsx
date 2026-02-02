@@ -1,11 +1,4 @@
-import {
-    createEffect,
-    createResource,
-    createSignal,
-    For,
-    Suspense,
-    type Component,
-} from "solid-js";
+import { createResource, createSignal, For, Suspense, type Component } from "solid-js";
 import styles from "./Index.module.scss";
 import SearchResult from "./components/SearchResult/SearchResult";
 import trpc from "../../lib/trpc";
@@ -14,9 +7,7 @@ import UKTopAppBar from "@tcsw/uikit-solid/src/components/topAppBar/UKTopAppBar.
 
 const Page: Component = () => {
     const [searchQuery, setSearchQuery] = createSignal<string>("");
-    const [results, { refetch: refetchResults }] = createResource(() =>
-        trpc.search.searchFor.query(searchQuery()),
-    );
+    const [results, { refetch: refetchResults }] = createResource(() => trpc.search.searchFor.query(searchQuery()));
 
     return (
         <>
@@ -35,10 +26,7 @@ const Page: Component = () => {
                         <For each={results()}>
                             {(result) => {
                                 return (
-                                    <SearchResult
-                                        applicationId={result.applicationId}
-                                        repository={result.repository}
-                                    />
+                                    <SearchResult applicationId={result.applicationId} repository={result.repository} />
                                 );
                             }}
                         </For>
