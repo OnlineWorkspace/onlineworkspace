@@ -1,0 +1,99 @@
+.root {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-rows: 1fr;
+    width: 100%;
+    height: 100%;
+
+    &[data-sidebar-mode-mobile-mode="true"] {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr;
+
+        .component {
+            height: max-content;
+            width: 100%;
+        }
+    }
+}
+
+.component {
+    display: flex;
+    flex-direction: column;
+    width: 22.5rem;
+    height: 100%;
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+    background-color: rgb(var(--uk-sys-color-surface-container-low));
+
+    .button {
+        height: 3.5rem;
+        border: none;
+        padding-left: 1rem;
+        padding-right: 1rem;
+        text-align: start;
+        border-radius: var(--uk-sys-shape-corner-full);
+        background-color: transparent;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+
+        .buttonIcon {
+            color: rgb(var(--uk-sys-color-on-surface-variant));
+        }
+
+        .buttonLabel {
+            margin: 0;
+            margin-right: auto;
+            color: rgb(var(--uk-sys-color-on-surface-variant));
+            line-height: var(--uk-sys-typescale-label-large-line-height);
+            font-weight: var(--uk-sys-typescale-label-large-weight);
+            letter-spacing: var(--uk-sys-typescale-label-large-tracking);
+            font-family: var(--uk-sys-typescale-label-large-font), system-ui;
+            font-size: 0.875rem;
+        }
+
+        .badgeLabel {
+            color: rgb(var(--uk-sys-color-on-surface-variant));
+            line-height: var(--uk-sys-typescale-title-small-line-height);
+            font-weight: var(--uk-sys-typescale-title-small-weight);
+            letter-spacing: var(--uk-sys-typescale-title-small-tracking);
+            font-size: var(--uk-sys-typescale-title-small-size);
+            font-family: var(--uk-sys-typescale-title-small-font), system-ui;
+        }
+
+        &[data-selected="true"] {
+            background-color: rgb(var(--uk-sys-color-secondary-container));
+
+            .buttonIcon {
+                color: rgb(var(--uk-sys-color-on-secondary-container));
+            }
+
+            .buttonLabel {
+                color: rgb(var(--uk-sys-color-on-secondary-container));
+                font-weight: 700;
+            }
+        }
+    }
+
+    .label {
+        padding-bottom: 1rem;
+        padding-left: 1rem;
+        color: rgb(var(--uk-sys-color-on-surface-variant));
+        font-size: var(--uk-sys-typescale-title-small-size);
+        font-weight: var(--uk-sys-typescale-title-small-weight);
+        letter-spacing: var(--uk-sys-typescale-title-small-tracking);
+        line-height: var(--uk-sys-typescale-title-small-line-height);
+        font-family: var(--uk-sys-typescale-title-small-font), system-ui;
+    }
+}
+
+.page {
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
