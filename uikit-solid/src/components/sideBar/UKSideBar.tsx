@@ -1,30 +1,31 @@
-import { For, type Component, type ParentProps } from "solid-js";
+import { Index, type Component, type ParentProps } from "solid-js";
 import styles from "./UKSideBar.module.scss";
 import UKIcon from "../icon/UKIcon.tsx";
 import useIsMobile from "../../core/useIsMobile.ts";
 
+interface ButtonItem {
+    type: "button";
+    icon: { type: "icon" | "image"; value: string };
+    imageIcon?: string;
+    label: string;
+    onClick: () => void;
+    onMiddleClick?: () => void;
+    badgeLabel?: number;
+    active?: boolean;
+}
+
+interface LabelItem {
+    type: "label";
+    label: string;
+}
+
+interface DividerItem {
+    type: "divider";
+}
+
 const UKSideBar: Component<
     ParentProps<{
-        items: (
-            | {
-                  type: "button";
-                  icon: { type: "icon" | "image"; value: string };
-                  imageIcon?: string;
-                  label: string;
-                  onClick: () => void;
-                  onMiddleClick?: () => void;
-                  badgeLabel?: number;
-                  active?: boolean;
-              }
-            | {
-                  type: "label";
-                  label: string;
-              }
-            | {
-                  type: "divider";
-              }
-            | undefined
-        )[];
+        items: (ButtonItem | LabelItem | DividerItem | undefined)[];
     }>
 > = (props) => {
     const isMobile = useIsMobile();
@@ -32,34 +33,40 @@ const UKSideBar: Component<
     return (
         <div class={styles.root} data-sidebar-mode-mobile-mode={isMobile()}>
             <div class={styles.component}>
-                <For each={props.items}>
+                <Index each={props.items.filter((i) => i !== undefined)}>
                     {(item) => {
-                        if (!item) return null;
-
-                        switch (item.type) {
+                        switch (item().type) {
                             case "button":
                                 return (
-                                    <button class={styles.button} data-selected={item.active} onClick={item.onClick}>
-                                        {item.icon && (
+                                    <button
+                                        class={styles.button}
+                                        data-selected={(item() as ButtonItem).active}
+                                        onClick={(item() as ButtonItem).onClick}
+                                    >
+                                        {(item() as ButtonItem).icon && (
                                             <>
-                                                {item.icon.type === "image" ? (
-                                                    <img src={item.icon.value} alt={""} />
+                                                {(item() as ButtonItem).icon.type === "image" ? (
+                                                    <img src={(item() as ButtonItem).icon.value} alt={""} />
                                                 ) : (
-                                                    <UKIcon class={styles.buttonIcon}>{item.icon.value}</UKIcon>
+                                                    <UKIcon class={styles.buttonIcon}>
+                                                        {(item() as ButtonItem).icon.value}
+                                                    </UKIcon>
                                                 )}
                                             </>
                                         )}
-                                        <div class={styles.buttonLabel}>{item.label}</div>
-                                        {item.badgeLabel && <div class={styles.badgeLabel}>{item.badgeLabel}</div>}
+                                        <div class={styles.buttonLabel}>{(item() as ButtonItem).label}</div>
+                                        {(item() as ButtonItem).badgeLabel && (
+                                            <div class={styles.badgeLabel}>{(item() as ButtonItem).badgeLabel}</div>
+                                        )}
                                     </button>
                                 );
                             case "label":
-                                return <div class={styles.label}>{item.label}</div>;
+                                return <div class={styles.label}>{(item() as LabelItem).label}</div>;
                             default:
                                 return <div>AHH</div>;
                         }
                     }}
-                </For>
+                </Index>
             </div>
             <div class={styles.page}>{props.children}</div>
         </div>
