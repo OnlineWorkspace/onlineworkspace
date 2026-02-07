@@ -46,7 +46,7 @@ const RootPage: Component = () => {
                         if (!Widget)
                             return (
                                 <UKText role={"body"} size="l" align={"center"} emphasized>
-                                    Invalid WidgetId
+                                    Invalid WidgetId '{widgetId}'
                                 </UKText>
                             );
 
