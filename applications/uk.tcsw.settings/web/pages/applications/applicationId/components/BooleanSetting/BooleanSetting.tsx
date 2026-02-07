@@ -3,6 +3,7 @@ import UKSwitch from "@tcsw/uikit-solid/src/components/switch/UKSwitch.jsx";
 import { createEffect, createSignal, type Component } from "solid-js";
 import trpc from "../../../../../lib/trpc.ts";
 import { useParams } from "@solidjs/router";
+import styles from "./BooleanSetting.module.scss";
 
 const BooleanSetting: Component<{ displayName: string; id: string; defaultValue: boolean; currentValue: boolean }> = (
     props,
@@ -26,7 +27,7 @@ const BooleanSetting: Component<{ displayName: string; id: string; defaultValue:
             supportingText={props.id}
             inlineComponent={
                 <>
-                    <UKSwitch getValue={setValue} value={value()} />
+                    <UKSwitch class={styles.switch} getValue={setValue} value={value()} />
                 </>
             }
         />

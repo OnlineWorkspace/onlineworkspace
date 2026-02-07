@@ -13,7 +13,7 @@ export default class SettingsSystem extends System {
         return this;
     }
 
-    async getUserSettings(userId: number): Promise<Record<string, any>> {
+    async getUserSettings(userId: number): Promise<Record<string, string>> {
         const db = this.instance.sys.database.postgres();
 
         return (await db`SELECT settings FROM tricolor_workspaces.public.users WHERE id = ${userId}`)?.[0]
