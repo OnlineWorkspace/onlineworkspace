@@ -1,8 +1,6 @@
-import ApplicationSetting from "./applicationSetting.js";
+import { ApplicationSetting, GlobalApplicationSetting } from "./applicationSetting.js";
 
 export class BooleanApplicationSetting extends ApplicationSetting<boolean> {
-    global = false;
-
     constructor(applicationId: string, id: string, defaultValue: boolean) {
         super();
 
@@ -14,24 +12,24 @@ export class BooleanApplicationSetting extends ApplicationSetting<boolean> {
         this.description = "No description provided";
     }
 
-    async setValue(value: boolean, userId: number) {
+    async setValue(userId: number, value: boolean) {
         let userSettings = await this.instance.sys.settings.getUserSettings(userId);
 
-        userSettings[`app:${this.applicationId}:${this.id}`] = value ? "true" : "false";
+        userSettings[`app:${this.applicationId}:${this.id}`] = value;
 
         await this.instance.sys.settings.setUserSettings(userId, userSettings);
 
-        return this;
+        return true;
     }
 
     async getValue(userId: number): Promise<boolean> {
         let userSettings = await this.instance.sys.settings.getUserSettings(userId);
 
-        const settingValue = userSettings[`${this.applicationId}:${this.id}`];
+        const settingValue = userSettings[`app:${this.applicationId}:${this.id}`];
 
         if (settingValue === undefined) return this.defaultValue;
 
-        return settingValue === "true";
+        return settingValue;
     }
 
     setDisplayName(displayName: string): this {
@@ -47,9 +45,7 @@ export class BooleanApplicationSetting extends ApplicationSetting<boolean> {
     }
 }
 
-export class GlobalBooleanApplicationSetting extends ApplicationSetting<boolean> {
-    global = true;
-
+export class GlobalBooleanApplicationSetting extends GlobalApplicationSetting<boolean> {
     constructor(applicationId: string, id: string, defaultValue: boolean) {
         super();
 
@@ -61,20 +57,17 @@ export class GlobalBooleanApplicationSetting extends ApplicationSetting<boolean>
     }
 
     async setValue(value: boolean) {
-        await this.instance.sys.settings.setGlobalSetting(
-            `app:${this.applicationId}:${this.id}`,
-            value ? "true" : "false",
-        );
+        await this.instance.sys.settings.setGlobalSetting(`app:${this.applicationId}:${this.id}`, value);
 
-        return this;
+        return true;
     }
 
     async getValue(): Promise<boolean> {
-        const settingValue = await this.instance.sys.settings.getGlobalSetting(`${this.applicationId}:${this.id}`);
+        const settingValue = await this.instance.sys.settings.getGlobalSetting(`app:${this.applicationId}:${this.id}`);
 
         if (settingValue === undefined) return this.defaultValue;
 
-        return settingValue === "true";
+        return settingValue;
     }
 
     setDisplayName(displayName: string): this {

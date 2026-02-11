@@ -1,8 +1,6 @@
-import ApplicationSetting from "./applicationSetting.js";
+import { ApplicationSetting, GlobalApplicationSetting } from "./applicationSetting.js";
 
 export class StringApplicationSetting extends ApplicationSetting<string> {
-    global = false;
-
     constructor(applicationId: string, id: string, defaultValue: string) {
         super();
 
@@ -14,20 +12,20 @@ export class StringApplicationSetting extends ApplicationSetting<string> {
         this.description = "No description provided";
     }
 
-    async setValue(value: string, userId: number) {
+    async setValue(userId: number, value: string) {
         let userSettings = await this.instance.sys.settings.getUserSettings(userId);
 
         userSettings[`app:${this.applicationId}:${this.id}`] = value;
 
         await this.instance.sys.settings.setUserSettings(userId, userSettings);
 
-        return this;
+        return true;
     }
 
     async getValue(userId: number): Promise<string> {
         let userSettings = await this.instance.sys.settings.getUserSettings(userId);
 
-        const settingValue = userSettings[`${this.applicationId}:${this.id}`];
+        const settingValue = userSettings[`app:${this.applicationId}:${this.id}`];
 
         if (settingValue === undefined) return this.defaultValue;
 
@@ -47,9 +45,7 @@ export class StringApplicationSetting extends ApplicationSetting<string> {
     }
 }
 
-export class GlobalStringApplicationSetting extends ApplicationSetting<string> {
-    global = true;
-
+export class GlobalStringApplicationSetting extends GlobalApplicationSetting<string> {
     constructor(applicationId: string, id: string, defaultValue: string) {
         super();
 
@@ -63,11 +59,11 @@ export class GlobalStringApplicationSetting extends ApplicationSetting<string> {
     async setValue(value: string) {
         await this.instance.sys.settings.setGlobalSetting(`app:${this.applicationId}:${this.id}`, value);
 
-        return this;
+        return true;
     }
 
     async getValue(): Promise<string> {
-        const settingValue = await this.instance.sys.settings.getGlobalSetting(`${this.applicationId}:${this.id}`);
+        const settingValue = await this.instance.sys.settings.getGlobalSetting(`app:${this.applicationId}:${this.id}`);
 
         if (settingValue === undefined) return this.defaultValue;
 

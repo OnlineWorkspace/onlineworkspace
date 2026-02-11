@@ -13,6 +13,7 @@ import UKDivider from "@tcsw/uikit-solid/src/components/divider/UKDivider.tsx";
 import UKButtonGroup from "@tcsw/uikit-solid/src/components/buttonGroup/UKButtonGroup.tsx";
 import UKButton from "@tcsw/uikit-solid/src/components/button/UKButton.jsx";
 import UKIcon from "@tcsw/uikit-solid/src/components/icon/UKIcon.tsx";
+import StringListSetting from "./components/StringListSetting/StringListSetting.tsx";
 
 const ApplicationPage: Component = () => {
     const navigate = useNavigate();
@@ -54,11 +55,22 @@ const ApplicationPage: Component = () => {
                             <UKButton
                                 onClick={() => {
                                     // Fixme: somehow we need to figure out what repo the app is hosted on? maybe the store is in need of a redesigned path for applications
-                                    navigate(`/app/uk.tcsw.store/app/local/${params.applicationId}`);
+                                    navigate(
+                                        `/app/uk.tcsw.store/app/local/${params.applicationId}?origin=/app/uk.tcsw.settings/applications/${params.applicationId}`,
+                                    );
                                 }}
                                 color={"tonal"}
                             >
-                                Open in Store
+                                View in Store
+                            </UKButton>
+                            <UKButton
+                                onClick={() => {
+                                    // Fixme: somehow we need to figure out what repo the app is hosted on? maybe the store is in need of a redesigned path for applications
+                                    navigate(`/app/${params.applicationId}`);
+                                }}
+                                color={"filled"}
+                            >
+                                Open
                             </UKButton>
                         </UKButtonGroup>
                     </div>
@@ -82,14 +94,23 @@ const ApplicationPage: Component = () => {
                                     return (
                                         <BooleanSetting
                                             id={setting.id}
-                                            currentValue={setting.currentValue === "true"}
-                                            defaultValue={setting.defaultValue === "true"}
+                                            currentValue={setting.currentValue}
+                                            defaultValue={setting.defaultValue}
                                             displayName={setting.displayName}
                                         />
                                     );
                                 case "string":
                                     return (
                                         <StringSetting
+                                            id={setting.id}
+                                            currentValue={setting.currentValue}
+                                            defaultValue={setting.defaultValue}
+                                            displayName={setting.displayName}
+                                        />
+                                    );
+                                case "stringList":
+                                    return (
+                                        <StringListSetting
                                             id={setting.id}
                                             currentValue={setting.currentValue}
                                             defaultValue={setting.defaultValue}

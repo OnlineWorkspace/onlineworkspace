@@ -14,9 +14,10 @@ const RootPage: Component = () => {
     const [widgets] = createResource(() => trpc.dashboard.getWidgets.query());
     const [wallpaperOptions] = createResource(() => trpc.dashboard.getWallpaperOptions.query());
     const [welcomeMessage] = createResource(() => trpc.dashboard.welcomeMessage.query());
+    const [contentBackground] = createResource(() => trpc.dashboard.contentBackground.query());
 
     return (
-        <div class={styles.root}>
+        <div class={styles.root} data-show-background={contentBackground()}>
             <Suspense fallback={<UKIndeterminateSpinner class={styles.wallpaperSpinner} />}>
                 <img
                     alt={""}

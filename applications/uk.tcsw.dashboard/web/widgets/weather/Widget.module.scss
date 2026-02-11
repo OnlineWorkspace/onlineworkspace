@@ -1,0 +1,56 @@
+.root {
+    display: flex;
+    flex-direction: column;
+    grid-row: span 2;
+    gap: 0.5rem;
+}
+
+.header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.overviewContainer {
+    display: flex;
+    flex-direction: column;
+}
+
+.overviewCondition {
+    display: flex;
+    flex-direction: row;
+    gap: 0.5rem;
+}
+
+.overviewIcon {
+    --icon-size: 2rem;
+}
+
+.overviewHighLow {
+    display: flex;
+    flex-direction: row;
+    gap: 0.25rem;
+    align-items: center;
+}
+
+.overviewHighLowSeparator {
+    font-size: 2rem !important;
+}
+
+.hours {
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+    padding: 0.25rem;
+    overflow-x: auto;
+}
+
+.dataSource {
+    margin-top: -0.25rem;
+    margin-bottom: -0.75rem;
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+    font-size: 0.5rem !important;
+    opacity: 0.5;
+}

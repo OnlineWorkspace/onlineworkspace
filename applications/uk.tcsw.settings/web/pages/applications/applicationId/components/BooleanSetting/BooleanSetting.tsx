@@ -14,10 +14,10 @@ const BooleanSetting: Component<{ displayName: string; id: string; defaultValue:
     createEffect(async () => {
         if (!params.applicationId) return;
 
-        await trpc.application.setApplicationSettingValue.mutate({
+        await trpc.application.setAppicationBooleanSettingValue.mutate({
             applicationId: params.applicationId as string,
             id: props.id,
-            value: value().toString(),
+            value: value(),
         });
     });
 

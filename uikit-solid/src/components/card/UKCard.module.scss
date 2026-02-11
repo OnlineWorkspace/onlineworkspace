@@ -48,7 +48,7 @@
 
     &[data-color="filled"] {
         background-color: rgb(var(--uk-sys-color-surface-container-highest));
-        color: rgb(var(--uk-sys-color-primary));
+        color: rgb(var(--uk-sys-color-on-surface));
         box-shadow: 0 0 1px rgb(var(--uk-sys-color-shadow));
         border-radius: var(--uk-sys-shape-corner-medium);
 
@@ -59,7 +59,7 @@
 
     &[data-color="elevated"] {
         background-color: rgb(var(--uk-sys-color-surface-container-low));
-        color: rgb(var(--uk-sys-color-primary));
+        color: rgb(var(--uk-sys-color-on-surface));
         box-shadow: 0 0 1px rgb(var(--uk-sys-color-shadow));
         border-radius: var(--uk-sys-shape-corner-medium);
         z-index: 1;

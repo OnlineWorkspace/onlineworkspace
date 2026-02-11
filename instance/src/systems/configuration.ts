@@ -10,6 +10,7 @@ export enum WorkspacesFeatureFlags {
 }
 
 export const FEATURE_FLAG_DESCRIPTIONS = {
+    [WorkspacesFeatureFlags.SlashCommands]: "Enable the ability to use slash commands in the instance's console",
     [WorkspacesFeatureFlags.ShootYourselfInTheFoot]:
         "Allow administrators to alter settings / configuration options which may cause the instance to malfunction. (Only enable this if you are sure you know what you are doing!)",
     [WorkspacesFeatureFlags.AllowUserSignups]: "Allow new users to create accounts from the instance user login page",

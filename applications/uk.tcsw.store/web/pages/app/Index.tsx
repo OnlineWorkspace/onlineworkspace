@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from "@solidjs/router";
+import { useNavigate, useParams, useSearchParams } from "@solidjs/router";
 import { createResource, For, type Component } from "solid-js";
 import styles from "./Index.module.scss";
 import trpc from "../../lib/trpc";
@@ -13,6 +13,7 @@ import UKStackItem from "@tcsw/uikit-solid/src/components/stack/UKStackItem.jsx"
 
 const ApplicationPage: Component = () => {
     const { applicationId, repository } = useParams();
+    const [searchParams] = useSearchParams();
     const navigate = useNavigate();
     const [application] = createResource(() => trpc.app.get.query({ applicationId, repository }));
 
@@ -23,7 +24,7 @@ const ApplicationPage: Component = () => {
                 leadingIcon="chevron_left"
                 color="tonal"
                 onClick={() => {
-                    navigate("../../../");
+                    navigate(searchParams.origin?.toString() ?? "../../../");
                 }}
             >
                 Back

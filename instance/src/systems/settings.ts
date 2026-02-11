@@ -1,9 +1,9 @@
 import { Instance } from "../index.js";
 import System from "../system.js";
-import ApplicationSetting from "./settings/applicationSetting/applicationSetting.js";
+import { ApplicationSetting, GlobalApplicationSetting } from "./settings/applicationSetting/applicationSetting.js";
 
 export default class SettingsSystem extends System {
-    applicationSettings: { [applicationId: string]: ApplicationSetting<any>[] };
+    applicationSettings: { [applicationId: string]: (ApplicationSetting<any> | GlobalApplicationSetting<any>)[] };
 
     constructor(instance: Instance) {
         super("settings", instance);
@@ -13,35 +13,40 @@ export default class SettingsSystem extends System {
         return this;
     }
 
-    async getUserSettings(userId: number): Promise<Record<string, string>> {
+    async getUserSettings(userId: number): Promise<Record<string, any>> {
         const db = this.instance.sys.database.postgres();
 
         return (await db`SELECT settings FROM tricolor_workspaces.public.users WHERE id = ${userId}`)?.[0]
             ?.settings as Record<string, any>;
     }
 
-    async getUserApplicationSetting(userId: number, applicationId: string, settingId: string): Promise<string> {
-        const settings = await this.getUserSettings(userId);
-
+    async getUserApplicationSetting<SettingType extends ApplicationSetting<any>>(
+        userId: number,
+        applicationId: string,
+        settingId: string,
+    ): Promise<SettingType["defaultValue"]> {
         return (
-            settings[`${applicationId}:${settingId}`] ??
+            (await this.applicationSettings[applicationId].find((s) => s.id === settingId)?.getValue(userId)) ??
             this.applicationSettings[applicationId].find((s) => s.id === settingId)?.defaultValue
         );
     }
 
-    async setUserApplicationSetting(
+    async setUserApplicationSetting<T>(
         userId: number,
         applicationId: string,
         settingId: string,
-        value: string,
+        value: T,
     ): Promise<boolean> {
-        const settings = await this.getUserSettings(userId);
+        const applicationSetting = this.applicationSettings[applicationId].find((s) => s.id === settingId);
 
-        settings[`${applicationId}:${settingId}`] = value;
+        if (!applicationSetting) return false;
 
-        await this.setUserSettings(userId, settings);
-
-        return true;
+        if (applicationSetting instanceof ApplicationSetting) {
+            await applicationSetting?.setValue(userId, value);
+            return true;
+        } else {
+            return false;
+        }
     }
 
     async setUserSettings(userId: number, settings: Record<string, any>): Promise<boolean> {
@@ -52,14 +57,14 @@ export default class SettingsSystem extends System {
         return true;
     }
 
-    async getGlobalSetting(settingId: string): Promise<string | undefined> {
+    async getGlobalSetting(settingId: string): Promise<any | undefined> {
         const db = this.instance.sys.database.postgres();
 
         return (await db`SELECT value FROM tricolor_workspaces.public.global_settings WHERE key = ${settingId}`)?.[0]
             ?.value;
     }
 
-    async setGlobalSetting(settingId: string, value: string): Promise<boolean> {
+    async setGlobalSetting(settingId: string, value: any): Promise<boolean> {
         const db = this.instance.sys.database.postgres();
 
         await db`INSERT INTO tricolor_workspaces.public.global_settings (key, value) VALUES (${settingId}, ${value}) ON CONFLICT (key) DO UPDATE SET value = ${value};`;
@@ -76,11 +81,14 @@ export default class SettingsSystem extends System {
         >;
     }
 
-    registerApplicationSetting<Setting extends ApplicationSetting<any>>(setting: Setting) {
+    registerApplicationSetting<Setting extends ApplicationSetting<any> | GlobalApplicationSetting<any>>(
+        setting: Setting,
+    ) {
         if (!this.applicationSettings[setting.applicationId]) {
             this.applicationSettings[setting.applicationId] = [];
         }
 
+        setting.instance = this.instance;
         this.log.info(`Setting '${setting.id}' was registered for application '${setting.applicationId}'`);
         this.applicationSettings[setting.applicationId].push(setting);
 

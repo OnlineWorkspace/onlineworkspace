@@ -10,6 +10,8 @@ import { octetInputParser } from "@trpc/server/http";
 import fs from "fs/promises";
 import sharp from "sharp";
 import { FEATURE_FLAG_DESCRIPTIONS, WorkspacesFeatureFlags } from "@tcsw/workspaces-instance/src/systems/configuration";
+import { GlobalApplicationSetting } from "@tcsw/workspaces-instance/src/systems/settings/applicationSetting/applicationSetting";
+import { isPropertyDeclaration } from "typescript";
 
 const log = instance.log.createLogger("uk.tcsw.settings");
 
@@ -746,8 +748,8 @@ const router = t.router({
                     settings: z
                         .object({
                             displayName: z.string(),
-                            defaultValue: z.string(),
-                            currentValue: z.string().or(z.undefined()),
+                            defaultValue: z.any(),
+                            currentValue: z.any().or(z.undefined()),
                             type: z.string(),
                             id: z.string(),
                             global: z.boolean(),
@@ -780,30 +782,57 @@ const router = t.router({
 
                 const userApplicationSettings = await instance.sys.settings.getUserSettings(opt.ctx.userId);
 
+                const settings = await Promise.all(
+                    instance.sys.settings.applicationSettings[opt.input.id]
+                        ?.map(async (a) => {
+                            if (!(a instanceof GlobalApplicationSetting)) {
+                                return {
+                                    displayName: a.displayName,
+                                    defaultValue: a.defaultValue,
+                                    currentValue: await a.getValue(opt.ctx.userId),
+                                    type: a.type,
+                                    id: a.id,
+                                    global: false,
+                                };
+                            }
+
+                            console.log("HANDLE GLOBAL SETTINGS!!!");
+                        })
+                        .filter((a) => a !== undefined),
+                );
+
                 return {
                     displayName: application?.manifest?.displayName || opt.input.id,
                     icon: icon,
-                    settings:
-                        instance.sys.settings.applicationSettings[opt.input.id]
-                            ?.map((a) => {
-                                if (!a.global) {
-                                    return {
-                                        displayName: a.displayName,
-                                        defaultValue: a.defaultValue.toString() as string,
-                                        currentValue: userApplicationSettings[`${a.applicationId}:${a.id}`],
-                                        type: a.type,
-                                        id: a.id,
-                                        global: false,
-                                    };
-                                }
-
-                                console.log("HANDLE GLOBAL SETTINGS!!!");
-                            })
-                            .filter((a) => a !== undefined) || [],
+                    settings: settings || [],
                 };
             }),
-        setApplicationSettingValue: procedure
+        setAppicationBooleanSettingValue: procedure
+            .input(z.object({ applicationId: z.string(), id: z.string(), value: z.boolean() }))
+            .mutation(async (opt) => {
+                await instance.sys.settings.setUserApplicationSetting(
+                    opt.ctx.userId,
+                    opt.input.applicationId,
+                    opt.input.id,
+                    opt.input.value,
+                );
+
+                return true;
+            }),
+        setApplicationStringSettingValue: procedure
             .input(z.object({ applicationId: z.string(), id: z.string(), value: z.string() }))
+            .mutation(async (opt) => {
+                await instance.sys.settings.setUserApplicationSetting(
+                    opt.ctx.userId,
+                    opt.input.applicationId,
+                    opt.input.id,
+                    opt.input.value,
+                );
+
+                return true;
+            }),
+        setApplicationStringListSettingValue: procedure
+            .input(z.object({ applicationId: z.string(), id: z.string(), value: z.string().array() }))
             .mutation(async (opt) => {
                 await instance.sys.settings.setUserApplicationSetting(
                     opt.ctx.userId,

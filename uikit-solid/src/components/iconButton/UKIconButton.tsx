@@ -43,6 +43,7 @@ const UKIconButton: Component<{
                 }
             }}
             class={clsx(props.class, styles.root)}
+            aria-label={props.alt}
         >
             <UKIcon class={props.iconClass}>{props.icon}</UKIcon>
         </button>

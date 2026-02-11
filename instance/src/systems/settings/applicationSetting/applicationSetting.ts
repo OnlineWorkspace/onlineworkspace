@@ -1,6 +1,6 @@
 import { Instance } from "../../../index.js";
 
-export default abstract class ApplicationSetting<T> {
+export abstract class ApplicationSetting<T> {
     applicationId!: string;
     id!: string;
     displayName!: string;
@@ -8,5 +8,20 @@ export default abstract class ApplicationSetting<T> {
     type!: string;
     instance!: Instance;
     description!: string;
-    abstract global: boolean;
+
+    abstract getValue(userId: number): Promise<T>;
+    abstract setValue(userId: number, value: T): Promise<boolean>;
+}
+
+export abstract class GlobalApplicationSetting<T> {
+    applicationId!: string;
+    id!: string;
+    displayName!: string;
+    defaultValue!: T;
+    type!: string;
+    instance!: Instance;
+    description!: string;
+
+    abstract getValue(): Promise<T>;
+    abstract setValue(value: T): Promise<boolean>;
 }

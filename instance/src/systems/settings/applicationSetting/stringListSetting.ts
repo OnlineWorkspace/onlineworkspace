@@ -1,9 +1,15 @@
-import ApplicationSetting from "./applicationSetting.js";
+import { ApplicationSetting, GlobalApplicationSetting } from "./applicationSetting.js";
 
 export class StringListApplicationSetting extends ApplicationSetting<string[]> {
-    global = false;
+    allowedValues?: string[];
+    allowDuplicateValues?: boolean;
 
-    constructor(applicationId: string, id: string, defaultValue: string[]) {
+    constructor(
+        applicationId: string,
+        id: string,
+        defaultValue: string[],
+        options?: { allowedValues: string[]; allowDuplicateValues?: boolean },
+    ) {
         super();
 
         this.applicationId = applicationId;
@@ -12,19 +18,34 @@ export class StringListApplicationSetting extends ApplicationSetting<string[]> {
         this.displayName = id;
         this.type = "stringList";
         this.description = "No description provided";
+        this.allowedValues = options?.allowedValues;
+        this.allowDuplicateValues = options?.allowDuplicateValues;
+
+        return this;
     }
 
-    async setValue(value: string[], userId: number) {
+    async setValue(userId: number, value: string[]) {
+        if (this.allowedValues) {
+            for (const val of value) {
+                if (!this.allowedValues.includes(val)) {
+                    this.instance.log.system.warning(
+                        `Unable to set setting '${this.applicationId}:${this.id}' for user ${userId} as it contains invalid value '${value}'`,
+                    );
+                    return false;
+                }
+            }
+        }
+
         let userSettings = await this.instance.sys.settings.getUserSettings(userId);
 
         userSettings[`app:${this.applicationId}:${this.id}`] = JSON.stringify(value);
 
         await this.instance.sys.settings.setUserSettings(userId, userSettings);
 
-        return this;
+        return true;
     }
 
-    async addValue(value: string, userId: number) {
+    async addValue(userId: number, value: string) {
         let userSettings = await this.instance.sys.settings.getUserSettings(userId);
 
         userSettings[`app:${this.applicationId}:${this.id}`] = JSON.stringify([
@@ -40,7 +61,7 @@ export class StringListApplicationSetting extends ApplicationSetting<string[]> {
     async getValue(userId: number): Promise<string[]> {
         let userSettings = await this.instance.sys.settings.getUserSettings(userId);
 
-        const settingValue = userSettings[`${this.applicationId}:${this.id}`];
+        const settingValue = userSettings[`app:${this.applicationId}:${this.id}`];
 
         if (settingValue === undefined) return this.defaultValue;
 
@@ -60,10 +81,16 @@ export class StringListApplicationSetting extends ApplicationSetting<string[]> {
     }
 }
 
-export class GlobalStringListApplicationSetting extends ApplicationSetting<string[]> {
-    global = true;
+export class GlobalStringListApplicationSetting extends GlobalApplicationSetting<string[]> {
+    allowedValues?: string[];
+    allowDuplicateValues?: boolean;
 
-    constructor(applicationId: string, id: string, defaultValue: string[]) {
+    constructor(
+        applicationId: string,
+        id: string,
+        defaultValue: string[],
+        options?: { allowedValues: string[]; allowDuplicateValues?: boolean },
+    ) {
         super();
 
         this.applicationId = applicationId;
@@ -71,15 +98,30 @@ export class GlobalStringListApplicationSetting extends ApplicationSetting<strin
         this.defaultValue = defaultValue;
         this.type = "string";
         this.description = "No description provided";
+        this.allowedValues = options?.allowedValues;
+        this.allowDuplicateValues = options?.allowDuplicateValues;
+
+        return this;
     }
 
     async setValue(value: string[]) {
+        if (this.allowedValues) {
+            for (const val of value) {
+                if (!this.allowedValues.includes(val)) {
+                    this.instance.log.system.warning(
+                        `Unable to set setting '${this.applicationId}:${this.id}' as it contains invalid value '${value}'`,
+                    );
+                    return false;
+                }
+            }
+        }
+
         await this.instance.sys.settings.setGlobalSetting(
             `app:${this.applicationId}:${this.id}`,
             JSON.stringify(value),
         );
 
-        return this;
+        return true;
     }
 
     async addValue(value: string) {
@@ -103,7 +145,7 @@ export class GlobalStringListApplicationSetting extends ApplicationSetting<strin
     }
 
     async getValue(): Promise<string[]> {
-        const settingValue = await this.instance.sys.settings.getGlobalSetting(`${this.applicationId}:${this.id}`);
+        const settingValue = await this.instance.sys.settings.getGlobalSetting(`app:${this.applicationId}:${this.id}`);
 
         if (settingValue === undefined) return this.defaultValue;
 

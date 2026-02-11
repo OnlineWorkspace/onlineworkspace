@@ -17,14 +17,12 @@ const StringSetting: Component<{
     createEffect(async () => {
         if (!params.applicationId) return;
 
-        await trpc.application.setApplicationSettingValue.mutate({
+        await trpc.application.setApplicationStringSettingValue.mutate({
             applicationId: params.applicationId as string,
             id: props.id,
             value: value().toString(),
         });
     });
-
-    console.log(value() !== props.defaultValue);
 
     return (
         <UKStackItem
