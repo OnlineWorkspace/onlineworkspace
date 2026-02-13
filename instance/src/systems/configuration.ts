@@ -60,6 +60,9 @@ export default class ConfigurationSystem extends System {
                 port: 5432,
             },
         };
+
+        if (process.env.POSTGRES_DATABASE_HOST) this.databases.postgres.host = process.env.POSTGRES_DATABASE_HOST;
+
         this.backendUrl = "http://localhost:3563";
         this.webUrl = ["http://localhost:5173", "http://192.168.1.118:5173"];
         this.signupRequirements = {
