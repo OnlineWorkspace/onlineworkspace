@@ -500,7 +500,7 @@ const router = t.router({
                 const requiredResizedWallpaperPath = path.join(resizedWallpapersPath, `${504}x${280}.png`);
 
                 if (!(await fs.exists(rawWallpaperPath))) {
-                    return "/assets/tricolor/tricolor.svg";
+                    return undefined;
                 }
 
                 if (!(await fs.exists(requiredResizedWallpaperPath))) {
@@ -650,6 +650,31 @@ const router = t.router({
                 return newBuf;
             }),
         },
+        quickShortcuts: {
+            get: procedure
+                .output(
+                    z.object({
+                        displayName: z.string(),
+                        defaultValue: z.any(),
+                        currentValue: z.any().or(z.undefined()),
+                        type: z.string(),
+                        id: z.string(),
+                    }),
+                )
+                .query(async (opt) => {
+                    const a = instance.sys.settings.applicationSettings["core"].find((s) => s.id === "quick_shortcuts");
+
+                    if (!a) throw "The core:quick_shortcuts setting is somehow missing???";
+
+                    return {
+                        displayName: a.displayName,
+                        defaultValue: a.defaultValue,
+                        currentValue: await a.getValue(opt.ctx.userId),
+                        type: a.type,
+                        id: a.id,
+                    };
+                }),
+        },
     },
     storage: {
         usage: procedure
@@ -780,11 +805,9 @@ const router = t.router({
                     }
                 }
 
-                const userApplicationSettings = await instance.sys.settings.getUserSettings(opt.ctx.userId);
-
-                const settings = await Promise.all(
-                    instance.sys.settings.applicationSettings[opt.input.id]
-                        ?.map(async (a) => {
+                const settings = (
+                    await Promise.all(
+                        instance.sys.settings.applicationSettings[opt.input.id]?.map(async (a) => {
                             if (!(a instanceof GlobalApplicationSetting)) {
                                 return {
                                     displayName: a.displayName,
@@ -797,9 +820,9 @@ const router = t.router({
                             }
 
                             console.log("HANDLE GLOBAL SETTINGS!!!");
-                        })
-                        .filter((a) => a !== undefined),
-                );
+                        }) || [],
+                    )
+                ).filter((a) => a !== undefined);
 
                 return {
                     displayName: application?.manifest?.displayName || opt.input.id,

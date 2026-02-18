@@ -6,8 +6,11 @@ import trpc from "../../lib/trpc";
 import UKIndeterminateSpinner from "@tcsw/uikit-solid/src/components/indeterminateSpinner/UKIndeterminateSpinner.jsx";
 import clsx from "clsx";
 import PLACEHOLDER_WALLPAPER from "./../../assets/placeholder_wallpaper.png";
+import UKButton from "@tcsw/uikit-solid/src/components/button/UKButton.jsx";
+import { useNavigate } from "@solidjs/router";
 
 const RootPage: Component = () => {
+    const navigate = useNavigate();
     const [wallpaper] = createResource(() =>
         trpc.dashboard.getWallpaper.query({ width: screen.width, height: screen.height }),
     );
@@ -55,6 +58,15 @@ const RootPage: Component = () => {
                     }}
                 </For>
             </div>
+            <UKButton
+                leadingIcon={"edit"}
+                onClick={() => {
+                    navigate("/app/uk.tcsw.settings/applications/uk.tcsw.dashboard?origin=/app/uk.tcsw.dashboard");
+                }}
+                color={"tonal"}
+            >
+                Edit widgets
+            </UKButton>
         </div>
     );
 };

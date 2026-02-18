@@ -3,6 +3,7 @@ import styles from "./ThemePreview.module.scss";
 import UKIcon from "@tcsw/uikit-solid/src/components/icon/UKIcon.tsx";
 import trpc from "../../../../lib/trpc.ts";
 import UKIndeterminateSpinner from "@tcsw/uikit-solid/src/components/indeterminateSpinner/UKIndeterminateSpinner.tsx";
+import PLACEHOLDER_WALLPAPER from "./../../../../assets/placeholder_wallpaper.png";
 import clsx from "clsx";
 
 const ThemePreview: Component<{
@@ -10,20 +11,14 @@ const ThemePreview: Component<{
     align?: ["left" | "center" | "right", "top" | "middle" | "bottom"];
     fillStyle?: "cover" | "fill" | "contain";
 }> = (props) => {
-    const [currentWallpaper] = createResource(() =>
-        trpc.customization.wallpaper.currentWallpaper.query(),
-    );
+    const [currentWallpaper] = createResource(() => trpc.customization.wallpaper.currentWallpaper.query());
 
     return (
         <div class={styles.root}>
             <Suspense fallback={<UKIndeterminateSpinner class={styles.wallpaperSpinner} />}>
                 <img
                     alt={""}
-                    src={
-                        props.wallpaperOverride ||
-                        currentWallpaper() ||
-                        "/assets/tricolor/tricolor.svg"
-                    }
+                    src={props.wallpaperOverride ?? currentWallpaper() ?? PLACEHOLDER_WALLPAPER}
                     style={{
                         "object-fit": props.fillStyle || "cover",
                     }}

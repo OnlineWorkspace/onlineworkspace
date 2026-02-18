@@ -22,6 +22,7 @@ import WebFrontendSystem from "./systems/webFrontend.js";
 import { promises as fs } from "fs";
 import EmailSystem from "./systems/email.js";
 import EventSystem, { WorkspacesEvent } from "./systems/events.js";
+import { StringListApplicationSetting } from "./systems/settings/applicationSetting/stringListSetting.js";
 
 export enum InstanceStatus {
     Online,
@@ -90,6 +91,16 @@ class Instance {
                 sys.log.error(`System Startup Failed!`);
             }
         }
+
+        this.sys.event.on(WorkspacesEvent.BeforeStartupComplete, () => {
+            this.sys.settings.registerApplicationSetting(
+                new StringListApplicationSetting("core", "quick_shortcuts", [
+                    "uk.tcsw.dashboard",
+                    "uk.tcsw.store",
+                    "uk.tcsw.settings",
+                ]).setDisplayName("Quick Shortcuts"),
+            );
+        });
 
         this.sys.event.invoke(WorkspacesEvent.BeforeStartupComplete);
 

@@ -12,6 +12,7 @@ import WallpaperPage from "./pages/customization/wallpaper/Index.tsx";
 import ColorThemePage from "./pages/customization/colorTheme/Index.tsx";
 import ApplicationsPage from "./pages/applications/Index.tsx";
 import ApplicationPage from "./pages/applications/applicationId/Index.tsx";
+import QuickShortcutsPage from "./pages/customization/quickShortcuts/Index.tsx";
 
 const App: Component = () => {
     return (
@@ -28,6 +29,7 @@ const App: Component = () => {
                     <Route path={"/"} component={CustomizationPage} />
                     <Route path={"/wallpaper"} component={WallpaperPage} />
                     <Route path={"/color-theme"} component={ColorThemePage} />
+                    <Route path={"/quick-shortcuts"} component={QuickShortcutsPage} />
                 </Route>
                 <Route path={"/instance"} component={InstancePage} />
                 <Route path={"/applications"}>

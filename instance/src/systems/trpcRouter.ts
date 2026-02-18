@@ -549,10 +549,15 @@ ${opt.ctx.instance.sys.configuration.termsOfUse.message}`;
                     });
                 }),
             getQuickShortcuts: procedure.query(async (opt) => {
-                let applications = opt.ctx.instance.sys.applications.getEnabledApplications();
-                let userSettings = await opt.ctx.instance.sys.settings.getUser(opt.ctx.userId);
+                const a = opt.ctx.instance.sys.settings.applicationSettings["core"].find(
+                    (s) => s.id === "quick_shortcuts",
+                );
 
-                let quickShortcuts = (userSettings["instance.navigation.quick_shortcuts"] as string[]) || [];
+                if (!a) throw "The core:quick_shortcuts setting is somehow missing???";
+
+                const quickShortcuts = (await a.getValue(opt.ctx.userId)) as string[];
+
+                let applications = opt.ctx.instance.sys.applications.getEnabledApplications();
 
                 return quickShortcuts
                     .map((shortcut) => {

@@ -102,7 +102,7 @@ const router = t.router({
             );
 
             if (!(await fs.exists(rawWallpaperPath))) {
-                return "/assets/tricolor/tricolor.svg";
+                return undefined;
             }
 
             if (!(await fs.exists(requiredResizedWallpaperPath))) {

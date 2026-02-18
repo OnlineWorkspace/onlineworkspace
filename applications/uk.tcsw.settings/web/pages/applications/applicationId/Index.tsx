@@ -2,7 +2,7 @@ import { createResource, For, type Component } from "solid-js";
 import styles from "./Index.module.scss";
 import UKText from "@tcsw/uikit-solid/src/components/text/UKText.jsx";
 import UKTopAppBar from "@tcsw/uikit-solid/src/components/topAppBar/UKTopAppBar.jsx";
-import { useNavigate, useParams } from "@solidjs/router";
+import { useNavigate, useParams, useSearchParams } from "@solidjs/router";
 import trpc from "../../../lib/trpc.ts";
 import UKStackItem from "@tcsw/uikit-solid/src/components/stack/UKStackItem.tsx";
 import UKStack from "@tcsw/uikit-solid/src/components/stack/UKStack.tsx";
@@ -17,6 +17,7 @@ import StringListSetting from "./components/StringListSetting/StringListSetting.
 
 const ApplicationPage: Component = () => {
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
     const params = useParams();
     const [data] = createResource(() => trpc.application.getApplication.query({ id: params.applicationId }));
 
@@ -28,7 +29,7 @@ const ApplicationPage: Component = () => {
                 leadingButton={{
                     icon: "chevron_left",
                     onClick() {
-                        navigate("/app/uk.tcsw.settings/applications");
+                        navigate(searchParams.origin?.toString() ?? "/app/uk.tcsw.settings/applications");
                     },
                     accessibleLabel: "Go back",
                 }}

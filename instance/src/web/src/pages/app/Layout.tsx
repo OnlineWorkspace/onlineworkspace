@@ -16,7 +16,7 @@ const AppLayout: Component<RouteSectionProps<unknown>> = (props) => {
     const navigate = useNavigate();
     const isMobile = useIsMobile();
 
-    const [quickShortcuts] = createResource(() => trpc.app.navigation.getApplications.query());
+    const [quickShortcuts] = createResource(() => trpc.app.navigation.getQuickShortcuts.query());
     const [expanded, setExpanded] = createSignal<boolean>(false);
     const [toggledDrawer, setToggledDrawer] = createSignal<"applications" | "notifications" | false>(false);
 

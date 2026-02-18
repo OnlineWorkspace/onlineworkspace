@@ -48,6 +48,13 @@ const CustomizationPage: Component = () => {
                             navigate("/app/uk.tcsw.settings/customization/wallpaper");
                         }}
                     />
+                    <UKStackItem
+                        labelText={"Quick Shortcuts"}
+                        supportingText={"Modify the applications shown in your quick shortcuts"}
+                        onClick={() => {
+                            navigate("/app/uk.tcsw.settings/customization/quick-shortcuts");
+                        }}
+                    />
                 </UKStack>
             </div>
         </>
