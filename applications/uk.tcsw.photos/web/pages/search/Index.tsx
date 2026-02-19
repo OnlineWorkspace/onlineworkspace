@@ -14,7 +14,6 @@ const SearchPage: Component = () => {
             <UKTopAppBar type="search" getValue={() => {}} value={() => ""} placeholder="Begin typing to search" />
             <div class={styles.page}>
                 <UKStack class={styles.searchResults}>
-                    Results
                     <UKStackItem labelText="Search Result 1" />
                     <UKStackItem labelText="Search Result 2" />
                     <UKStackItem labelText="Search Result 3" />
@@ -48,7 +47,6 @@ const SearchPage: Component = () => {
                             People
                         </UKText>
                     </div>
-
                     <div class={styles.category}>
                         <UKCard class={styles.previewCollage}>
                             <img
