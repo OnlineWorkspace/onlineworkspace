@@ -13,6 +13,7 @@ const StringListSetting: Component<{
     id: string;
     defaultValue: string[];
     currentValue: string[] | undefined;
+    description: string;
 }> = (props) => {
     const params = useParams();
     const [inputValue, setInputValue] = createSignal<string>("");
@@ -30,8 +31,8 @@ const StringListSetting: Component<{
 
     return (
         <UKStackItem
-            labelText={props.displayName}
-            supportingText={props.id}
+            labelText={`${props.displayName} (${props.id})`}
+            supportingText={props.description}
             leading={
                 items() !== props.defaultValue
                     ? {

@@ -10,6 +10,7 @@ const StringSetting: Component<{
     id: string;
     defaultValue: string;
     currentValue: string | undefined;
+    description: string;
 }> = (props) => {
     const params = useParams();
     const [value, setValue] = createSignal(props.currentValue ?? props.defaultValue);
@@ -26,8 +27,8 @@ const StringSetting: Component<{
 
     return (
         <UKStackItem
-            labelText={props.displayName}
-            supportingText={props.id}
+            labelText={`${props.displayName} (${props.id})`}
+            supportingText={props.description}
             leading={
                 value() !== props.defaultValue
                     ? {

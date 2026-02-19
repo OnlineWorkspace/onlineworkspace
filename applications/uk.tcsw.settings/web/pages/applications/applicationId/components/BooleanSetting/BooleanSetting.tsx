@@ -5,9 +5,13 @@ import trpc from "../../../../../lib/trpc.ts";
 import { useParams } from "@solidjs/router";
 import styles from "./BooleanSetting.module.scss";
 
-const BooleanSetting: Component<{ displayName: string; id: string; defaultValue: boolean; currentValue: boolean }> = (
-    props,
-) => {
+const BooleanSetting: Component<{
+    displayName: string;
+    id: string;
+    defaultValue: boolean;
+    currentValue: boolean;
+    description: string;
+}> = (props) => {
     const params = useParams();
     const [value, setValue] = createSignal(props.currentValue ?? props.defaultValue);
 
@@ -23,8 +27,8 @@ const BooleanSetting: Component<{ displayName: string; id: string; defaultValue:
 
     return (
         <UKStackItem
-            labelText={props.displayName}
-            supportingText={props.id}
+            labelText={`${props.displayName} (${props.id})`}
+            supportingText={props.description}
             inlineComponent={
                 <>
                     <UKSwitch class={styles.switch} getValue={setValue} value={value()} />

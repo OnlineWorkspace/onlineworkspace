@@ -95,6 +95,7 @@ const ApplicationPage: Component = () => {
                                     return (
                                         <BooleanSetting
                                             id={setting.id}
+                                            description={setting.description}
                                             currentValue={setting.currentValue}
                                             defaultValue={setting.defaultValue}
                                             displayName={setting.displayName}
@@ -104,6 +105,7 @@ const ApplicationPage: Component = () => {
                                     return (
                                         <StringSetting
                                             id={setting.id}
+                                            description={setting.description}
                                             currentValue={setting.currentValue}
                                             defaultValue={setting.defaultValue}
                                             displayName={setting.displayName}
@@ -113,6 +115,7 @@ const ApplicationPage: Component = () => {
                                     return (
                                         <StringListSetting
                                             id={setting.id}
+                                            description={setting.description}
                                             currentValue={setting.currentValue}
                                             defaultValue={setting.defaultValue}
                                             displayName={setting.displayName}

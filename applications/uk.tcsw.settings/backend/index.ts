@@ -778,6 +778,7 @@ const router = t.router({
                             type: z.string(),
                             id: z.string(),
                             global: z.boolean(),
+                            description: z.string(),
                         })
                         .array(),
                 }),
@@ -816,6 +817,7 @@ const router = t.router({
                                     type: a.type,
                                     id: a.id,
                                     global: false,
+                                    description: a.description || "No description provided.",
                                 };
                             }
 
