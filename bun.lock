@@ -170,6 +170,46 @@
         "vite": "^7.1.2",
       },
     },
+    "applications/uk.tcsw.photos/backend": {
+      "name": "uk-tcsw-photos-backend",
+      "dependencies": {
+        "@tcsw/workspaces-instance": "workspace:*",
+        "@trpc/server": "^11.6.0",
+        "@types/bun": "^1.3.0",
+        "@types/cookies": "^0.9.1",
+        "@types/cors": "^2.8.19",
+        "@types/dockerode": "^3.3.42",
+        "@types/express": "^5.0.3",
+        "@types/minimist": "^1.2.5",
+        "chalk": "^5.5.0",
+        "cookies": "^0.9.1",
+        "cors": "^2.8.5",
+        "dockerode": "^4.0.7",
+        "dotenv": "^17.2.1",
+        "express": "^5.1.0",
+        "minimist": "^1.2.8",
+        "sharp": "^0.34.3",
+        "trpc-bun-adapter": "^1.3.0",
+        "typescript": "^5.9.2",
+        "zod": "^4.0.17",
+      },
+    },
+    "applications/uk.tcsw.photos/web": {
+      "name": "uk-tcsw-photos-web",
+      "dependencies": {
+        "@solidjs/router": "^0.15.3",
+        "@tcsw/uikit-solid": "workspace:*",
+        "@trpc/client": "^11.6.0",
+        "@trpc/server": "^11.6.0",
+        "clsx": "^2.1.1",
+        "ghostty-web": "^0.3.0",
+        "solid-js": "^1.9.8",
+      },
+      "devDependencies": {
+        "typescript": "~5.8.3",
+        "vite": "^7.1.2",
+      },
+    },
     "applications/uk.tcsw.settings/backend": {
       "name": "uk-tcsw-settings-backend",
       "dependencies": {
@@ -1441,6 +1481,10 @@
 
     "uk-tcsw-ghostty-web": ["uk-tcsw-ghostty-web@workspace:applications/uk.tcsw.ghostty/web"],
 
+    "uk-tcsw-photos-backend": ["uk-tcsw-photos-backend@workspace:applications/uk.tcsw.photos/backend"],
+
+    "uk-tcsw-photos-web": ["uk-tcsw-photos-web@workspace:applications/uk.tcsw.photos/web"],
+
     "uk-tcsw-settings-backend": ["uk-tcsw-settings-backend@workspace:applications/uk.tcsw.settings/backend"],
 
     "uk-tcsw-settings-web": ["uk-tcsw-settings-web@workspace:applications/uk.tcsw.settings/web"],
@@ -1540,6 +1584,8 @@
     "uk-tcsw-files-web/typescript": ["typescript@5.8.3", "", { "bin": { "tsc": "bin/tsc", "tsserver": "bin/tsserver" } }, "sha512-p1diW6TqL9L07nNxvRMM7hMMw4c5XOo/1ibL4aAIGmSAt9slTE1Xgw5KWuof2uTOvCg9BY7ZRi+GaF+7sfgPeQ=="],
 
     "uk-tcsw-ghostty-web/typescript": ["typescript@5.8.3", "", { "bin": { "tsc": "bin/tsc", "tsserver": "bin/tsserver" } }, "sha512-p1diW6TqL9L07nNxvRMM7hMMw4c5XOo/1ibL4aAIGmSAt9slTE1Xgw5KWuof2uTOvCg9BY7ZRi+GaF+7sfgPeQ=="],
+
+    "uk-tcsw-photos-web/typescript": ["typescript@5.8.3", "", { "bin": { "tsc": "bin/tsc", "tsserver": "bin/tsserver" } }, "sha512-p1diW6TqL9L07nNxvRMM7hMMw4c5XOo/1ibL4aAIGmSAt9slTE1Xgw5KWuof2uTOvCg9BY7ZRi+GaF+7sfgPeQ=="],
 
     "uk-tcsw-settings-web/typescript": ["typescript@5.8.3", "", { "bin": { "tsc": "bin/tsc", "tsserver": "bin/tsserver" } }, "sha512-p1diW6TqL9L07nNxvRMM7hMMw4c5XOo/1ibL4aAIGmSAt9slTE1Xgw5KWuof2uTOvCg9BY7ZRi+GaF+7sfgPeQ=="],
 
