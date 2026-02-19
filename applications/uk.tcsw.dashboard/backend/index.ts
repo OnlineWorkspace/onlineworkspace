@@ -69,6 +69,13 @@ const router = t.router({
                 "content_background",
             );
         }),
+        showEditButton: procedure.output(z.boolean()).query(async (opt) => {
+            return await opt.ctx.instance.sys.settings.getUserApplicationSetting<BooleanApplicationSetting>(
+                opt.ctx.userId,
+                "uk.tcsw.dashboard",
+                "show_edit_button",
+            );
+        }),
         getWallpaperOptions: procedure
             .output(
                 z.object({
@@ -153,16 +160,31 @@ instance.sys.tRPC.registeredRouters.push({
 
 instance.sys.event.on(WorkspacesEvent.BeforeStartupComplete, () => {
     instance.sys.settings.registerApplicationSetting(
-        new BooleanApplicationSetting("uk.tcsw.dashboard", "show_greeting", true).setDisplayName("Show Greeting"),
+        new BooleanApplicationSetting("uk.tcsw.dashboard", "show_greeting", true)
+            .setDisplayName("Show Greeting")
+            .setDescription(
+                "Should a greeting message be shown on the dashboard welcoming the user. The message will include the user's forename if available.",
+            ),
     );
     instance.sys.settings.registerApplicationSetting(
-        new BooleanApplicationSetting("uk.tcsw.dashboard", "content_background", true).setDisplayName(
-            "Show Content Background",
-        ),
+        new BooleanApplicationSetting("uk.tcsw.dashboard", "content_background", true)
+            .setDisplayName("Show Content Background")
+            .setDescription(
+                "Should a background be shown behind the dashboard content to improve readability when using certain wallpapers.",
+            ),
     );
     instance.sys.settings.registerApplicationSetting(
-        new StringListApplicationSetting("uk.tcsw.dashboard", "widgets", ["user.profile"]).setDisplayName(
-            "Enabled Widgets",
-        ),
+        new StringListApplicationSetting("uk.tcsw.dashboard", "widgets", ["user.profile"])
+            .setDisplayName("Enabled Widgets")
+            .setDescription(
+                "A list of widget IDs that should be enabled on the dashboard. Widget IDs are not yet documented, but can be found in the source code of this application.",
+            ),
+    );
+    instance.sys.settings.registerApplicationSetting(
+        new BooleanApplicationSetting("uk.tcsw.dashboard", "show_edit_button", true)
+            .setDisplayName("Show Edit Button on Dashboard")
+            .setDescription(
+                "Should the edit button be displayed on the dashboard to allow quick navigation to this settings page.",
+            ),
     );
 });

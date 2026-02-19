@@ -75,6 +75,44 @@ const QuickShortcuts: Component<{
                                     <UKText role="body" size="l" class={styles.itemLabel}>
                                         {item}
                                     </UKText>
+                                    {items().indexOf(item) < items().length - 1 && (
+                                        <UKIconButton
+                                            color="tonal"
+                                            alt="Move item down"
+                                            onClick={() => {
+                                                setItems((ims) => {
+                                                    const index = ims.indexOf(item);
+                                                    if (index === -1 || index === ims.length - 1) return ims;
+                                                    const newItems = [...ims];
+                                                    [newItems[index + 1], newItems[index]] = [
+                                                        newItems[index],
+                                                        newItems[index + 1],
+                                                    ];
+                                                    return newItems;
+                                                });
+                                            }}
+                                            icon="arrow_downward"
+                                        ></UKIconButton>
+                                    )}
+                                    {items().indexOf(item) > 0 && (
+                                        <UKIconButton
+                                            color="tonal"
+                                            alt="Move item up"
+                                            onClick={() => {
+                                                setItems((ims) => {
+                                                    const index = ims.indexOf(item);
+                                                    if (index === -1 || index === 0) return ims;
+                                                    const newItems = [...ims];
+                                                    [newItems[index - 1], newItems[index]] = [
+                                                        newItems[index],
+                                                        newItems[index - 1],
+                                                    ];
+                                                    return newItems;
+                                                });
+                                            }}
+                                            icon="arrow_upward"
+                                        ></UKIconButton>
+                                    )}
                                 </div>
                             );
                         }}

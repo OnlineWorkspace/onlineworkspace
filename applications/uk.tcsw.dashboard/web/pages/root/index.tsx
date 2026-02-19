@@ -18,6 +18,7 @@ const RootPage: Component = () => {
     const [wallpaperOptions] = createResource(() => trpc.dashboard.getWallpaperOptions.query());
     const [welcomeMessage] = createResource(() => trpc.dashboard.welcomeMessage.query());
     const [contentBackground] = createResource(() => trpc.dashboard.contentBackground.query());
+    const [showEditButton] = createResource(() => trpc.dashboard.showEditButton.query());
 
     return (
         <div class={styles.root} data-show-background={contentBackground()}>
@@ -58,15 +59,17 @@ const RootPage: Component = () => {
                     }}
                 </For>
             </div>
-            <UKButton
-                leadingIcon={"edit"}
-                onClick={() => {
-                    navigate("/app/uk.tcsw.settings/applications/uk.tcsw.dashboard?origin=/app/uk.tcsw.dashboard");
-                }}
-                color={"tonal"}
-            >
-                Edit widgets
-            </UKButton>
+            {showEditButton() && (
+                <UKButton
+                    leadingIcon={"edit"}
+                    onClick={() => {
+                        navigate("/app/uk.tcsw.settings/applications/uk.tcsw.dashboard?origin=/app/uk.tcsw.dashboard");
+                    }}
+                    color={"tonal"}
+                >
+                    Edit widgets
+                </UKButton>
+            )}
         </div>
     );
 };
