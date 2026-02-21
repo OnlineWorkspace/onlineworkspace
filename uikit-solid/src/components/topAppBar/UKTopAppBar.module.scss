@@ -15,19 +15,28 @@
         padding-left: 0.25rem;
         padding-right: 0.25rem;
         background-color: rgb(var(--uk-sys-color-background));
-        display: flex;
+        display: grid;
         flex-direction: row;
+        grid-template-columns: 1fr minmax(0%, 100%) 1fr;
+        gap: 0.5rem;
         z-index: 50;
         min-height: var(--top-bar-size);
         transition:
-            background-color var(--uk-sys-motion-duration-100)
-                var(--uk-sys-motion-easing-standard-decelerate),
-            min-height var(--uk-sys-motion-duration-100)
-                var(--uk-sys-motion-easing-standard-decelerate);
+            background-color var(--uk-sys-motion-duration-100) var(--uk-sys-motion-easing-standard-decelerate),
+            min-height var(--uk-sys-motion-duration-100) var(--uk-sys-motion-easing-standard-decelerate);
 
-        .leadingIcon {
+        .leading {
             color: rgb(var(--uk-sys-color-on-surface));
-            margin-top: 0.75rem;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            width: max-content;
+            gap: 1rem;
+
+            &:has(*) {
+                padding-left: 0.25rem;
+            }
         }
 
         .trailing {
@@ -36,6 +45,7 @@
             flex-direction: row;
             align-items: center;
             justify-content: center;
+            width: max-content;
             gap: 1rem;
 
             &:has(*) {
@@ -71,14 +81,10 @@
                 padding-left: 0.5rem;
 
                 transition:
-                    top var(--uk-sys-motion-duration-200)
-                        var(--uk-sys-motion-easing-standard-decelerate),
-                    left var(--uk-sys-motion-duration-100)
-                        var(--uk-sys-motion-easing-standard-decelerate),
-                    transform var(--uk-sys-motion-duration-100)
-                        var(--uk-sys-motion-easing-standard-decelerate),
-                    padding-left var(--uk-sys-motion-duration-100)
-                        var(--uk-sys-motion-easing-standard-decelerate);
+                    top var(--uk-sys-motion-duration-200) var(--uk-sys-motion-easing-standard-decelerate),
+                    left var(--uk-sys-motion-duration-100) var(--uk-sys-motion-easing-standard-decelerate),
+                    transform var(--uk-sys-motion-duration-100) var(--uk-sys-motion-easing-standard-decelerate),
+                    padding-left var(--uk-sys-motion-duration-100) var(--uk-sys-motion-easing-standard-decelerate);
 
                 .headline {
                     color: rgb(var(--uk-sys-color-on-surface));
@@ -116,8 +122,7 @@
                 padding-right: 1rem;
                 color: rgb(var(--uk-sys-color-on-surface-variant));
 
-                transition: opacity var(--uk-sys-motion-duration-100)
-                    var(--uk-sys-motion-easing-standard-decelerate);
+                transition: opacity var(--uk-sys-motion-duration-100) var(--uk-sys-motion-easing-standard-decelerate);
             }
 
             &:has(> input:focus),
@@ -153,10 +158,8 @@
                 font-variation-settings: "opsz" 16;
 
                 transition:
-                    text-align var(--uk-sys-motion-duration-200)
-                        var(--uk-sys-motion-easing-standard-decelerate),
-                    background-color var(--uk-sys-motion-duration-100)
-                        var(--uk-sys-motion-easing-standard-decelerate);
+                    text-align var(--uk-sys-motion-duration-200) var(--uk-sys-motion-easing-standard-decelerate),
+                    background-color var(--uk-sys-motion-duration-100) var(--uk-sys-motion-easing-standard-decelerate);
             }
         }
 

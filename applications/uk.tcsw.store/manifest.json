@@ -9,6 +9,7 @@
     "authors": [
         "Tricolor Software <https://tcsw.uk>"
     ],
+    "graphicsAcceleration": "Recommended",
     "license": "MIT",
     "source": "https://github.com/tricolorsoftware/workspaces/src/branch/main/packages/applications/uk.tcsw.store",
     "modules": {

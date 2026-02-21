@@ -10,6 +10,7 @@ export interface WorkspacesApplication {
     authors: string[];
     license: string;
     source?: string;
+    graphicsAcceleration?: string;
     modules: {
         // not yet supported
         docker?: {}[];

@@ -87,20 +87,18 @@ const ApplicationPage: Component = () => {
                                 Instance Storage
                             </UKText>
                             <UKText role="body" size="m">
-                                10GB
+                                <>{application()?.installSize}</>
                             </UKText>
-                            <UKText role="label" size="l">
-                                Per User Storage (consumes personal quota)
-                            </UKText>
-                            <UKText role="body" size="m">
-                                1GB
-                            </UKText>
-                            <UKText role="label" size="l">
-                                Graphics Acceleration
-                            </UKText>
-                            <UKText role="body" size="m">
-                                Recommended
-                            </UKText>
+                            {application()?.graphicsAcceleration && (
+                                <>
+                                    <UKText role="label" size="l">
+                                        Graphics Acceleration
+                                    </UKText>
+                                    <UKText role="body" size="m">
+                                        <>{application()?.graphicsAcceleration}</>
+                                    </UKText>
+                                </>
+                            )}
                         </div>
                     }
                 />

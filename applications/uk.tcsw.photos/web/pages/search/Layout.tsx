@@ -8,9 +8,9 @@ import styles from "./Layout.module.scss";
 import { useNavigate } from "@solidjs/router";
 
 const SEARCH_TYPES: { displayName: string; prefix: string }[] = [
-    { displayName: "Search in people", prefix: "people" },
-    { displayName: "Search in albums", prefix: "albums" },
-    { displayName: "Search in places", prefix: "places" },
+    { displayName: "Search in people for ", prefix: "people" },
+    { displayName: "Search in albums for ", prefix: "albums" },
+    { displayName: "Search in places for ", prefix: "places" },
 ];
 
 const SearchLayout: Component<ParentProps> = (props) => {
@@ -44,7 +44,7 @@ const SearchLayout: Component<ParentProps> = (props) => {
                             <For each={SEARCH_TYPES}>
                                 {(type) => (
                                     <UKStackItem
-                                        labelText={type.displayName}
+                                        labelText={`${type.displayName} "${query()}"`}
                                         onClick={() =>
                                             navigate(
                                                 `/app/uk.tcsw.photos/search/${type.prefix}/${encodeURIComponent(query())}`,

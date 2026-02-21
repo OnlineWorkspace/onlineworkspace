@@ -6,6 +6,7 @@ export interface RepositoryApplication {
     authors: { name: string; link: string }[];
     modules: string[];
     bannerImage?: string;
+    graphicsAcceleration?: string;
 }
 export interface RepositoryApplicationSummary {
     id: string;
@@ -22,5 +23,5 @@ export default abstract class ApplicationRepository {
     abstract searchForApplicationIds(query: string): Promise<string[]>;
     abstract getApplicationSummaryById(applicationId: string): Promise<RepositoryApplicationSummary | undefined>;
     abstract getPromotedApplications(): Promise<string[]>;
-    abstract getInstallPath(applicationId: string): Promise<string>;
+    abstract getInstallURI(applicationId: string): Promise<string>;
 }

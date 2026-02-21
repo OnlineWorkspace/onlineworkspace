@@ -99,7 +99,11 @@ export default class LocalApplicationRepository extends ApplicationRepository {
         return ["uk.tcsw.dashboard", "uk.tcsw.settings", "uk.tcsw.ghostty"];
     }
 
-    async getInstallPath(applicationId: string): Promise<string> {
+    async getInstallURI(applicationId: string): Promise<string> {
         return `local:${applicationId}`;
+    }
+
+    async getSourcePath(applicationId: string): Promise<string> {
+        return path.join(instance.sys.filesystem.SRC_ROOT, "../../applications/", applicationId);
     }
 }

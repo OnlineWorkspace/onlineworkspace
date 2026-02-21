@@ -5,6 +5,7 @@ import UKText from "../text/UKText";
 
 interface ISharedProps {
     leadingButton?: { icon: string; accessibleLabel: string; onClick(): void };
+    leadingElements?: JSXElement;
     trailingElements?: JSXElement;
 }
 
@@ -88,15 +89,18 @@ const UKTopAppBar: Component<
                 data-scrolled={scrolled()}
             >
                 <div class={styles.topAppBar}>
-                    {props.leadingButton && (
-                        <UKIconButton
-                            class={styles.leadingIcon}
-                            alt={props.leadingButton.accessibleLabel}
-                            icon={props.leadingButton.icon}
-                            onClick={props.leadingButton.onClick}
-                            color={"standard"}
-                        />
-                    )}
+                    <div class={styles.leading}>
+                        {props.leadingButton && (
+                            <UKIconButton
+                                class={styles.leadingIcon}
+                                alt={props.leadingButton.accessibleLabel}
+                                icon={props.leadingButton.icon}
+                                onClick={props.leadingButton.onClick}
+                                color={"standard"}
+                            />
+                        )}
+                        {props.leadingElements}
+                    </div>
                     {props.type === "small" && "titleImage" in props ? (
                         <img src={props.titleImage} alt={props.titleImageAccessibleLabel} />
                     ) : props.type !== "search" ? (

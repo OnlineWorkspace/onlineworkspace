@@ -7,6 +7,8 @@ import ApplicationRepository from "./repository/applicationRepository";
 import LocalApplicationRepository from "./repository/localRepository";
 import { DEFAULT_APPLICATIONS } from "@tcsw/workspaces-instance/src/systems/applications";
 import { WorkspacesFeatureFlags } from "@tcsw/workspaces-instance/src/systems/configuration";
+import fs from "fs/promises";
+import path from "path";
 
 const log = instance.log.createLogger("uk.tcsw.store");
 
@@ -201,6 +203,8 @@ const router = t.router({
                     ? instance.sys.configuration.hasFeature(WorkspacesFeatureFlags.ShootYourselfInTheFoot)
                     : true,
                 isInstalled: opt.ctx.instance.sys.applications.enabledApplications.includes(app.id),
+                installSize: repository instanceof LocalApplicationRepository ? (await fs.stat(await repository.getSourcePath(app.id))).size : -1,
+                graphicsAcceleration: app.graphicsAcceleration
             };
         }),
         install: procedure
@@ -217,7 +221,7 @@ const router = t.router({
                 // the user must be administrator
                 if (!(await (await opt.ctx.user())?.isAdministrator())) return false;
 
-                await opt.ctx.instance.sys.applications.installApplication(await repository.getInstallPath(app.id));
+                await opt.ctx.instance.sys.applications.installApplication(await repository.getInstallURI(app.id));
                 await opt.ctx.instance.sys.applications.enableApplication(app.id);
 
                 return true;
