@@ -1,6 +1,6 @@
 /// <reference path="./global.d.ts" />
 
-import { createTRPCContext, procedure } from "@tcsw/workspaces-instance/src/system/trpcRouter";
+import { createTRPCContext, procedure } from "@tcsw/workspaces-instance/src/systems/trpcRouter";
 import { initTRPC } from "@trpc/server";
 
 const log = instance.log.createLogger("uk.tcsw.ghostty");

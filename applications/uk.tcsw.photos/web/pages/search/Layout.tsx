@@ -19,24 +19,7 @@ const SearchLayout: Component<ParentProps> = (props) => {
 
     return (
         <>
-            <UKTopAppBar
-                leadingButton={
-                    query() !== ""
-                        ? {
-                              onClick() {
-                                  setQuery("");
-                                  navigate("/app/uk.tcsw.photos/search");
-                              },
-                              accessibleLabel: "Go Back",
-                              icon: "chevron_left",
-                          }
-                        : undefined
-                }
-                type="search"
-                getValue={setQuery}
-                value={query}
-                placeholder="Begin typing to search"
-            />
+            <UKTopAppBar type="search" getValue={setQuery} value={query} placeholder="Begin typing to search" />
             <div class={styles.page}>
                 {query() !== "" && (
                     <>
