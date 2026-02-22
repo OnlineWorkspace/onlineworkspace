@@ -2,7 +2,7 @@
 
 import { WorkspacesNotificationPriority } from "@tcsw/workspaces-instance/src/systems/notifications";
 import { AuthorizedDeviceType, SESSION_VALID_TERM_MS } from "@tcsw/workspaces-instance/src/systems/authorization";
-import { adminProcedure, createTRPCContext, procedure } from "@tcsw/workspaces-instance/src/systems/trpcRouter";
+import { adminProcedure, createTRPCContext, procedure } from "@tcsw/workspaces-instance/src/systems/trpcRouter.js";
 import { initTRPC, TRPCError } from "@trpc/server";
 import z from "zod";
 import path from "path";

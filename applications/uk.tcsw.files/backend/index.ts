@@ -1,6 +1,6 @@
 /// <reference path="./global.d.ts" />
 
-import { createTRPCContext, procedure } from "@tcsw/workspaces-instance/src/systems/trpcRouter";
+import { createTRPCContext, procedure } from "@tcsw/workspaces-instance/src/systems/trpcRouter.js";
 import { initTRPC } from "@trpc/server";
 import z from "zod";
 import * as path from "node:path";

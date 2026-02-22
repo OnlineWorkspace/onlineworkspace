@@ -1,11 +1,11 @@
 /// <reference path="./global.d.ts" />
 
-import { createTRPCContext, procedure } from "@tcsw/workspaces-instance/src/systems/trpcRouter";
+import { createTRPCContext, procedure } from "@tcsw/workspaces-instance/src/systems/trpcRouter.js";
 import { initTRPC } from "@trpc/server";
 import z from "zod";
 import path from "path";
 import fs from "fs/promises";
-import { WorkspacesEvent } from "@tcsw/workspaces-instance/src/systems/events";
+import { WorkspacesEvent } from "@tcsw/workspaces-instance/src/systems/events.js";
 import { BooleanApplicationSetting } from "../../../instance/src/systems/settings/applicationSetting/booleanSetting";
 import { StringListApplicationSetting } from "../../../instance/src/systems/settings/applicationSetting/stringListSetting";
 import { ApplicationSetting } from "@tcsw/workspaces-instance/src/systems/settings/applicationSetting/applicationSetting";
