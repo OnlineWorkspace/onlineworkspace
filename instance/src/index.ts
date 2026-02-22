@@ -407,6 +407,8 @@ class Instance {
         this.sys.consoleCommands.currentCommandInterface.cb = () => 0;
         this.log.system.info("Shutting down...");
 
+        this.sys.event.invoke(WorkspacesEvent.BeforeShutdown);
+
         if (!!process.stdout.cursorTo) {
             process.stdout.cursorTo(0, 0);
             process.stdout.clearScreenDown();

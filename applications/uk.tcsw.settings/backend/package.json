@@ -1,6 +1,7 @@
 {
     "name": "uk-tcsw-settings-backend",
     "author": "Tricolor Software",
+    "type": "module",
     "private": true,
     "dependencies": {
         "@trpc/server": "^11.6.0",

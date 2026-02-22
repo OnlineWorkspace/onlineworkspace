@@ -45,6 +45,7 @@ export default class ImageSystem extends System {
 
     // returns an endpoint where the image located at the provided path can be loaded from on the client
     // defaults to 3hrs validity
+
     async serveImage(
         userId: number,
         path: string,
@@ -52,62 +53,80 @@ export default class ImageSystem extends System {
             isPublic?: boolean;
             dontCachePath?: boolean;
             validMs?: number;
-            resize?: {
-                dimensions:
-                    | { width: number; height: number }
-                    | ((originalSize: { width: number; height: number }) => {
-                          width: number;
-                          height: number;
-                      });
-                changeFormatTo?: "avif" | "jpeg" | "png";
-                position?:
-                    | "top"
-                    | "right top"
-                    | "right"
-                    | "right bottom"
-                    | "bottom"
-                    | "left bottom"
-                    | "left"
-                    | "left top"
-                    | "centre";
-                fit?: "cover" | "contain" | "fill";
-                background?: string;
-            };
-        },
+        } & (
+            | {
+                  crop?: {
+                      x: number;
+                      y: number;
+                      width: number;
+                      height: number;
+                  };
+              }
+            | {
+                  resize?: {
+                      dimensions:
+                          | { width: number; height: number }
+                          | ((originalSize: { width: number; height: number }) => {
+                                width: number;
+                                height: number;
+                            });
+                      changeFormatTo?: "avif" | "jpeg" | "png";
+                      position?:
+                          | "top"
+                          | "right top"
+                          | "right"
+                          | "right bottom"
+                          | "bottom"
+                          | "left bottom"
+                          | "left"
+                          | "left top"
+                          | "centre";
+                      fit?: "cover" | "contain" | "fill";
+                      background?: string;
+                  };
+              }
+        ),
     ): Promise<string> {
         const opts = {
-            isPublic: false,
-            dontCachePath: false,
-            validMs: 21600000,
-            ...options,
+            isPublic: options?.isPublic ?? false,
+            dontCachePath: options?.dontCachePath ?? false,
+            validMs: options?.validMs ?? 21600000,
+            crop: options && "crop" in options ? options.crop : undefined,
+            resize: options && "resize" in options ? options.resize : undefined,
         };
 
-        if (options?.resize?.dimensions) {
-            if (typeof options?.resize?.dimensions === "function") {
+        if (opts.resize?.dimensions) {
+            if (typeof opts.resize.dimensions === "function") {
                 const sharpInstance = sharp(path);
-                opts.resize!.dimensions = options?.resize?.dimensions(
-                    await sharpInstance.metadata(),
-                );
+                const metadata = await sharpInstance.metadata();
+                opts.resize.dimensions = opts.resize.dimensions({
+                    width: metadata.width ?? 0,
+                    height: metadata.height ?? 0,
+                });
             }
+        }
+
+        let cropKey = "";
+        if (opts.crop) {
+            cropKey = `crop_${opts.crop.x}_${opts.crop.y}_${opts.crop.width}_${opts.crop.height}`;
+        }
+
+        let requestResolution = "raw";
+        if (opts.resize?.dimensions && typeof opts.resize.dimensions !== "function") {
+            requestResolution = `${opts.resize.dimensions.width}x${opts.resize.dimensions.height}`;
+        }
+        if (cropKey) {
+            requestResolution += `_${cropKey}`;
         }
 
         if (!opts.dontCachePath) {
             const existingImageId = this._internalImagePaths.get(path);
-
             if (existingImageId) {
                 const existingImage = this._internalImages.get(existingImageId);
-
                 if (existingImage) {
-                    const requestResolution = opts.resize
-                        ? // @ts-ignore
-                          opts.resize.dimensions.width + "x" + opts.resize.dimensions.height
-                        : "raw";
-
                     const existingImageOfResolution = existingImage[requestResolution];
-
                     if (existingImageOfResolution) {
-                        existingImageOfResolution!.validUntil = Date.now() + opts.validMs;
-
+                        existingImageOfResolution.validUntil = Date.now() + opts.validMs;
                         return `/api/asset/image/${existingImageId}/${requestResolution}`;
                     }
                 }
@@ -116,40 +135,23 @@ export default class ImageSystem extends System {
 
         const imageId = randomUUIDv7();
 
-        const requestResolution = opts.resize
-            ? // @ts-ignore
-              opts.resize.dimensions.width + "x" + opts.resize.dimensions.height
-            : "raw";
-
-        if (this._internalImages.has(imageId)) {
-            let currentImage = this._internalImages.get(imageId)!;
-
-            currentImage[requestResolution] = {
+        this._internalImages.set(imageId, {
+            [requestResolution]: {
                 path: path,
                 userId: userId,
                 validUntil: Date.now() + opts.validMs,
                 public: opts.isPublic,
-                // @ts-ignore
-                resize: opts.resize,
-            };
-
-            this._internalImages.set(imageId, currentImage);
-        } else {
-            let currentImage = {
-                [requestResolution]: {
-                    path: path,
-                    userId: userId,
-                    validUntil: Date.now() + opts.validMs,
-                    public: opts.isPublic,
-                    resize: opts.resize,
+                resize: {
+                    dimensions: opts.resize?.dimensions as { width: number; height: number },
+                    changeFormatTo: opts.resize?.changeFormatTo ?? "jpeg",
+                    position: opts.resize?.position ?? "top",
+                    fit: opts.resize?.fit ?? "cover",
+                    background: opts.resize?.background ?? "white",
                 },
-            };
+            },
+        })
 
-            // @ts-ignore
-            this._internalImages.set(imageId, currentImage);
-
-            this._internalImagePaths.set(path, imageId);
-        }
+        this._internalImagePaths.set(path, imageId);
 
         this.log.info(
             `Serving image at '${nodePath.relative(this.instance.sys.filesystem.FS_ROOT, path)}' as '${imageId}'`,
