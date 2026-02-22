@@ -2,6 +2,7 @@
     "name": "uk-tcsw-photos-web",
     "author": "Tricolor Software",
     "private": true,
+    "version": "0.0.1",
     "dependencies": {
         "@solidjs/router": "^0.15.3",
         "@tcsw/uikit-solid": "workspace:*",

@@ -3,6 +3,7 @@
     "author": "Tricolor Software",
     "type": "module",
     "private": true,
+    "version": "0.0.1",
     "dependencies": {
         "@trpc/server": "^11.6.0",
         "@types/bun": "^1.3.0",
