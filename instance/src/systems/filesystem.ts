@@ -57,7 +57,12 @@ export default class FilesystemSystem extends System {
     // @returns {true} if created
     // @returns {false} if already exists
     async createDirectoryIfNotExists(path: string): Promise<boolean> {
-        if (await fs.promises.exists(path)) {
+        if (
+            await fs.promises
+                .access(path)
+                .then(() => true)
+                .catch(() => false)
+        ) {
             return false;
         }
 
@@ -187,6 +192,10 @@ export default class FilesystemSystem extends System {
         //     read: permissions[0].read_permission,
         //     write: permissions[0].write_permission,
         // };
+    }
+
+    getUserHomeDirectory(userId: number): string {
+        return path.join(this.FS_ROOT, `/users/${userId}`);
     }
 
     async startup(): Promise<boolean> {

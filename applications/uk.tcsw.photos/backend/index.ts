@@ -124,23 +124,17 @@ instance.sys.tRPC.registeredRouters.push({
 });
 
 instance.sys.event.on(WorkspacesEvent.QuarterHourly, async () => {
-    // find new images in the filesystem and add them to the queue for processing
-    const usersRoot = path.join(instance.sys.filesystem.FS_ROOT, "users");
-    // Get all user directories
-    const userDirs = await fs.readdir(usersRoot);
-
-    for (const userDir of userDirs) {
-        const userId = parseInt(path.basename(userDir));
-        if (isNaN(userId)) continue;
+    for (const user of await instance.sys.users.getAllUsers()) {
+        const userFsDir = path.join(instance.sys.filesystem.getUserHomeDirectory(user.userId), "fs");
 
         // Find all image files in user's directory
-        const imagesDir = path.join(userDir, "photos");
-        const imageFiles = await fs.readdir(imagesDir, {
+        const imageFiles = await fs.readdir(userFsDir, {
             recursive: true,
-            filter: (file) => /\.(jpg|jpeg|png)$/i.test(file),
         });
 
         for (const imagePath of imageFiles) {
+            // Only process image files supported by sharp (jpg, jpeg, png, webp, tiff, gif, avif, heif)
+            if (!path.basename(imagePath).match(/\.(jpe?g|png|webp|tiff?|gif|avif|heif)$/i)) continue;
             // Check if image is already in the database
             const exists =
                 await db`SELECT 1 FROM tricolor_workspaces.public.uk_tcsw_photos_media WHERE path = ${imagePath}`;
