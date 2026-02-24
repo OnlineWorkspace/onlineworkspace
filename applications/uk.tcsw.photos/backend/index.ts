@@ -6,6 +6,7 @@ import { initTRPC } from "@trpc/server";
 import z from "zod";
 import path from "path";
 import { promises as fs } from "fs";
+import sharp from "sharp";
 
 const log = instance.log.createLogger("uk.tcsw.photos");
 const db = instance.sys.database.postgres();
@@ -125,6 +126,7 @@ instance.sys.tRPC.registeredRouters.push({
 
 instance.sys.event.on(WorkspacesEvent.QuarterHourly, async () => {
     for (const user of await instance.sys.users.getAllUsers()) {
+        const userId = user.userId;
         const userFsDir = path.join(instance.sys.filesystem.getUserHomeDirectory(user.userId), "fs");
 
         // Find all image files in user's directory
@@ -133,27 +135,29 @@ instance.sys.event.on(WorkspacesEvent.QuarterHourly, async () => {
         });
 
         for (const imagePath of imageFiles) {
-            // Only process image files supported by sharp (jpg, jpeg, png, webp, tiff, gif, avif, heif)
+            // Only process image files supported by sharp
             if (!path.basename(imagePath).match(/\.(jpe?g|png|webp|tiff?|gif|avif|heif)$/i)) continue;
             // Check if image is already in the database
             const exists =
-                await db`SELECT 1 FROM tricolor_workspaces.public.uk_tcsw_photos_media WHERE path = ${imagePath}`;
+                await db`SELECT image_id FROM tricolor_workspaces.public.uk_tcsw_photos_media WHERE path = ${imagePath}`;
             if (exists.length === 0) {
-                // Get image metadata
-                const metadata = await instance.sys.image.getMetadata(imagePath);
-                await db`INSERT INTO tricolor_workspaces.public.uk_tcsw_photos_media (width, height, path, timestamp, location, owner_id) VALUES (${metadata.width}, ${metadata.height}, ${imagePath}, ${metadata.timestamp}, ${metadata.location ?? null}, ${userId})`;
+                const imageMetadata = await sharp(path.join(userFsDir, imagePath)).metadata();
+                const imageFileStats = await fs.stat(path.join(userFsDir, imagePath));
+
+                await db`INSERT INTO tricolor_workspaces.public.uk_tcsw_photos_media (width, height, path, timestamp, owner_id) VALUES (${imageMetadata.width}, ${imageMetadata.height}, ${imagePath}, ${imageFileStats.mtime}, ${userId})`;
             }
         }
     }
 
     // scan images left in queue
     const unprocessedImages =
-        await db`SELECT image_id, path, owner_id FROM tricolor_workspaces.public.uk_tcsw_photos_media WHERE faces_detected = FALSE OR objects_detected = FALSE`;
+        await db`SELECT image_id, path, owner_id, faces_detected, objects_detected FROM tricolor_workspaces.public.uk_tcsw_photos_media WHERE faces_detected = FALSE OR objects_detected = FALSE`;
 
     for (const image of unprocessedImages) {
         // perform face detection
         if (!image.faces_detected) {
-            const faces = await instance.sys.image.detectFaces(image.owner_id, image.path);
+            // perform facial detection using tensorflow
+
             for (const face of faces) {
                 await db`INSERT INTO tricolor_workspaces.public.uk_tcsw_photos_faces (image_id, x, y, width, height, owner_id) VALUES (${image.image_id}, ${face.x}, ${face.y}, ${face.width}, ${face.height}, ${image.owner_id})`;
             }
