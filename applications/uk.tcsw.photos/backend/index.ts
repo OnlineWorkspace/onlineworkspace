@@ -7,6 +7,9 @@ import z from "zod";
 import path from "path";
 import { promises as fs } from "fs";
 import sharp from "sharp";
+import { FaceLandmarker, FilesetResolver } from "@mediapipe/tasks-vision";
+import * as canvas from "canvas";
+import { JSDOM } from "jsdom";
 
 const log = instance.log.createLogger("uk.tcsw.photos");
 const db = instance.sys.database.postgres();
@@ -124,30 +127,58 @@ instance.sys.tRPC.registeredRouters.push({
     createContext: createTRPCContext(instance),
 });
 
-instance.sys.event.on(WorkspacesEvent.QuarterHourly, async () => {
+const dom = new JSDOM();
+const window = dom.window;
+
+const navigator = window.navigator;
+global.document = dom.window.document;
+global.navigator = navigator;
+// @ts-ignore
+global.window = window;
+
+// instance.sys.event.on(WorkspacesEvent.QuarterHourly, async () => {
+instance.sys.event.on(WorkspacesEvent.BeforeStartupComplete, async () => {
     for (const user of await instance.sys.users.getAllUsers()) {
         const userId = user.userId;
         const userFsDir = path.join(instance.sys.filesystem.getUserHomeDirectory(user.userId), "fs");
 
-        // Find all image files in user's directory
-        const imageFiles = await fs.readdir(userFsDir, {
+        const userFiles = await fs.readdir(userFsDir, {
             recursive: true,
         });
 
-        for (const imagePath of imageFiles) {
+        for (const userFilePath of userFiles) {
             // Only process image files supported by sharp
-            if (!path.basename(imagePath).match(/\.(jpe?g|png|webp|tiff?|gif|avif|heif)$/i)) continue;
+            if (!path.basename(userFilePath).match(/\.(jpe?g|png|webp|tiff?|gif|avif|heif)$/i)) continue;
             // Check if image is already in the database
             const exists =
-                await db`SELECT image_id FROM tricolor_workspaces.public.uk_tcsw_photos_media WHERE path = ${imagePath}`;
-            if (exists.length === 0) {
-                const imageMetadata = await sharp(path.join(userFsDir, imagePath)).metadata();
-                const imageFileStats = await fs.stat(path.join(userFsDir, imagePath));
+                await db`SELECT image_id FROM tricolor_workspaces.public.uk_tcsw_photos_media WHERE path = ${userFilePath}`;
+            if (exists.count === 0) {
+                let imageMetadata;
+                try {
+                    imageMetadata = await sharp(path.join(userFsDir, userFilePath)).metadata();
+                } catch (err) {
+                    console.warn(`Failed to read metadata for ${userFilePath}: ${err}`);
+                    continue;
+                }
+                const imageFileStats = await fs.stat(path.join(userFsDir, userFilePath));
 
-                await db`INSERT INTO tricolor_workspaces.public.uk_tcsw_photos_media (width, height, path, timestamp, owner_id) VALUES (${imageMetadata.width}, ${imageMetadata.height}, ${imagePath}, ${imageFileStats.mtime}, ${userId})`;
+                await db`INSERT INTO tricolor_workspaces.public.uk_tcsw_photos_media (width, height, path, timestamp, owner_id) VALUES (${imageMetadata.width}, ${imageMetadata.height}, ${userFilePath}, ${imageFileStats.mtime}, ${userId})`;
             }
         }
     }
+
+    // const filesetResolver = await FilesetResolver.forVisionTasks(
+    //     "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3/wasm",
+    // );
+
+    // const faceLandmarker = await FaceLandmarker.createFromOptions(filesetResolver, {
+    //     baseOptions: {
+    //         modelAssetPath: `https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task`,
+    //     },
+    //     outputFaceBlendshapes: false,
+    //     runningMode: "IMAGE",
+    //     numFaces: 1,
+    // });
 
     // scan images left in queue
     const unprocessedImages =
@@ -156,12 +187,26 @@ instance.sys.event.on(WorkspacesEvent.QuarterHourly, async () => {
     for (const image of unprocessedImages) {
         // perform face detection
         if (!image.faces_detected) {
-            // perform facial detection using tensorflow
+            const rawImage = await sharp(
+                path.join(instance.sys.filesystem.getUserHomeDirectory(image.owner_id), "fs", image.path),
+            )
+                .raw()
+                .toBuffer({ resolveWithObject: true });
+
+            const imageData = window.createImageData(
+                new Uint8ClampedArray(rawImage.data),
+                rawImage.info.width,
+                rawImage.info.height,
+            );
+
+            const faces = faceLandmarker.detect(imageData).faceLandmarks;
 
             for (const face of faces) {
-                await db`INSERT INTO tricolor_workspaces.public.uk_tcsw_photos_faces (image_id, x, y, width, height, owner_id) VALUES (${image.image_id}, ${face.x}, ${face.y}, ${face.width}, ${face.height}, ${image.owner_id})`;
+                // await db`INSERT INTO tricolor_workspaces.public.uk_tcsw_photos_faces (image_id, x, y, width, height, owner_id) VALUES (${image.image_id}, ${face.x}, ${face.y}, ${face.width}, ${face.height}, ${image.owner_id})`;
+
+                console.log(face);
             }
-            await db`UPDATE tricolor_workspaces.public.uk_tcsw_photos_media SET faces_detected = TRUE WHERE image_id = ${image.image_id}`;
+            // await db`UPDATE tricolor_workspaces.public.uk_tcsw_photos_media SET faces_detected = TRUE WHERE image_id = ${image.image_id}`;
         }
 
         // perform object detection
