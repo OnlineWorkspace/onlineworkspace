@@ -3,17 +3,19 @@ import { createResource, type Component } from "solid-js";
 import trpc from "../../../../lib/trpc";
 import styles from "./Gender.module.scss";
 import UKButton from "@tcsw/uikit-solid/src/components/button/UKButton.jsx";
-import { SearchableDropdownMenuItemType } from "@tcsw/uikit-solid/src/components/searchableDropdownMenu/lib/items.js";
 import UKSearchableDropdownMenu from "@tcsw/uikit-solid/src/components/searchableDropdownMenu/UKSearchableDropdownMenu.jsx";
 
 const Gender: Component = () => {
-    const [gender, { mutate: setGender, refetch: refetchGender }] = createResource(() => trpc.profile.getGender.query());
+    const [gender, { mutate: setGender, refetch: refetchGender }] = createResource(() =>
+        trpc.profile.getGender.query(),
+    );
 
     return (
         <UKStackItem
             leading={{
                 type: "icon",
                 value: "person",
+                alt: "",
             }}
             labelText="Gender"
             supportingText={gender()}
@@ -26,20 +28,22 @@ const Gender: Component = () => {
                         inputColor={"outlined"}
                         label={"Gender"}
                         defaultValue={gender()}
-                        // @ts-ignore
-                        getValue={(val) => setGender(val.toLowerCase())}
+                        getValue={(val) => setGender(val)}
                         items={[
                             {
-                                type: SearchableDropdownMenuItemType.Button,
+                                type: "button",
                                 label: "Female",
+                                id: "female",
                             },
                             {
-                                type: SearchableDropdownMenuItemType.Button,
+                                type: "button",
                                 label: "Male",
+                                id: "male",
                             },
                             {
-                                type: SearchableDropdownMenuItemType.Button,
+                                type: "button",
                                 label: "Other",
+                                id: "other",
                             },
                         ]}
                     />

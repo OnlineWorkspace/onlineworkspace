@@ -1,9 +1,8 @@
-import { type Component, createEffect, createSignal, For, type ParentProps } from "solid-js";
+import { type Component, createSignal, For } from "solid-js";
 import UKDivider from "../divider/UKDivider.tsx";
 import clsx from "clsx";
 import styles from "./UKMenu.module.scss";
 import { Portal } from "solid-js/web";
-import { Ref } from "@solid-primitives/refs";
 import UKText from "../text/UKText.tsx";
 import UKIcon from "../icon/UKIcon.tsx";
 
@@ -36,44 +35,24 @@ type MenuItem =
           type: "spacer";
       };
 
-const UKMenu: Component<
-    ParentProps<{
-        items: (MenuItem | undefined)[];
-        class?: string;
-        showMenu?: { x: number; y: number } | false;
-        vibrant?: boolean;
-    }>
-> = (props) => {
+const UKMenu: Component<{
+    items: (MenuItem | undefined)[];
+    class?: string;
+    showMenu?: { x: number; y: number } | false;
+    vibrant?: boolean;
+}> = (props) => {
     const [ref, setRef] = createSignal<Element | undefined>();
     const [showMenu, setShowMenu] = createSignal<{ x: number; y: number } | false>(props.showMenu || false);
-    const [selected, setSelected] = createSignal<number | undefined>(undefined);
-
-    createEffect(() => {
-        const element = ref();
-
-        if (!element) return;
-
-        element.addEventListener("contextmenu", (e) => {
-            e.preventDefault();
-
-            if (e.target === element)
-                setShowMenu({
-                    x: (e as unknown as MouseEvent).clientX,
-                    y: (e as unknown as MouseEvent).clientY,
-                });
-        });
-    });
 
     return (
         <>
-            <Ref ref={setRef}>{props.children || <div>no menu content provided?</div>}</Ref>
-            {selected() !== undefined && (
+            {/*{selected() !== undefined && (
                 <UKMenu
                     vibrant={props.vibrant}
                     showMenu={{ x: ref()!.clientLeft, y: ref()!.clientTop }}
                     items={(props.items[selected() as number] as { children: MenuItem[] }).children || []}
                 />
-            )}
+            )}*/}
             {showMenu() !== false && (
                 <Portal mount={ref()?.closest("[data-uikit-root]") || document.body}>
                     <div

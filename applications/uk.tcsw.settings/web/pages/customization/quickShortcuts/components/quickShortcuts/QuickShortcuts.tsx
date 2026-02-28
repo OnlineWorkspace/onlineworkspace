@@ -6,6 +6,7 @@ import styles from "./QuickShortcuts.module.scss";
 import UKButton from "@tcsw/uikit-solid/src/components/button/UKButton.jsx";
 import UKIconButton from "@tcsw/uikit-solid/src/components/iconButton/UKIconButton.jsx";
 import UKText from "@tcsw/uikit-solid/src/components/text/UKText.jsx";
+import UKSearchableDropdownMenu from "@tcsw/uikit-solid/src/components/searchableDropdownMenu/UKSearchableDropdownMenu.jsx";
 
 const QuickShortcuts: Component<{
     defaultValue: string[];
@@ -43,6 +44,19 @@ const QuickShortcuts: Component<{
             expandedComponent={
                 <>
                     <div class={styles.inputContainer}>
+                        <UKSearchableDropdownMenu
+                            getValue={setInputValue}
+                            defaultValue={inputValue()}
+                            inputColor="outlined"
+                            items={[
+                                {
+                                    id: "test",
+                                    label: "Test Item",
+                                    type: "button",
+                                },
+                            ]}
+                            label="Application Id"
+                        />
                         <UKTextField
                             containerClass={styles.textField}
                             color={"outlined"}

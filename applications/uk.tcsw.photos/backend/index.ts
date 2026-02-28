@@ -176,7 +176,7 @@ instance.sys.event.on(WorkspacesEvent.QuarterHourly, async () => {
         if (!image.faces_detected) {
             const detectedFaces: { x: number; y: number; width: number; height: number }[] = [];
 
-            // perform facial detection using tensorflow
+            // perform facial detection using mediapipe
 
             for (const face of detectedFaces) {
                 await db`INSERT INTO tricolor_workspaces.public.uk_tcsw_photos_faces (image_id, x, y, width, height, owner_id) VALUES (${image.image_id}, ${face.x}, ${face.y}, ${face.width}, ${face.height}, ${image.owner_id})`;

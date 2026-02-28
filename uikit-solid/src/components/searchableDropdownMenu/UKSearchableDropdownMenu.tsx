@@ -1,49 +1,83 @@
 import { type Component, createEffect, createSignal } from "solid-js";
 import UKTextField from "../textField/UKTextField.tsx";
 import UKMenu from "../menu/UKMenu.tsx";
-import {
-    type SearchableDropDownMenuButtonItem,
-    type SearchableDropdownMenuItems,
-    SearchableDropdownMenuItemType,
-} from "./lib/items.ts";
-import type { MenuButtonItem, MenuDividerItem } from "../menu/lib/items.ts";
 import styles from "./UKSearchableDropdownMenu.module.scss";
+
+interface DropdownMenuItem {
+    type: "button" | "divider";
+    label: string;
+    id: string;
+}
 
 const UKSearchableDropdownMenu: Component<{
     inputColor: "outlined" | "filled";
     label: string;
-    items: SearchableDropdownMenuItems;
+    items: DropdownMenuItem[];
     defaultValue?: string;
     getValue: (value: string) => void;
     inputLeadingIcon?: string;
     inputTrailingIcon?: string;
 }> = (props) => {
+    const [ref, setRef] = createSignal<HTMLDivElement | undefined>();
     const [query, setQuery] = createSignal<string>(props.defaultValue || "");
-    const [isFocussed, setIsFocussed] = createSignal<boolean>(false);
-    const [queriedItems, setQueriedItems] = createSignal<SearchableDropdownMenuItems>(props.items);
+    const [showMenu, setShowMenu] = createSignal<false | { x: number; y: number }>(false);
+    const [queriedItems, setQueriedItems] = createSignal<DropdownMenuItem[]>(props.items);
 
     createEffect(() => {
         setQueriedItems(
             props.items
                 .map((i) => {
-                    if (i.type === SearchableDropdownMenuItemType.Button) {
-                        if (i.label.toLowerCase().includes(query().toLowerCase().trim())) {
+                    if (i.type === "button") {
+                        if (
+                            i.id.toLowerCase().includes(query().toLowerCase().trim()) ||
+                            i.label.toLowerCase().includes(query().toLowerCase().trim())
+                        ) {
                             return i;
                         }
                         return undefined;
                     }
-                    if (i.type === SearchableDropdownMenuItemType.Divider) {
+                    if (i.type === "divider") {
                         return i;
                     }
                 })
                 .filter((i) => i !== undefined),
         );
 
-        props.getValue(query());
+        if (props.items.find((i) => i.id === query())) {
+            props.getValue(query());
+        } else if (props.items.find((i) => i.label.toLowerCase() === query().toLowerCase().trim())) {
+            props.getValue(props.items.find((i) => i.label.toLowerCase() === query().toLowerCase().trim())!.id);
+        } else {
+            props.getValue("");
+        }
     }, [query()]);
 
+    createEffect(() => {
+        const element = ref();
+
+        if (!element) return;
+
+        element.addEventListener("focusin", (e) => {
+            e.preventDefault();
+
+            // @ts-ignore
+            const cr = element.getBoundingClientRect();
+
+            setShowMenu({
+                x: cr.left - element.offsetLeft,
+                y: cr.top - element.offsetTop,
+            });
+        });
+
+        element.addEventListener("focusout", (e) => {
+            e.preventDefault();
+
+            setShowMenu(false);
+        });
+    });
+
     return (
-        <div class={styles.root}>
+        <div ref={setRef} class={styles.root}>
             <UKTextField
                 class={styles.input}
                 error={
@@ -51,9 +85,8 @@ const UKSearchableDropdownMenu: Component<{
                         ? false
                         : queriedItems().find((i) => {
                               return (
-                                  i?.type === SearchableDropdownMenuItemType.Button &&
-                                  (i as SearchableDropDownMenuButtonItem).label.toLowerCase() ===
-                                      query().toLowerCase().trim()
+                                  i?.type === "button" &&
+                                  (i as DropdownMenuItem).label.toLowerCase() === query().toLowerCase().trim()
                               );
                           }) === undefined
                 }
@@ -61,16 +94,13 @@ const UKSearchableDropdownMenu: Component<{
                 label={props.label}
                 defaultValue={query()}
                 getValue={setQuery}
-                onFocus={() => setIsFocussed(true)}
-                forceFocussed={isFocussed()}
+                forceFocussed={showMenu() !== false}
                 setValue={query()}
-                onEscape={() => setIsFocussed(false)}
+                onEscape={() => setShowMenu(false)}
                 leadingIcon={props.inputLeadingIcon ? { icon: props.inputLeadingIcon } : undefined}
-                trailingIcon={
-                    props.inputTrailingIcon ? { icon: props.inputTrailingIcon } : undefined
-                }
+                trailingIcon={props.inputTrailingIcon ? { icon: props.inputTrailingIcon } : undefined}
             />
-            {isFocussed() && (
+            {showMenu() && (
                 // <UKMenu
                 //     class={styles.menu}
                 //     items={queriedItems().map((i) => {
@@ -87,13 +117,31 @@ const UKSearchableDropdownMenu: Component<{
                 //         return i as unknown as MenuDividerItem;
                 //     })}
                 // />
-                <>UKMenu has not been re-implemented!</>
+                <UKMenu
+                    showMenu={showMenu()}
+                    items={queriedItems().map((i) => {
+                        if (i.type === "button") {
+                            return {
+                                type: "button",
+                                label: i.label,
+                                onClick() {
+                                    setQuery(i.label);
+                                    setShowMenu(false);
+                                },
+                            };
+                        }
+
+                        return {
+                            type: "divider",
+                        };
+                    })}
+                />
             )}
-            {isFocussed() && (
+            {showMenu() && (
                 <div
                     onClick={(e) => {
                         if (e.target === e.currentTarget) {
-                            setIsFocussed(false);
+                            setShowMenu(false);
 
                             let a = document.elementFromPoint(e.clientX, e.clientY);
                             // @ts-ignore
