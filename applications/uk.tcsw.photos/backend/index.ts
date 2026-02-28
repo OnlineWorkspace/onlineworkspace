@@ -1,6 +1,7 @@
 /// <reference path="./global.d.ts" />
 
 import { WorkspacesEvent } from "@tcsw/workspaces-instance/src/systems/events.js";
+import { BooleanApplicationSetting } from "@tcsw/workspaces-instance/src/systems/settings/applicationSetting/booleanSetting.js";
 import { createTRPCContext, procedure } from "@tcsw/workspaces-instance/src/systems/trpcRouter.js";
 import { initTRPC } from "@trpc/server";
 import z from "zod";
@@ -124,6 +125,23 @@ instance.sys.tRPC.registeredRouters.push({
     createContext: createTRPCContext(instance),
 });
 
+instance.sys.event.on(WorkspacesEvent.BeforeStartupComplete, () => {
+    instance.sys.settings.registerApplicationSetting(
+        new BooleanApplicationSetting("uk.tcsw.photos", "enable_facial_recognition", false)
+            .setDisplayName("Enable Facial Recognition")
+            .setDescription(
+                "Allow the application to perform facial recognition on your photos. This will analyze your photos to detect faces and group them together.",
+            ),
+    );
+    instance.sys.settings.registerApplicationSetting(
+        new BooleanApplicationSetting("uk.tcsw.photos", "facial_recognition_use_gpu", false)
+            .setDisplayName("Enable GPU Acceleration for Facial Recognition")
+            .setDescription(
+                "Allow the application to use GPU acceleration for facial recognition. This can significantly speed up the process of analyzing photos, especially if you have a large collection. Note that this may increase resource usage on your device and requires a compatable GPU.",
+            ),
+    );
+});
+
 instance.sys.event.on(WorkspacesEvent.QuarterHourly, async () => {
     for (const user of await instance.sys.users.getAllUsers()) {
         const userId = user.userId;
@@ -156,9 +174,11 @@ instance.sys.event.on(WorkspacesEvent.QuarterHourly, async () => {
     for (const image of unprocessedImages) {
         // perform face detection
         if (!image.faces_detected) {
+            const detectedFaces: { x: number; y: number; width: number; height: number }[] = [];
+
             // perform facial detection using tensorflow
 
-            for (const face of faces) {
+            for (const face of detectedFaces) {
                 await db`INSERT INTO tricolor_workspaces.public.uk_tcsw_photos_faces (image_id, x, y, width, height, owner_id) VALUES (${image.image_id}, ${face.x}, ${face.y}, ${face.width}, ${face.height}, ${image.owner_id})`;
             }
             await db`UPDATE tricolor_workspaces.public.uk_tcsw_photos_media SET faces_detected = TRUE WHERE image_id = ${image.image_id}`;

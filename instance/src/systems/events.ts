@@ -10,6 +10,10 @@ export enum WorkspacesEvent {
     HalfHourly,
     QuarterHourly,
     Minutely,
+    ApplicationSettingsChanged,
+    GlobalApplicationSettingsChanged,
+    UpdateAvailable,
+    UpdateComplete,
 }
 
 export default class EventSystem extends System {
