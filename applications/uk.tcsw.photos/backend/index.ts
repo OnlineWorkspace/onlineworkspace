@@ -178,9 +178,11 @@ instance.sys.event.on(WorkspacesEvent.QuarterHourly, async () => {
 
             // perform facial detection using mediapipe
 
+
             for (const face of detectedFaces) {
                 await db`INSERT INTO tricolor_workspaces.public.uk_tcsw_photos_faces (image_id, x, y, width, height, owner_id) VALUES (${image.image_id}, ${face.x}, ${face.y}, ${face.width}, ${face.height}, ${image.owner_id})`;
             }
+
             await db`UPDATE tricolor_workspaces.public.uk_tcsw_photos_media SET faces_detected = TRUE WHERE image_id = ${image.image_id}`;
         }
 
