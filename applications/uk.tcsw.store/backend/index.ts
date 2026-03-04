@@ -3,12 +3,12 @@
 import { createTRPCContext, procedure } from "@tcsw/workspaces-instance/src/systems/trpcRouter.js";
 import { initTRPC } from "@trpc/server";
 import z from "zod";
-import ApplicationRepository from "./repository/applicationRepository";
-import LocalApplicationRepository from "./repository/localRepository";
-import { DEFAULT_APPLICATIONS } from "@tcsw/workspaces-instance/src/systems/applications";
-import { WorkspacesFeatureFlags } from "@tcsw/workspaces-instance/src/systems/configuration";
+import ApplicationRepository from "./repository/applicationRepository.js";
+import LocalApplicationRepository from "./repository/localRepository.js";
+import { DEFAULT_APPLICATIONS } from "@tcsw/workspaces-instance/src/systems/applications.js";
+import { WorkspacesFeatureFlags } from "@tcsw/workspaces-instance/src/systems/configuration.js";
+import fastFolderSizeSync from "fast-folder-size/sync.js";
 import fs from "fs/promises";
-import path from "path";
 
 const log = instance.log.createLogger("uk.tcsw.store");
 
@@ -203,7 +203,7 @@ const router = t.router({
                     ? instance.sys.configuration.hasFeature(WorkspacesFeatureFlags.ShootYourselfInTheFoot)
                     : true,
                 isInstalled: opt.ctx.instance.sys.applications.enabledApplications.includes(app.id),
-                installSize: repository instanceof LocalApplicationRepository ? (await fs.stat(await repository.getSourcePath(app.id))).size : -1,
+                installSize: repository instanceof LocalApplicationRepository ? fastFolderSizeSync(await repository.getSourcePath(app.id)) : -1,
                 graphicsAcceleration: app.graphicsAcceleration
             };
         }),

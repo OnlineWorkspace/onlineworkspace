@@ -2,7 +2,7 @@ import path from "path";
 import ApplicationRepository, {
     type RepositoryApplication,
     type RepositoryApplicationSummary,
-} from "./applicationRepository";
+} from "./applicationRepository.js";
 import fs from "fs/promises";
 
 export default class LocalApplicationRepository extends ApplicationRepository {
