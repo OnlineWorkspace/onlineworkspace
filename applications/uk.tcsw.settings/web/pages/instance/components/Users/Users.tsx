@@ -1,19 +1,18 @@
-import UKText from "@tcsw/uikit-solid/src/components/text/UKText.jsx";
 import { createResource, For, type Component } from "solid-js";
-import instanceStyles from "./../../Index.module.scss";
 import trpc from "../../../../lib/trpc";
 import UKStack from "@tcsw/uikit-solid/src/components/stack/UKStack.jsx";
 import User from "./components/User/User";
 import CreateUser from "./components/CreateUser/CreateUser";
+import UKStackLabel from "@tcsw/uikit-solid/src/components/stack/UKStackLabel.tsx";
 
 const Users: Component = () => {
     const [users, { refetch: refetchUsers }] = createResource(() => trpc.instance.getUsers.query());
 
     return (
         <>
-            <UKText class={instanceStyles.subheading} role="title" size="m" align="start">
+            <UKStackLabel>
                 Instance Users
-            </UKText>
+            </UKStackLabel>
             <UKStack>
                 <For each={users()}>
                     {(userId) => {

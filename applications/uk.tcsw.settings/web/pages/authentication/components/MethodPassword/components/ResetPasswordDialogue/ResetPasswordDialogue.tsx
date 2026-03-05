@@ -6,31 +6,43 @@ import { createSignal, type Component } from "solid-js";
 import styles from "./ResetPasswordDialogue.module.scss";
 import UKButton from "@tcsw/uikit-solid/src/components/button/UKButton.jsx";
 import trpc from "../../../../../../lib/trpc";
+import UKButtonGroup from "@tcsw/uikit-solid/src/components/buttonGroup/UKButtonGroup.tsx";
 
-const ResetPasswordDialogue: Component<{ closeDialogue: () => void }> = (props) => {
-    const [passwordOne, setPasswordOne] = createSignal<string>("");
-    const [passwordTwo, setPasswordTwo] = createSignal<string>("");
+const ResetPasswordDialogue: Component<{ closeDialogue: () => void }> = (
+  props,
+) => {
+  const [passwordOne, setPasswordOne] = createSignal<string>("");
+  const [passwordTwo, setPasswordTwo] = createSignal<string>("");
 
-    return (
-      <div class={styles.component}>
-        <UKText role="title" size="l">
-          Change password
-        </UKText>
-        <UKDivider direction={DividerDirection.horizontal} />
-        <UKTextField
-          label="New Password"
-          color="outlined"
-          shouldMask
-          getValue={setPasswordOne}
-          defaultValue={passwordOne()}
-        />
-        <UKTextField
-          label="Re-Enter New Password"
-          color="outlined"
-          shouldMask
-          getValue={setPasswordTwo}
-          defaultValue={passwordTwo()}
-        />
+  return (
+    <div class={styles.component}>
+      <UKText role="title" size="l">
+        Change password
+      </UKText>
+      <UKDivider direction={DividerDirection.horizontal} />
+      <UKTextField
+        label="New Password"
+        color="outlined"
+        shouldMask
+        getValue={setPasswordOne}
+        defaultValue={passwordOne()}
+      />
+      <UKTextField
+        label="Re-Enter New Password"
+        color="outlined"
+        shouldMask
+        getValue={setPasswordTwo}
+        defaultValue={passwordTwo()}
+      />
+      <UKButtonGroup size={"s"}>
+        <UKButton
+          color="tonal"
+          onClick={() => {
+            props.closeDialogue();
+          }}
+        >
+          Cancel
+        </UKButton>
         <UKButton
           leadingIcon="check"
           color="filled"
@@ -49,8 +61,9 @@ const ResetPasswordDialogue: Component<{ closeDialogue: () => void }> = (props) 
         >
           Confirm
         </UKButton>
-      </div>
-    );
+      </UKButtonGroup>
+    </div>
+  );
 };
 
 export default ResetPasswordDialogue;

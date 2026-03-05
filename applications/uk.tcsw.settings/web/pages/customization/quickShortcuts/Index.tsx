@@ -45,7 +45,7 @@ const QuickShortcutsPage: Component = () => {
           <br />
           The navigation bar can be found on the left or bottom of the screen.
         </UKText>
-        <UKDivider direction={"horizontal"} />
+        <UKDivider width={"middle-inset"} direction={"horizontal"} />
         <UKStack>
           {data()?.currentValue.length === 0 ? (
             <div class={styles.noQuickShortcutsContainer}>

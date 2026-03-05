@@ -5,10 +5,14 @@ import trpc from "../../../../../lib/trpc.ts";
 import UKCard from "@tcsw/uikit-solid/src/components/card/UKCard.tsx";
 import UKIcon from "@tcsw/uikit-solid/src/components/icon/UKIcon.tsx";
 import UKText from "@tcsw/uikit-solid/src/components/text/UKText.tsx";
+import styles from "./AddShortcutButton.module.scss";
 
-const AddShortcutButton: Component<{ refetchData: () => void; addShortcut: (shortcutId: string) => void }> = (props) => {
+const AddShortcutButton: Component<{
+  refetchData: () => void;
+  addShortcut: (shortcutId: string) => void;
+}> = (props) => {
   const [showDialog, setShowDialog] = createSignal<boolean>(false);
-  const [availableShortcuts, setAvailableShortcuts] = createResource(() =>
+  const [availableShortcuts] = createResource(() =>
     trpc.customization.quickShortcuts.availableShortcuts.query(),
   );
 
@@ -24,26 +28,39 @@ const AddShortcutButton: Component<{ refetchData: () => void; addShortcut: (shor
         Add Shortcut
       </UKButton>
       <UKDialog onClose={() => setShowDialog(false)} show={showDialog}>
-        <For each={availableShortcuts()}>
-          {(shortcut) => {
-            return (
-              <UKCard color={"outlined"} onClick={() => {
-                props.addShortcut(shortcut.id);
-                setShowDialog(false);
-              }}>
-                {shortcut.icon.type === "icon" && (
-                  <UKIcon>{shortcut.icon.value}</UKIcon>
-                )}
-                {shortcut.icon.type === "image" && (
-                  <img src={shortcut.icon.value} alt={""} />
-                )}
-                <UKText role={"label"} size={"l"}>
-                  {shortcut.displayName}
-                </UKText>
-              </UKCard>
-            );
-          }}
-        </For>
+        <UKText role={"title"} size={"l"}>Add a shortcut</UKText>
+        <div class={styles.shortcutGrid}>
+          <For each={availableShortcuts()}>
+            {(shortcut) => {
+              return (
+                <UKCard
+                  class={styles.shortcut}
+                  color={"outlined"}
+                  onClick={() => {
+                    props.addShortcut(shortcut.id);
+                    setShowDialog(false);
+                  }}
+                >
+                  {shortcut.icon.type === "icon" && (
+                    <UKIcon class={styles.shortcutIcon}>
+                      {shortcut.icon.value}
+                    </UKIcon>
+                  )}
+                  {shortcut.icon.type === "image" && (
+                    <img
+                      class={styles.shortcutImage}
+                      src={shortcut.icon.value}
+                      alt={""}
+                    />
+                  )}
+                  <UKText align={"center"} role={"label"} size={"l"}>
+                    {shortcut.displayName}
+                  </UKText>
+                </UKCard>
+              );
+            }}
+          </For>
+        </div>
       </UKDialog>
     </>
   );

@@ -1,0 +1,19 @@
+.shortcutGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(6rem, 1fr));
+  gap: 0.5rem;
+}
+
+.shortcut {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.shortcutIcon {
+  --icon-size: 2rem;
+}
+
+.shortcutImage {
+
+}

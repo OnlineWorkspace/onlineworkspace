@@ -1,40 +1,42 @@
 .root {
-    display: flex;
-    flex-direction: column;
-    padding-top: 2rem;
-    padding-bottom: 2rem;
-    overflow-y: auto;
-    align-items: center;
+  display: flex;
+  flex-direction: column;
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+  overflow-y: auto;
+  align-items: center;
 }
 
 .content {
-    display: flex;
-    flex-direction: column;
-    max-width: 64rem;
-    width: 100%;
-    height: max-content;
-    gap: 1rem;
+  display: flex;
+  flex-direction: column;
+  max-width: 64rem;
+  width: 100%;
+  height: max-content;
+  gap: 1rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
 }
 
 .divider {
-    margin-top: 1rem;
-    margin-bottom: 1rem;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
 }
 
 .header {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    padding-left: 1rem;
-    gap: 1rem;
-    cursor: pointer;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding-left: 1rem;
+  gap: 1rem;
+  cursor: pointer;
 
-    .fullName {
-        color: rgb(var(--uk-sys-color-on-surface));
-    }
+  .fullName {
+    color: rgb(var(--uk-sys-color-on-surface));
+  }
 
-    .permissionLevel {
-        margin-top: -0.25rem;
-        color: rgb(var(--uk-sys-color-on-surface-variant));
-    }
+  .permissionLevel {
+    margin-top: -0.25rem;
+    color: rgb(var(--uk-sys-color-on-surface-variant));
+  }
 }

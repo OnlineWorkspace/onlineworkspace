@@ -19,7 +19,7 @@ const ApplicationPage: Component = () => {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const params = useParams();
-    const [data] = createResource(() => trpc.application.getApplication.query({ id: params.applicationId }));
+    const [data] = createResource(() => trpc.application.getApplication.query({ id: params.applicationId! }));
 
     return (
         <>

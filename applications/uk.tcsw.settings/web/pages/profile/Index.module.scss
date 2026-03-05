@@ -1,39 +1,41 @@
 .root {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    width: 100%;
-    align-items: center;
-    padding-top: 2rem;
-    padding-bottom: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+  align-items: center;
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
 }
 
 .subheading {
-    width: 100%;
-    max-width: 64rem;
-    padding-left: 1.5rem;
-    padding-right: 1.5rem;
+  width: 100%;
+  max-width: 64rem;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
 }
 
 .header {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    padding-left: 1rem;
-    gap: 1rem;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding-left: 1rem;
+  gap: 1rem;
 
-    .fullName {
-        color: rgb(var(--uk-sys-color-on-surface));
-    }
+  .fullName {
+    color: rgb(var(--uk-sys-color-on-surface));
+  }
 
-    .permissionLevel {
-        margin-top: -0.25rem;
-        color: rgb(var(--uk-sys-color-on-surface-variant));
-    }
+  .permissionLevel {
+    margin-top: -0.25rem;
+    color: rgb(var(--uk-sys-color-on-surface-variant));
+  }
 }
 
 .editDialogue {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
