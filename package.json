@@ -1,26 +1,26 @@
 {
-    "name": "@tcsw/workspaces",
-    "type": "module",
-    "version": "0.0.0",
-    "workspaces": [
-        "instance/",
-        "instance/src/web/",
-        "applications/*/web/",
-        "applications/*/backend/",
-        "uikit-solid/"
-    ],
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/tricolorsoftware/workspaces"
-    },
-    "scripts": {
-        "dev": "bun --watch instance/src/index.ts",
-        "build-web": "bun run --cwd instance/src/web build",
-        "uikit": "bun run --cwd uikit-solid dev"
-    },
-    "private": true,
-    "dependencies": {
-        "@typescript/native-preview": "^7.0.0-dev.20260129.1",
-        "prettier": "^3.8.1"
-    }
+  "name": "@tcsw/workspaces",
+  "type": "module",
+  "version": "0.0.0",
+  "workspaces": [
+    "instance/",
+    "instance/src/web/",
+    "applications/*/web/",
+    "applications/*/backend/",
+    "uikit-solid/"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tricolorsoftware/workspaces"
+  },
+  "scripts": {
+    "dev": "bun --watch instance/src/index.ts",
+    "build-web": "bun run --cwd instance/src/web build",
+    "uikit": "bun run --cwd uikit-solid dev"
+  },
+  "private": true,
+  "dependencies": {
+    "@typescript/native-preview": "^7.0.0-dev.20260304.1",
+    "prettier": "^3.8.1"
+  }
 }

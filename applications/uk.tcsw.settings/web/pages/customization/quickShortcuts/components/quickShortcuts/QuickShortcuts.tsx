@@ -1,140 +1,91 @@
 import UKStackItem from "@tcsw/uikit-solid/src/components/stack/UKStackItem.jsx";
-import { createEffect, createSignal, For, type Component } from "solid-js";
-import trpc from "../../../../../lib/trpc.ts";
-import UKTextField from "@tcsw/uikit-solid/src/components/textField/UKTextField.tsx";
+import { type Component, createEffect, createSignal, For } from "solid-js";
 import styles from "./QuickShortcuts.module.scss";
-import UKButton from "@tcsw/uikit-solid/src/components/button/UKButton.jsx";
 import UKIconButton from "@tcsw/uikit-solid/src/components/iconButton/UKIconButton.jsx";
-import UKText from "@tcsw/uikit-solid/src/components/text/UKText.jsx";
-import UKSearchableDropdownMenu from "@tcsw/uikit-solid/src/components/searchableDropdownMenu/UKSearchableDropdownMenu.jsx";
 
 const QuickShortcuts: Component<{
-    defaultValue: string[];
-    currentValue: string[] | undefined;
+  defaultValue: string[];
+  currentValue: string[] | undefined;
+  setShortcuts: (shortcuts: string[]) => void;
 }> = (props) => {
-    const [inputValue, setInputValue] = createSignal<string>("");
-    const [items, setItems] = createSignal<string[]>(props.currentValue ?? props.defaultValue);
+  const [items, setItems] = createSignal<string[]>(
+    props.currentValue ?? props.defaultValue,
+  );
 
-    createEffect(async () => {
-        await trpc.application.setApplicationStringListSettingValue.mutate({
-            applicationId: "core",
-            id: "quick_shortcuts",
-            value: items(),
-        });
-    });
+  createEffect(() => {
+    if (props.currentValue) {
+      if (props.currentValue !== items()) setItems(props.currentValue);
+    }
+  });
 
-    return (
-        <UKStackItem
-            labelText={"Quick Shortcuts"}
-            supportingText={
-                "The application shortcuts displayed inside the navigation bar. The navigation bar can be found on the left or bottom of the screen."
-            }
-            leading={
-                items() !== props.defaultValue
-                    ? {
-                          type: "iconButton",
-                          alt: "Reset settings to the default value",
-                          value: "reset_wrench",
-                          onClick() {
-                              setItems(props.defaultValue);
-                          },
-                      }
-                    : undefined
-            }
-            expandedComponent={
-                <>
-                    <div class={styles.inputContainer}>
-                        <UKSearchableDropdownMenu
-                            getValue={setInputValue}
-                            defaultValue={inputValue()}
-                            inputColor="outlined"
-                            items={[
-                                {
-                                    id: "test",
-                                    label: "Test Item",
-                                    type: "button",
-                                },
-                            ]}
-                            label="Application Id"
-                        />
-                        <UKTextField
-                            containerClass={styles.textField}
-                            color={"outlined"}
-                            label={"Value"}
-                            getValue={setInputValue}
-                            defaultValue={inputValue()}
-                        />
-                        <UKButton
-                            size="m"
-                            onClick={() => {
-                                setItems((ims) => [...ims, inputValue()]);
-                                setInputValue("");
-                            }}
-                        >
-                            Add
-                        </UKButton>
-                    </div>
-                    <For each={items()}>
-                        {(item) => {
-                            return (
-                                <div class={styles.item}>
-                                    <UKIconButton
-                                        icon="remove"
-                                        alt="remove item"
-                                        color="tonal"
-                                        onClick={() => {
-                                            setItems((ims) => ims.filter((i) => i !== item));
-                                        }}
-                                    />
-                                    <UKText role="body" size="l" class={styles.itemLabel}>
-                                        {item}
-                                    </UKText>
-                                    {items().indexOf(item) < items().length - 1 && (
-                                        <UKIconButton
-                                            color="tonal"
-                                            alt="Move item down"
-                                            onClick={() => {
-                                                setItems((ims) => {
-                                                    const index = ims.indexOf(item);
-                                                    if (index === -1 || index === ims.length - 1) return ims;
-                                                    const newItems = [...ims];
-                                                    [newItems[index + 1], newItems[index]] = [
-                                                        newItems[index],
-                                                        newItems[index + 1],
-                                                    ];
-                                                    return newItems;
-                                                });
-                                            }}
-                                            icon="arrow_downward"
-                                        ></UKIconButton>
-                                    )}
-                                    {items().indexOf(item) > 0 && (
-                                        <UKIconButton
-                                            color="tonal"
-                                            alt="Move item up"
-                                            onClick={() => {
-                                                setItems((ims) => {
-                                                    const index = ims.indexOf(item);
-                                                    if (index === -1 || index === 0) return ims;
-                                                    const newItems = [...ims];
-                                                    [newItems[index - 1], newItems[index]] = [
-                                                        newItems[index],
-                                                        newItems[index - 1],
-                                                    ];
-                                                    return newItems;
-                                                });
-                                            }}
-                                            icon="arrow_upward"
-                                        ></UKIconButton>
-                                    )}
-                                </div>
-                            );
-                        }}
-                    </For>
-                </>
-            }
-        />
-    );
+  return (
+    <For each={items()}>
+      {(quickShortcut) => {
+        return (
+          <>
+            <UKStackItem
+              labelText={
+                quickShortcut.split(".").slice(2).join(" ") ?? quickShortcut
+              }
+              supportingText={quickShortcut}
+              inlineComponent={
+                <div class={styles.item}>
+                  <UKIconButton
+                    icon="remove"
+                    alt="remove item"
+                    color="tonal"
+                    onClick={() => {
+                      const ims = items();
+                      props.setShortcuts(
+                        ims.filter((i) => i !== quickShortcut),
+                      );
+                    }}
+                  />
+                  {items().indexOf(quickShortcut) < items().length - 1 && (
+                    <UKIconButton
+                      color="tonal"
+                      alt="Move item down"
+                      onClick={() => {
+                        const ims = items();
+                        const index = ims.indexOf(quickShortcut);
+                        if (index === -1 || index === ims.length - 1)
+                          return ims;
+                        const newItems = [...ims];
+                        [newItems[index + 1], newItems[index]] = [
+                          newItems[index],
+                          newItems[index + 1],
+                        ];
+                        props.setShortcuts(newItems);
+                      }}
+                      icon="arrow_downward"
+                    ></UKIconButton>
+                  )}
+                  {items().indexOf(quickShortcut) > 0 && (
+                    <UKIconButton
+                      color="tonal"
+                      alt="Move item up"
+                      onClick={() => {
+                        const ims = items();
+                        const index = ims.indexOf(quickShortcut);
+                        if (index === -1 || index === 0) return ims;
+                        const newItems = [...ims];
+                        [newItems[index - 1], newItems[index]] = [
+                          newItems[index],
+                          newItems[index - 1],
+                        ];
+                        props.setShortcuts(newItems);
+                      }}
+                      icon="arrow_upward"
+                    ></UKIconButton>
+                  )}
+                </div>
+              }
+            />
+          </>
+        );
+      }}
+    </For>
+  );
 };
 
 export default QuickShortcuts;

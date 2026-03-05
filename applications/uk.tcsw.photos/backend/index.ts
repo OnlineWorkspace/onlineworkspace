@@ -184,6 +184,7 @@ instance.sys.event.on(WorkspacesEvent.QuarterHourly, async () => {
       const exists =
         await db`SELECT image_id FROM tricolor_workspaces.public.uk_tcsw_photos_media WHERE path = ${imagePath}`;
       if (exists.length === 0) {
+        console.log(`Sharp path ${path.join(userFsDir, imagePath)}`);
         const imageMetadata = await sharp(
           path.join(userFsDir, imagePath),
         ).metadata();

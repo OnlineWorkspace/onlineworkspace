@@ -86,17 +86,18 @@ const ApplicationPage: Component = () => {
             {application()?.description}
           </UKText>
         </UKCard>
-        <div data-carousel={"TODO! THIS!!!"}>
-          <UKCard>
-            Image 1
-          </UKCard>
-          <UKCard>
-            Image 2
-          </UKCard>
-          <UKCard>
-            Image 3
-          </UKCard>
-        </div>
+        {/*TODO: implement this*/}
+        {/*<UKCarousel>*/}
+        {/*  <UKCard>*/}
+        {/*    Image 1*/}
+        {/*  </UKCard>*/}
+        {/*  <UKCard>*/}
+        {/*    Image 2*/}
+        {/*  </UKCard>*/}
+        {/*  <UKCard>*/}
+        {/*    Image 3*/}
+        {/*  </UKCard>*/}
+        {/*</UKCarousel>*/}
         <UKStack class={styles.requirements}>
           <UKStackItem defaultExpanded
             labelText="Requirements"

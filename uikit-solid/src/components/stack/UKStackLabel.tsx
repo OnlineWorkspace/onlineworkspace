@@ -1,8 +1,13 @@
 import type { Component } from "solid-js";
-import styles from "./UKStackItem.module.scss"
+import styles from "./UKStackLabel.module.scss"
+import UKText from "../text/UKText.tsx";
 
 const UKStackLabel: Component<{ children: string }> = (props) => {
-    return <div class={styles.component}>{props.children}</div>
+    return (
+      <UKText class={styles.component} role="title" size="m" align="start">
+        {props.children}
+      </UKText>
+    );
 }
 
 export default UKStackLabel

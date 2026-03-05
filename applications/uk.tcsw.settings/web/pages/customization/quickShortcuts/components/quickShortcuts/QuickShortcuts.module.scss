@@ -1,29 +1,6 @@
-.textField {
-    flex-grow: 1;
-}
-
-.inputContainer {
-    display: flex;
-    flex-direction: row;
-    gap: 0.5rem;
-    padding: 0.5rem;
-}
-
 .item {
-    display: flex;
-    flex-direction: row;
-    gap: 0.5rem;
-    padding-left: 0.5rem;
-    padding-right: 0.5rem;
-    padding-bottom: 0.25rem;
-
-    &:last-child {
-        padding-bottom: 0.5rem;
-    }
-}
-
-.itemLabel {
-    margin-top: auto;
-    margin-bottom: auto;
-    margin-right: auto;
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
+  margin-left: auto;
 }

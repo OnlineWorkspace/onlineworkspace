@@ -6,6 +6,8 @@ import UKTopAppBar from "@tcsw/uikit-solid/src/components/topAppBar/UKTopAppBar.
 import { useNavigate } from "@solidjs/router";
 import DuplicateFiles from "./components/DuplicateFiles/DuplicateFiles";
 import TemporaryFiles from "./components/TemporaryFiles/TemporaryFiles";
+import UKStackLabel
+  from "@tcsw/uikit-solid/src/components/stack/UKStackLabel.tsx";
 
 const StoragePage: Component = () => {
     const navigate = useNavigate();
@@ -24,17 +26,17 @@ const StoragePage: Component = () => {
                 }}
             />
             <div class={styles.page}>
-                <UKText role={"title"} size={"m"} class={styles.subheading}>
+                <UKStackLabel>
                     Usage Graph
-                </UKText>
+                </UKStackLabel>
                 <UsageGraph />
-                <UKText role={"title"} size={"m"} class={styles.subheading}>
+                <UKStackLabel>
                     Duplicate Files
-                </UKText>
+                </UKStackLabel>
                 <DuplicateFiles />
-                <UKText role={"title"} size={"m"} class={styles.subheading}>
+                <UKStackLabel>
                     Temporary Files
-                </UKText>
+                </UKStackLabel>
                 <TemporaryFiles />
             </div>
         </>

@@ -15,7 +15,7 @@ const Layout: Component<ParentProps> = (props) => {
             items={[
                 {
                     type: "label",
-                    label: "Categories",
+                    label: "Settings",
                 },
                 {
                     type: "button",

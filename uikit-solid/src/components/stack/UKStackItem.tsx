@@ -35,7 +35,7 @@ const UKStackItem: Component<{
     console.error(
       "Cannot have a UKStackItem with both expandedComponent & onClick",
     );
-    return <>Incompatable props, check console!</>;
+    return <>Incompatible props, check console!</>;
   }
 
   if (!props.expandedComponent) {
@@ -43,13 +43,13 @@ const UKStackItem: Component<{
       console.error(
         "Cannot have a UKStackItem with onExpand without expandedComponent",
       );
-      return <>Incompatable props, check console!</>;
+      return <>Incompatible props, check console!</>;
     }
     if (!!props.onCollapse) {
       console.error(
         "Cannot have a UKStackItem with onCollapse without expandedComponent",
       );
-      return <>Incompatable props, check console!</>;
+      return <>Incompatible props, check console!</>;
     }
   }
 
