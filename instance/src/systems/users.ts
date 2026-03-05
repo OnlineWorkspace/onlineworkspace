@@ -66,8 +66,9 @@ export class WorkspacesUser {
     const db = this.instance.sys.database.postgres();
 
     return (
-      (await db`SELECT username FROM users WHERE id = ${this.userId}`)?.[0]
-        ?.username || undefined
+      (
+        await db`SELECT username FROM tricolor_workspaces.public.users WHERE id = ${this.userId}`
+      )?.[0]?.username || undefined
     );
   }
 
@@ -80,7 +81,7 @@ export class WorkspacesUser {
     const db = this.instance.sys.database.postgres();
 
     try {
-      await db`UPDATE Users SET forename = ${forename} WHERE id = ${this.userId}`;
+      await db`UPDATE tricolor_workspaces.public.users SET forename = ${forename} WHERE id = ${this.userId}`;
 
       return true;
     } catch (err) {
@@ -100,8 +101,9 @@ export class WorkspacesUser {
     const db = this.instance.sys.database.postgres();
 
     return (
-      (await db`SELECT forename FROM users WHERE id = ${this.userId}`)?.[0]
-        ?.forename || undefined
+      (
+        await db`SELECT forename FROM tricolor_workspaces.public.users WHERE id = ${this.userId}`
+      )?.[0]?.forename || undefined
     );
   }
 
