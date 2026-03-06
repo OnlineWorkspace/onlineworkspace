@@ -8,7 +8,7 @@ import UKIconButton from "../iconButton/UKIconButton.tsx";
 interface LeadingIconOrImage {
     type: "image" | "icon";
     value: string;
-    alt: string;
+    alt?: string;
 }
 
 interface LeadingIconButton {
