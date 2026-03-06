@@ -156,7 +156,7 @@ const router = t.router({
 
         let filePath = path.join(userPath, "system/temp/avatar");
 
-        await fs.writeFile(filePath, data);
+        await fs.writeFile(filePath, data.bytes());
 
         await user.setAvatar(filePath);
         await user.generateAvatars(true);
@@ -861,6 +861,14 @@ const router = t.router({
           icon: { type: "icon" | "image"; value: string };
         }[] = [];
 
+        const quickShortcutsSetting = instance.sys.settings.applicationSettings[
+          "core"
+        ]?.find((s) => s.id === "quick_shortcuts");
+
+        if (!quickShortcutsSetting) return [];
+        const userShortcuts =
+          (await quickShortcutsSetting.getValue(opt.ctx.userId)) || [];
+
         for (const applicationId of applications) {
           const application =
             instance.sys.applications.availableApplications.find(
@@ -869,7 +877,14 @@ const router = t.router({
 
           if (!application) continue;
 
-          let icon = { type: "icon" as "icon" | "image", value: "indeterminate_question_box" };
+          if (userShortcuts.includes(applicationId)) {
+            continue;
+          }
+
+          let icon = {
+            type: "icon" as "icon" | "image",
+            value: "indeterminate_question_box",
+          };
 
           if (application.manifest?.icon) {
             if (application.manifest.icon.type === "image") {

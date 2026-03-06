@@ -2,6 +2,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(6rem, 1fr));
   gap: 0.5rem;
+  padding-bottom: 0.5rem;
 }
 
 .shortcut {
@@ -15,5 +16,17 @@
 }
 
 .shortcutImage {
+  width: 2rem;
+  height: 2rem;
+}
 
+.dialogDivider {
+  margin-bottom: 0.5rem;
+}
+
+.spinner {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }

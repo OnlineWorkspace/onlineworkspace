@@ -9,12 +9,19 @@ import { RootContext } from "../../rootContext.ts";
 import UKCard from "../card/UKCard.tsx";
 import styles from "./UKDialog.module.scss";
 import useIsMobile from "../../core/useIsMobile.ts";
+import type { CardColor } from "../card/lib/color.ts";
 
 const UKDialog: Component<
-  ParentProps<{ onClose: () => void; show: Accessor<boolean>, maxWidth?: string, adaptToMobile?: boolean }>
+  ParentProps<{
+    onClose: () => void;
+    show: Accessor<boolean>;
+    maxWidth?: string;
+    adaptToMobile?: boolean;
+    dialogColor?: CardColor;
+  }>
 > = (props) => {
   const rootContext = useContext(RootContext);
-  const isMobile = useIsMobile()
+  const isMobile = useIsMobile();
 
   return (
     <>
@@ -36,7 +43,7 @@ const UKDialog: Component<
               }
             }}
           >
-            <UKCard color={"filled"} class={styles.card}>
+            <UKCard color={props.dialogColor ?? "filled"} class={styles.card}>
               {props.children}
             </UKCard>
           </div>

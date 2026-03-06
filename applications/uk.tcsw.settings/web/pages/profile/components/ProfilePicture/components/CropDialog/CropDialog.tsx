@@ -9,7 +9,7 @@ const CropDialog: Component<{
 }> = (props) => {
   return (
     <UKDialog show={() => props.show} onClose={props.onClose}>
-      <CropImage refetchAvatar={props.refetchAvatar} />
+      <CropImage refetchAvatar={props.refetchAvatar} close={props.onClose} />
     </UKDialog>
   );
 };

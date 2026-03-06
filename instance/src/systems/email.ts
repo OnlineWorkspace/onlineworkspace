@@ -3,22 +3,27 @@ import System from "../system.js";
 import * as nm from "nodemailer";
 
 export default class EmailSystem extends System {
-    transporter!: nm.Transporter;
+  transporter!: nm.Transporter;
 
-    constructor(instance: Instance) {
-        super("email", instance);
+  constructor(instance: Instance) {
+    super("email", instance);
 
-        return this;
+    return this;
+  }
+
+  async startup(): Promise<boolean> {
+    this.transporter = nm.createTransport(
+      this.instance.sys.configuration.mailServer,
+    );
+
+    try {
+      this.log.info(
+        `Connecting to ${this.instance.sys.configuration.mailServer.host}:${this.instance.sys.configuration.mailServer.port}...`,
+      );
+      await this.transporter.verify();
+      return true;
+    } catch (err) {
+      return false;
     }
-
-    async startup(): Promise<boolean> {
-        this.transporter = nm.createTransport(this.instance.sys.configuration.mailServer);
-
-        try {
-            await this.transporter.verify();
-            return true;
-        } catch (err) {
-            return false;
-        }
-    }
+  }
 }

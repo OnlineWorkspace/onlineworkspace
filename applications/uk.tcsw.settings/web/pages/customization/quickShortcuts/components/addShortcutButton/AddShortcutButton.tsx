@@ -1,4 +1,11 @@
-import { type Component, createResource, createSignal, For } from "solid-js";
+import {
+  type Component,
+  createEffect,
+  createResource,
+  createSignal,
+  For,
+  Suspense,
+} from "solid-js";
 import UKButton from "@tcsw/uikit-solid/src/components/button/UKButton.tsx";
 import UKDialog from "@tcsw/uikit-solid/src/components/dialog/UKDialog.tsx";
 import trpc from "../../../../../lib/trpc.ts";
@@ -6,15 +13,24 @@ import UKCard from "@tcsw/uikit-solid/src/components/card/UKCard.tsx";
 import UKIcon from "@tcsw/uikit-solid/src/components/icon/UKIcon.tsx";
 import UKText from "@tcsw/uikit-solid/src/components/text/UKText.tsx";
 import styles from "./AddShortcutButton.module.scss";
+import UKDivider from "@tcsw/uikit-solid/src/components/divider/UKDivider.jsx";
+import UKIndeterminateSpinner from "@tcsw/uikit-solid/src/components/indeterminateSpinner/UKIndeterminateSpinner.jsx";
 
 const AddShortcutButton: Component<{
   refetchData: () => void;
   addShortcut: (shortcutId: string) => void;
 }> = (props) => {
   const [showDialog, setShowDialog] = createSignal<boolean>(false);
-  const [availableShortcuts] = createResource(() =>
-    trpc.customization.quickShortcuts.availableShortcuts.query(),
-  );
+  const [availableShortcuts, { refetch: refetchAvailableShortcuts }] =
+    createResource(() =>
+      trpc.customization.quickShortcuts.availableShortcuts.query(),
+    );
+
+  createEffect(() => {
+    if (showDialog()) {
+      refetchAvailableShortcuts();
+    }
+  });
 
   return (
     <>
@@ -27,40 +43,57 @@ const AddShortcutButton: Component<{
       >
         Add Shortcut
       </UKButton>
-      <UKDialog onClose={() => setShowDialog(false)} show={showDialog}>
-        <UKText role={"title"} size={"l"}>Add a shortcut</UKText>
+      <UKDialog
+        dialogColor="outlined"
+        onClose={() => setShowDialog(false)}
+        show={showDialog}
+      >
+        <UKText role={"title"} size={"l"}>
+          Select a shortcut to add
+        </UKText>
+        <UKDivider direction="horizontal" class={styles.dialogDivider} />
         <div class={styles.shortcutGrid}>
-          <For each={availableShortcuts()}>
-            {(shortcut) => {
-              return (
-                <UKCard
-                  class={styles.shortcut}
-                  color={"outlined"}
-                  onClick={() => {
-                    props.addShortcut(shortcut.id);
-                    setShowDialog(false);
-                  }}
-                >
-                  {shortcut.icon.type === "icon" && (
-                    <UKIcon class={styles.shortcutIcon}>
-                      {shortcut.icon.value}
-                    </UKIcon>
-                  )}
-                  {shortcut.icon.type === "image" && (
-                    <img
-                      class={styles.shortcutImage}
-                      src={shortcut.icon.value}
-                      alt={""}
-                    />
-                  )}
-                  <UKText align={"center"} role={"label"} size={"l"}>
-                    {shortcut.displayName}
-                  </UKText>
-                </UKCard>
-              );
-            }}
-          </For>
+          <Suspense
+            fallback={
+              <div class={styles.spinner}>
+                <UKIndeterminateSpinner />
+              </div>
+            }
+          >
+            <For each={availableShortcuts()}>
+              {(shortcut) => {
+                return (
+                  <UKCard
+                    class={styles.shortcut}
+                    onClick={() => {
+                      props.addShortcut(shortcut.id);
+                      setShowDialog(false);
+                    }}
+                  >
+                    {shortcut.icon.type === "icon" && (
+                      <UKIcon class={styles.shortcutIcon}>
+                        {shortcut.icon.value}
+                      </UKIcon>
+                    )}
+                    {shortcut.icon.type === "image" && (
+                      <img
+                        class={styles.shortcutImage}
+                        src={shortcut.icon.value}
+                        alt={""}
+                      />
+                    )}
+                    <UKText align={"center"} role={"label"} size={"l"}>
+                      {shortcut.displayName}
+                    </UKText>
+                  </UKCard>
+                );
+              }}
+            </For>
+          </Suspense>
         </div>
+        <UKButton color="tonal" onClick={() => setShowDialog(false)}>
+          Close
+        </UKButton>
       </UKDialog>
     </>
   );

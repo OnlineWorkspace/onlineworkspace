@@ -1,43 +1,51 @@
 .root {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
 
-    &:has(> .cropper > :global(cropper-canvas)) {
-        gap: 0.5rem;
-    }
+  &:has(> .cropper > :global(cropper-canvas)) {
+    gap: 0.5rem;
+  }
 }
 
 .cropper {
-    border-radius: var(--uk-sys-shape-corner-medium);
-    overflow: hidden;
+  border-radius: var(--uk-sys-shape-corner-medium);
+  overflow: hidden;
 
-    &:has(:global(cropper-canvas)) {
-        aspect-ratio: 1 / 1;
-        width: 100%;
-    }
+  &:has(:global(cropper-canvas)) {
+    aspect-ratio: 1 / 1;
+    width: 100%;
+  }
 
-    //noinspection CssInvalidHtmlTagReference
-    :global(cropper-canvas) {
-        width: 100%;
-        height: 100%;
-    }
+  //noinspection CssInvalidHtmlTagReference
+  :global(cropper-canvas) {
+    width: 100%;
+    height: 100%;
+  }
 
-    //noinspection CssInvalidHtmlTagReference
-    :global(cropper-selection),
-    :global(cropper-handle),
-    :global(cropper-grid) {
-        border-radius: 100%;
-    }
+  //noinspection CssInvalidHtmlTagReference
+  :global(cropper-selection),
+  :global(cropper-handle),
+  :global(cropper-grid) {
+    border-radius: 100%;
+  }
 }
 
 .button {
-    margin-left: auto;
+  margin-left: auto;
 }
 
 .buttons {
-    margin-left: auto;
-    display: flex;
-    flex-direction: row;
-    gap: 0.5rem;
+  margin-left: auto;
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
+}
+
+.spinnerContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
 }
