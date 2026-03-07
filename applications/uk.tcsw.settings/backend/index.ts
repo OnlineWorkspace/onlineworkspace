@@ -156,7 +156,8 @@ const router = t.router({
 
         let filePath = path.join(userPath, "system/temp/avatar");
 
-        await fs.writeFile(filePath, data.bytes());
+        const fileResponse = new Response(opt.input);
+        await fs.writeFile(filePath, await fileResponse.bytes());
 
         await user.setAvatar(filePath);
         await user.generateAvatars(true);

@@ -432,6 +432,7 @@ export class WorkspacesUser {
       { width: 64, height: 64, name: "m" },
       { width: 128, height: 128, name: "l" },
       { width: 256, height: 256, name: "xl" },
+      { width: 512, height: 512, name: "2xl" },
     ];
 
     try {
@@ -717,7 +718,7 @@ export default class UsersSystem extends System {
         @returns `undefined` - no such user exists
     */
   async getUserById(userId: number): Promise<WorkspacesUser | undefined> {
-    if (await this.doesUserExist(userId) === undefined) return undefined;
+    if ((await this.doesUserExist(userId)) === undefined) return undefined;
 
     return new WorkspacesUser(this.instance, userId);
   }

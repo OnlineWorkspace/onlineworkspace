@@ -1,19 +1,19 @@
 {
-    "name": "uk-tcsw-ghostty-web",
-    "author": "Tricolor Software",
-    "private": true,
-    "version": "0.0.1",
-    "dependencies": {
-        "@solidjs/router": "^0.15.3",
-        "@tcsw/uikit-solid": "workspace:*",
-        "@trpc/client": "^11.6.0",
-        "@trpc/server": "^11.6.0",
-        "clsx": "^2.1.1",
-        "ghostty-web": "^0.3.0",
-        "solid-js": "^1.9.8"
-    },
-    "devDependencies": {
-        "typescript": "~5.8.3",
-        "vite": "^7.1.2"
-    }
+  "name": "uk-tcsw-ghostty-web",
+  "author": "Tricolor Software",
+  "private": true,
+  "version": "0.0.1",
+  "dependencies": {
+    "@solidjs/router": "^0.15.3",
+    "@tcsw/uikit-solid": "workspace:*",
+    "@trpc/client": "^11.6.0",
+    "@trpc/server": "^11.6.0",
+    "clsx": "^2.1.1",
+    "ghostty-web": "^0.3.0",
+    "solid-js": "^1.9.8"
+  },
+  "devDependencies": {
+    "typescript": "~5.8.3",
+    "vite": "^7.1.2"
+  }
 }

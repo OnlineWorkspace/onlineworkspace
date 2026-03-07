@@ -1,22 +1,20 @@
 {
-    "id": "uk.tcsw.files",
-    "displayName": "Files",
-    "icon": {
-        "type": "icon",
-        "value": "folder"
+  "id": "uk.tcsw.files",
+  "displayName": "Files",
+  "icon": {
+    "type": "icon",
+    "value": "folder"
+  },
+  "description": "Navigate and manage files in your Workspace",
+  "authors": ["Tricolor Software <https://tcsw.uk>"],
+  "license": "MIT",
+  "source": "https://github.com/tricolorsoftware/workspaces/src/branch/main/packages/applications/uk.tcsw.files",
+  "modules": {
+    "web": {
+      "path": "./web"
     },
-    "description": "Navigate and manage files in your Workspace",
-    "authors": [
-        "Tricolor Software <https://tcsw.uk>"
-    ],
-    "license": "MIT",
-    "source": "https://github.com/tricolorsoftware/workspaces/src/branch/main/packages/applications/uk.tcsw.files",
-    "modules": {
-        "web": {
-            "path": "./web"
-        },
-        "bun": {
-            "path": "./backend/index.ts"
-        }
+    "bun": {
+      "path": "./backend/index.ts"
     }
+  }
 }

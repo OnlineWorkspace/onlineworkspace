@@ -7,16 +7,19 @@ import Layout from "./Layout";
 import ApplicationPage from "./pages/app/Index";
 
 const App: Component = () => {
-    return (
-        <Route component={Layout}>
-            {/*<Route path="/" component={RootPage} />*/}
-            <Route path="/" component={SearchPage} />
-            <Route path="/search" component={SearchPage} />
-            <Route path="/categories" component={CategoriesPage} />
-            <Route path="/manage-installed" component={ManageInstalledPage} />
-            <Route path="/app/:repository/:applicationId" component={ApplicationPage} />
-        </Route>
-    );
+  return (
+    <Route component={Layout}>
+      {/*<Route path="/" component={RootPage} />*/}
+      <Route path="/" component={SearchPage} />
+      <Route path="/search" component={SearchPage} />
+      <Route path="/categories" component={CategoriesPage} />
+      <Route path="/manage-installed" component={ManageInstalledPage} />
+      <Route
+        path="/app/:repository/:applicationId"
+        component={ApplicationPage}
+      />
+    </Route>
+  );
 };
 
 export default App;

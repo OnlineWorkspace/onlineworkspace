@@ -1,25 +1,25 @@
 {
-    "id": "uk.tcsw.ghostty",
-    "displayName": "Ghostty",
-    "icon": {
-        "type": "image",
-        "value": "./icon.png"
+  "id": "uk.tcsw.ghostty",
+  "displayName": "Ghostty",
+  "icon": {
+    "type": "image",
+    "value": "./icon.png"
+  },
+  "bannerImage": "./banner.svg",
+  "description": "The Ghostty Terminal for Workspaces",
+  "authors": [
+    "Ghostty <https://github.com/ghostty-org>",
+    "Coder for ghostty-web <https://github.com/coder>",
+    "Tricolor Software <https://tcsw.uk>"
+  ],
+  "license": "MIT",
+  "source": "https://github.com/tricolorsoftware/workspaces/src/branch/main/packages/applications/uk.tcsw.ghostty",
+  "modules": {
+    "web": {
+      "path": "./web"
     },
-    "bannerImage": "./banner.svg",
-    "description": "The Ghostty Terminal for Workspaces",
-    "authors": [
-        "Ghostty <https://github.com/ghostty-org>",
-        "Coder for ghostty-web <https://github.com/coder>",
-        "Tricolor Software <https://tcsw.uk>"
-    ],
-    "license": "MIT",
-    "source": "https://github.com/tricolorsoftware/workspaces/src/branch/main/packages/applications/uk.tcsw.ghostty",
-    "modules": {
-        "web": {
-            "path": "./web"
-        },
-        "bun": {
-            "path": "./backend/index.ts"
-        }
+    "bun": {
+      "path": "./backend/index.ts"
     }
+  }
 }

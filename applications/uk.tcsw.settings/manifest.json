@@ -1,20 +1,20 @@
 {
-    "id": "uk.tcsw.settings",
-    "displayName": "Settings",
-    "icon": {
-        "type": "icon",
-        "value": "settings"
+  "id": "uk.tcsw.settings",
+  "displayName": "Settings",
+  "icon": {
+    "type": "icon",
+    "value": "settings"
+  },
+  "description": "The Workspaces Settings Manager",
+  "authors": ["Tricolor Software <https://tcsw.uk>"],
+  "license": "MIT",
+  "source": "https://github.com/tricolorsoftware/workspaces/src/branch/main/packages/applications/uk.tcsw.settings",
+  "modules": {
+    "web": {
+      "path": "./web"
     },
-    "description": "The Workspaces Settings Manager",
-    "authors": ["Tricolor Software <https://tcsw.uk>"],
-    "license": "MIT",
-    "source": "https://github.com/tricolorsoftware/workspaces/src/branch/main/packages/applications/uk.tcsw.settings",
-    "modules": {
-        "web": {
-            "path": "./web"
-        },
-        "bun": {
-            "path": "./backend/index.ts"
-        }
+    "bun": {
+      "path": "./backend/index.ts"
     }
+  }
 }

@@ -16,42 +16,42 @@ import EmailSystem from "./systems/email.js";
 import EventSystem from "./systems/events.js";
 
 export type Sys = {
-    users: UsersSubsystem;
-    notifications: NotificationsSubsystem;
-    filesystem: FilesystemSubsystem;
-    configuration: ConfigurationSubsystem;
-    consoleCommands: ConsoleCommandsSubsystem;
-    authorization: AuthorizationSubsystem;
-    database: DatabaseSubsystem;
-    applications: ApplicationsSubsystem;
-    tRPC: TRPCSubsystem;
-    image: ImageSubsystem;
-    settings: SettingsSubsystem;
-    webFrontend: WebFrontendSubsystem;
-    email: EmailSystem;
-    event: EventSystem;
+  users: UsersSubsystem;
+  notifications: NotificationsSubsystem;
+  filesystem: FilesystemSubsystem;
+  configuration: ConfigurationSubsystem;
+  consoleCommands: ConsoleCommandsSubsystem;
+  authorization: AuthorizationSubsystem;
+  database: DatabaseSubsystem;
+  applications: ApplicationsSubsystem;
+  tRPC: TRPCSubsystem;
+  image: ImageSubsystem;
+  settings: SettingsSubsystem;
+  webFrontend: WebFrontendSubsystem;
+  email: EmailSystem;
+  event: EventSystem;
 } & { [key: string]: System };
 
 export default abstract class System {
-    instance: Instance;
-    readonly log: Logger;
-    readonly id: string;
+  instance: Instance;
+  readonly log: Logger;
+  readonly id: string;
 
-    protected constructor(id: string, instance: Instance) {
-        this.instance = instance;
-        this.id = id;
-        this.log = instance.log.createLogger(this.id);
+  protected constructor(id: string, instance: Instance) {
+    this.instance = instance;
+    this.id = id;
+    this.log = instance.log.createLogger(this.id);
 
-        return this;
-    }
+    return this;
+  }
 
-    async startup(): Promise<boolean> {
-        this.log.info("Starting up...");
-        return true;
-    }
+  async startup(): Promise<boolean> {
+    this.log.info("Starting up...");
+    return true;
+  }
 
-    stop() {
-        this.log.info(`Stopping System ${this.id}`);
-        return this;
-    }
+  stop() {
+    this.log.info(`Stopping System ${this.id}`);
+    return this;
+  }
 }

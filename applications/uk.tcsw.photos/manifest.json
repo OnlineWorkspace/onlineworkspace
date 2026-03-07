@@ -1,20 +1,20 @@
 {
-    "id": "uk.tcsw.photos",
-    "displayName": "Photos",
-    "icon": {
-        "type": "icon",
-        "value": "photo_prints"
+  "id": "uk.tcsw.photos",
+  "displayName": "Photos",
+  "icon": {
+    "type": "icon",
+    "value": "photo_prints"
+  },
+  "description": "Manage & View your photos and videos",
+  "authors": ["Tricolor Software <https://tcsw.uk>"],
+  "license": "MIT",
+  "source": "https://github.com/tricolorsoftware/workspaces/src/branch/main/packages/applications/uk.tcsw.photos",
+  "modules": {
+    "web": {
+      "path": "./web"
     },
-    "description": "Manage & View your photos and videos",
-    "authors": ["Tricolor Software <https://tcsw.uk>"],
-    "license": "MIT",
-    "source": "https://github.com/tricolorsoftware/workspaces/src/branch/main/packages/applications/uk.tcsw.photos",
-    "modules": {
-        "web": {
-            "path": "./web"
-        },
-        "bun": {
-            "path": "./backend/index.ts"
-        }
+    "bun": {
+      "path": "./backend/index.ts"
     }
+  }
 }

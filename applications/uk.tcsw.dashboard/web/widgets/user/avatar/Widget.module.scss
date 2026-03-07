@@ -1,0 +1,10 @@
+.root {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  grid-row: span 3;
+}
+
+.avatar {
+  --size: 21rem !important;
+}

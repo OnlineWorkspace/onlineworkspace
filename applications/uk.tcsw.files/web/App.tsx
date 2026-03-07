@@ -5,15 +5,15 @@ import Redirect from "./components/Redirect.tsx";
 import ViewContainer from "./components/ViewContainer/ViewContainer.tsx";
 
 const App: Component = () => {
-    return (
-        <>
-            <Route path={"/"} component={Redirect} />
-            <Route component={Layout}>
-                <Route path={"/dir"} component={ViewContainer} />
-                <Route path={"/dir/*currentPath"} component={ViewContainer} />
-            </Route>
-        </>
-    );
+  return (
+    <>
+      <Route path={"/"} component={Redirect} />
+      <Route component={Layout}>
+        <Route path={"/dir"} component={ViewContainer} />
+        <Route path={"/dir/*currentPath"} component={ViewContainer} />
+      </Route>
+    </>
+  );
 };
 
 export default App;

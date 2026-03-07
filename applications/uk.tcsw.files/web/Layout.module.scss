@@ -1,13 +1,13 @@
 .root {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    grid-template-rows: auto 1fr auto;
-    height: 100%;
-    width: 100%;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: auto 1fr auto;
+  height: 100%;
+  width: 100%;
 }
 
 .view {
-    background-color: rgb(var(--uk-sys-color-surface-container));
-    overflow-y: auto;
-    height: 100%;
+  background-color: rgb(var(--uk-sys-color-surface-container));
+  overflow-y: auto;
+  height: 100%;
 }

@@ -3,7 +3,7 @@ import styles from "./UKAvatar.module.scss";
 import clsx from "clsx";
 
 const UKAvatar: Component<{
-    size: "xs" | "s" | "m" | "l" | "xl";
+    size: "xs" | "s" | "m" | "l" | "xl" | "2xl";
     username: string;
     avatar: string;
     class?: string;

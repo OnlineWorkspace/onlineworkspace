@@ -15,30 +15,30 @@ import ApplicationPage from "./pages/applications/applicationId/Index.tsx";
 import QuickShortcutsPage from "./pages/customization/quickShortcuts/Index.tsx";
 
 const App: Component = () => {
-    return (
-        <>
-            <Route component={Layout}>
-                <Route path={"/"} component={RootPage} />
-                <Route path={"/profile"} component={ProfilePage} />
-                <Route path={"/authentication"}>
-                    <Route path={"/"} component={AuthenticationPage} />
-                    <Route path={"/reset-password"} component={ResetPasswordPage} />
-                </Route>
-                <Route path={"/storage"} component={StoragePage} />
-                <Route path={"/customization"}>
-                    <Route path={"/"} component={CustomizationPage} />
-                    <Route path={"/wallpaper"} component={WallpaperPage} />
-                    <Route path={"/color-theme"} component={ColorThemePage} />
-                    <Route path={"/quick-shortcuts"} component={QuickShortcutsPage} />
-                </Route>
-                <Route path={"/instance"} component={InstancePage} />
-                <Route path={"/applications"}>
-                    <Route path={"/"} component={ApplicationsPage} />
-                    <Route path={":applicationId"} component={ApplicationPage} />
-                </Route>
-            </Route>
-        </>
-    );
+  return (
+    <>
+      <Route component={Layout}>
+        <Route path={"/"} component={RootPage} />
+        <Route path={"/profile"} component={ProfilePage} />
+        <Route path={"/authentication"}>
+          <Route path={"/"} component={AuthenticationPage} />
+          <Route path={"/reset-password"} component={ResetPasswordPage} />
+        </Route>
+        <Route path={"/storage"} component={StoragePage} />
+        <Route path={"/customization"}>
+          <Route path={"/"} component={CustomizationPage} />
+          <Route path={"/wallpaper"} component={WallpaperPage} />
+          <Route path={"/color-theme"} component={ColorThemePage} />
+          <Route path={"/quick-shortcuts"} component={QuickShortcutsPage} />
+        </Route>
+        <Route path={"/instance"} component={InstancePage} />
+        <Route path={"/applications"}>
+          <Route path={"/"} component={ApplicationsPage} />
+          <Route path={":applicationId"} component={ApplicationPage} />
+        </Route>
+      </Route>
+    </>
+  );
 };
 
 export default App;

@@ -60,35 +60,41 @@ const AddShortcutButton: Component<{
               </div>
             }
           >
-            <For each={availableShortcuts()}>
-              {(shortcut) => {
-                return (
-                  <UKCard
-                    class={styles.shortcut}
-                    onClick={() => {
-                      props.addShortcut(shortcut.id);
-                      setShowDialog(false);
-                    }}
-                  >
-                    {shortcut.icon.type === "icon" && (
-                      <UKIcon class={styles.shortcutIcon}>
-                        {shortcut.icon.value}
-                      </UKIcon>
-                    )}
-                    {shortcut.icon.type === "image" && (
-                      <img
-                        class={styles.shortcutImage}
-                        src={shortcut.icon.value}
-                        alt={""}
-                      />
-                    )}
-                    <UKText align={"center"} role={"label"} size={"l"}>
-                      {shortcut.displayName}
-                    </UKText>
-                  </UKCard>
-                );
-              }}
-            </For>
+            {availableShortcuts()?.length === 0 ? (
+              <>
+                <UKText role={"body"} size={"l"}>No more Quick Shortcuts are available</UKText>
+              </>
+            ) : (
+              <For each={availableShortcuts()}>
+                {(shortcut) => {
+                  return (
+                    <UKCard
+                      class={styles.shortcut}
+                      onClick={() => {
+                        props.addShortcut(shortcut.id);
+                        setShowDialog(false);
+                      }}
+                    >
+                      {shortcut.icon.type === "icon" && (
+                        <UKIcon class={styles.shortcutIcon}>
+                          {shortcut.icon.value}
+                        </UKIcon>
+                      )}
+                      {shortcut.icon.type === "image" && (
+                        <img
+                          class={styles.shortcutImage}
+                          src={shortcut.icon.value}
+                          alt={""}
+                        />
+                      )}
+                      <UKText align={"center"} role={"label"} size={"l"}>
+                        {shortcut.displayName}
+                      </UKText>
+                    </UKCard>
+                  );
+                }}
+              </For>
+            )}
           </Suspense>
         </div>
         <UKButton color="tonal" onClick={() => setShowDialog(false)}>

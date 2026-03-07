@@ -5,9 +5,9 @@ import utils from "node:util";
 import * as OTPAuth from "otpauth";
 
 export enum AuthorizedDeviceType {
-    Desktop,
-    Mobile,
-    UnknownBrowser,
+  Desktop,
+  Mobile,
+  UnknownBrowser,
 }
 
 // the number of ms that a login session is valid for
@@ -259,7 +259,8 @@ export default class AuthorizationSystem extends System {
       return false;
     }
 
-    const userPasskeys = await db`SELECT passkeys FROM tricolor_workspaces.public.users WHERE id = ${userId}`;
+    const userPasskeys =
+      await db`SELECT passkeys FROM tricolor_workspaces.public.users WHERE id = ${userId}`;
 
     return userPasskeys?.[0]?.passkeys?.length > 0;
   }
