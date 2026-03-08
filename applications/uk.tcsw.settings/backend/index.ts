@@ -1007,15 +1007,19 @@ const router = t.router({
     getApplications: procedure
       .output(z.object({ displayName: z.string(), id: z.string() }).array())
       .query(async (opt) => {
-        return instance.sys.applications.enabledApplications.map((a) => {
-          return {
-            displayName:
-              instance.sys.applications.availableApplications.find(
-                (aa) => aa.manifest?.id === a,
-              )?.manifest?.displayName || `Failed to find application '${a}'`,
-            id: a,
-          };
-        });
+        return instance.sys.applications.enabledApplications.map(
+          (enabledApplication) => {
+            return {
+              displayName:
+                instance.sys.applications.availableApplications.find(
+                  (availableApplication) =>
+                    availableApplication.manifest?.id === enabledApplication,
+                )?.manifest?.displayName ||
+                `Failed to find application '${enabledApplication}'`,
+              id: enabledApplication,
+            };
+          },
+        );
       }),
     getApplication: procedure
       .input(z.object({ id: z.string() }))
