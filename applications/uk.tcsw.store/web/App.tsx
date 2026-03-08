@@ -6,7 +6,7 @@ import ManageInstalledPage from "./pages/manage-installed/Index";
 import Layout from "./Layout";
 import ApplicationPage from "./pages/app/Index";
 
-const App: Component = () => {
+const App: Component = () => {1
   return (
     <Route component={Layout}>
       {/*<Route path="/" component={RootPage} />*/}

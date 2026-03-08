@@ -11,6 +11,7 @@ import z from "zod";
 import path from "path";
 import { promises as fs } from "fs";
 import sharp from "sharp";
+import { FaceLandmarker } from "@mediapipe/tasks-vision";
 
 const log = instance.log.createLogger("uk.tcsw.photos");
 const db = instance.sys.database.postgres();
@@ -197,9 +198,16 @@ instance.sys.event.on(WorkspacesEvent.QuarterHourly, async () => {
 
   // scan images left in queue
   const unprocessedImages =
-    await db`SELECT image_id, path, owner_id, faces_detected, objects_detected 
-             FROM tricolor_workspaces.public.uk_tcsw_photos_media 
+    await db`SELECT image_id, path, owner_id, faces_detected, objects_detected
+             FROM tricolor_workspaces.public.uk_tcsw_photos_media
              WHERE faces_detected = FALSE OR objects_detected = FALSE`;
+
+  // create landmarker
+  const faceLandmarker = await FaceLandmarker.createFromOptions({
+    wasmBinaryPath: path.join(instance.sys.filesystem.getApplicationSrc("uk.tcsw.photos")!, "backend/services/faceLandmarker/landmarker.wasm")
+  }, {
+
+  });
 
   for (const image of unprocessedImages) {
     // perform face detection
@@ -211,7 +219,7 @@ instance.sys.event.on(WorkspacesEvent.QuarterHourly, async () => {
         height: number;
       }[] = [];
 
-      // perform facial detection using mediapipe
+      // perform facial landmarking using MediaPipe.
 
       for (const face of detectedFaces) {
         await db`INSERT INTO tricolor_workspaces.public.uk_tcsw_photos_faces (image_id, x, y, width, height, owner_id) VALUES (${image.image_id}, ${face.x}, ${face.y}, ${face.width}, ${face.height}, ${image.owner_id})`;
@@ -227,7 +235,7 @@ instance.sys.event.on(WorkspacesEvent.QuarterHourly, async () => {
       // await db`UPDATE tricolor_workspaces.public.uk_tcsw_photos_media SET objects_detected = TRUE WHERE image_id = ${image.image_id}`;
     }
   }
-});
+};);
 
 instance.sys.event.on(WorkspacesEvent.Daily, () => {
   // remove missing images from the database
