@@ -203,11 +203,11 @@ instance.sys.event.on(WorkspacesEvent.QuarterHourly, async () => {
              WHERE faces_detected = FALSE OR objects_detected = FALSE`;
 
   // create landmarker
-  const faceLandmarker = await FaceLandmarker.createFromOptions({
-    wasmBinaryPath: path.join(instance.sys.filesystem.getApplicationSrc("uk.tcsw.photos")!, "backend/services/faceLandmarker/landmarker.wasm")
-  }, {
+  // const faceLandmarker = await FaceLandmarker.createFromOptions({
+  //   wasmBinaryPath: path.join(instance.sys.filesystem.getApplicationSrc("uk.tcsw.photos")!, "backend/services/faceLandmarker/landmarker.wasm")
+  // }, {
 
-  });
+  // });
 
   for (const image of unprocessedImages) {
     // perform face detection
@@ -235,7 +235,7 @@ instance.sys.event.on(WorkspacesEvent.QuarterHourly, async () => {
       // await db`UPDATE tricolor_workspaces.public.uk_tcsw_photos_media SET objects_detected = TRUE WHERE image_id = ${image.image_id}`;
     }
   }
-};);
+});
 
 instance.sys.event.on(WorkspacesEvent.Daily, () => {
   // remove missing images from the database
