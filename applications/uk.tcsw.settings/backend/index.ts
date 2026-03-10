@@ -515,6 +515,38 @@ const router = t.router({
 
         return true;
       }),
+    mailserver: {
+      get: procedure
+        .output(
+          z
+            .object({
+              host: z.string(),
+              port: z.number(),
+              secure: z.boolean(),
+              auth: z.object({
+                user: z.string(),
+                pass: z.string(),
+              }),
+            })
+            .or(z.undefined()),
+        )
+        .query(async (opt) => {
+          const mailserverConfig =
+            await instance.sys.configuration.getMailserverConfig();
+
+          if (!mailserverConfig) return undefined;
+
+          return {
+            host: mailserverConfig.host,
+            port: mailserverConfig.port,
+            secure: mailserverConfig.secure,
+            auth: {
+              user: mailserverConfig.auth.user,
+              pass: "********",
+            },
+          };
+        }),
+    },
   },
   customization: {
     wallpaper: {

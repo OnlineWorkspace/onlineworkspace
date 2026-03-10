@@ -8,6 +8,7 @@ import UKButton from "@tcsw/uikit-solid/src/components/button/UKButton.jsx";
 import trpc from "../../../../../../lib/trpc";
 import UKButtonGroup from "@tcsw/uikit-solid/src/components/buttonGroup/UKButtonGroup.jsx";
 import UKDialog from "@tcsw/uikit-solid/src/components/dialog/UKDialog.jsx";
+import UKDivider from "@tcsw/uikit-solid/src/components/divider/UKDivider.jsx";
 
 const User: Component<{
   userId: number;
@@ -56,6 +57,10 @@ const User: Component<{
       />
       <UKDialog show={showDialog} onClose={() => setShowDialog(false)}>
         <div class={styles.expanded}>
+          <UKText role="title" size="l">
+            Modify User
+          </UKText>
+          <UKDivider direction="horizontal" />
           <UKTextField
             color="outlined"
             getValue={(val) => {
@@ -121,7 +126,7 @@ const User: Component<{
               value={isAdministrator()}
             />
           </div>
-          <UKButtonGroup size={"s"} align={"end"}>
+          <UKButtonGroup size={"s"} align={"start"}>
             <UKButton color={"tonal"} disabled={true} onClick={() => 0}>
               Invalidate all sessions
             </UKButton>
@@ -137,6 +142,7 @@ const User: Component<{
             >
               Boop
             </UKButton>
+            {/* FIXME: TODO: add warning dialog */}
             <UKButton
               color={"standard"}
               onClick={async () => {
@@ -149,6 +155,15 @@ const User: Component<{
               Delete
             </UKButton>
           </UKButtonGroup>
+          <UKButton
+            class={styles.closeButton}
+            color={"filled"}
+            onClick={() => {
+              setShowDialog(false);
+            }}
+          >
+            Close
+          </UKButton>
         </div>
       </UKDialog>
     </>

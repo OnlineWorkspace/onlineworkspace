@@ -423,6 +423,30 @@
     }
 }
 
+.inProgress {
+  cursor: not-allowed;
+}
+
 .iconClass {
     font-size: var(--icon-size);
+    margin-right: 0px;
+}
+
+.leadingIconSpin {
+  animation: spin 1s linear infinite;
+
+  @keyframes spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+}
+
+.leadingIconNoWidth {
+  --icon-size: 0px;
+  margin-right: -8px;
+  transition: width var(--uk-sys-motion-duration-500) var(--uk-sys-motion-easing-standard-normal), margin-right var(--uk-sys-motion-duration-500) var(--uk-sys-motion-easing-standard-normal);
 }
