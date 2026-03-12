@@ -1,7 +1,7 @@
 import type { Instance } from "../index.js";
 import System from "../system.js";
 import path from "path";
-import { promises as fs } from "fs";
+import { promises as fs, readFileSync as fsReadFileSync } from "fs";
 
 export enum WorkspacesFeatureFlags {
   SlashCommands = "slash_commands",
@@ -26,6 +26,7 @@ export default class ConfigurationSystem extends System {
       password: string;
       host: string;
       port: number;
+      database: string;
     };
   };
   // http://localhost:3563
@@ -55,11 +56,11 @@ export default class ConfigurationSystem extends System {
     this.enabledFeatures = [WorkspacesFeatureFlags.SlashCommands];
     this.databases = {
       postgres: {
-        // TODO: actually set these values
         user: "postgres",
         password: "postgres",
         host: "localhost",
         port: 5432,
+        database: "tricolor_workspaces",
       },
     };
 
@@ -103,6 +104,38 @@ export default class ConfigurationSystem extends System {
     - These terms may change. If we make significant updates, we will post a notification within the app or send an email.`,
       lastUpdated: Date.now(),
     };
+
+    if (
+      path.join(
+        this.instance.sys.filesystem.AUTOINSTALL_PATH,
+        "configuration.json",
+      )
+    ) {
+      let autoInstallConfig = JSON.parse(
+        fsReadFileSync(
+          path.join(
+            this.instance.sys.filesystem.AUTOINSTALL_PATH,
+            "configuration.json",
+          ),
+        ).toString(),
+      );
+
+      if (autoInstallConfig.enabledFeatures)
+        this.enabledFeatures = autoInstallConfig.enabledFeatures;
+      if (autoInstallConfig.databases)
+        this.databases = autoInstallConfig.databases;
+      if (autoInstallConfig.backendUrl)
+        this.backendUrl = autoInstallConfig.backendUrl;
+      if (autoInstallConfig.webUrl) this.webUrl = autoInstallConfig.webUrl;
+      if (autoInstallConfig.signupRequirements)
+        this.signupRequirements = autoInstallConfig.signupRequirements;
+      if (autoInstallConfig.displayName)
+        this.displayName = autoInstallConfig.displayName;
+      if (autoInstallConfig.mailserver)
+        this.mailServer = autoInstallConfig.mailserver;
+      if (autoInstallConfig.termsOfUse)
+        this.termsOfUse = autoInstallConfig.termsOfUse;
+    }
 
     return this;
   }

@@ -42,12 +42,12 @@ export class WorkspacesUser {
     try {
       if (
         (
-          await db`SELECT username FROM tricolor_workspaces.public.users WHERE username = ${username}`
+          await db`SELECT username FROM public.users WHERE username = ${username}`
         ).count !== 0
       )
         return false;
 
-      await db`UPDATE tricolor_workspaces.public.users SET username = ${username} WHERE id = ${this.userId}`;
+      await db`UPDATE public.users SET username = ${username} WHERE id = ${this.userId}`;
       return true;
     } catch (err) {
       this.instance.sys.users.log.error(
@@ -67,7 +67,7 @@ export class WorkspacesUser {
 
     return (
       (
-        await db`SELECT username FROM tricolor_workspaces.public.users WHERE id = ${this.userId}`
+        await db`SELECT username FROM public.users WHERE id = ${this.userId}`
       )?.[0]?.username || undefined
     );
   }
@@ -81,7 +81,7 @@ export class WorkspacesUser {
     const db = this.instance.sys.database.postgres();
 
     try {
-      await db`UPDATE tricolor_workspaces.public.users SET forename = ${forename} WHERE id = ${this.userId}`;
+      await db`UPDATE public.users SET forename = ${forename} WHERE id = ${this.userId}`;
 
       return true;
     } catch (err) {
@@ -102,7 +102,7 @@ export class WorkspacesUser {
 
     return (
       (
-        await db`SELECT forename FROM tricolor_workspaces.public.users WHERE id = ${this.userId}`
+        await db`SELECT forename FROM public.users WHERE id = ${this.userId}`
       )?.[0]?.forename || undefined
     );
   }
@@ -116,7 +116,7 @@ export class WorkspacesUser {
     const db = this.instance.sys.database.postgres();
 
     try {
-      await db`UPDATE tricolor_workspaces.public.users SET surname = ${surname} WHERE id = ${this.userId}`;
+      await db`UPDATE public.users SET surname = ${surname} WHERE id = ${this.userId}`;
 
       return true;
     } catch (err) {
@@ -137,7 +137,7 @@ export class WorkspacesUser {
 
     return (
       (
-        await db`SELECT surname FROM tricolor_workspaces.public.users WHERE id = ${this.userId}`
+        await db`SELECT surname FROM public.users WHERE id = ${this.userId}`
       )?.[0]?.surname || undefined
     );
   }
@@ -173,7 +173,7 @@ export class WorkspacesUser {
     const db = this.instance.sys.database.postgres();
 
     try {
-      await db`UPDATE tricolor_workspaces.public.users SET storage_quota = ${quota} WHERE id = ${this.userId}`;
+      await db`UPDATE public.users SET storage_quota = ${quota} WHERE id = ${this.userId}`;
       return true;
     } catch (err) {
       this.instance.sys.users.log.error(
@@ -193,7 +193,7 @@ export class WorkspacesUser {
 
     return (
       (
-        await db`SELECT storage_quota FROM tricolor_workspaces.public.users WHERE id = ${this.userId}`
+        await db`SELECT storage_quota FROM public.users WHERE id = ${this.userId}`
       )?.[0]?.storage_quota || undefined
     );
   }
@@ -207,7 +207,7 @@ export class WorkspacesUser {
     const db = this.instance.sys.database.postgres();
 
     try {
-      await db`UPDATE tricolor_workspaces.public.users SET bio = ${bio} WHERE id = ${this.userId}`;
+      await db`UPDATE public.users SET bio = ${bio} WHERE id = ${this.userId}`;
       return true;
     } catch (err) {
       this.instance.sys.users.log.error(`Failed to set bio for ${this.userId}`);
@@ -224,9 +224,8 @@ export class WorkspacesUser {
     const db = this.instance.sys.database.postgres();
 
     return (
-      (
-        await db`SELECT bio FROM tricolor_workspaces.public.users WHERE id = ${this.userId}`
-      )?.[0]?.bio || undefined
+      (await db`SELECT bio FROM public.users WHERE id = ${this.userId}`)?.[0]
+        ?.bio || undefined
     );
   }
 
@@ -238,7 +237,7 @@ export class WorkspacesUser {
   async setEmail(email: string): Promise<boolean> {
     const db = this.instance.sys.database.postgres();
     try {
-      await db`UPDATE tricolor_workspaces.public.users SET email = ${email} WHERE id = ${this.userId}`;
+      await db`UPDATE public.users SET email = ${email} WHERE id = ${this.userId}`;
       return true;
     } catch (err) {
       this.instance.sys.users.log.error(
@@ -257,9 +256,8 @@ export class WorkspacesUser {
     const db = this.instance.sys.database.postgres();
 
     return (
-      (
-        await db`SELECT email FROM tricolor_workspaces.public.users WHERE id = ${this.userId}`
-      )?.[0]?.email || undefined
+      (await db`SELECT email FROM public.users WHERE id = ${this.userId}`)?.[0]
+        ?.email || undefined
     );
   }
 
@@ -272,7 +270,7 @@ export class WorkspacesUser {
     const db = this.instance.sys.database.postgres();
 
     try {
-      await db`UPDATE tricolor_workspaces.public.users SET gender = ${gender} WHERE id = ${this.userId}`;
+      await db`UPDATE public.users SET gender = ${gender} WHERE id = ${this.userId}`;
       return true;
     } catch (err) {
       this.instance.sys.users.log.error(
@@ -291,9 +289,8 @@ export class WorkspacesUser {
     const db = this.instance.sys.database.postgres();
 
     return (
-      (
-        await db`SELECT gender FROM tricolor_workspaces.public.users WHERE id = ${this.userId}`
-      )?.[0]?.gender || undefined
+      (await db`SELECT gender FROM public.users WHERE id = ${this.userId}`)?.[0]
+        ?.gender || undefined
     );
   }
 
@@ -313,8 +310,8 @@ export class WorkspacesUser {
       }
 
       await db`
-            UPDATE tricolor_workspaces.public.users 
-            SET groups = array_append(groups, ${groupId}) 
+            UPDATE public.users
+            SET groups = array_append(groups, ${groupId})
             WHERE id = ${this.userId}
         `;
 
@@ -341,8 +338,8 @@ export class WorkspacesUser {
       }
 
       await db`
-            UPDATE tricolor_workspaces.public.users 
-            SET groups = array_remove(groups, ${groupId}) 
+            UPDATE public.users
+            SET groups = array_remove(groups, ${groupId})
             WHERE id = ${this.userId}
         `;
 
@@ -361,9 +358,8 @@ export class WorkspacesUser {
     const db = this.instance.sys.database.postgres();
 
     return (
-      (
-        await db`SELECT groups FROM tricolor_workspaces.public.users WHERE id = ${this.userId}`
-      )?.[0].groups || []
+      (await db`SELECT groups FROM public.users WHERE id = ${this.userId}`)?.[0]
+        .groups || []
     );
   }
 
@@ -376,7 +372,7 @@ export class WorkspacesUser {
 
     return (
       (
-        await db`SELECT is_administrator FROM tricolor_workspaces.public.users WHERE id = ${this.userId}`
+        await db`SELECT is_administrator FROM public.users WHERE id = ${this.userId}`
       )?.[0]?.is_administrator || false
     );
   }
@@ -390,7 +386,7 @@ export class WorkspacesUser {
     const db = this.instance.sys.database.postgres();
 
     try {
-      await db`UPDATE tricolor_workspaces.public.users SET is_administrator = ${administrator} WHERE id = ${this.userId}`;
+      await db`UPDATE public.users SET is_administrator = ${administrator} WHERE id = ${this.userId}`;
       return true;
     } catch (err) {
       this.instance.sys.users.log.error(
@@ -539,8 +535,8 @@ export class WorkspacesUser {
 
     const db = this.instance.sys.database.postgres();
 
-    await db`DELETE FROM tricolor_workspaces.public.users WHERE id = ${this.userId};`;
-    await db`DELETE FROM tricolor_workspaces.public.sessions WHERE user_id = ${this.userId};`;
+    await db`DELETE FROM public.users WHERE id = ${this.userId};`;
+    await db`DELETE FROM public.sessions WHERE user_id = ${this.userId};`;
 
     return true;
   }
@@ -641,9 +637,8 @@ export default class UsersSystem extends System {
     const db = this.instance.sys.database.postgres();
 
     if (
-      (
-        await db`SELECT username FROM tricolor_workspaces.public.users WHERE username = ${username}`
-      ).count !== 0
+      (await db`SELECT username FROM public.users WHERE username = ${username}`)
+        .count !== 0
     )
       return undefined;
 
@@ -653,9 +648,8 @@ export default class UsersSystem extends System {
       surname: "Doe",
     };
 
-    let id = (
-      await db`INSERT INTO tricolor_workspaces.public.users ${sql(user)} RETURNING id`
-    )?.[0]?.id;
+    let id = (await db`INSERT INTO public.users ${sql(user)} RETURNING id`)?.[0]
+      ?.id;
 
     const ubi = await this.getUserById(id);
 
@@ -688,9 +682,8 @@ export default class UsersSystem extends System {
     const db = this.instance.sys.database.postgres();
 
     return (
-      (
-        await db`SELECT username FROM tricolor_workspaces.public.users WHERE id = ${userId}`
-      ).count === 1
+      (await db`SELECT username FROM public.users WHERE id = ${userId}`)
+        .count === 1
     );
   }
 
@@ -702,7 +695,7 @@ export default class UsersSystem extends System {
     const db = this.instance.sys.database.postgres();
 
     try {
-      return (await db`SELECT id FROM tricolor_workspaces.public.users`).map(
+      return (await db`SELECT id FROM public.users`).map(
         (u: { id: number }) => new WorkspacesUser(this.instance, u.id),
       );
     } catch (err) {
@@ -734,7 +727,7 @@ export default class UsersSystem extends System {
     const db = this.instance.sys.database.postgres();
 
     const userId = (
-      await db`SELECT id FROM tricolor_workspaces.public.users WHERE username = ${username}`
+      await db`SELECT id FROM public.users WHERE username = ${username}`
     )?.[0]?.id;
 
     if (!(await this.doesUserExist(userId))) return undefined;

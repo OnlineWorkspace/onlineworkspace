@@ -36,7 +36,7 @@ export default class AuthorizationSystem extends System {
         !(await Bun.password.verify(
           password,
           (
-            await db`SELECT hashed_password FROM tricolor_workspaces.public.users WHERE id = ${userId}`
+            await db`SELECT hashed_password FROM public.users WHERE id = ${userId}`
           )?.[0]?.hashed_password,
         ))
       ) {
@@ -59,7 +59,7 @@ export default class AuthorizationSystem extends System {
           algorithm: "SHA1",
           digits: 6,
           secret: (
-            await db`SELECT two_factor_secret FROM tricolor_workspaces.public.users WHERE id = ${userId}`
+            await db`SELECT two_factor_secret FROM public.users WHERE id = ${userId}`
           )?.[0]?.two_factor_secret,
         });
 
@@ -70,7 +70,7 @@ export default class AuthorizationSystem extends System {
 
       const sessionToken = crypto.getRandomValues(new Uint32Array(16)).join("");
 
-      await db`INSERT INTO tricolor_workspaces.public.sessions (user_id, session_token, device_type, valid_until, ip_address) VALUES (${userId}, ${sessionToken}, ${deviceId}, ${Date.now() + SESSION_VALID_TERM_MS}, ${ipAddress || "Anonymous"})`;
+      await db`INSERT INTO public.sessions (user_id, session_token, device_type, valid_until, ip_address) VALUES (${userId}, ${sessionToken}, ${deviceId}, ${Date.now() + SESSION_VALID_TERM_MS}, ${ipAddress || "Anonymous"})`;
 
       const user = await this.instance.sys.users.getUserById(userId);
 
@@ -135,11 +135,11 @@ export default class AuthorizationSystem extends System {
     const sessionsDb = this.instance.sys.database.postgres();
 
     const session = (
-      await sessionsDb`SELECT session_id, valid_until FROM tricolor_workspaces.public.sessions WHERE user_id = ${userId} AND session_token = ${token}`
+      await sessionsDb`SELECT session_id, valid_until FROM public.sessions WHERE user_id = ${userId} AND session_token = ${token}`
     )?.[0];
 
     if (Number(session?.valid_until) < Date.now()) {
-      await sessionsDb`DELETE FROM tricolor_workspaces.public.sessions WHERE user_id = ${userId} AND session_token = ${token}`;
+      await sessionsDb`DELETE FROM public.sessions WHERE user_id = ${userId} AND session_token = ${token}`;
       return undefined;
     }
 
@@ -156,7 +156,7 @@ export default class AuthorizationSystem extends System {
 
     const sessionsDb = this.instance.sys.database.postgres();
 
-    await sessionsDb`DELETE FROM tricolor_workspaces.public.sessions WHERE user_id = ${userId} AND session_token = ${token}`;
+    await sessionsDb`DELETE FROM public.sessions WHERE user_id = ${userId} AND session_token = ${token}`;
 
     return true;
   }
@@ -170,7 +170,7 @@ export default class AuthorizationSystem extends System {
   ): Promise<boolean | undefined> {
     const sessionsDb = this.instance.sys.database.postgres();
 
-    await sessionsDb`DELETE FROM tricolor_workspaces.public.sessions WHERE user_id = ${userId} AND session_id = ${sessionId}`;
+    await sessionsDb`DELETE FROM public.sessions WHERE user_id = ${userId} AND session_id = ${sessionId}`;
 
     return true;
   }
@@ -187,7 +187,7 @@ export default class AuthorizationSystem extends System {
 
     const hashedPassword = await Bun.password.hash(password);
 
-    await db`UPDATE tricolor_workspaces.public.users SET hashed_password = ${hashedPassword} WHERE id = ${userId}`;
+    await db`UPDATE public.users SET hashed_password = ${hashedPassword} WHERE id = ${userId}`;
 
     return true;
   }
@@ -204,7 +204,7 @@ export default class AuthorizationSystem extends System {
 
     let [{ exists }] = await db`
             SELECT (hashed_password IS NOT NULL) as exists
-            FROM tricolor_workspaces.public.users
+            FROM public.users
             WHERE id = ${userId}
         `;
 
@@ -222,7 +222,7 @@ export default class AuthorizationSystem extends System {
     }
 
     try {
-      await db`UPDATE tricolor_workspaces.public.users SET two_factor_secret = ${secret} WHERE id = ${userId}`;
+      await db`UPDATE public.users SET two_factor_secret = ${secret} WHERE id = ${userId}`;
     } catch (err) {
       return false;
     }
@@ -242,7 +242,7 @@ export default class AuthorizationSystem extends System {
 
     let [{ exists }] = await db`
             SELECT (two_factor_secret IS NOT NULL) as exists
-            FROM tricolor_workspaces.public.users
+            FROM public.users
             WHERE id = ${userId}
         `;
 
@@ -260,7 +260,7 @@ export default class AuthorizationSystem extends System {
     }
 
     const userPasskeys =
-      await db`SELECT passkeys FROM tricolor_workspaces.public.users WHERE id = ${userId}`;
+      await db`SELECT passkeys FROM public.users WHERE id = ${userId}`;
 
     return userPasskeys?.[0]?.passkeys?.length > 0;
   }
@@ -287,7 +287,7 @@ export default class AuthorizationSystem extends System {
             valid_until BIGINT,
             ip_address TEXT DEFAULT 'Anonymous',
             login_method TEXT,
-            FOREIGN KEY (user_id) REFERENCES tricolor_workspaces.public.users(id) ON DELETE CASCADE
+            FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE
         )`;
 
     return true;

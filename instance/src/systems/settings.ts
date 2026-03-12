@@ -25,7 +25,7 @@ export default class SettingsSystem extends System {
     const db = this.instance.sys.database.postgres();
 
     return (
-      await db`SELECT settings FROM tricolor_workspaces.public.users WHERE id = ${userId}`
+      await db`SELECT settings FROM public.users WHERE id = ${userId}`
     )?.[0]?.settings as Record<string, any>;
   }
 
@@ -69,7 +69,7 @@ export default class SettingsSystem extends System {
   ): Promise<boolean> {
     const db = this.instance.sys.database.postgres();
 
-    await db`UPDATE tricolor_workspaces.public.users SET settings = ${settings} WHERE id = ${userId}`;
+    await db`UPDATE public.users SET settings = ${settings} WHERE id = ${userId}`;
 
     return true;
   }
@@ -78,14 +78,14 @@ export default class SettingsSystem extends System {
     const db = this.instance.sys.database.postgres();
 
     return (
-      await db`SELECT value FROM tricolor_workspaces.public.global_settings WHERE key = ${settingId}`
+      await db`SELECT value FROM public.global_settings WHERE key = ${settingId}`
     )?.[0]?.value;
   }
 
   async setGlobalSetting(settingId: string, value: any): Promise<boolean> {
     const db = this.instance.sys.database.postgres();
 
-    await db`INSERT INTO tricolor_workspaces.public.global_settings (key, value) VALUES (${settingId}, ${value}) ON CONFLICT (key) DO UPDATE SET value = ${value};`;
+    await db`INSERT INTO public.global_settings (key, value) VALUES (${settingId}, ${value}) ON CONFLICT (key) DO UPDATE SET value = ${value};`;
 
     return true;
   }
@@ -93,9 +93,8 @@ export default class SettingsSystem extends System {
   async getGlobalSettings(): Promise<Record<string, string>> {
     const db = this.instance.sys.database.postgres();
 
-    return (
-      await db`SELECT * FROM tricolor_workspaces.public.global_settings`
-    )?.[0]?.settings as Record<string, string>;
+    return (await db`SELECT * FROM public.global_settings`)?.[0]
+      ?.settings as Record<string, string>;
   }
 
   registerApplicationSetting<

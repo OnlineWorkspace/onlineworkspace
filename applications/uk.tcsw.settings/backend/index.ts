@@ -233,7 +233,7 @@ const router = t.router({
         const db = instance.sys.database.postgres();
 
         const sessions =
-          (await db`SELECT session_id, device_type, valid_until, ip_address, session_token FROM tricolor_workspaces.public.sessions WHERE user_id = ${user.userId}`) as {
+          (await db`SELECT session_id, device_type, valid_until, ip_address, session_token FROM public.sessions WHERE user_id = ${user.userId}`) as {
             session_id: number;
             device_type: AuthorizedDeviceType;
             valid_until: number;

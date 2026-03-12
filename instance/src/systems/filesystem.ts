@@ -8,6 +8,7 @@ export default class FilesystemSystem extends System {
   readonly SRC_ROOT = path.resolve("./instance/src/");
   readonly FS_ROOT = path.resolve("./fs/");
   readonly CACHE_PATH = path.join(this.FS_ROOT, "cache");
+  readonly AUTOINSTALL_PATH = path.join(process.cwd(), "autoinstall");
 
   _internalAssets: Map<
     string,
@@ -31,10 +32,21 @@ export default class FilesystemSystem extends System {
     }
 
     if (!fs.existsSync(path.join(this.FS_ROOT, "assets/login/banner.png"))) {
-      fs.cpSync(
-        path.join(this.SRC_ROOT, "assets/placeholder/banner.png"),
-        path.join(this.FS_ROOT, "assets/login/banner.png"),
-      );
+      if (
+        !fs.existsSync(
+          path.join(this.AUTOINSTALL_PATH, "assets/login/banner.png"),
+        )
+      ) {
+        fs.cpSync(
+          path.join(this.SRC_ROOT, "assets/placeholder/banner.png"),
+          path.join(this.FS_ROOT, "assets/login/banner.png"),
+        );
+      } else {
+        fs.cpSync(
+          path.join(this.AUTOINSTALL_PATH, "assets/login/banner.png"),
+          path.join(this.FS_ROOT, "assets/login/banner.png"),
+        );
+      }
     }
 
     if (
@@ -190,14 +202,14 @@ export default class FilesystemSystem extends System {
     //     SELECT
     //         EXISTS(
     //             SELECT 1
-    //             FROM tricolor_workspaces.public.filesystem_permission_overrides
+    //             FROM public.filesystem_permission_overrides
     //             WHERE file_path = ${fsPath}
     //                 AND read_permission_groups && ${validUserGroups}::TEXT[]
     //                OR read_permission_users @> ARRAY[${userIdArray}::TEXT]
     //         ) AS read_permission,
     //         EXISTS(
     //             SELECT 1
-    //             FROM tricolor_workspaces.public.filesystem_permission_overrides
+    //             FROM public.filesystem_permission_overrides
     //             WHERE file_path = ${fsPath}
     //                 AND write_permission_groups && ${validUserGroups}::TEXT[]
     //                OR write_permission_users @> ARRAY[${userIdArray}::TEXT]
