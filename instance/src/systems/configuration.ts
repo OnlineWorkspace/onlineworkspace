@@ -49,6 +49,8 @@ export default class ConfigurationSystem extends System {
     };
   };
   termsOfUse: { message: string; lastUpdated: number };
+  defaultQuickShortcuts: string[];
+  defaultApplications: { id: string; uri: string }[];
 
   constructor(instance: Instance) {
     super("configuration", instance);
@@ -105,6 +107,22 @@ export default class ConfigurationSystem extends System {
       lastUpdated: Date.now(),
     };
 
+    this.defaultQuickShortcuts = [
+      "uk.tcsw.dashboard",
+      "uk.tcsw.store",
+      "uk.tcsw.settings",
+      "uk.tcsw.photos",
+      "uk.tcsw.files",
+    ];
+
+    this.defaultApplications = [
+      { id: "uk.tcsw.dashboard", uri: "local:uk.tcsw.dashboard" },
+      { id: "uk.tcsw.store", uri: "local:uk.tcsw.store" },
+      { id: "uk.tcsw.settings", uri: "local:uk.tcsw.settings" },
+      { id: "uk.tcsw.photos", uri: "local:uk.tcsw.photos" },
+      { id: "uk.tcsw.files", uri: "local:uk.tcsw.files" },
+    ];
+
     if (
       path.join(
         this.instance.sys.filesystem.AUTOINSTALL_PATH,
@@ -135,6 +153,10 @@ export default class ConfigurationSystem extends System {
         this.mailServer = autoInstallConfig.mailserver;
       if (autoInstallConfig.termsOfUse)
         this.termsOfUse = autoInstallConfig.termsOfUse;
+      if (autoInstallConfig.defaultQuickShortcuts)
+        this.defaultQuickShortcuts = autoInstallConfig.defaultQuickShortcuts;
+      if (autoInstallConfig.defaultApplications)
+        this.defaultApplications = autoInstallConfig.defaultApplications;
     }
 
     return this;
@@ -181,6 +203,7 @@ export default class ConfigurationSystem extends System {
           displayName: this.displayName,
           mailserver: this.mailServer,
           termsOfUse: this.termsOfUse,
+          defaultQuickShortcuts: this.defaultQuickShortcuts,
         },
         null,
         2,
@@ -219,6 +242,10 @@ export default class ConfigurationSystem extends System {
       this.mailServer = configurationFile.mailserver;
     if (configurationFile.termsOfUse)
       this.termsOfUse = configurationFile.termsOfUse;
+    if (configurationFile.defaultQuickShortcuts)
+      this.defaultQuickShortcuts = configurationFile.defaultQuickShortcuts;
+    if (configurationFile.defaultApplications)
+      this.defaultApplications = configurationFile.defaultApplications;
 
     for (const feature of Object.keys(WorkspacesFeatureFlags)) {
       this.log.info(

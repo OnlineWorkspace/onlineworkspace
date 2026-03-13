@@ -9,12 +9,6 @@ import { WorkspacesNotificationPriority } from "./notifications.js";
 const APPLICATIONS_CONFIG_FILE_PATH = (subsystem: System) =>
   path.join(subsystem.instance.sys.filesystem.FS_ROOT, "applications.json");
 
-export const DEFAULT_APPLICATIONS: string[] = [
-  "uk.tcsw.store",
-  "uk.tcsw.dashboard",
-  "uk.tcsw.settings",
-];
-
 interface AvailableWorkspacesApplication {
   path: string;
   enabled: boolean;
@@ -79,21 +73,22 @@ export default class ApplicationsSystem extends System {
           JSON.stringify([]),
         );
 
-      // TODO: maybe check if the `applications.json` file is valid JSON?
-
       this.availableApplications = JSON.parse(
         (await fs.readFile(APPLICATIONS_CONFIG_FILE_PATH(this))).toString(),
       );
 
-      for (const defaultApp of DEFAULT_APPLICATIONS) {
+      for (const defaultApplication of this.instance.sys.configuration
+        .defaultApplications) {
         if (
-          !this.availableApplications.find((aa) => aa.path.endsWith(defaultApp))
+          !this.availableApplications.find((aa) =>
+            aa.path.endsWith(defaultApplication.id),
+          )
         ) {
           this.log.info(
-            `The instance is missing default application '${defaultApp}', installing from local`,
+            `The instance is missing default application '${defaultApplication.id}', installing it now...`,
           );
-          await this.installApplication(`local:${defaultApp}`);
-          await this.enableApplication(defaultApp);
+          await this.installApplication(defaultApplication.uri);
+          await this.enableApplication(defaultApplication.id);
         }
       }
 
@@ -215,7 +210,10 @@ export default class ApplicationsSystem extends System {
     }
 
     if (applicationURI.startsWith("file:")) {
-      applicationPath = applicationURI.slice("file:".length);
+      applicationPath = path.resolve(
+        process.cwd(),
+        applicationURI.slice("file:".length),
+      );
     }
 
     if (applicationURI.startsWith("ssh:")) {
