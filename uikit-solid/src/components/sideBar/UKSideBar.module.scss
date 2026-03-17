@@ -1,144 +1,157 @@
 .root {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    grid-template-rows: 1fr;
-    width: 100%;
-    height: 100%;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: 1fr;
+  width: 100%;
+  height: 100%;
 
-    &[data-sidebar-mode-mobile-mode="true"] {
-        grid-template-columns: 1fr;
-        grid-template-rows: auto 1fr;
+  &[data-sidebar-mode-mobile-mode="true"] {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
 
-        .component {
-            height: max-content;
-            width: 100%;
-        }
+    .component {
+      height: max-content;
+      width: 100%;
     }
+  }
 }
 
 .component {
+  display: flex;
+  flex-direction: column;
+  width: 22.5rem;
+  height: 100%;
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+  padding-top: 1rem;
+  background-color: rgb(var(--uk-sys-color-surface-container-low));
+
+  .button {
+    height: 3.5rem;
+    border: none;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    text-align: start;
+    border-radius: var(--uk-sys-shape-corner-full);
+    background-color: transparent;
     display: flex;
-    flex-direction: column;
-    width: 22.5rem;
-    height: 100%;
-    padding-left: 0.75rem;
-    padding-right: 0.75rem;
-    padding-top: 1rem;
-    padding-bottom: 1rem;
-    background-color: rgb(var(--uk-sys-color-surface-container-low));
+    align-items: center;
+    gap: 0.75rem;
+    position: relative;
+    transition:
+      color var(--uk-sys-motion-duration-250)
+        var(--uk-sys-motion-easing-emphasized-decelerate),
+      background-color var(--uk-sys-motion-duration-250)
+        var(--uk-sys-motion-easing-emphasized-decelerate);
+    outline-style: solid;
+    outline-offset: 0;
+    outline-width: 0;
+    outline-color: transparent;
 
-    .button {
-        height: 3.5rem;
-        border: none;
-        padding-left: 1rem;
-        padding-right: 1rem;
-        text-align: start;
-        border-radius: var(--uk-sys-shape-corner-full);
-        background-color: transparent;
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        position: relative;
-        transition:
-            color var(--uk-sys-motion-duration-250) var(--uk-sys-motion-easing-emphasized-decelerate),
-            background-color var(--uk-sys-motion-duration-250) var(--uk-sys-motion-easing-emphasized-decelerate);
-        outline-style: solid;
-        outline-offset: 0;
-        outline-width: 0;
-        outline-color: transparent;
+    &::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      transition: background-color var(--uk-sys-motion-duration-250)
+        var(--uk-sys-motion-easing-emphasized-decelerate);
+      border-radius: var(--uk-sys-shape-corner-full);
+    }
 
+    .buttonIcon {
+      color: rgb(var(--uk-sys-color-on-surface-variant));
+    }
+
+    .buttonLabel {
+      margin: 0;
+      margin-right: auto;
+      color: rgb(var(--uk-sys-color-on-surface-variant));
+      line-height: var(--uk-sys-typescale-label-large-line-height);
+      font-weight: var(--uk-sys-typescale-label-large-weight);
+      letter-spacing: var(--uk-sys-typescale-label-large-tracking);
+      font-family: var(--uk-sys-typescale-label-large-font), system-ui;
+      font-size: 0.875rem;
+    }
+
+    .badgeLabel {
+      color: rgb(var(--uk-sys-color-on-surface-variant));
+      line-height: var(--uk-sys-typescale-title-small-line-height);
+      font-weight: var(--uk-sys-typescale-title-small-weight);
+      letter-spacing: var(--uk-sys-typescale-title-small-tracking);
+      font-size: var(--uk-sys-typescale-title-small-size);
+      font-family: var(--uk-sys-typescale-title-small-font), system-ui;
+    }
+
+    &:hover {
+      &::after {
+        background-color: rgb(
+          var(--uk-sys-color-on-surface),
+          var(--uk-sys-state-hover-state-layer-opacity)
+        );
+      }
+    }
+
+    &:focus-visible {
+      outline-width: var(--uk-sys-state-focus-indicator-thickness);
+      outline-offset: var(--uk-sys-state-focus-indicator-outer-offset);
+      outline-color: rgb(var(--uk-sys-color-secondary));
+    }
+
+    &[disabled] {
+      cursor: not-allowed;
+    }
+
+    &[data-selected="true"] {
+      background-color: rgb(var(--uk-sys-color-secondary-container));
+
+      &:hover {
         &::after {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            transition: background-color var(--uk-sys-motion-duration-250)
-                var(--uk-sys-motion-easing-emphasized-decelerate);
-            border-radius: var(--uk-sys-shape-corner-full);
+          background-color: rgb(
+            var(--uk-sys-color-secondary-container),
+            var(--uk-sys-state-hover-state-layer-opacity)
+          );
         }
+      }
 
-        .buttonIcon {
-            color: rgb(var(--uk-sys-color-on-surface-variant));
-        }
+      .buttonIcon {
+        color: rgb(var(--uk-sys-color-on-secondary-container));
+      }
 
-        .buttonLabel {
-            margin: 0;
-            margin-right: auto;
-            color: rgb(var(--uk-sys-color-on-surface-variant));
-            line-height: var(--uk-sys-typescale-label-large-line-height);
-            font-weight: var(--uk-sys-typescale-label-large-weight);
-            letter-spacing: var(--uk-sys-typescale-label-large-tracking);
-            font-family: var(--uk-sys-typescale-label-large-font), system-ui;
-            font-size: 0.875rem;
-        }
-
-        .badgeLabel {
-            color: rgb(var(--uk-sys-color-on-surface-variant));
-            line-height: var(--uk-sys-typescale-title-small-line-height);
-            font-weight: var(--uk-sys-typescale-title-small-weight);
-            letter-spacing: var(--uk-sys-typescale-title-small-tracking);
-            font-size: var(--uk-sys-typescale-title-small-size);
-            font-family: var(--uk-sys-typescale-title-small-font), system-ui;
-        }
-
-        &:hover {
-            &::after {
-                background-color: rgb(var(--uk-sys-color-on-surface), var(--uk-sys-state-hover-state-layer-opacity));
-            }
-        }
-
-        &:focus-visible {
-            outline-width: var(--uk-sys-state-focus-indicator-thickness);
-            outline-offset: var(--uk-sys-state-focus-indicator-outer-offset);
-            outline-color: rgb(var(--uk-sys-color-secondary));
-        }
-
-        &[disabled] {
-            cursor: not-allowed;
-        }
-
-        &[data-selected="true"] {
-            background-color: rgb(var(--uk-sys-color-secondary-container));
-
-            &:hover {
-                &::after {
-                    background-color: rgb(
-                        var(--uk-sys-color-secondary-container),
-                        var(--uk-sys-state-hover-state-layer-opacity)
-                    );
-                }
-            }
-
-            .buttonIcon {
-                color: rgb(var(--uk-sys-color-on-secondary-container));
-            }
-
-            .buttonLabel {
-                color: rgb(var(--uk-sys-color-on-secondary-container));
-                font-weight: 700;
-            }
-        }
+      .buttonLabel {
+        color: rgb(var(--uk-sys-color-on-secondary-container));
+        font-weight: 700;
+      }
     }
+  }
 
-    .label {
-        padding-bottom: 1rem;
-        padding-left: 1rem;
-        color: rgb(var(--uk-sys-color-on-surface-variant));
-        font-size: var(--uk-sys-typescale-title-small-size);
-        font-weight: var(--uk-sys-typescale-title-small-weight);
-        letter-spacing: var(--uk-sys-typescale-title-small-tracking);
-        line-height: var(--uk-sys-typescale-title-small-line-height);
-        font-family: var(--uk-sys-typescale-title-small-font), system-ui;
-    }
+  .label {
+    padding-bottom: 1rem;
+    padding-left: 1rem;
+    color: rgb(var(--uk-sys-color-on-surface-variant));
+    font-size: var(--uk-sys-typescale-title-small-size);
+    font-weight: var(--uk-sys-typescale-title-small-weight);
+    letter-spacing: var(--uk-sys-typescale-title-small-tracking);
+    line-height: var(--uk-sys-typescale-title-small-line-height);
+    font-family: var(--uk-sys-typescale-title-small-font), system-ui;
+  }
+
+  .divider {
+    margin-bottom: 1rem;
+    margin-top: 1rem;
+  }
+
+  .margin {
+    margin-bottom: auto;
+  }
 }
 
 .page {
-    display: flex;
-    flex-direction: column;
-    overflow-y: auto;
-    width: 100%;
-    height: 100%;
-    position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  width: 100%;
+  height: 100%;
+  position: relative;
 }

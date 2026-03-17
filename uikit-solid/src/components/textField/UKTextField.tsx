@@ -1,4 +1,4 @@
-import { type Component, createEffect, createSignal, onMount } from "solid-js";
+import { type Component, createEffect, createSignal } from "solid-js";
 import styles from "./UKTextField.module.scss";
 import type { DOMElement } from "solid-js/jsx-runtime";
 import clsx from "clsx";
@@ -18,7 +18,7 @@ const UKTextField: Component<{
     onFocus?: () => void;
     onBlur?: () => void;
     defaultValue?: string;
-    setValue?: string;
+    setValue: string;
     maximumCharacterCount?: number;
     shouldMask?: boolean;
     forceFocussed?: boolean;

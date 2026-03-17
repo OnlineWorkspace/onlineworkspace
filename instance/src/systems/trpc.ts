@@ -3,10 +3,7 @@ import type { Instance } from "../index.js";
 import System from "../system.js";
 import { type TRPCBuiltRouter } from "@trpc/server";
 import { createTRPCContext } from "./trpcRouter.js";
-import {
-  type FetchCreateContextFnOptions,
-  fetchRequestHandler,
-} from "@trpc/server/adapters/fetch";
+import { type FetchCreateContextFnOptions, fetchRequestHandler } from "@trpc/server/adapters/fetch";
 
 export default class TRPCSystem extends System {
   registeredRouters: {
@@ -22,8 +19,6 @@ export default class TRPCSystem extends System {
     super("trpc", instance);
 
     this.registeredRouters = [];
-
-    return this;
   }
 
   async startup(): Promise<boolean> {
@@ -72,17 +67,12 @@ export default class TRPCSystem extends System {
       ...options,
       port: 3563,
       hostname: "0.0.0.0",
-      async fetch(
-        req: BunRequest,
-        server: Server<ReturnType<typeof createTRPCContext>>,
-      ) {
+      async fetch(req: BunRequest, server: Server<ReturnType<typeof createTRPCContext>>) {
         let requestOriginDomain = req.headers.get("Origin");
 
         if (!requestOriginDomain) return new Response("Invalid request");
 
-        if (
-          !self.instance.sys.configuration.webUrl.includes(requestOriginDomain)
-        )
+        if (!self.instance.sys.configuration.webUrl.includes(requestOriginDomain))
           return new Response("Invalid request");
 
         if (req.method === "OPTIONS") {
@@ -100,22 +90,10 @@ export default class TRPCSystem extends System {
           let trpcResponse = await self.attemptTRPCRequest(req, server);
 
           if (trpcResponse) {
-            trpcResponse.headers.set(
-              "Access-Control-Allow-Origin",
-              requestOriginDomain,
-            );
-            trpcResponse.headers.set(
-              "Access-Control-Allow-Methods",
-              "GET, POST, OPTIONS",
-            );
-            trpcResponse.headers.set(
-              "Access-Control-Allow-Headers",
-              "Content-Type, Authorization",
-            );
-            trpcResponse.headers.set(
-              "Access-Control-Allow-Credentials",
-              "true",
-            );
+            trpcResponse.headers.set("Access-Control-Allow-Origin", requestOriginDomain);
+            trpcResponse.headers.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+            trpcResponse.headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
+            trpcResponse.headers.set("Access-Control-Allow-Credentials", "true");
             return trpcResponse;
           }
         } catch (err) {
@@ -127,14 +105,8 @@ export default class TRPCSystem extends System {
         try {
           const resp = options?.fetch?.call(server, req, server);
           resp.headers.set("Access-Control-Allow-Origin", requestOriginDomain);
-          resp.headers.set(
-            "Access-Control-Allow-Methods",
-            "GET, POST, OPTIONS",
-          );
-          resp.headers.set(
-            "Access-Control-Allow-Headers",
-            "Content-Type, Authorization",
-          );
+          resp.headers.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+          resp.headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
           resp.headers.set("Access-Control-Allow-Credentials", "true");
 
           return resp;
