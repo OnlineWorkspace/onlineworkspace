@@ -288,6 +288,12 @@ const router = t.router({
       }),
   },
   instance: {
+    hasFeature: procedure
+      .input(z.string())
+      .output(z.boolean())
+      .query(async (opt) => {
+        return opt.ctx.instance.sys.configuration.hasFeature(opt.input);
+      }),
     getUsers: adminProcedure.output(z.number().array()).query(async (_opt) => {
       const users = await instance.sys.users.getAllUsers();
 
@@ -391,7 +397,12 @@ const router = t.router({
           return email || "unknown";
         }),
       setEmail: adminProcedure
-        .input(z.object({ userId: z.number(), email: z.email() }))
+        .input(
+          z.object({
+            userId: z.number(),
+            email: z.email().or(z.literal("unknown")),
+          }),
+        )
         .mutation(async (opt) => {
           await (
             await opt.ctx.instance.sys.users.getUserById(opt.input.userId)
@@ -417,6 +428,12 @@ const router = t.router({
           )?.setIsAdministrator(opt.input.administrator);
 
           return true;
+        }),
+      getIsMe: adminProcedure
+        .input(z.number())
+        .output(z.boolean())
+        .query(async (opt) => {
+          return opt.input === opt.ctx.userId;
         }),
       delete: adminProcedure
         .input(z.object({ userId: z.number() }))
@@ -465,7 +482,7 @@ const router = t.router({
         return await user.isAdministrator();
       }
 
-      return this;
+      return false;
     }),
     createUser: procedure
       .input(z.object({ username: z.string() }))

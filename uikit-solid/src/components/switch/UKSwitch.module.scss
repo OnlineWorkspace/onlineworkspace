@@ -103,4 +103,30 @@
             background-color: rgb(var(--uk-sys-color-on-primary));
         }
     }
+
+    &:disabled {
+        background-color: rgb(var(--uk-sys-color-outline));
+
+        &::before {
+            background-color: rgb(var(--uk-sys-color-outline));
+        }
+
+        .handle {
+            color: rgb(var(--uk-sys-color-surface-container-highest), 0.38);
+            background-color: rgb(var(--uk-sys-color-outline), 0.38);
+        }
+    }
+
+    &[data-value="true"]:disabled {
+        background-color: rgb(var(--uk-sys-color-outline));
+
+        &::before {
+            background-color: rgb(var(--uk-sys-color-outline));
+        }
+
+        .handle {
+            color: rgb(var(--uk-sys-color-on-surface), 0.38);
+            background-color: rgb(var(--uk-sys-color-surface), 0.38);
+        }
+    }
 }

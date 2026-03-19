@@ -1,20 +1,30 @@
-import UKStackItem from "@tcsw/uikit-solid/src/components/stack/UKStackItem.jsx";
-import { createResource, createSignal, type Component } from "solid-js";
-import styles from "./User.module.scss";
-import UKTextField from "@tcsw/uikit-solid/src/components/textField/UKTextField.jsx";
-import UKSwitch from "@tcsw/uikit-solid/src/components/switch/UKSwitch.jsx";
-import UKText from "@tcsw/uikit-solid/src/components/text/UKText.jsx";
 import UKButton from "@tcsw/uikit-solid/src/components/button/UKButton.jsx";
-import trpc from "../../../../../../lib/trpc";
 import UKButtonGroup from "@tcsw/uikit-solid/src/components/buttonGroup/UKButtonGroup.jsx";
 import UKDialog from "@tcsw/uikit-solid/src/components/dialog/UKDialog.jsx";
 import UKDivider from "@tcsw/uikit-solid/src/components/divider/UKDivider.jsx";
+import UKStackItem from "@tcsw/uikit-solid/src/components/stack/UKStackItem.jsx";
+import UKSwitch from "@tcsw/uikit-solid/src/components/switch/UKSwitch.jsx";
+import UKText from "@tcsw/uikit-solid/src/components/text/UKText.jsx";
+import UKTextField from "@tcsw/uikit-solid/src/components/textField/UKTextField.jsx";
+import {
+  type Component,
+  createResource,
+  createSignal,
+  Show,
+  useContext,
+} from "solid-js";
+import { AppContext } from "../../../../../../appContext.ts";
+import trpc from "../../../../../../lib/trpc";
+import styles from "./User.module.scss";
 
 const User: Component<{
   userId: number;
   updateUsers: () => void;
 }> = (props) => {
-  const [showDialog, setShowDialog] = createSignal(false);
+  const appContext = useContext(AppContext)!;
+  const [showDialog, setShowDialog] = createSignal<
+    "user" | "confirmDelete" | "removeOwnAdmin" | undefined
+  >(undefined);
   const [username, { mutate: setUsername }] = createResource(
     () => trpc.instance.user.getUsername.query(props.userId),
     {
@@ -43,6 +53,12 @@ const User: Component<{
     () => trpc.instance.user.getIsAdministrator.query(props.userId),
     { initialValue: false },
   );
+  const [isMe] = createResource(
+    () => trpc.instance.user.getIsMe.query(props.userId),
+    {
+      initialValue: false,
+    },
+  );
 
   return (
     <>
@@ -51,11 +67,14 @@ const User: Component<{
           type: "icon",
           value: isAdministrator() ? "shield_person" : "person",
         }}
-        labelText={`${forename()} ${surname()}`}
+        labelText={`${isMe() ? "(YOU) - " : ""} ${forename()} ${surname() !== "undefined" ? surname() : ""}`}
         supportingText={`(${props.userId}) ${username()}`}
-        onClick={() => setShowDialog(true)}
+        onClick={() => setShowDialog("user")}
       />
-      <UKDialog show={showDialog} onClose={() => setShowDialog(false)}>
+      <UKDialog
+        show={() => showDialog() === "user"}
+        onClose={() => setShowDialog(undefined)}
+      >
         <div class={styles.expanded}>
           <UKText role="title" size="l">
             Modify User
@@ -72,6 +91,7 @@ const User: Component<{
             }}
             defaultValue={username()}
             label="Username"
+            setValue={username()}
           />
           <div class={styles.name}>
             <UKTextField
@@ -85,6 +105,7 @@ const User: Component<{
               }}
               defaultValue={forename()}
               label="Forename"
+              setValue={forename()}
             />
             <UKTextField
               color="outlined"
@@ -97,6 +118,7 @@ const User: Component<{
               }}
               defaultValue={surname()}
               label="Surname"
+              setValue={surname()}
             />
           </div>
           <UKTextField
@@ -110,13 +132,19 @@ const User: Component<{
             }}
             defaultValue={email()}
             label="Email"
+            setValue={email()}
           />
           <div class={styles.boolean}>
             <UKText role="label" size="m">
               Is Administrator
             </UKText>
             <UKSwitch
+              disabled={isMe() && !appContext.shootYourselfInTheFoot()}
               getValue={(val) => {
+                if (isMe() && !val) {
+                  setShowDialog("removeOwnAdmin");
+                  return;
+                }
                 setIsAdministrator(val);
                 trpc.instance.user.setIsAdministrator.mutate({
                   administrator: val,
@@ -146,10 +174,7 @@ const User: Component<{
             <UKButton
               color={"standard"}
               onClick={async () => {
-                await trpc.instance.user.delete.mutate({
-                  userId: props.userId,
-                });
-                props.updateUsers();
+                setShowDialog("confirmDelete");
               }}
             >
               Delete
@@ -159,12 +184,85 @@ const User: Component<{
             class={styles.closeButton}
             color={"filled"}
             onClick={() => {
-              setShowDialog(false);
+              setShowDialog(undefined);
             }}
           >
             Close
           </UKButton>
         </div>
+      </UKDialog>
+      <UKDialog
+        show={() => showDialog() === "confirmDelete"}
+        onClose={() => setShowDialog(undefined)}
+      >
+        <UKText role="title" size="l">
+          Confirm Deletion
+        </UKText>
+        <UKDivider direction="horizontal" />
+        <Show when={!isMe()}>
+          <UKText role="body" size="m">
+            Are you sure you want to delete this user? This action cannot be
+            undone.
+          </UKText>
+          <UKButtonGroup size={"s"} align={"end"}>
+            <UKButton
+              color={"tonal"}
+              onClick={async () => {
+                await trpc.instance.user.delete.mutate({
+                  userId: props.userId,
+                });
+                props.updateUsers();
+              }}
+            >
+              Yes, delete
+            </UKButton>
+            <UKButton color={"filled"} onClick={() => setShowDialog(undefined)}>
+              No, cancel
+            </UKButton>
+          </UKButtonGroup>
+        </Show>
+        <Show when={isMe()}>
+          <UKText role="body" size="m">
+            Sorry, you cannot delete your own user account. Please ask another
+            administrator to delete your account if you wish to do so.
+          </UKText>
+          <UKButton color={"filled"} onClick={() => setShowDialog(undefined)}>
+            Close
+          </UKButton>
+        </Show>
+      </UKDialog>
+      <UKDialog
+        show={() => showDialog() === "removeOwnAdmin"}
+        onClose={() => setShowDialog(undefined)}
+      >
+        <UKText role="title" size="l">
+          Remove Administrator Privileges
+        </UKText>
+        <UKDivider direction="horizontal" />
+        <UKText role="body" size="m">
+          Are you sure you want to remove your own administrator privileges? You
+          will not be able to modify any users or settings if you do this.
+          Please ask another administrator or use the console if you need to
+          restore your privileges.
+        </UKText>
+        <UKButtonGroup size={"s"} align={"end"}>
+          <UKButton
+            color={"tonal"}
+            onClick={async () => {
+              setIsAdministrator(false);
+              await trpc.instance.user.setIsAdministrator.mutate({
+                administrator: false,
+                userId: props.userId,
+              });
+              setShowDialog(undefined);
+            }}
+          >
+            Yes, remove
+          </UKButton>
+          <UKButton color={"filled"} onClick={() => setShowDialog("user")}>
+            Cancel
+          </UKButton>
+        </UKButtonGroup>
       </UKDialog>
     </>
   );

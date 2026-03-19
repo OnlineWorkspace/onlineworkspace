@@ -1,35 +1,61 @@
 import UKButton from "@tcsw/uikit-solid/src/components/button/UKButton.jsx";
-import UKStack from "@tcsw/uikit-solid/src/components/stack/UKStack.jsx";
-import UKStackItem from "@tcsw/uikit-solid/src/components/stack/UKStackItem.jsx";
+import UKDialog from "@tcsw/uikit-solid/src/components/dialog/UKDialog.jsx";
+import UKDivider from "@tcsw/uikit-solid/src/components/divider/UKDivider.jsx";
+import UKText from "@tcsw/uikit-solid/src/components/text/UKText.jsx";
 import UKTextField from "@tcsw/uikit-solid/src/components/textField/UKTextField.jsx";
-import { createSignal, type Component } from "solid-js";
-import styles from "./CreateUser.module.scss";
+import { type Component, createSignal } from "solid-js";
 import trpc from "../../../../../../lib/trpc";
+import styles from "./CreateUser.module.scss";
 
 const CreateUser: Component<{ updateUsers: () => void }> = (props) => {
-    const [username, setUsername] = createSignal<string>("");
+  const [username, setUsername] = createSignal<string>("");
+  const [showCreateUserDialog, setShowCreateUserDialog] =
+    createSignal<boolean>(false);
 
-    return (
-        <UKStack>
-            <UKStackItem
-                labelText="Create user"
-                expandedComponent={
-                    <div class={styles.expanded}>
-                        <UKTextField color={"outlined"} label={"Username"} getValue={setUsername} defaultValue={username()} />
-                        <UKButton
-                            onClick={async () => {
-                                await trpc.instance.createUser.mutate({ username: username() });
-                                props.updateUsers();
-                                setUsername("");
-                            }}
-                        >
-                            Create User
-                        </UKButton>
-                    </div>
-                }
-            />
-        </UKStack>
-    );
+  return (
+    <>
+      <div class={styles.component}>
+        <UKButton
+          class={styles.createNewUserButton}
+          onClick={() => {
+            setShowCreateUserDialog(true);
+          }}
+          size={"s"}
+          color="filled"
+        >
+          Create new user
+        </UKButton>
+      </div>
+      <UKDialog
+        show={showCreateUserDialog}
+        onClose={() => setShowCreateUserDialog(false)}
+      >
+        <UKText role="title" size="l">
+          Create user
+        </UKText>
+        <UKDivider direction="horizontal" />
+        <UKTextField
+          color={"outlined"}
+          label={"Username"}
+          getValue={setUsername}
+          setValue={username()}
+          defaultValue={username()}
+        />
+        <UKButton
+          disabled={username().length === 0}
+          onClick={async () => {
+            await trpc.instance.createUser.mutate({
+              username: username(),
+            });
+            props.updateUsers();
+            setUsername("");
+          }}
+        >
+          Create User
+        </UKButton>
+      </UKDialog>
+    </>
+  );
 };
 
 export default CreateUser;

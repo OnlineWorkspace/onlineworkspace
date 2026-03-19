@@ -22,5 +22,8 @@
   "dependencies": {
     "@typescript/native-preview": "^7.0.0-dev.20260304.1",
     "prettier": "^3.8.1"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.4.8"
   }
 }

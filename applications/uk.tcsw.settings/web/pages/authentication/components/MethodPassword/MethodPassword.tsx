@@ -1,5 +1,9 @@
+import { useSearchParams } from "@solidjs/router";
 import UKButton from "@tcsw/uikit-solid/src/components/button/UKButton.jsx";
+import UKDialog from "@tcsw/uikit-solid/src/components/dialog/UKDialog.tsx";
+import UKIcon from "@tcsw/uikit-solid/src/components/icon/UKIcon.jsx";
 import UKStackItem from "@tcsw/uikit-solid/src/components/stack/UKStackItem.jsx";
+import UKText from "@tcsw/uikit-solid/src/components/text/UKText.jsx";
 import {
   type Component,
   createResource,
@@ -7,17 +11,17 @@ import {
   Suspense,
 } from "solid-js";
 import trpc from "../../../../lib/trpc";
-import styles from "./MethodPassword.module.scss";
-import UKText from "@tcsw/uikit-solid/src/components/text/UKText.jsx";
-import UKIcon from "@tcsw/uikit-solid/src/components/icon/UKIcon.jsx";
-import UKDialog from "@tcsw/uikit-solid/src/components/dialog/UKDialog.tsx";
 import ResetPasswordDialogue from "./components/ResetPasswordDialogue/ResetPasswordDialogue.tsx";
+import styles from "./MethodPassword.module.scss";
 
 const MethodPassword: Component = () => {
   const [hasPassword, { refetch: refetchHasPassword }] = createResource(() =>
     trpc.authentication.hasPassword.query(),
   );
-  const [showDialog, setShowDialog] = createSignal<boolean>(false);
+  const [urlSearchParams] = useSearchParams();
+  const [showDialog, setShowDialog] = createSignal<boolean>(
+    urlSearchParams["change-passsword"] === "true",
+  );
 
   return (
     <>

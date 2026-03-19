@@ -367,7 +367,7 @@ export class WorkspacesUser {
         Get if the user is an administrator
         @returns `boolean` - if the user an administrator
     */
-  async isAdministrator(): Promise<boolean | undefined> {
+  async isAdministrator(): Promise<boolean> {
     const db = this.instance.sys.database.postgres();
 
     return (

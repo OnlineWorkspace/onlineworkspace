@@ -3,6 +3,8 @@
   flex-direction: column;
   padding-top: 2rem;
   padding-bottom: 2rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
   overflow-y: auto;
   align-items: center;
 }
@@ -14,8 +16,6 @@
   width: 100%;
   height: max-content;
   gap: 1rem;
-  padding-left: 1rem;
-  padding-right: 1rem;
 }
 
 .divider {
@@ -27,9 +27,12 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-  padding-left: 1rem;
+  justify-content: center;
   gap: 1rem;
+  padding: 0;
   cursor: pointer;
+  background: transparent;
+  border: none;
 
   .fullName {
     color: rgb(var(--uk-sys-color-on-surface));
@@ -39,4 +42,14 @@
     margin-top: -0.25rem;
     color: rgb(var(--uk-sys-color-on-surface-variant));
   }
+}
+
+.quickActions {
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1rem;
+  margin-bottom: -1rem;
 }

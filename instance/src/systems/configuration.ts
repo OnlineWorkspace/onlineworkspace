@@ -1,7 +1,11 @@
 import type { Instance } from "../index.js";
 import System from "../system.js";
 import path from "path";
-import { promises as fs, readFileSync as fsReadFileSync } from "fs";
+import {
+  promises as fs,
+  readFileSync as fsReadFileSync,
+  existsSync as fsExistsSync,
+} from "fs";
 
 export enum WorkspacesFeatureFlags {
   SlashCommands = "slash_commands",
@@ -124,11 +128,17 @@ export default class ConfigurationSystem extends System {
     ];
 
     if (
-      path.join(
-        this.instance.sys.filesystem.AUTOINSTALL_PATH,
-        "configuration.json",
+      fsExistsSync(
+        path.join(
+          this.instance.sys.filesystem.AUTOINSTALL_PATH,
+          "configuration.json",
+        ),
       )
     ) {
+      this.log.info(
+        "Auto-install configuration detected. Loading configuration from auto-install.",
+      );
+
       let autoInstallConfig = JSON.parse(
         fsReadFileSync(
           path.join(
