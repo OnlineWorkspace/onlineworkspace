@@ -60,6 +60,7 @@ const router = t.router({
       );
     }),
     welcomeMessage: procedure
+      .input(z.number())
       .output(z.string().or(z.undefined()))
       .query(async (opt) => {
         if (
@@ -68,8 +69,41 @@ const router = t.router({
             "uk.tcsw.dashboard",
             "show_greeting",
           )
-        )
-          return `Hiya, ${(await (await opt.ctx.instance.sys.users.getUserById(opt.ctx.userId))?.getForename()) || "Anonymous"}!`;
+        ) {
+          const date = new Date(opt.input);
+          const hours = date.getHours();
+          const forename =
+            (await (
+              await opt.ctx.instance.sys.users.getUserById(opt.ctx.userId)
+            )?.getForename()) || "Anonymous";
+
+          // Early bird 5am - 7am
+          if (hours >= 5 && hours < 7) {
+            return `Hello early bird, ${forename}!`;
+          }
+          // Good Morning 7am - 12pm
+          if (hours >= 7 && hours < 12) {
+            return `Good Morning, ${forename}!`;
+          }
+          // Good Afternoon 12pm - 5pm
+          if (hours >= 12 && hours < 17) {
+            return `Good Afternoon, ${forename}!`;
+          }
+          // Good Evening 5pm - 10pm
+          if (hours >= 17 && hours < 22) {
+            return `Good Evening, ${forename}!`;
+          }
+          // Good Night 10pm - 12am
+          if (hours >= 22 || hours < 5) {
+            return `Good Night, ${forename}!`;
+          }
+          // Night owl 12am - 5am
+          if (hours >= 0 && hours < 5) {
+            return `Hello night owl, ${forename}!`;
+          }
+
+          return `Hiya, ${forename}!`;
+        }
 
         return undefined;
       }),
