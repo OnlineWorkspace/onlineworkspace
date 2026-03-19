@@ -1,11 +1,12 @@
-import type { Component } from "solid-js";
-import styles from "./Index.module.scss";
-import Users from "./components/Users/Users";
-import InstalledApplications from "./components/InstalledApplications/InstalledApplications";
-import FeatureFlags from "./components/FeatureFlags/FeatureFlags";
-import UKTopAppBar from "@tcsw/uikit-solid/src/components/topAppBar/UKTopAppBar.jsx";
 import { useNavigate } from "@solidjs/router";
+import UKTopAppBar from "@tcsw/uikit-solid/src/components/topAppBar/UKTopAppBar.jsx";
+import type { Component } from "solid-js";
+import Branding from "./components/Branding/Branding";
+import FeatureFlags from "./components/FeatureFlags/FeatureFlags";
+import InstalledApplications from "./components/InstalledApplications/InstalledApplications";
 import Mailserver from "./components/Mailserver/Mailserver";
+import Users from "./components/Users/Users";
+import styles from "./Index.module.scss";
 
 const InstancePage: Component = () => {
   const navigate = useNavigate();
@@ -29,6 +30,7 @@ const InstancePage: Component = () => {
         <InstalledApplications />
         <Mailserver />
         <FeatureFlags />
+        <Branding />
       </div>
     </>
   );
