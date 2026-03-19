@@ -63,22 +63,28 @@ const CropImage: Component<{ refetchAvatar(): void; close(): void }> = (
               Cancel
             </UKButton>
             <UKButton
+              affirmative
               color="filled"
               onClick={async () => {
-                const canvas = await cropper
-                  ?.getCropperSelection()
-                  ?.$toCanvas();
+                return new Promise<boolean>(async (resolve) => {
+                  const canvas = await cropper
+                    ?.getCropperSelection()
+                    ?.$toCanvas();
 
-                if (canvas)
-                  canvas.toBlob(async (c) => {
-                    if (c) {
-                      await trpc.profile.setProfilePicture.mutate(c);
-                      cropper?.destroy();
-                      clearFiles();
-                      props.refetchAvatar();
-                      props.close();
-                    }
-                  });
+                  if (canvas)
+                    canvas.toBlob(async (c) => {
+                      if (c) {
+                        await trpc.profile.setProfilePicture.mutate(c);
+                        setTimeout(() => {
+                          cropper?.destroy();
+                          clearFiles();
+                          props.refetchAvatar();
+                          props.close();
+                        }, 1000);
+                        resolve(true);
+                      }
+                    });
+                });
               }}
             >
               Confirm profile picture

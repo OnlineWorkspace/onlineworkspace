@@ -1,9 +1,4 @@
-import {
-  createSignal,
-  type Component,
-  type JSX,
-  type ParentProps,
-} from "solid-js";
+import { createSignal, type Component, type ParentProps } from "solid-js";
 import type { ButtonSize } from "./lib/size.ts";
 import clsx from "clsx";
 import UKIcon from "../icon/UKIcon.tsx";

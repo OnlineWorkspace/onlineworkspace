@@ -1,7 +1,7 @@
 import type { Instance } from "../index.js";
 import System from "../system.js";
 import path from "path";
-import { promises as fs } from "fs";
+import { promises as fs, readFileSync as fsReadFileSync } from "fs";
 
 export enum WorkspacesFeatureFlags {
   SlashCommands = "slash_commands",
@@ -26,6 +26,7 @@ export default class ConfigurationSystem extends System {
       password: string;
       host: string;
       port: number;
+      database: string;
     };
   };
   // http://localhost:3563
@@ -48,6 +49,8 @@ export default class ConfigurationSystem extends System {
     };
   };
   termsOfUse: { message: string; lastUpdated: number };
+  defaultQuickShortcuts: string[];
+  defaultApplications: { id: string; uri: string }[];
 
   constructor(instance: Instance) {
     super("configuration", instance);
@@ -55,11 +58,11 @@ export default class ConfigurationSystem extends System {
     this.enabledFeatures = [WorkspacesFeatureFlags.SlashCommands];
     this.databases = {
       postgres: {
-        // TODO: actually set these values
         user: "postgres",
         password: "postgres",
         host: "localhost",
         port: 5432,
+        database: "tricolor_workspaces",
       },
     };
 
@@ -103,6 +106,58 @@ export default class ConfigurationSystem extends System {
     - These terms may change. If we make significant updates, we will post a notification within the app or send an email.`,
       lastUpdated: Date.now(),
     };
+
+    this.defaultQuickShortcuts = [
+      "uk.tcsw.dashboard",
+      "uk.tcsw.store",
+      "uk.tcsw.settings",
+      "uk.tcsw.photos",
+      "uk.tcsw.files",
+    ];
+
+    this.defaultApplications = [
+      { id: "uk.tcsw.dashboard", uri: "local:uk.tcsw.dashboard" },
+      { id: "uk.tcsw.store", uri: "local:uk.tcsw.store" },
+      { id: "uk.tcsw.settings", uri: "local:uk.tcsw.settings" },
+      { id: "uk.tcsw.photos", uri: "local:uk.tcsw.photos" },
+      { id: "uk.tcsw.files", uri: "local:uk.tcsw.files" },
+    ];
+
+    if (
+      path.join(
+        this.instance.sys.filesystem.AUTOINSTALL_PATH,
+        "configuration.json",
+      )
+    ) {
+      let autoInstallConfig = JSON.parse(
+        fsReadFileSync(
+          path.join(
+            this.instance.sys.filesystem.AUTOINSTALL_PATH,
+            "configuration.json",
+          ),
+        ).toString(),
+      );
+
+      if (autoInstallConfig.enabledFeatures)
+        this.enabledFeatures = autoInstallConfig.enabledFeatures;
+      if (autoInstallConfig.databases)
+        this.databases = autoInstallConfig.databases;
+      if (autoInstallConfig.backendUrl)
+        this.backendUrl = autoInstallConfig.backendUrl;
+      if (autoInstallConfig.webUrl) this.webUrl = autoInstallConfig.webUrl;
+      if (autoInstallConfig.signupRequirements)
+        this.signupRequirements = autoInstallConfig.signupRequirements;
+      if (autoInstallConfig.displayName)
+        this.displayName = autoInstallConfig.displayName;
+      if (autoInstallConfig.mailserver)
+        this.mailServer = autoInstallConfig.mailserver;
+      if (autoInstallConfig.termsOfUse)
+        this.termsOfUse = autoInstallConfig.termsOfUse;
+      if (autoInstallConfig.defaultQuickShortcuts)
+        this.defaultQuickShortcuts = autoInstallConfig.defaultQuickShortcuts;
+      if (autoInstallConfig.defaultApplications)
+        this.defaultApplications = autoInstallConfig.defaultApplications;
+    }
 
     return this;
   }
@@ -148,6 +203,7 @@ export default class ConfigurationSystem extends System {
           displayName: this.displayName,
           mailserver: this.mailServer,
           termsOfUse: this.termsOfUse,
+          defaultQuickShortcuts: this.defaultQuickShortcuts,
         },
         null,
         2,
@@ -186,6 +242,10 @@ export default class ConfigurationSystem extends System {
       this.mailServer = configurationFile.mailserver;
     if (configurationFile.termsOfUse)
       this.termsOfUse = configurationFile.termsOfUse;
+    if (configurationFile.defaultQuickShortcuts)
+      this.defaultQuickShortcuts = configurationFile.defaultQuickShortcuts;
+    if (configurationFile.defaultApplications)
+      this.defaultApplications = configurationFile.defaultApplications;
 
     for (const feature of Object.keys(WorkspacesFeatureFlags)) {
       this.log.info(

@@ -24,7 +24,6 @@ export default class DatabaseSystem extends System {
       ".sqlite";
 
     let con = new SQL({
-      // NOTE: use SQLite for now, in the future we should switch to postgres / a better alternative
       adapter: "sqlite",
       readwrite: true,
       create: true,
@@ -40,7 +39,7 @@ export default class DatabaseSystem extends System {
     if (this.databaseConnections["postgres"])
       return this.databaseConnections["postgres"];
 
-    const connectionString = `postgres://${this.instance.sys.configuration.databases.postgres.user}:${this.instance.sys.configuration.databases.postgres.password}@${this.instance.sys.configuration.databases.postgres.host}:${this.instance.sys.configuration.databases.postgres.port}/${"tricolor_workspaces"}`;
+    const connectionString = `postgres://${this.instance.sys.configuration.databases.postgres.user}:${this.instance.sys.configuration.databases.postgres.password}@${this.instance.sys.configuration.databases.postgres.host}:${this.instance.sys.configuration.databases.postgres.port}/${this.instance.sys.configuration.databases.postgres.database}`;
     let con = new SQL(connectionString);
 
     this.databaseConnections[`postgres`] = con;

@@ -34,7 +34,7 @@ const router = t.router({
             const db = instance.sys.database.postgres();
 
             const { forename, surname, username } = (
-              await db`SELECT forename, surname, username FROM tricolor_workspaces.public.users WHERE id = ${opt.ctx.userId}`
+              await db`SELECT forename, surname, username FROM public.users WHERE id = ${opt.ctx.userId}`
             )?.[0] || {
               forename: "Unknown",
               surname: "",

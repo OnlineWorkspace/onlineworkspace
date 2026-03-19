@@ -8,7 +8,6 @@ import { initTRPC } from "@trpc/server";
 import z from "zod";
 import ApplicationRepository from "./repository/applicationRepository.js";
 import LocalApplicationRepository from "./repository/localRepository.js";
-import { DEFAULT_APPLICATIONS } from "@tcsw/workspaces-instance/src/systems/applications.js";
 import { WorkspacesFeatureFlags } from "@tcsw/workspaces-instance/src/systems/configuration.js";
 import fastFolderSizeSync from "fast-folder-size/sync.js";
 import fs from "fs/promises";
@@ -121,7 +120,7 @@ const router = t.router({
             WorkspacesFeatureFlags.ShootYourselfInTheFoot,
           )
             ? []
-            : DEFAULT_APPLICATIONS,
+            : instance.sys.configuration.defaultApplications.map((a) => a.id),
         };
       }),
     setEnabledApplications: procedure
@@ -226,7 +225,9 @@ const router = t.router({
         return {
           ...app,
           isUserAdministrator: await (await opt.ctx.user())?.isAdministrator(),
-          canBeUninstalled: DEFAULT_APPLICATIONS.includes(app.id)
+          canBeUninstalled: instance.sys.configuration.defaultApplications.some(
+            (a) => a.id === app.id,
+          )
             ? instance.sys.configuration.hasFeature(
                 WorkspacesFeatureFlags.ShootYourselfInTheFoot,
               )
@@ -270,8 +271,12 @@ const router = t.router({
       .mutation(async (opt) => {
         // the user must be administrator
         if (!(await (await opt.ctx.user())?.isAdministrator())) return false;
-        // the application must not be protected if without ShootYourselfInTheFoot
-        if (DEFAULT_APPLICATIONS.includes(opt.input.applicationId)) {
+        // the application must not be protected if ShootYourselfInTheFoot is enabled
+        if (
+          instance.sys.configuration.defaultApplications.some(
+            (a) => a.id === opt.input.applicationId,
+          )
+        ) {
           if (
             !instance.sys.configuration.hasFeature(
               WorkspacesFeatureFlags.ShootYourselfInTheFoot,

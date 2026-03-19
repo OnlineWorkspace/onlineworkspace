@@ -101,11 +101,11 @@ class Instance {
 
     this.sys.event.on(WorkspacesEvent.BeforeStartupComplete, () => {
       this.sys.settings.registerApplicationSetting(
-        new StringListApplicationSetting("core", "quick_shortcuts", [
-          "uk.tcsw.dashboard",
-          "uk.tcsw.store",
-          "uk.tcsw.settings",
-        ]).setDisplayName("Quick Shortcuts"),
+        new StringListApplicationSetting(
+          "core",
+          "quick_shortcuts",
+          this.sys.configuration.defaultQuickShortcuts,
+        ).setDisplayName("Quick Shortcuts"),
       );
     });
 
