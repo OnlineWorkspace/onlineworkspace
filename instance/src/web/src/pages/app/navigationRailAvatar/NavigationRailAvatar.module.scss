@@ -1,80 +1,127 @@
 .root {
-    margin-top: 2.75rem;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 1rem;
-    background: #0000;
-    padding: 1rem;
-    border-radius: 10rem;
-    position: relative;
+  margin-top: 2.75rem;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 1rem;
+  background: #0000;
+  padding: 1rem;
+  border-radius: 10rem;
+  position: relative;
+
+  transition:
+    background-color var(--uk-sys-motion-duration-250)
+      var(--uk-sys-motion-easing-emphasized-decelerate),
+    color var(--uk-sys-motion-duration-250)
+      var(--uk-sys-motion-easing-emphasized-decelerate);
+
+  .avatar {
+    outline-style: solid;
+    outline-offset: 2px;
+    outline-width: 0;
+    outline-color: transparent;
+    margin-bottom: 0;
 
     transition:
-        background-color var(--uk-sys-motion-duration-250) var(--uk-sys-motion-easing-emphasized-decelerate),
-        color var(--uk-sys-motion-duration-250) var(--uk-sys-motion-easing-emphasized-decelerate);
+      outline-color var(--uk-sys-motion-duration-100)
+        var(--uk-sys-motion-easing-standard-decelerate),
+      outline-width var(--uk-sys-motion-duration-50) linear,
+      margin-bottom var(--uk-sys-motion-duration-500)
+        var(--uk-sys-motion-easing-emphasized-decelerate);
+
+    &:hover {
+      outline-width: var(--uk-sys-state-focus-indicator-thickness);
+      outline-offset: var(--uk-sys-state-focus-indicator-outer-offset);
+      outline-color: rgb(var(--uk-sys-color-secondary));
+    }
+  }
+
+  .nameContainer {
+    width: 100%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    white-space: nowrap;
+  }
+
+  .displayName {
+    line-height: 1rem !important;
+  }
+
+  &[data-expanded="true"] {
+    color: rgb(var(--uk-sys-color-secondary));
+    background-color: rgb(var(--uk-sys-color-secondary-container));
+
+    > .logout {
+      visibility: visible;
+      pointer-events: all;
+      opacity: 1;
+      transition: opacity var(--uk-sys-motion-duration-1000)
+        var(--uk-sys-motion-easing-emphasized-decelerate);
+    }
+  }
+
+  .logout {
+    display: flex;
+    pointer-events: none;
+    position: absolute;
+    bottom: 0.75rem;
+    right: 0.75rem;
+    opacity: 0;
+    visibility: hidden;
+  }
+
+  &[data-expanded="false"]:hover {
+    flex-direction: column;
+    color: rgb(var(--uk-sys-color-secondary));
+    background-color: rgb(var(--uk-sys-color-secondary-container));
 
     .avatar {
-        outline-style: solid;
-        outline-offset: 2px;
-        outline-width: 0;
-        outline-color: transparent;
-
-        transition:
-            outline-color var(--uk-sys-motion-duration-100) var(--uk-sys-motion-easing-standard-decelerate),
-            outline-width var(--uk-sys-motion-duration-50) linear;
-
-        &:hover {
-            outline-width: var(--uk-sys-state-focus-indicator-thickness);
-            outline-offset: var(--uk-sys-state-focus-indicator-outer-offset);
-            outline-color: rgb(var(--uk-sys-color-secondary));
-        }
-    }
-
-    .nameContainer {
-        width: 100%;
-        overflow: hidden;
-        display: flex;
-        flex-direction: column;
-        white-space: nowrap;
-    }
-
-    .displayName {
-        line-height: 1rem !important;
-    }
-
-    .username {
-    }
-
-    &[data-expanded="true"] {
-        color: rgb(var(--uk-sys-color-secondary));
-        background-color: rgb(var(--uk-sys-color-secondary-container));
-
-        > .logout {
-            visibility: visible;
-            pointer-events: all;
-            opacity: 1;
-            transition: opacity var(--uk-sys-motion-duration-1000) var(--uk-sys-motion-easing-emphasized-decelerate);
-        }
+      margin-bottom: 3rem;
+      outline-width: var(--uk-sys-state-focus-indicator-thickness);
+      outline-offset: var(--uk-sys-state-focus-indicator-outer-offset);
+      outline-color: rgb(var(--uk-sys-color-secondary));
     }
 
     .logout {
-        display: flex;
-        pointer-events: none;
-        position: absolute;
-        top: 0.75rem;
-        right: 0.75rem;
-        opacity: 0;
-        visibility: hidden;
+      visibility: visible;
+      pointer-events: all;
+      opacity: 1;
+      transition: opacity var(--uk-sys-motion-duration-1000)
+        var(--uk-sys-motion-easing-emphasized-decelerate);
     }
 
-    *[data-navigation-rail-mobile-mode="true"] > div > & {
-        margin-top: unset;
-        padding: unset;
-        aspect-ratio: 1 / 1;
-        background: transparent;
-
-        .avatar {
-            margin: auto;
-        }
+    .nameContainer {
+      visibility: hidden;
+      display: none;
     }
+  }
+
+  *[data-navigation-rail-mobile-mode="true"] > div > & {
+    margin-top: unset;
+    padding: unset;
+    aspect-ratio: 1 / 1;
+    background: transparent;
+
+    .avatar {
+      margin: auto;
+    }
+
+    &[data-expanded="false"] {
+      background: transparent;
+
+      .avatar {
+        margin-bottom: auto;
+      }
+    }
+
+    .logout {
+      pointer-events: none;
+      position: absolute;
+      bottom: 0.75rem;
+      right: 0.75rem;
+      opacity: 0;
+      visibility: hidden;
+    }
+  }
 }
