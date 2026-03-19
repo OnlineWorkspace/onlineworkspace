@@ -1,9 +1,9 @@
-import { createSignal, type Component, type ParentProps } from "solid-js";
-import type { ButtonSize } from "./lib/size.ts";
 import clsx from "clsx";
+import { type Component, createSignal, type ParentProps } from "solid-js";
 import UKIcon from "../icon/UKIcon.tsx";
-import type { ButtonShape } from "./lib/shape.ts";
 import type { ButtonColor } from "./lib/color.ts";
+import type { ButtonShape } from "./lib/shape.ts";
+import type { ButtonSize } from "./lib/size.ts";
 import styles from "./UKButton.module.scss";
 
 type ButtonProps =
@@ -78,14 +78,18 @@ const UKButton: Component<ParentProps<ButtonProps>> = (props) => {
 
             setAffirmativeState("in-progress");
             try {
-              await props.onClick(e);
+              const clickResponse = await props.onClick(e);
 
               setAffirmativeState("affirmative");
 
               setTimeout(() => {
                 setAffirmativeState("unset");
+
+                if (clickResponse && typeof clickResponse === "function") {
+                  clickResponse();
+                }
               }, 2000);
-            } catch (error) {
+            } catch (_) {
               setAffirmativeState("unset");
             }
             return;
@@ -102,8 +106,7 @@ const UKButton: Component<ParentProps<ButtonProps>> = (props) => {
       type="button"
     >
       {props.affirmative ? (
-        affirmativeState() === "unset" ||
-        affirmativeState() === "affirmative" ? (
+        affirmativeState() === "unset" || affirmativeState() === "affirmative" ? (
           <UKIcon
             class={clsx(
               styles.iconClass,
@@ -113,19 +116,13 @@ const UKButton: Component<ParentProps<ButtonProps>> = (props) => {
             {affirmativeState() === "affirmative" ? "check" : ""}
           </UKIcon>
         ) : affirmativeState() === "in-progress" ? (
-          <UKIcon class={clsx(styles.iconClass, styles.leadingIconSpin)}>
-            progress_activity
-          </UKIcon>
+          <UKIcon class={clsx(styles.iconClass, styles.leadingIconSpin)}>progress_activity</UKIcon>
         ) : null
       ) : (
-        props.leadingIcon && (
-          <UKIcon class={styles.iconClass}>{props.leadingIcon}</UKIcon>
-        )
+        props.leadingIcon && <UKIcon class={styles.iconClass}>{props.leadingIcon}</UKIcon>
       )}
       {props.children || "No Label Provided"}
-      {props.trailingIcon && (
-        <UKIcon class={styles.iconClass}>{props.trailingIcon}</UKIcon>
-      )}
+      {props.trailingIcon && <UKIcon class={styles.iconClass}>{props.trailingIcon}</UKIcon>}
     </button>
   );
 };
