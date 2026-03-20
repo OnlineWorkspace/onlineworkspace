@@ -6,13 +6,7 @@ import UKStackItem from "@tcsw/uikit-solid/src/components/stack/UKStackItem.jsx"
 import UKSwitch from "@tcsw/uikit-solid/src/components/switch/UKSwitch.jsx";
 import UKText from "@tcsw/uikit-solid/src/components/text/UKText.jsx";
 import UKTextField from "@tcsw/uikit-solid/src/components/textField/UKTextField.jsx";
-import {
-  type Component,
-  createResource,
-  createSignal,
-  Show,
-  useContext,
-} from "solid-js";
+import { type Component, createResource, createSignal, Show, useContext } from "solid-js";
 import { AppContext } from "../../../../../../appContext.ts";
 import trpc from "../../../../../../lib/trpc";
 import styles from "./User.module.scss";
@@ -53,12 +47,9 @@ const User: Component<{
     () => trpc.instance.user.getIsAdministrator.query(props.userId),
     { initialValue: false },
   );
-  const [isMe] = createResource(
-    () => trpc.instance.user.getIsMe.query(props.userId),
-    {
-      initialValue: false,
-    },
-  );
+  const [isMe] = createResource(() => trpc.instance.user.getIsMe.query(props.userId), {
+    initialValue: false,
+  });
 
   return (
     <>
@@ -71,10 +62,7 @@ const User: Component<{
         supportingText={`(${props.userId}) ${username()}`}
         onClick={() => setShowDialog("user")}
       />
-      <UKDialog
-        show={() => showDialog() === "user"}
-        onClose={() => setShowDialog(undefined)}
-      >
+      <UKDialog show={() => showDialog() === "user"} onClose={() => setShowDialog(undefined)}>
         <div class={styles.expanded}>
           <UKText role="title" size="l">
             Modify User
@@ -201,8 +189,7 @@ const User: Component<{
         <UKDivider direction="horizontal" />
         <Show when={!isMe()}>
           <UKText role="body" size="m">
-            Are you sure you want to delete this user? This action cannot be
-            undone.
+            Are you sure you want to delete this user? This action cannot be undone.
           </UKText>
           <UKButtonGroup size={"s"} align={"end"}>
             <UKButton
@@ -223,8 +210,8 @@ const User: Component<{
         </Show>
         <Show when={isMe()}>
           <UKText role="body" size="m">
-            Sorry, you cannot delete your own user account. Please ask another
-            administrator to delete your account if you wish to do so.
+            Sorry, you cannot delete your own user account. Please ask another administrator to
+            delete your account if you wish to do so.
           </UKText>
           <UKButton color={"filled"} onClick={() => setShowDialog(undefined)}>
             Close
@@ -240,10 +227,9 @@ const User: Component<{
         </UKText>
         <UKDivider direction="horizontal" />
         <UKText role="body" size="m">
-          Are you sure you want to remove your own administrator privileges? You
-          will not be able to modify any users or settings if you do this.
-          Please ask another administrator or use the console if you need to
-          restore your privileges.
+          Are you sure you want to remove your own administrator privileges? You will not be able to
+          modify any users or settings if you do this. Please ask another administrator or use the
+          console if you need to restore your privileges.
         </UKText>
         <UKButtonGroup size={"s"} align={"end"}>
           <UKButton

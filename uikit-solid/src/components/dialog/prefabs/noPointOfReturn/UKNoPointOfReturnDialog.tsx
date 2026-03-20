@@ -1,8 +1,8 @@
 import type { Accessor, Component } from "solid-js";
-import UKDialog from "../../UKDialog.tsx";
-import UKText from "../../../text/UKText.tsx";
-import UKButtonGroup from "../../../buttonGroup/UKButtonGroup.tsx";
 import UKButton from "../../../button/UKButton.tsx";
+import UKButtonGroup from "../../../buttonGroup/UKButtonGroup.tsx";
+import UKText from "../../../text/UKText.tsx";
+import UKDialog from "../../UKDialog.tsx";
 
 const UKNoPointOfReturnDialog: Component<{
   message: string;
@@ -31,7 +31,7 @@ const UKNoPointOfReturnDialog: Component<{
         <UKButton
           size={"s"}
           onClick={() => {
-            props.onConfirm()
+            props.onConfirm();
           }}
         >
           Confirm
