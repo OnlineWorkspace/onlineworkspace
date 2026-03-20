@@ -1,22 +1,17 @@
 /// <reference path="./global.d.ts" />
 
-import {
-  createTRPCContext,
-  procedure,
-} from "@tcsw/workspaces-instance/src/systems/trpcRouter.js";
-import { initTRPC } from "@trpc/server";
-import z from "zod";
-import path from "path";
-import fs from "fs/promises";
 import { WorkspacesEvent } from "@tcsw/workspaces-instance/src/systems/events.js";
 import { BooleanApplicationSetting } from "@tcsw/workspaces-instance/src/systems/settings/applicationSetting/booleanSetting.js";
 import { StringListApplicationSetting } from "@tcsw/workspaces-instance/src/systems/settings/applicationSetting/stringListSetting.js";
+import { createTRPCContext, procedure } from "@tcsw/workspaces-instance/src/systems/trpcRouter.js";
+import { initTRPC } from "@trpc/server";
+import fs from "fs/promises";
+import path from "path";
+import z from "zod";
 
 const log = instance.log.createLogger("uk.tcsw.dashboard");
 
-export const t = initTRPC
-  .context<ReturnType<typeof createTRPCContext>>()
-  .create();
+export const t = initTRPC.context<ReturnType<typeof createTRPCContext>>().create();
 
 const router = t.router({
   dashboard: {
@@ -73,9 +68,8 @@ const router = t.router({
           const date = new Date(opt.input);
           const hours = date.getHours();
           const forename =
-            (await (
-              await opt.ctx.instance.sys.users.getUserById(opt.ctx.userId)
-            )?.getForename()) || "Anonymous";
+            (await (await opt.ctx.instance.sys.users.getUserById(opt.ctx.userId))?.getForename()) ||
+            "Anonymous";
 
           // Early bird 5am - 7am
           if (hours >= 5 && hours < 7) {
@@ -94,7 +88,7 @@ const router = t.router({
             return `Good Evening, ${forename}!`;
           }
           // Good Night 10pm - 12am
-          if (hours >= 22 || hours < 5) {
+          if (hours >= 22 || hours < 0) {
             return `Good Night, ${forename}!`;
           }
           // Night owl 12am - 5am
@@ -129,16 +123,11 @@ const router = t.router({
         }),
       )
       .query(async (opt) => {
-        const wallpaperPath = path.join(
-          (await opt.ctx.user()).getPath(),
-          "assets/wallpapers",
-        );
+        const wallpaperPath = path.join((await opt.ctx.user()).getPath(), "assets/wallpapers");
 
         if (await fs.exists(path.join(wallpaperPath, "config.json"))) {
-          let options = JSON.parse(
-            (
-              await fs.readFile(path.join(wallpaperPath, "config.json"))
-            ).toString(),
+          const options = JSON.parse(
+            (await fs.readFile(path.join(wallpaperPath, "config.json"))).toString(),
           );
 
           options.position = options.position.split(" ");
@@ -154,10 +143,7 @@ const router = t.router({
     getWallpaper: procedure
       .input(z.object({ width: z.number(), height: z.number() }))
       .query(async (opt) => {
-        const wallpapersRootPath = path.join(
-          (await opt.ctx.user()).getPath(),
-          "assets/wallpapers",
-        );
+        const wallpapersRootPath = path.join((await opt.ctx.user()).getPath(), "assets/wallpapers");
         const rawWallpaperPath = path.join(wallpapersRootPath, "current.png");
         const resizedWallpapersPath = path.join(wallpapersRootPath, "resized");
         const requiredResizedWallpaperPath = path.join(
@@ -172,12 +158,8 @@ const router = t.router({
         if (!(await fs.exists(requiredResizedWallpaperPath))) {
           const options = await (async () => {
             if (await fs.exists(path.join(wallpapersRootPath, "config.json"))) {
-              let options = JSON.parse(
-                (
-                  await fs.readFile(
-                    path.join(wallpapersRootPath, "config.json"),
-                  )
-                ).toString(),
+              const options = JSON.parse(
+                (await fs.readFile(path.join(wallpapersRootPath, "config.json"))).toString(),
               );
 
               options.position = options.position.split(" ");
@@ -231,20 +213,14 @@ instance.sys.event.on(WorkspacesEvent.BeforeStartupComplete, () => {
       ),
   );
   instance.sys.settings.registerApplicationSetting(
-    new BooleanApplicationSetting(
-      "uk.tcsw.dashboard",
-      "content_background",
-      true,
-    )
+    new BooleanApplicationSetting("uk.tcsw.dashboard", "content_background", true)
       .setDisplayName("Show Content Background")
       .setDescription(
         "Should a background be shown behind the dashboard content to improve readability when using certain wallpapers.",
       ),
   );
   instance.sys.settings.registerApplicationSetting(
-    new StringListApplicationSetting("uk.tcsw.dashboard", "widgets", [
-      "user.profile",
-    ])
+    new StringListApplicationSetting("uk.tcsw.dashboard", "widgets", ["user.profile"])
       .setDisplayName("Enabled Widgets")
       .setDescription(
         "A list of widget IDs that should be enabled on the dashboard. Widget IDs are not yet documented, but can be found in the source code of this application.",
