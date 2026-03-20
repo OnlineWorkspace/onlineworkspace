@@ -20,6 +20,7 @@
     position: relative;
     max-height: calc(100% - 1rem);
     overflow-y: auto;
+    animation: fadeCard 0.125s ease-out forwards;
   }
 
   &[data-mobile="true"] {
@@ -51,5 +52,14 @@
   }
   to {
     background-color: rgba(0, 0, 0, 0.5);
+  }
+}
+
+@keyframes fadeCard {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
   }
 }
