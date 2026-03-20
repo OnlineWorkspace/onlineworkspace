@@ -105,7 +105,6 @@ const router = t.router({
             `Welcome back, ${forename}!`,
             `Hey there, ${forename}!`,
             `Greetings, ${forename}!`,
-            `Salutations, ${forename}!`,
             `Howdy, ${forename}!`,
             `Ahoy, ${forename}!`,
             `Bonjour, ${forename}!`,
