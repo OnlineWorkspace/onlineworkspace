@@ -1,39 +1,24 @@
 /// <reference path="./global.d.ts" />
 
-import {
-  createTRPCContext,
-  procedure,
-} from "@tcsw/workspaces-instance/src/systems/trpcRouter.js";
-import { initTRPC } from "@trpc/server";
-import z from "zod";
+import { promises as fs } from "node:fs";
 import * as path from "node:path";
-import { promises as fs } from "fs";
+import { createTRPCContext, procedure } from "@tcsw/workspaces-instance/src/systems/trpcRouter.js";
+import { initTRPC } from "@trpc/server";
 import { octetInputParser } from "@trpc/server/http";
 import { randomUUIDv7 } from "bun";
+import z from "zod";
 
 const log = instance.log.createLogger("uk.tcsw.files");
 
-export const t = initTRPC
-  .context<ReturnType<typeof createTRPCContext>>()
-  .create();
+export const t = initTRPC.context<ReturnType<typeof createTRPCContext>>().create();
 
 const router = t.router({
   getFileGrid: procedure
     .input(z.object({ path: z.string(), sortBy: z.enum(["name"]) }))
     .query(async (opt) => {
-      const finalPath = path.join(
-        instance.sys.filesystem.FS_ROOT,
-        opt.input.path,
-      );
+      const finalPath = path.join(instance.sys.filesystem.FS_ROOT, opt.input.path);
 
-      if (
-        !(
-          await instance.sys.filesystem.getUserPermissions(
-            opt.ctx.userId,
-            finalPath,
-          )
-        ).read
-      ) {
+      if (!(await instance.sys.filesystem.getUserPermissions(opt.ctx.userId, finalPath)).read) {
         // send a missing permissions notification
         return {
           type: "error" as const,
@@ -44,7 +29,7 @@ const router = t.router({
 
       const THUMBNAIL_SIZE = 128;
 
-      let output: {
+      const output: {
         name: string;
         path: string;
         icon?: string;
@@ -63,7 +48,7 @@ const router = t.router({
         const itemPath = path.join(finalPath, item);
         const isDirectory = (await fs.lstat(itemPath)).isDirectory();
 
-        let icon = undefined;
+        let icon: string;
 
         if (!isDirectory) {
           switch (instance.sys.filesystem.getFileType(itemPath)) {
@@ -79,16 +64,14 @@ const router = t.router({
                       if (dimensions.width > dimensions.height) {
                         newWidth = THUMBNAIL_SIZE;
                         newHeight = Math.round(
-                          (dimensions.height / dimensions.width) *
-                            THUMBNAIL_SIZE,
+                          (dimensions.height / dimensions.width) * THUMBNAIL_SIZE,
                         );
                       }
 
                       if (dimensions.height > dimensions.width) {
                         newHeight = THUMBNAIL_SIZE;
                         newWidth = Math.round(
-                          (dimensions.height / dimensions.width) *
-                            THUMBNAIL_SIZE,
+                          (dimensions.height / dimensions.width) * THUMBNAIL_SIZE,
                         );
                       }
 
@@ -104,10 +87,7 @@ const router = t.router({
         }
 
         let itemName = item;
-        const finalItemPath = path.relative(
-          instance.sys.filesystem.FS_ROOT,
-          itemPath,
-        );
+        const finalItemPath = path.relative(instance.sys.filesystem.FS_ROOT, itemPath);
 
         if (finalItemPath.split(itemName)[0] === "users/") {
           itemName += ` (${await (await instance.sys.users.getUserById(Number(itemName)))?.getUsername()})`;
@@ -116,6 +96,7 @@ const router = t.router({
         output.push({
           name: itemName,
           path: finalItemPath,
+          // @ts-ignore
           icon: icon,
           type: isDirectory ? "directory" : "file",
         });
@@ -134,19 +115,9 @@ const router = t.router({
   getFileList: procedure
     .input(z.object({ path: z.string(), sortBy: z.enum(["name"]) }))
     .query(async (opt) => {
-      const finalPath = path.join(
-        instance.sys.filesystem.FS_ROOT,
-        opt.input.path,
-      );
+      const finalPath = path.join(instance.sys.filesystem.FS_ROOT, opt.input.path);
 
-      if (
-        !(
-          await instance.sys.filesystem.getUserPermissions(
-            opt.ctx.userId,
-            finalPath,
-          )
-        ).read
-      ) {
+      if (!(await instance.sys.filesystem.getUserPermissions(opt.ctx.userId, finalPath)).read) {
         // send a missing permissions notification
         return {
           type: "error" as const,
@@ -157,7 +128,7 @@ const router = t.router({
 
       const THUMBNAIL_SIZE = 32;
 
-      let output: {
+      const output: {
         name: string;
         path: string;
         icon?: string;
@@ -176,7 +147,7 @@ const router = t.router({
         const itemPath = path.join(finalPath, item);
         const isDirectory = (await fs.lstat(itemPath)).isDirectory();
 
-        let icon = undefined;
+        let icon: string;
 
         if (!isDirectory) {
           switch (instance.sys.filesystem.getFileType(itemPath)) {
@@ -192,16 +163,14 @@ const router = t.router({
                       if (dimensions.width > dimensions.height) {
                         newWidth = THUMBNAIL_SIZE;
                         newHeight = Math.round(
-                          (dimensions.height / dimensions.width) *
-                            THUMBNAIL_SIZE,
+                          (dimensions.height / dimensions.width) * THUMBNAIL_SIZE,
                         );
                       }
 
                       if (dimensions.height > dimensions.width) {
                         newHeight = THUMBNAIL_SIZE;
                         newWidth = Math.round(
-                          (dimensions.height / dimensions.width) *
-                            THUMBNAIL_SIZE,
+                          (dimensions.height / dimensions.width) * THUMBNAIL_SIZE,
                         );
                       }
 
@@ -217,10 +186,7 @@ const router = t.router({
         }
 
         let itemName = item;
-        const finalItemPath = path.relative(
-          instance.sys.filesystem.FS_ROOT,
-          itemPath,
-        );
+        const finalItemPath = path.relative(instance.sys.filesystem.FS_ROOT, itemPath);
 
         if (finalItemPath.split(itemName)[0] === "users/") {
           itemName += ` (${await (await instance.sys.users.getUserById(Number(itemName)))?.getUsername()})`;
@@ -229,6 +195,7 @@ const router = t.router({
         output.push({
           name: itemName,
           path: finalItemPath,
+          // @ts-ignore
           icon: icon,
           type: isDirectory ? "directory" : "file",
         });
@@ -246,14 +213,7 @@ const router = t.router({
     }),
   getRawFile: procedure.input(z.string()).query(async (opt) => {
     const finalPath = path.join(instance.sys.filesystem.FS_ROOT, opt.input);
-    if (
-      !(
-        await instance.sys.filesystem.getUserPermissions(
-          opt.ctx.userId,
-          finalPath,
-        )
-      ).read
-    ) {
+    if (!(await instance.sys.filesystem.getUserPermissions(opt.ctx.userId, finalPath)).read) {
       return "You lack the required permissions to access this resource!";
     }
 
@@ -272,27 +232,12 @@ const router = t.router({
         if (path.join(item.path, "..") === "users") continue;
 
         const finalPath = path.join(instance.sys.filesystem.FS_ROOT, item.path);
-        const finalNewPath = path.join(
-          instance.sys.filesystem.FS_ROOT,
-          item.newPath,
-        );
+        const finalNewPath = path.join(instance.sys.filesystem.FS_ROOT, item.newPath);
 
         try {
-          if (
-            (
-              await instance.sys.filesystem.getUserPermissions(
-                opt.ctx.userId,
-                finalPath,
-              )
-            ).read
-          ) {
+          if ((await instance.sys.filesystem.getUserPermissions(opt.ctx.userId, finalPath)).read) {
             if (
-              (
-                await instance.sys.filesystem.getUserPermissions(
-                  opt.ctx.userId,
-                  finalNewPath,
-                )
-              ).write
+              (await instance.sys.filesystem.getUserPermissions(opt.ctx.userId, finalNewPath)).write
             ) {
               await fs.rename(finalPath, finalNewPath);
             } else {
@@ -318,27 +263,12 @@ const router = t.router({
         if (path.join(item.path, "..") === "users") continue;
 
         const finalPath = path.join(instance.sys.filesystem.FS_ROOT, item.path);
-        const finalNewPath = path.join(
-          instance.sys.filesystem.FS_ROOT,
-          item.newPath,
-        );
+        const finalNewPath = path.join(instance.sys.filesystem.FS_ROOT, item.newPath);
 
         try {
-          if (
-            (
-              await instance.sys.filesystem.getUserPermissions(
-                opt.ctx.userId,
-                finalPath,
-              )
-            ).read
-          ) {
+          if ((await instance.sys.filesystem.getUserPermissions(opt.ctx.userId, finalPath)).read) {
             if (
-              (
-                await instance.sys.filesystem.getUserPermissions(
-                  opt.ctx.userId,
-                  finalNewPath,
-                )
-              ).write
+              (await instance.sys.filesystem.getUserPermissions(opt.ctx.userId, finalNewPath)).write
             ) {
               await fs.cp(finalPath, finalNewPath, { recursive: true });
             } else {
@@ -361,14 +291,7 @@ const router = t.router({
       const itemPath = path.join(instance.sys.filesystem.FS_ROOT, item);
 
       try {
-        if (
-          (
-            await instance.sys.filesystem.getUserPermissions(
-              opt.ctx.userId,
-              itemPath,
-            )
-          ).write
-        ) {
+        if ((await instance.sys.filesystem.getUserPermissions(opt.ctx.userId, itemPath)).write) {
           await fs.rm(itemPath, { recursive: true });
         } else {
           // send a missing permissions notification
@@ -381,50 +304,28 @@ const router = t.router({
 
     return true;
   }),
-  createFile: procedure
-    .input(z.object({ filePath: z.string() }))
-    .mutation(async (opt) => {
-      const filePath = path.join(
-        instance.sys.filesystem.FS_ROOT,
-        opt.input.filePath,
-      );
+  createFile: procedure.input(z.object({ filePath: z.string() })).mutation(async (opt) => {
+    const filePath = path.join(instance.sys.filesystem.FS_ROOT, opt.input.filePath);
 
-      if (await fs.exists(filePath)) return false;
+    if (await fs.exists(filePath)) return false;
 
-      if (
-        (
-          await instance.sys.filesystem.getUserPermissions(
-            opt.ctx.userId,
-            filePath,
-          )
-        ).write
-      ) {
-        await fs.writeFile(filePath, "");
-      } else {
-        // send a missing permissions notification
-        return false;
-      }
+    if ((await instance.sys.filesystem.getUserPermissions(opt.ctx.userId, filePath)).write) {
+      await fs.writeFile(filePath, "");
+    } else {
+      // send a missing permissions notification
+      return false;
+    }
 
-      return true;
-    }),
+    return true;
+  }),
   createDirectory: procedure
     .input(z.object({ directoryPath: z.string() }))
     .mutation(async (opt) => {
-      const filePath = path.join(
-        instance.sys.filesystem.FS_ROOT,
-        opt.input.directoryPath,
-      );
+      const filePath = path.join(instance.sys.filesystem.FS_ROOT, opt.input.directoryPath);
 
       if (await fs.exists(filePath)) return false;
 
-      if (
-        (
-          await instance.sys.filesystem.getUserPermissions(
-            opt.ctx.userId,
-            filePath,
-          )
-        ).write
-      ) {
+      if ((await instance.sys.filesystem.getUserPermissions(opt.ctx.userId, filePath)).write) {
         await fs.mkdir(filePath, { recursive: true });
       } else {
         // send a missing permissions notification
@@ -452,10 +353,7 @@ const router = t.router({
   }),
   uploadFile: procedure.input(octetInputParser).mutation(async (opt) => {
     const uuid = randomUUIDv7();
-    const uploadFilePath = path.join(
-      (await opt.ctx.user()).getPath(),
-      `system/temp/${uuid}`,
-    );
+    const uploadFilePath = path.join((await opt.ctx.user()).getPath(), `system/temp/${uuid}`);
 
     log.info(`Uploading file ${uuid}`);
 
@@ -465,27 +363,17 @@ const router = t.router({
     return { id: uuid };
   }),
   setUploadMetadata: procedure
-    .input(
-      z.object({ id: z.string(), path: z.string(), lastModified: z.number() }),
-    )
+    .input(z.object({ id: z.string(), path: z.string(), lastModified: z.number() }))
     .mutation(async (opt) => {
       const uploadFilePath = path.join(
         (await opt.ctx.user()).getPath(),
         `system/temp/${opt.input.id}`,
       );
-      const actualFilePath = path.join(
-        instance.sys.filesystem.FS_ROOT,
-        `${opt.input.path}`,
-      );
+      const actualFilePath = path.join(instance.sys.filesystem.FS_ROOT, `${opt.input.path}`);
       const actualFilePathParentDir = path.join(actualFilePath, "..");
 
       if (
-        !(
-          await instance.sys.filesystem.getUserPermissions(
-            opt.ctx.userId,
-            actualFilePath,
-          )
-        ).write
+        !(await instance.sys.filesystem.getUserPermissions(opt.ctx.userId, actualFilePath)).write
       ) {
         return false;
       }
@@ -494,9 +382,7 @@ const router = t.router({
         await fs.mkdir(actualFilePathParentDir, { recursive: true });
       }
 
-      log.info(
-        `Applying metadata to file (${opt.input.id}) '${actualFilePath}'`,
-      );
+      log.info(`Applying metadata to file (${opt.input.id}) '${actualFilePath}'`);
 
       await fs.rename(uploadFilePath, actualFilePath);
       await fs.utimes(actualFilePath, 0, opt.input.lastModified);

@@ -70,30 +70,52 @@ const router = t.router({
           const forename =
             (await (await opt.ctx.instance.sys.users.getUserById(opt.ctx.userId))?.getForename()) ||
             "Anonymous";
+          const shouldShowTimeBasedGreeting = Math.random() < 0.5;
 
-          // Early bird 5am - 7am
-          if (hours >= 5 && hours < 7) {
-            return `Hello early bird, ${forename}!`;
+          if (shouldShowTimeBasedGreeting) {
+            // Early bird 5am - 7am
+            if (hours >= 5 && hours < 7) {
+              return `Hello early bird!`;
+            }
+            // Good Morning 7am - 12pm
+            if (hours >= 7 && hours < 12) {
+              return `Good Morning, ${forename}!`;
+            }
+            // Good Afternoon 12pm - 5pm
+            if (hours >= 12 && hours < 17) {
+              return `Good Afternoon, ${forename}!`;
+            }
+            // Good Evening 5pm - 10pm
+            if (hours >= 17 && hours < 22) {
+              return `Good Evening, ${forename}!`;
+            }
+            // Good Night 10pm - 12am
+            if (hours >= 22 || hours < 0) {
+              return `Good Night, ${forename}!`;
+            }
+            // Night owl 12am - 5am
+            if (hours >= 0 && hours < 5) {
+              return `Hello night owl!`;
+            }
           }
-          // Good Morning 7am - 12pm
-          if (hours >= 7 && hours < 12) {
-            return `Good Morning, ${forename}!`;
-          }
-          // Good Afternoon 12pm - 5pm
-          if (hours >= 12 && hours < 17) {
-            return `Good Afternoon, ${forename}!`;
-          }
-          // Good Evening 5pm - 10pm
-          if (hours >= 17 && hours < 22) {
-            return `Good Evening, ${forename}!`;
-          }
-          // Good Night 10pm - 12am
-          if (hours >= 22 || hours < 0) {
-            return `Good Night, ${forename}!`;
-          }
-          // Night owl 12am - 5am
-          if (hours >= 0 && hours < 5) {
-            return `Hello night owl, ${forename}!`;
+
+          const greetingVariants = [
+            `Hiya, ${forename}!`,
+            `Hello, ${forename}!`,
+            `Welcome back, ${forename}!`,
+            `Hey there, ${forename}!`,
+            `Greetings, ${forename}!`,
+            `Salutations, ${forename}!`,
+            `Howdy, ${forename}!`,
+            `Ahoy, ${forename}!`,
+            `Bonjour, ${forename}!`,
+            `Hola, ${forename}!`,
+          ];
+
+          const randomGreetingVariantIndex = Math.floor(Math.random() * greetingVariants.length);
+
+          if (greetingVariants[randomGreetingVariantIndex]) {
+            return greetingVariants[randomGreetingVariantIndex];
           }
 
           return `Hiya, ${forename}!`;
@@ -223,7 +245,7 @@ instance.sys.event.on(WorkspacesEvent.BeforeStartupComplete, () => {
     new StringListApplicationSetting("uk.tcsw.dashboard", "widgets", ["user.profile"])
       .setDisplayName("Enabled Widgets")
       .setDescription(
-        "A list of widget IDs that should be enabled on the dashboard. Widget IDs are not yet documented, but can be found in the source code of this application.",
+        "A list of widget IDs that should be enabled on the dashboard. The current available widgets are: user.profile, user.avatar, weather & search",
       ),
   );
   instance.sys.settings.registerApplicationSetting(
