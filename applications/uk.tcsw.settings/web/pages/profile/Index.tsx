@@ -1,28 +1,25 @@
-import UKStack from "@tcsw/uikit-solid/src/components/stack/UKStack.tsx";
-import { createResource, type Component } from "solid-js";
-import styles from "./Index.module.scss";
-import UKText from "@tcsw/uikit-solid/src/components/text/UKText.tsx";
-import trpc from "../../lib/trpc";
+import { useNavigate } from "@solidjs/router";
 import UKAvatar from "@tcsw/uikit-solid/src/components/avatar/UKAvatar.tsx";
+import UKStack from "@tcsw/uikit-solid/src/components/stack/UKStack.tsx";
+import UKStackItem from "@tcsw/uikit-solid/src/components/stack/UKStackItem.tsx";
+import UKText from "@tcsw/uikit-solid/src/components/text/UKText.tsx";
+import UKTopAppBar from "@tcsw/uikit-solid/src/components/topAppBar/UKTopAppBar.jsx";
+import useIsMobile from "@tcsw/uikit-solid/src/core/useIsMobile.js";
+import webInstanceTRPC from "@tcsw/workspaces-instance-web/src/lib/trpc.ts";
+import { type Component, createResource } from "solid-js";
+import trpc from "../../lib/trpc";
+import Bio from "./components/Bio/Bio.tsx";
+import Email from "./components/Email/Email";
+import Gender from "./components/Gender/Gender";
+import Name from "./components/Name/Name";
 import ProfilePicture from "./components/ProfilePicture/ProfilePicture";
 import Username from "./components/Username/Username";
-import Name from "./components/Name/Name";
-import Gender from "./components/Gender/Gender";
-import Email from "./components/Email/Email";
-import Bio from "./components/Bio/Bio.tsx";
-import UKTopAppBar from "@tcsw/uikit-solid/src/components/topAppBar/UKTopAppBar.jsx";
-import { useNavigate } from "@solidjs/router";
-import UKStackItem from "@tcsw/uikit-solid/src/components/stack/UKStackItem.tsx";
-import webInstanceTRPC from "@tcsw/workspaces-instance-web/src/lib/trpc.ts";
-import useIsMobile from "@tcsw/uikit-solid/src/core/useIsMobile.js";
-import UKDivider from "@tcsw/uikit-solid/src/components/divider/UKDivider.jsx";
+import styles from "./Index.module.scss";
 
 const ProfilePage: Component = () => {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
-  const [name, { refetch: refetchName }] = createResource(() =>
-    trpc.profile.getName.query(),
-  );
+  const [name, { refetch: refetchName }] = createResource(() => trpc.profile.getName.query());
   const [role] = createResource(() => trpc.profile.getRole.query());
   const [avatar, { refetch: refetchAvatar }] = createResource(() =>
     trpc.profile.getProfilePicture.query(),
@@ -45,11 +42,7 @@ const ProfilePage: Component = () => {
         <div class={styles.header}>
           <UKAvatar
             username="username"
-            avatar={
-              avatar()
-                ? `${avatar()}?t=${Date.now()}`
-                : "/assets/placeholder/avatar.png"
-            }
+            avatar={avatar() ? `${avatar()}?t=${Date.now()}` : "/assets/placeholder/avatar.png"}
             size="l"
           />
           <div>
@@ -79,20 +72,15 @@ const ProfilePage: Component = () => {
         </UKStack>
         {isMobile() ? (
           <>
-            <UKText
-              class={styles.subheading}
-              role="title"
-              size="m"
-              align="start"
-            >
+            <UKText class={styles.subheading} role="title" size="m" align="start">
               Session
             </UKText>
             <UKStack>
               <UKStackItem
                 labelText={"Logout"}
                 leading={{ type: "icon", value: "logout" }}
-                onClick={() => {
-                  webInstanceTRPC.authorization.logout.mutate();
+                onClick={async () => {
+                  await webInstanceTRPC.authorization.logout.mutate();
                   navigate("/");
                 }}
               />

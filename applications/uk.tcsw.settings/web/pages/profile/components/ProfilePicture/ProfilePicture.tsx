@@ -1,11 +1,9 @@
+import UKButton from "@tcsw/uikit-solid/src/components/button/UKButton.tsx";
 import UKStackItem from "@tcsw/uikit-solid/src/components/stack/UKStackItem.jsx";
 import { type Component, createSignal } from "solid-js";
-import styles from "./ProfilePicture.module.scss";
-import CropImage from "./components/CropImage/CropImage.tsx";
-import UKButton from "@tcsw/uikit-solid/src/components/button/UKButton.tsx";
-import ImageSelectDialog
-  from "./components/ImageSelectDialog/ImageSelectDialog.tsx";
 import CropDialog from "./components/CropDialog/CropDialog.tsx";
+import ImageSelectDialog from "./components/ImageSelectDialog/ImageSelectDialog.tsx";
+import styles from "./ProfilePicture.module.scss";
 
 const ProfilePicture: Component<{ refetchAvatar(): void }> = (props) => {
   const [showDialog, setShowDialog] = createSignal<"select" | "crop" | undefined>(undefined);
@@ -36,8 +34,16 @@ const ProfilePicture: Component<{ refetchAvatar(): void }> = (props) => {
         //   </div>
         // }
       />
-      <ImageSelectDialog show={showDialog() === "select"} onClose={() => setShowDialog(undefined)} openCropper={() => setShowDialog("crop")}/>
-      <CropDialog show={showDialog() === "crop"} onClose={() => setShowDialog(undefined)} refetchAvatar={props.refetchAvatar}/>
+      <ImageSelectDialog
+        show={showDialog() === "select"}
+        onClose={() => setShowDialog(undefined)}
+        openCropper={() => setShowDialog("crop")}
+      />
+      <CropDialog
+        show={showDialog() === "crop"}
+        onClose={() => setShowDialog(undefined)}
+        refetchAvatar={props.refetchAvatar}
+      />
     </>
   );
 };

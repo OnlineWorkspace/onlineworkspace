@@ -1,5 +1,5 @@
-import type { Component } from "solid-js";
 import UKDialog from "@tcsw/uikit-solid/src/components/dialog/UKDialog.tsx";
+import type { Component } from "solid-js";
 import CropImage from "../CropImage/CropImage.tsx";
 
 const CropDialog: Component<{
