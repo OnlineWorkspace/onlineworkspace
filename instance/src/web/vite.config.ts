@@ -1,5 +1,6 @@
 // import devtools from "solid-devtools/vite";
 import { defineConfig } from "vite";
+import {compression} from "vite-plugin-compression2";
 import solid from "vite-plugin-solid";
 
 export default defineConfig({
@@ -10,6 +11,7 @@ export default defineConfig({
     //     autoname: true, // e.g. enable autoname
     // }),
     solid(),
+    compression(),
   ],
   server: {
     host: true,
@@ -18,7 +20,8 @@ export default defineConfig({
     alias: {
       "@solidjs/router": "/../../../node_modules/@solidjs/router",
       "@tcsw/uikit-solid": "/../../../uikit-solid",
-      "@material-design-icons/svg": "/../../../node_modules/@material-design-icons/svg",
+      "@tcsw/workspaces-applications": "/../../../fs/Applications.tsx",
+      "@material-symbols/svg": "/../../../node_modules/@material-symbols/svg-500/outlined",
     },
   },
 });

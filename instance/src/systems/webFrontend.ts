@@ -14,17 +14,13 @@ export default class WebFrontendSystem extends System {
     if (this.instance.sys.configuration.isDevMode) {
       this.viteServer = await createViteServer({
         configFile: path.join(this.instance.sys.filesystem.SRC_ROOT, "web/vite.config.ts"),
-        configLoader: "native",
         root: path.join(this.instance.sys.filesystem.SRC_ROOT, "web"),
         clearScreen: false,
       });
-
       await this.viteServer.listen();
-
       this.log.info("Listening for web requests at:");
       this.viteServer.printUrls();
     }
-
     return true;
   }
 }

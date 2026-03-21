@@ -4,6 +4,9 @@ import UKText from "@tcsw/uikit-solid/src/components/text/UKText.tsx";
 import type { Component } from "solid-js";
 import Hour from "./components/hour/Hour";
 import styles from "./Widget.module.scss";
+import CLOUD_ICON from "@material-symbols/svg/cloud.svg?url"
+import SUNNY_ICON from "@material-symbols/svg/sunny.svg?url"
+import RAINY_ICON from "@material-symbols/svg/rainy.svg?url"
 
 const Widget: Component = () => {
   return (
@@ -14,7 +17,7 @@ const Widget: Component = () => {
       <div class={styles.header}>
         <div class={styles.overviewContainer}>
           <div class={styles.overviewCondition}>
-            <UKIcon class={styles.overviewIcon}>cloud</UKIcon>
+            <UKIcon class={styles.overviewIcon}>{CLOUD_ICON}</UKIcon>
             <UKText role="headline" size="m">
               Cloudy
             </UKText>
@@ -39,15 +42,15 @@ const Widget: Component = () => {
         </UKText>
       </div>
       <UKCard color="elevated" class={styles.hours}>
-        <Hour conditionIcon="cloud" temperature={9} time="Now" />
-        <Hour conditionIcon="sunny" temperature={9} time="13:00" />
-        <Hour conditionIcon="rainy" temperature={9} time="14:00" />
-        <Hour conditionIcon="cloud" temperature={9} time="15:00" />
-        <Hour conditionIcon="cloud" temperature={9} time="15:00" />
-        <Hour conditionIcon="cloud" temperature={9} time="15:00" />
-        <Hour conditionIcon="cloud" temperature={9} time="15:00" />
-        <Hour conditionIcon="cloud" temperature={9} time="15:00" />
-        <Hour conditionIcon="cloud" temperature={9} time="15:00" />
+        <Hour conditionIcon={CLOUD_ICON} temperature={9} time="Now" />
+        <Hour conditionIcon={SUNNY_ICON} temperature={9} time="13:00" />
+        <Hour conditionIcon={RAINY_ICON} temperature={9} time="14:00" />
+        <Hour conditionIcon={CLOUD_ICON} temperature={9} time="15:00" />
+        <Hour conditionIcon={CLOUD_ICON} temperature={9} time="15:00" />
+        <Hour conditionIcon={CLOUD_ICON} temperature={9} time="15:00" />
+        <Hour conditionIcon={CLOUD_ICON} temperature={9} time="15:00" />
+        <Hour conditionIcon={CLOUD_ICON} temperature={9} time="15:00" />
+        <Hour conditionIcon={CLOUD_ICON} temperature={9} time="15:00" />
       </UKCard>
       <UKText size="s" role="label" class={styles.dataSource}>
         Source Open-Meteo

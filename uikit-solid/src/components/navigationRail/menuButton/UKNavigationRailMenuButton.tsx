@@ -2,6 +2,8 @@ import type { Component } from "solid-js";
 import styles from "./UKNavigationRailMenuButton.module.scss";
 import UKIconButton from "../../iconButton/UKIconButton";
 import clsx from "clsx";
+import MENU_OPEN_ICON from "@material-symbols/svg/menu_open.svg?url"
+import MENU_ICON from "@material-symbols/svg/menu.svg?url"
 
 const UKNavigationRailMenuButton: Component<{ expanded: boolean; setExpanded: (expanded: boolean) => void }> = (props) => {
     return (
@@ -11,7 +13,7 @@ const UKNavigationRailMenuButton: Component<{ expanded: boolean; setExpanded: (e
                 color={"standard"}
                 alt="toggle menu"
                 onClick={() => props.setExpanded(!props.expanded)}
-                icon={props.expanded ? "menu_open" : "menu"}
+                icon={props.expanded ? MENU_OPEN_ICON : MENU_ICON}
             />
         </div>
     );
