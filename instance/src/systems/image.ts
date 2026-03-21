@@ -1,8 +1,8 @@
 import { randomUUIDv7 } from "bun";
-import { Instance } from "../index.js";
-import System from "../system.js";
-import sharp from "sharp";
 import * as nodePath from "path";
+import sharp from "sharp";
+import type { Instance } from "../index.js";
+import System from "../system.js";
 
 export default class ImageSystem extends System {
   _internalImages: Map<
@@ -112,10 +112,7 @@ export default class ImageSystem extends System {
     }
 
     let requestResolution = "raw";
-    if (
-      opts.resize?.dimensions &&
-      typeof opts.resize.dimensions !== "function"
-    ) {
+    if (opts.resize?.dimensions && typeof opts.resize.dimensions !== "function") {
       requestResolution = `${opts.resize.dimensions.width}x${opts.resize.dimensions.height}`;
     }
     if (cropKey) {
@@ -176,7 +173,7 @@ export default class ImageSystem extends System {
           height: number;
         }),
     options?: {
-      changeFormatTo?: "avif" | "jpeg" | "png";
+      changeFormatTo?: "avif" | "jpeg" | "png" | "webp";
       position?:
         | "top"
         | "right top"

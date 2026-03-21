@@ -1,6 +1,6 @@
+// import devtools from "solid-devtools/vite";
 import { defineConfig } from "vite";
 import solid from "vite-plugin-solid";
-// import devtools from "solid-devtools/vite";
 
 export default defineConfig({
   plugins: [
@@ -18,6 +18,7 @@ export default defineConfig({
     alias: {
       "@solidjs/router": "/../../../node_modules/@solidjs/router",
       "@tcsw/uikit-solid": "/../../../uikit-solid",
+      "@material-design-icons/svg": "/../../../node_modules/@material-design-icons/svg",
     },
   },
 });

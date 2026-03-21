@@ -1,9 +1,9 @@
+import { promises as fs } from "node:fs";
+import path from "node:path";
 import { sql } from "bun";
+import sharp from "sharp";
 import type { Instance } from "../index.js";
 import System from "../system.js";
-import path from "path";
-import { promises as fs } from "fs";
-import sharp from "sharp";
 
 export interface IUserDatabaseUser {
   id: number;
@@ -20,15 +20,10 @@ export class WorkspacesUser {
   constructor(instance: Instance, userId: number) {
     this.instance = instance;
     this.userId = userId;
-
-    return this;
   }
 
   getPath(): string {
-    return path.join(
-      this.instance.sys.filesystem.FS_ROOT,
-      `users/${this.userId}`,
-    );
+    return path.join(this.instance.sys.filesystem.FS_ROOT, `users/${this.userId}`);
   }
 
   /**
@@ -40,19 +35,13 @@ export class WorkspacesUser {
     const db = this.instance.sys.database.postgres();
 
     try {
-      if (
-        (
-          await db`SELECT username FROM public.users WHERE username = ${username}`
-        ).count !== 0
-      )
+      if ((await db`SELECT username FROM public.users WHERE username = ${username}`).count !== 0)
         return false;
 
       await db`UPDATE public.users SET username = ${username} WHERE id = ${this.userId}`;
       return true;
     } catch (err) {
-      this.instance.sys.users.log.error(
-        `Failed to set username for ${this.userId}`,
-      );
+      this.instance.sys.users.log.error(`Failed to set username for ${this.userId}`);
       return false;
     }
   }
@@ -66,9 +55,8 @@ export class WorkspacesUser {
     const db = this.instance.sys.database.postgres();
 
     return (
-      (
-        await db`SELECT username FROM public.users WHERE id = ${this.userId}`
-      )?.[0]?.username || undefined
+      (await db`SELECT username FROM public.users WHERE id = ${this.userId}`)?.[0]?.username ||
+      undefined
     );
   }
 
@@ -85,9 +73,7 @@ export class WorkspacesUser {
 
       return true;
     } catch (err) {
-      this.instance.sys.users.log.error(
-        `Failed to set forename for ${this.userId}`,
-      );
+      this.instance.sys.users.log.error(`Failed to set forename for ${this.userId}`);
       return false;
     }
   }
@@ -101,9 +87,8 @@ export class WorkspacesUser {
     const db = this.instance.sys.database.postgres();
 
     return (
-      (
-        await db`SELECT forename FROM public.users WHERE id = ${this.userId}`
-      )?.[0]?.forename || undefined
+      (await db`SELECT forename FROM public.users WHERE id = ${this.userId}`)?.[0]?.forename ||
+      undefined
     );
   }
 
@@ -119,10 +104,8 @@ export class WorkspacesUser {
       await db`UPDATE public.users SET surname = ${surname} WHERE id = ${this.userId}`;
 
       return true;
-    } catch (err) {
-      this.instance.sys.users.log.error(
-        `Failed to set surname for ${this.userId}`,
-      );
+    } catch (_) {
+      this.instance.sys.users.log.error(`Failed to set surname for ${this.userId}`);
       return false;
     }
   }
@@ -136,9 +119,8 @@ export class WorkspacesUser {
     const db = this.instance.sys.database.postgres();
 
     return (
-      (
-        await db`SELECT surname FROM public.users WHERE id = ${this.userId}`
-      )?.[0]?.surname || undefined
+      (await db`SELECT surname FROM public.users WHERE id = ${this.userId}`)?.[0]?.surname ||
+      undefined
     );
   }
 
@@ -148,8 +130,8 @@ export class WorkspacesUser {
         @return `true` - successfully changed the surname
     */
   async setFullName(forename: string, surname: string): Promise<boolean> {
-    let forenameRes = await this.setForename(forename);
-    let surnameRes = await this.setSurname(surname);
+    const forenameRes = await this.setForename(forename);
+    const surnameRes = await this.setSurname(surname);
 
     return forenameRes && surnameRes;
   }
@@ -158,8 +140,8 @@ export class WorkspacesUser {
         Gets the user's forename and surname
     */
   async getFullName(): Promise<{ forename?: string; surname?: string }> {
-    let forenameRes = await this.getForename();
-    let surnameRes = await this.getSurname();
+    const forenameRes = await this.getForename();
+    const surnameRes = await this.getSurname();
 
     return { forename: forenameRes, surname: surnameRes };
   }
@@ -176,9 +158,7 @@ export class WorkspacesUser {
       await db`UPDATE public.users SET storage_quota = ${quota} WHERE id = ${this.userId}`;
       return true;
     } catch (err) {
-      this.instance.sys.users.log.error(
-        `Failed to set storage quota for ${this.userId}`,
-      );
+      this.instance.sys.users.log.error(`Failed to set storage quota for ${this.userId}`);
       return false;
     }
   }
@@ -192,9 +172,8 @@ export class WorkspacesUser {
     const db = this.instance.sys.database.postgres();
 
     return (
-      (
-        await db`SELECT storage_quota FROM public.users WHERE id = ${this.userId}`
-      )?.[0]?.storage_quota || undefined
+      (await db`SELECT storage_quota FROM public.users WHERE id = ${this.userId}`)?.[0]
+        ?.storage_quota || undefined
     );
   }
 
@@ -224,8 +203,7 @@ export class WorkspacesUser {
     const db = this.instance.sys.database.postgres();
 
     return (
-      (await db`SELECT bio FROM public.users WHERE id = ${this.userId}`)?.[0]
-        ?.bio || undefined
+      (await db`SELECT bio FROM public.users WHERE id = ${this.userId}`)?.[0]?.bio || undefined
     );
   }
 
@@ -240,9 +218,7 @@ export class WorkspacesUser {
       await db`UPDATE public.users SET email = ${email} WHERE id = ${this.userId}`;
       return true;
     } catch (err) {
-      this.instance.sys.users.log.error(
-        `Failed to set email for ${this.userId}`,
-      );
+      this.instance.sys.users.log.error(`Failed to set email for ${this.userId}`);
       return false;
     }
   }
@@ -256,8 +232,7 @@ export class WorkspacesUser {
     const db = this.instance.sys.database.postgres();
 
     return (
-      (await db`SELECT email FROM public.users WHERE id = ${this.userId}`)?.[0]
-        ?.email || undefined
+      (await db`SELECT email FROM public.users WHERE id = ${this.userId}`)?.[0]?.email || undefined
     );
   }
 
@@ -273,9 +248,7 @@ export class WorkspacesUser {
       await db`UPDATE public.users SET gender = ${gender} WHERE id = ${this.userId}`;
       return true;
     } catch (err) {
-      this.instance.sys.users.log.error(
-        `Failed to set gender for ${this.userId}`,
-      );
+      this.instance.sys.users.log.error(`Failed to set gender for ${this.userId}`);
       return false;
     }
   }
@@ -289,8 +262,8 @@ export class WorkspacesUser {
     const db = this.instance.sys.database.postgres();
 
     return (
-      (await db`SELECT gender FROM public.users WHERE id = ${this.userId}`)?.[0]
-        ?.gender || undefined
+      (await db`SELECT gender FROM public.users WHERE id = ${this.userId}`)?.[0]?.gender ||
+      undefined
     );
   }
 
@@ -357,10 +330,7 @@ export class WorkspacesUser {
   async getGroups(): Promise<string[]> {
     const db = this.instance.sys.database.postgres();
 
-    return (
-      (await db`SELECT groups FROM public.users WHERE id = ${this.userId}`)?.[0]
-        .groups || []
-    );
+    return (await db`SELECT groups FROM public.users WHERE id = ${this.userId}`)?.[0].groups || [];
   }
 
   /**
@@ -371,9 +341,8 @@ export class WorkspacesUser {
     const db = this.instance.sys.database.postgres();
 
     return (
-      (
-        await db`SELECT is_administrator FROM public.users WHERE id = ${this.userId}`
-      )?.[0]?.is_administrator || false
+      (await db`SELECT is_administrator FROM public.users WHERE id = ${this.userId}`)?.[0]
+        ?.is_administrator || false
     );
   }
 
@@ -388,10 +357,8 @@ export class WorkspacesUser {
     try {
       await db`UPDATE public.users SET is_administrator = ${administrator} WHERE id = ${this.userId}`;
       return true;
-    } catch (err) {
-      this.instance.sys.users.log.error(
-        `Failed to set is_administrator for ${this.userId}`,
-      );
+    } catch (_) {
+      this.instance.sys.users.log.error(`Failed to set is_administrator for ${this.userId}`);
       return false;
     }
   }
@@ -403,15 +370,10 @@ export class WorkspacesUser {
     */
   async setAvatar(avatarFile: string): Promise<boolean> {
     try {
-      await fs.cp(
-        avatarFile,
-        path.join(this.getPath(), "assets/avatar/avatar.png"),
-      );
+      await fs.cp(avatarFile, path.join(this.getPath(), "assets/avatar/avatar.webp"));
       return true;
-    } catch (err) {
-      this.instance.sys.users.log.error(
-        `Failed to set avatar for ${this.userId} to ${avatarFile}`,
-      );
+    } catch (_) {
+      this.instance.sys.users.log.error(`Failed to set avatar for ${this.userId} to ${avatarFile}`);
       return false;
     }
   }
@@ -435,24 +397,20 @@ export class WorkspacesUser {
       for (const size of AVATAR_SIZES) {
         if (
           override ||
-          !(await fs.exists(
-            path.join(this.getPath(), `assets/avatar/${size.name}.png`),
-          ))
+          !(await fs.exists(path.join(this.getPath(), `assets/avatar/${size.name}.webp`)))
         ) {
           this.instance.sys.users.log.info(
             `Generating avatar for user '${this.userId}' @ ${size.name}`,
           );
-          await sharp(path.join(this.getPath(), "assets/avatar/avatar.png"))
+          await sharp(path.join(this.getPath(), "assets/avatar/avatar.webp"))
             .resize(size.width, size.height)
-            .toFile(
-              path.join(this.getPath(), `assets/avatar/${size.name}.png`),
-            );
+            .toFile(path.join(this.getPath(), `assets/avatar/${size.name}.webp`));
           this.instance.sys.users.log.success(
             `Generated avatar for user '${this.userId}' @ ${size.name}`,
           );
         }
       }
-    } catch (err) {
+    } catch (_) {
       this.instance.sys.users.log.error("Failed to generate avatar sizes");
     }
 
@@ -487,22 +445,13 @@ export class WorkspacesUser {
 
     for (const dir of USER_DIRECTORIES) {
       await this.instance.sys.filesystem.createDirectoryIfNotExists(
-        path.join(
-          this.instance.sys.filesystem.FS_ROOT,
-          `users/${this.userId}`,
-          dir,
-        ),
+        path.join(this.instance.sys.filesystem.FS_ROOT, `users/${this.userId}`, dir),
       );
     }
 
-    if (
-      !(await fs.exists(path.join(this.getPath(), "assets/avatar/avatar.png")))
-    ) {
+    if (!(await fs.exists(path.join(this.getPath(), "assets/avatar/avatar.webp")))) {
       await this.setAvatar(
-        path.join(
-          this.instance.sys.filesystem.SRC_ROOT,
-          "assets/placeholder/avatar.png",
-        ),
+        path.join(this.instance.sys.filesystem.SRC_ROOT, "assets/placeholder/avatar.png"),
       );
     }
 
@@ -514,9 +463,7 @@ export class WorkspacesUser {
       );
     }
 
-    this.instance.sys.users.log.success(
-      `Verified user (${this.userId})${username}`,
-    );
+    this.instance.sys.users.log.success(`Verified user (${this.userId})${username}`);
 
     return true;
   }
@@ -525,13 +472,10 @@ export class WorkspacesUser {
         Deletes a user from the filesystem and all database entries
      */
   async delete() {
-    await fs.rm(
-      path.join(this.instance.sys.filesystem.FS_ROOT, `users/${this.userId}`),
-      {
-        recursive: true,
-        force: true,
-      },
-    );
+    await fs.rm(path.join(this.instance.sys.filesystem.FS_ROOT, `users/${this.userId}`), {
+      recursive: true,
+      force: true,
+    });
 
     const db = this.instance.sys.database.postgres();
 
@@ -545,8 +489,6 @@ export class WorkspacesUser {
 export default class UsersSystem extends System {
   constructor(instance: Instance) {
     super("users", instance);
-
-    return this;
   }
 
   async startup(): Promise<boolean> {
@@ -592,7 +534,7 @@ export default class UsersSystem extends System {
                passkeys JSONB DEFAULT '[]'::JSONB
              )`;
 
-    let administratorUserId = await this.createUser("admin");
+    const administratorUserId = await this.createUser("admin");
 
     // if the account is newly-created
     if (administratorUserId !== undefined) {
@@ -606,13 +548,8 @@ export default class UsersSystem extends System {
 
         const defaultPassword = "password";
 
-        await this.instance.sys.authorization.setPassword(
-          adminUser.userId,
-          defaultPassword,
-        );
-        this.log.info(
-          `The default admin user has a password of '${defaultPassword}'`,
-        );
+        await this.instance.sys.authorization.setPassword(adminUser.userId, defaultPassword);
+        this.log.info(`The default admin user has a password of '${defaultPassword}'`);
       }
     }
 
@@ -630,26 +567,19 @@ export default class UsersSystem extends System {
         @returns number - the userId of the created user
         @returns undefined - the user already exists
     */
-  async createUser(
-    username: string,
-    password?: string,
-  ): Promise<number | undefined> {
+  async createUser(username: string, password?: string): Promise<number | undefined> {
     const db = this.instance.sys.database.postgres();
 
-    if (
-      (await db`SELECT username FROM public.users WHERE username = ${username}`)
-        .count !== 0
-    )
+    if ((await db`SELECT username FROM public.users WHERE username = ${username}`).count !== 0)
       return undefined;
 
-    let user = {
+    const user = {
       username,
       forename: "John",
       surname: "Doe",
     };
 
-    let id = (await db`INSERT INTO public.users ${sql(user)} RETURNING id`)?.[0]
-      ?.id;
+    const id = (await db`INSERT INTO public.users ${sql(user)} RETURNING id`)?.[0]?.id;
 
     const ubi = await this.getUserById(id);
 
@@ -658,14 +588,10 @@ export default class UsersSystem extends System {
       return undefined;
     }
 
-    if (password)
-      await this.instance.sys.authorization.setPassword(id, password);
+    if (password) await this.instance.sys.authorization.setPassword(id, password);
 
     await ubi.setAvatar(
-      path.join(
-        this.instance.sys.filesystem.SRC_ROOT,
-        "assets/placeholder/avatar.png",
-      ),
+      path.join(this.instance.sys.filesystem.SRC_ROOT, "assets/placeholder/avatar.png"),
     );
 
     await ubi.verify();
@@ -681,10 +607,7 @@ export default class UsersSystem extends System {
   async doesUserExist(userId: number): Promise<boolean> {
     const db = this.instance.sys.database.postgres();
 
-    return (
-      (await db`SELECT username FROM public.users WHERE id = ${userId}`)
-        .count === 1
-    );
+    return (await db`SELECT username FROM public.users WHERE id = ${userId}`).count === 1;
   }
 
   /**
@@ -721,14 +644,10 @@ export default class UsersSystem extends System {
         @returns `WorkspacesUser` - the user
         @returns `undefined` - no such user exists
     */
-  async getUserByUsername(
-    username: string,
-  ): Promise<WorkspacesUser | undefined> {
+  async getUserByUsername(username: string): Promise<WorkspacesUser | undefined> {
     const db = this.instance.sys.database.postgres();
 
-    const userId = (
-      await db`SELECT id FROM public.users WHERE username = ${username}`
-    )?.[0]?.id;
+    const userId = (await db`SELECT id FROM public.users WHERE username = ${username}`)?.[0]?.id;
 
     if (!(await this.doesUserExist(userId))) return undefined;
 

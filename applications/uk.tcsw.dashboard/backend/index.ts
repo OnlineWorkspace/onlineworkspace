@@ -165,11 +165,11 @@ const router = t.router({
       .input(z.object({ width: z.number(), height: z.number() }))
       .query(async (opt) => {
         const wallpapersRootPath = path.join((await opt.ctx.user()).getPath(), "assets/wallpapers");
-        const rawWallpaperPath = path.join(wallpapersRootPath, "current.png");
+        const rawWallpaperPath = path.join(wallpapersRootPath, "current.webp");
         const resizedWallpapersPath = path.join(wallpapersRootPath, "resized");
         const requiredResizedWallpaperPath = path.join(
           resizedWallpapersPath,
-          `${opt.input.width}x${opt.input.height}.png`,
+          `${opt.input.width}x${opt.input.height}.webp`,
         );
 
         if (!(await fs.exists(rawWallpaperPath))) {
@@ -198,7 +198,7 @@ const router = t.router({
               height: opt.input.height,
             },
             {
-              changeFormatTo: "png",
+              changeFormatTo: "webp",
               fit: options.fit,
               position: options.position,
               background: options.background,

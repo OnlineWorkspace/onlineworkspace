@@ -1,24 +1,14 @@
 .root {
-    font-family: "Material Symbols Rounded";
-    font-weight: normal;
-    font-style: normal;
-    font-size: var(--icon-size, 24px);
-    line-height: var(--icon-size, 24px);
-    letter-spacing: normal;
-    text-transform: none;
-    white-space: nowrap;
-    word-wrap: normal;
-    direction: ltr;
-    user-select: none;
-    -webkit-font-feature-settings: "liga";
-    -moz-font-feature-settings: "liga";
-    font-feature-settings: "liga";
-    -webkit-font-smoothing: antialiased;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  user-select: none;
+  mask-size: cover;
+  mask-repeat: no-repeat;
+  mask-position: center;
+  height: var(--icon-size, 24px);
+  width: var(--icon-size, 24px);
 
-    &[data-clickable="true"] {
-        cursor: pointer;
-    }
+  background-color: currentColor;
+
+  &[data-clickable="true"] {
+    cursor: pointer;
+  }
 }

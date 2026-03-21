@@ -1,9 +1,9 @@
-import { type BunRequest, type Server } from "bun";
+import type { TRPCBuiltRouter } from "@trpc/server";
+import { type FetchCreateContextFnOptions, fetchRequestHandler } from "@trpc/server/adapters/fetch";
+import type { BunRequest, Server } from "bun";
 import type { Instance } from "../index.js";
 import System from "../system.js";
-import { type TRPCBuiltRouter } from "@trpc/server";
-import { createTRPCContext } from "./trpcRouter.js";
-import { type FetchCreateContextFnOptions, fetchRequestHandler } from "@trpc/server/adapters/fetch";
+import type { createTRPCContext } from "./trpcRouter.js";
 
 export default class TRPCSystem extends System {
   registeredRouters: {
@@ -68,7 +68,7 @@ export default class TRPCSystem extends System {
       port: 3563,
       hostname: "0.0.0.0",
       async fetch(req: BunRequest, server: Server<ReturnType<typeof createTRPCContext>>) {
-        let requestOriginDomain = req.headers.get("Origin");
+        const requestOriginDomain = req.headers.get("Origin");
 
         if (!requestOriginDomain) return new Response("Invalid request");
 
@@ -87,7 +87,7 @@ export default class TRPCSystem extends System {
         }
 
         try {
-          let trpcResponse = await self.attemptTRPCRequest(req, server);
+          const trpcResponse = await self.attemptTRPCRequest(req, server);
 
           if (trpcResponse) {
             trpcResponse.headers.set("Access-Control-Allow-Origin", requestOriginDomain);

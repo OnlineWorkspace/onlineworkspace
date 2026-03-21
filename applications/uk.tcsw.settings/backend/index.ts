@@ -532,9 +532,9 @@ const router = t.router({
 
           for (const wallpaperName of await fs.readdir(wallpapersPath)) {
             if (
-              wallpaperName === "current.png" ||
+              wallpaperName === "current.webp" ||
               wallpaperName === "resized" ||
-              !wallpaperName.endsWith(".png")
+              !wallpaperName.endsWith(".webp")
             )
               continue;
 
@@ -582,9 +582,9 @@ const router = t.router({
         }),
       currentWallpaper: procedure.query(async (opt) => {
         const wallpapersRootPath = path.join((await opt.ctx.user()).getPath(), "assets/wallpapers");
-        const rawWallpaperPath = path.join(wallpapersRootPath, "current.png");
+        const rawWallpaperPath = path.join(wallpapersRootPath, "current.webp");
         const resizedWallpapersPath = path.join(wallpapersRootPath, "resized");
-        const requiredResizedWallpaperPath = path.join(resizedWallpapersPath, `${504}x${280}.png`);
+        const requiredResizedWallpaperPath = path.join(resizedWallpapersPath, `${504}x${280}.webp`);
 
         if (!(await fs.exists(rawWallpaperPath))) {
           return undefined;
@@ -600,7 +600,7 @@ const router = t.router({
             requiredResizedWallpaperPath,
             { width: 504, height: 280 },
             {
-              changeFormatTo: "png",
+              changeFormatTo: "webp",
               fit: options?.fit,
               position: options?.position,
               background: options?.background,
@@ -629,14 +629,14 @@ const router = t.router({
         const bytes = await opt.input.bytes();
 
         await sharp(bytes)
-          .toFormat("png")
-          .toFile(path.join(wallpapersPath, `${wallpaperUUID}.png`));
+          .toFormat("webp")
+          .toFile(path.join(wallpapersPath, `${wallpaperUUID}.webp`));
 
         log.info(
-          `converted '${wallpaperUUID}' to PNG -> '${path.relative(instance.sys.filesystem.FS_ROOT, path.join(wallpapersPath, `${wallpaperUUID}.png`))}'`,
+          `converted '${wallpaperUUID}' to PNG -> '${path.relative(instance.sys.filesystem.FS_ROOT, path.join(wallpapersPath, `${wallpaperUUID}.webp`))}'`,
         );
 
-        return wallpaperUUID + ".png";
+        return wallpaperUUID + ".webp";
       }),
       delete: procedure.input(z.object({ name: z.string() })).mutation(async (opt) => {
         const wallpapersPath = path.join((await opt.ctx.user()).getPath(), "assets/wallpapers");
@@ -703,7 +703,7 @@ const router = t.router({
 
         await fs.copyFile(
           path.join(wallpaperPath, opt.input.name.replace(".preview", "")),
-          path.join(wallpaperPath, "current.png"),
+          path.join(wallpaperPath, "current.webp"),
         );
 
         return true;
@@ -724,7 +724,7 @@ const router = t.router({
 
           await fs.copyFile(
             path.join(officialWallpaperPath, opt.input.name),
-            path.join(wallpaperPath, "current.png"),
+            path.join(wallpaperPath, "current.webp"),
           );
 
           return true;
@@ -735,7 +735,7 @@ const router = t.router({
         const wallpaperPath = path.join(
           (await opt.ctx.user()).getPath(),
           "assets/wallpapers/resized",
-          `${504}x${280}.png`,
+          `${504}x${280}.webp`,
         );
 
         const buf = (await sharp(wallpaperPath).raw().toBuffer({ resolveWithObject: true })).data;

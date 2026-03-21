@@ -1,31 +1,31 @@
-import type { Sys } from "./system.js";
-import Log from "./log.js";
-import ConfigurationSystem from "./systems/configuration.js";
-import FilesystemSystem from "./systems/filesystem.js";
-import NotificationsSystem from "./systems/notifications.js";
-import UsersSystem from "./systems/users.js";
-import ConsoleCommandsSystem from "./systems/consoleCommands.js";
-import DatabaseSystem from "./systems/database.js";
-import AuthorizationSystem from "./systems/authorization.js";
+import { promises as fs } from "node:fs";
+import path from "node:path";
+import type { AnyRouter } from "@trpc/server";
+import { type BunRequest, file } from "bun";
+import chalk from "chalk";
 // https://github.com/cah4a/trpc-bun-adapter/blob/main/src/createBunHttpHandler.ts TODO: patch this and merge into the instance package
 import type { BunWSClientCtx } from "trpc-bun-adapter";
-import type { AnyRouter } from "@trpc/server";
+import Log from "./log.js";
+import type { Sys } from "./system.js";
+import ApplicationsSystem from "./systems/applications.js";
+import AuthorizationSystem from "./systems/authorization.js";
+import ConfigurationSystem from "./systems/configuration.js";
+import ConsoleCommandsSystem from "./systems/consoleCommands.js";
+import DatabaseSystem from "./systems/database.js";
+import EmailSystem from "./systems/email.js";
+import EventSystem, { WorkspacesEvent } from "./systems/events.js";
+import FilesystemSystem from "./systems/filesystem.js";
+import ImageSystem from "./systems/image.js";
+import NotificationsSystem from "./systems/notifications.js";
+import { StringListApplicationSetting } from "./systems/settings/applicationSetting/stringListSetting.js";
+import SettingsSystem from "./systems/settings.js";
+import TRPCSystem from "./systems/trpc.js";
 import {
   createTRPCContext as createWorkspacesTRPCContext,
   workspacesRouter,
 } from "./systems/trpcRouter.js";
-import { type BunRequest, file } from "bun";
-import ApplicationsSystem from "./systems/applications.js";
-import path from "path";
-import TRPCSystem from "./systems/trpc.js";
-import chalk from "chalk";
-import ImageSystem from "./systems/image.js";
-import SettingsSystem from "./systems/settings.js";
+import UsersSystem from "./systems/users.js";
 import WebFrontendSystem from "./systems/webFrontend.js";
-import { promises as fs } from "fs";
-import EmailSystem from "./systems/email.js";
-import EventSystem, { WorkspacesEvent } from "./systems/events.js";
-import { StringListApplicationSetting } from "./systems/settings/applicationSetting/stringListSetting.js";
 
 export enum InstanceStatus {
   Online,
@@ -62,8 +62,6 @@ class Instance {
     this.sys.email = new EmailSystem(this);
 
     this.status = InstanceStatus.Offline;
-
-    return this;
   }
 
   async startup() {
@@ -90,7 +88,7 @@ class Instance {
     }
 
     for (const sys of Object.values(this.sys)) {
-      let subSystemState = await sys.startup();
+      const subSystemState = await sys.startup();
 
       if (subSystemState) {
         sys.log.success(`System Startup Complete!`);
@@ -111,33 +109,21 @@ class Instance {
 
     this.sys.event.invoke(WorkspacesEvent.BeforeStartupComplete);
 
-    const self = this;
-
     // @ts-ignore
     this.webServer = Bun.serve(
       this.sys.tRPC.serve({
         routes: {
           "/api/instance/login/banner": {
-            GET: async (req: BunRequest) => {
+            GET: async (_: BunRequest) => {
               return new Response(
-                file(
-                  path.join(
-                    self.sys.filesystem.FS_ROOT,
-                    "assets/login/banner.png",
-                  ),
-                ),
+                file(path.join(this.sys.filesystem.FS_ROOT, "assets/login/banner.png")),
               );
             },
           },
           "/api/instance/login/background": {
-            GET: async (req: BunRequest) => {
+            GET: async (_: BunRequest) => {
               return new Response(
-                file(
-                  path.join(
-                    self.sys.filesystem.FS_ROOT,
-                    "assets/login/background.png",
-                  ),
-                ),
+                file(path.join(this.sys.filesystem.FS_ROOT, "assets/login/background.png")),
               );
             },
           },
@@ -156,7 +142,7 @@ class Instance {
 
               const parsedCookie = Bun.Cookie.parse(cookieString);
 
-              let userId = await self.sys.authorization.verifySession(
+              const userId = await this.sys.authorization.verifySession(
                 decodeURIComponent(parsedCookie.value),
               );
 
@@ -177,8 +163,8 @@ class Instance {
                   return new Response(
                     file(
                       path.join(
-                        self.sys.filesystem.FS_ROOT,
-                        `users/${userId}/assets/avatar/${size}.png`,
+                        this.sys.filesystem.FS_ROOT,
+                        `users/${userId}/assets/avatar/${size}.webp`,
                       ),
                     ),
                   );
@@ -186,8 +172,8 @@ class Instance {
                   return new Response(
                     file(
                       path.join(
-                        self.sys.filesystem.FS_ROOT,
-                        `users/${userId}/assets/avatar/xs.png`,
+                        this.sys.filesystem.FS_ROOT,
+                        `users/${userId}/assets/avatar/xs.webp`,
                       ),
                     ),
                   );
@@ -209,7 +195,7 @@ class Instance {
 
               const parsedCookie = Bun.Cookie.parse(cookieString);
 
-              let userId = await self.sys.authorization.verifySession(
+              const userId = await this.sys.authorization.verifySession(
                 decodeURIComponent(parsedCookie.value),
               );
 
@@ -220,10 +206,9 @@ class Instance {
                 });
               }
 
-              let application =
-                this.sys.applications.availableApplications.find(
-                  (a) => a.manifest?.id === app,
-                );
+              const application = this.sys.applications.availableApplications.find(
+                (a) => a.manifest?.id === app,
+              );
 
               if (!application)
                 return Response.json({
@@ -231,7 +216,7 @@ class Instance {
                   message: "Invalid application!",
                 });
 
-              let applicationIconPath = path.join(
+              const applicationIconPath = path.join(
                 application.path,
                 application.manifest?.icon?.value || "",
               );
@@ -241,9 +226,9 @@ class Instance {
           },
           "/api/asset/image/:imageId/:resolution": {
             GET: async (req: BunRequest) => {
-              let image = this.sys.image._internalImages.get(
+              const image = this.sys.image._internalImages.get(
                 // @ts-ignore
-                req.params["imageId"] as string,
+                req.params.imageId as string,
               );
 
               if (!image) {
@@ -262,7 +247,7 @@ class Instance {
 
                 const parsedCookie = Bun.Cookie.parse(cookieString);
 
-                let userId = await self.sys.authorization.verifySession(
+                const userId = await this.sys.authorization.verifySession(
                   decodeURIComponent(parsedCookie.value),
                 );
 
@@ -275,9 +260,9 @@ class Instance {
               }
 
               // @ts-ignore
-              const resolutionParam = req.params["resolution"] as string;
+              const resolutionParam = req.params.resolution as string;
 
-              let sourceImage = image[resolutionParam];
+              const sourceImage = image[resolutionParam];
 
               if (!sourceImage) {
                 return Response.json({
@@ -288,14 +273,13 @@ class Instance {
 
               if (resolutionParam === "raw") {
                 this.sys.image.log.info(
-                  `Served Image -> '${(req.params as { imageId: string })["imageId"]} @ ${resolutionParam}'`,
+                  `Served Image -> '${(req.params as { imageId: string }).imageId} @ ${resolutionParam}'`,
                 );
                 return new Response(file(sourceImage.path), {
                   headers: {
                     "Access-Control-Allow-Origin": "http://localhost:5173", // TODO: change this according to a config file
                     "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-                    "Access-Control-Allow-Headers":
-                      "Content-Type, Authorization",
+                    "Access-Control-Allow-Headers": "Content-Type, Authorization",
                     "Access-Control-Allow-Credentials": "true",
                   },
                 });
@@ -309,14 +293,13 @@ class Instance {
                 // FIXME!: IF THE IMAGE AT THE SOURCE PATH IS REPLACED WITH ANOTHER, IT WILL CONTINUE TO SEND THE OLD IMAGE
                 if (await fs.exists(outputPath)) {
                   this.sys.image.log.info(
-                    `Served Image -> '${(req.params as { imageId: string })["imageId"]} @ ${resolutionParam}'`,
+                    `Served Image -> '${(req.params as { imageId: string }).imageId} @ ${resolutionParam}'`,
                   );
                   return new Response(file(outputPath), {
                     headers: {
                       "Access-Control-Allow-Origin": "http://localhost:5173", // TODO: change this according to a config file
                       "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-                      "Access-Control-Allow-Headers":
-                        "Content-Type, Authorization",
+                      "Access-Control-Allow-Headers": "Content-Type, Authorization",
                       "Access-Control-Allow-Credentials": "true",
                     },
                   });
@@ -336,14 +319,13 @@ class Instance {
                 );
 
                 this.sys.image.log.info(
-                  `Served Image -> '${(req.params as { imageId: string })["imageId"]} @ ${resolutionParam}'`,
+                  `Served Image -> '${(req.params as { imageId: string }).imageId} @ ${resolutionParam}'`,
                 );
                 return new Response(file(outputPath), {
                   headers: {
                     "Access-Control-Allow-Origin": "http://localhost:5173", // TODO: change this according to a config file
                     "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-                    "Access-Control-Allow-Headers":
-                      "Content-Type, Authorization",
+                    "Access-Control-Allow-Headers": "Content-Type, Authorization",
                     "Access-Control-Allow-Credentials": "true",
                   },
                 });
@@ -352,9 +334,9 @@ class Instance {
           },
           "/api/asset/raw/:assetId": {
             GET: async (req: BunRequest) => {
-              let asset = this.sys.filesystem._internalAssets.get(
+              const asset = this.sys.filesystem._internalAssets.get(
                 // @ts-ignore
-                req.params["assetId"] as string,
+                req.params.assetId as string,
               );
 
               if (!asset) {
@@ -373,7 +355,7 @@ class Instance {
 
                 const parsedCookie = Bun.Cookie.parse(cookieString);
 
-                let userId = await self.sys.authorization.verifySession(
+                const userId = await this.sys.authorization.verifySession(
                   decodeURIComponent(parsedCookie.value),
                 );
 
@@ -410,9 +392,7 @@ class Instance {
       createContext: createWorkspacesTRPCContext(this),
     });
 
-    this.log.system.success(
-      `Listening for http requests on port ${this.webServer.port}`,
-    );
+    this.log.system.success(`Listening for http requests on port ${this.webServer.port}`);
 
     this.log.system.info("Startup complete");
 
@@ -433,7 +413,7 @@ class Instance {
 
     this.sys.event.invoke(WorkspacesEvent.BeforeShutdown);
 
-    if (!!process.stdout.cursorTo) {
+    if (process.stdout.cursorTo) {
       process.stdout.cursorTo(0, 0);
       process.stdout.clearScreenDown();
       process.stdout.cursorTo(0, 0);

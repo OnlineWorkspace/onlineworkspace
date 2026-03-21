@@ -1,24 +1,23 @@
+import * as nodeCrypto from "node:crypto";
+import { on } from "node:events";
 import { initTRPC, TRPCError } from "@trpc/server";
+import type { FetchCreateContextFnOptions } from "@trpc/server/adapters/fetch";
+import type { Server } from "bun";
+import { encode as hiBase32Encode } from "hi-base32";
+import * as OTPAuth from "otpauth";
 import z from "zod";
 import type { Instance } from "../index.js";
 import { AuthorizedDeviceType } from "./authorization.js";
-import type { FetchCreateContextFnOptions } from "@trpc/server/adapters/fetch";
-import {
-  WorkspacesNotificationEventEmitterEvent,
-  type WorkspacesNotification,
-} from "./notifications.js";
-import { on } from "node:events";
-import type { Server } from "bun";
-import type { WorkspacesUser } from "./users.js";
-import * as nodeCrypto from "node:crypto";
-import { encode as hiBase32Encode } from "hi-base32";
-import * as OTPAuth from "otpauth";
 import { WorkspacesFeatureFlags } from "./configuration.js";
+import {
+  type WorkspacesNotification,
+  WorkspacesNotificationEventEmitterEvent,
+} from "./notifications.js";
+import type { WorkspacesUser } from "./users.js";
 
 export const createTRPCContext =
-  (instance: Instance) =>
-  (opt: FetchCreateContextFnOptions, server: Server<{}>) => {
-    let originUrl = new URL(opt.req.url);
+  (instance: Instance) => (opt: FetchCreateContextFnOptions, server: Server<object>) => {
+    const originUrl = new URL(opt.req.url);
 
     originUrl.pathname = "";
     originUrl.search = "";
@@ -35,21 +34,19 @@ export const createTRPCContext =
     };
   };
 
-export const t = initTRPC
-  .context<ReturnType<typeof createTRPCContext>>()
-  .create({
-    sse: {
-      ping: {
-        // Enable periodic ping messages to keep connection alive
-        enabled: true,
-        // Send ping message every 2s
-        intervalMs: 4000,
-      },
-      client: {
-        reconnectAfterInactivityMs: 5000,
-      },
+export const t = initTRPC.context<ReturnType<typeof createTRPCContext>>().create({
+  sse: {
+    ping: {
+      // Enable periodic ping messages to keep connection alive
+      enabled: true,
+      // Send ping message every 2s
+      intervalMs: 4000,
     },
-  });
+    client: {
+      reconnectAfterInactivityMs: 5000,
+    },
+  },
+});
 
 export const publicProcedure = t.procedure.use(async (opt) => {
   return opt.next({
@@ -78,7 +75,7 @@ export const procedure = t.procedure.use(async (opt) => {
 
   const parsedCookie = Bun.Cookie.parse(cookieString);
 
-  let userId = await opt.ctx.instance.sys.authorization.verifySession(
+  const userId = await opt.ctx.instance.sys.authorization.verifySession(
     decodeURIComponent(parsedCookie.value),
   );
 
@@ -112,8 +109,8 @@ export const adminProcedure = procedure.use(async (opt) => {
   return opt.next();
 });
 
-let temporaryTwoFactorSecrets: Map<number, string> = new Map();
-let emailSignupVerificationCodes: Map<string, string> = new Map();
+const temporaryTwoFactorSecrets: Map<number, string> = new Map();
+const emailSignupVerificationCodes: Map<string, string> = new Map();
 let notifications: WorkspacesNotification[] = [];
 
 export const workspacesRouter = t.router({
@@ -138,13 +135,9 @@ export const workspacesRouter = t.router({
 
         let emailCode = "";
         const CODE_LENGTH = 8;
-        const CODE_VALID_CHARS =
-          "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        const CODE_VALID_CHARS = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
         for (let i = CODE_LENGTH; i > 0; --i)
-          emailCode +=
-            CODE_VALID_CHARS[
-              Math.floor(Math.random() * CODE_VALID_CHARS.length)
-            ];
+          emailCode += CODE_VALID_CHARS[Math.floor(Math.random() * CODE_VALID_CHARS.length)];
 
         emailSignupVerificationCodes.set(opt.input.emailAddress, emailCode);
         // TODO: send an email...
@@ -157,30 +150,20 @@ export const workspacesRouter = t.router({
     validateEmailCode: publicProcedure
       .input(z.object({ emailAddress: z.string(), emailCode: z.string() }))
       .query(async (opt) => {
-        if (
-          emailSignupVerificationCodes.get(opt.input.emailAddress) ===
-          opt.input.emailCode
-        ) {
+        if (emailSignupVerificationCodes.get(opt.input.emailAddress) === opt.input.emailCode) {
           return true;
         }
 
         return false;
       }),
     isUsernameValid: publicProcedure.input(z.string()).query(async (opt) => {
-      if (
-        (await opt.ctx.instance.sys.users.getUserByUsername(opt.input)) ===
-        undefined
-      )
+      if ((await opt.ctx.instance.sys.users.getUserByUsername(opt.input)) === undefined)
         return true;
 
       return false;
     }),
     canSignup: publicProcedure.query(async (opt) => {
-      if (
-        opt.ctx.instance.sys.configuration.hasFeature(
-          WorkspacesFeatureFlags.AllowUserSignups,
-        )
-      )
+      if (opt.ctx.instance.sys.configuration.hasFeature(WorkspacesFeatureFlags.AllowUserSignups))
         return true;
 
       return false;
@@ -217,11 +200,7 @@ export const workspacesRouter = t.router({
         ]),
       )
       .mutation(async (opt) => {
-        if (
-          !opt.ctx.instance.sys.configuration.hasFeature(
-            WorkspacesFeatureFlags.AllowUserSignups,
-          )
-        )
+        if (!opt.ctx.instance.sys.configuration.hasFeature(WorkspacesFeatureFlags.AllowUserSignups))
           return {
             type: "error",
             message: "This instance has disabled user signups",
@@ -237,20 +216,14 @@ export const workspacesRouter = t.router({
             };
           }
 
-          if (
-            opt.input.emailCode !==
-            emailSignupVerificationCodes.get(opt.input.emailAddress)
-          )
+          if (opt.input.emailCode !== emailSignupVerificationCodes.get(opt.input.emailAddress))
             return {
               type: "error",
               message: "The email code did not match!",
             };
         }
 
-        const uid = await opt.ctx.instance.sys.users.createUser(
-          username,
-          opt.input.password,
-        );
+        const uid = await opt.ctx.instance.sys.users.createUser(username, opt.input.password);
 
         if (uid === undefined)
           return {
@@ -266,11 +239,8 @@ export const workspacesRouter = t.router({
             message: "Failed to fetch the user",
           };
 
-        let splitDisplayName = opt.input.displayName.split(" ");
-        await user.setFullName(
-          splitDisplayName[0],
-          splitDisplayName.slice(1).join(" "),
-        );
+        const splitDisplayName = opt.input.displayName.split(" ");
+        await user.setFullName(splitDisplayName[0], splitDisplayName.slice(1).join(" "));
 
         if ("emailAddress" in opt.input) {
           await user.setEmail(opt.input.emailAddress);
@@ -329,7 +299,7 @@ export const workspacesRouter = t.router({
           return false;
         }
 
-        let totp = new OTPAuth.TOTP({
+        const totp = new OTPAuth.TOTP({
           issuer: opt.ctx.instance.sys.configuration.webUrl[0],
           label: `${opt.ctx.instance.sys.configuration.displayName} (Workspace)`,
           algorithm: "SHA1",
@@ -364,18 +334,14 @@ export const workspacesRouter = t.router({
       .mutation(async (opt) => {
         const generateSecretString = () => {
           const buffer = nodeCrypto.randomBytes(15);
-          const base32 = hiBase32Encode(buffer)
-            .replace(/=/g, "")
-            .substring(0, 24);
+          const base32 = hiBase32Encode(buffer).replace(/=/g, "").substring(0, 24);
           return base32;
         };
 
         const user = await opt.ctx.user();
 
         if (
-          await opt.ctx.instance.sys.authorization.hasTwoFactorAuthenticationSecret(
-            user.userId,
-          )
+          await opt.ctx.instance.sys.authorization.hasTwoFactorAuthenticationSecret(user.userId)
         ) {
           opt.ctx.instance.log.system.warning(
             `User (${user.userId})${await user.getUsername()} has attempted to re-setup their two factor from the signup method... this is suspicious...`,
@@ -385,13 +351,13 @@ export const workspacesRouter = t.router({
         }
 
         let secretString = generateSecretString();
-        let prevSecretString = temporaryTwoFactorSecrets.get(user.userId);
+        const prevSecretString = temporaryTwoFactorSecrets.get(user.userId);
 
         if (prevSecretString) {
           secretString = prevSecretString;
         }
 
-        let totp = new OTPAuth.TOTP({
+        const totp = new OTPAuth.TOTP({
           issuer: opt.ctx.instance.sys.configuration.webUrl[0],
           label: `${opt.ctx.instance.sys.configuration.displayName} (Workspace)`,
           algorithm: "SHA1",
@@ -423,8 +389,7 @@ export const workspacesRouter = t.router({
       )
       .mutation(async (opt) => {
         const username = opt.input.username.toLowerCase();
-        const user =
-          await opt.ctx.instance.sys.users.getUserByUsername(username);
+        const user = await opt.ctx.instance.sys.users.getUserByUsername(username);
 
         if (user === undefined)
           return {
@@ -433,9 +398,7 @@ export const workspacesRouter = t.router({
           };
 
         if (
-          await opt.ctx.instance.sys.authorization.hasTwoFactorAuthenticationSecret(
-            user.userId,
-          )
+          await opt.ctx.instance.sys.authorization.hasTwoFactorAuthenticationSecret(user.userId)
         ) {
           if (opt.input.twoFactorCode === undefined)
             return {
@@ -483,7 +446,7 @@ export const workspacesRouter = t.router({
 
         const parsedCookie = Bun.Cookie.parse(cookieString);
 
-        let userId = await opt.ctx.instance.sys.authorization.verifySession(
+        const userId = await opt.ctx.instance.sys.authorization.verifySession(
           decodeURIComponent(parsedCookie.value),
         );
 
@@ -497,32 +460,28 @@ export const workspacesRouter = t.router({
           authenticated: true,
         };
       }),
-    logout: procedure
-      .output(z.object({ success: z.literal(true) }))
-      .mutation(async (opt) => {
-        const cookieString = opt.ctx.rawRequest.req.headers?.get("cookie");
+    logout: procedure.output(z.object({ success: z.literal(true) })).mutation(async (opt) => {
+      const cookieString = opt.ctx.rawRequest.req.headers?.get("cookie");
 
-        if (cookieString === null) {
-          return {
-            success: true,
-          };
-        }
-
-        const parsedCookie = Bun.Cookie.parse(cookieString);
-
-        await opt.ctx.instance.sys.authorization.endSessionByToken(
-          decodeURIComponent(parsedCookie.value),
-        );
-
+      if (cookieString === null) {
         return {
           success: true,
         };
-      }),
+      }
+
+      const parsedCookie = Bun.Cookie.parse(cookieString);
+
+      await opt.ctx.instance.sys.authorization.endSessionByToken(
+        decodeURIComponent(parsedCookie.value),
+      );
+
+      return {
+        success: true,
+      };
+    }),
   },
   termsOfUse: publicProcedure.query(async (opt) => {
-    const date = new Date(
-      opt.ctx.instance.sys.configuration.termsOfUse.lastUpdated,
-    );
+    const date = new Date(opt.ctx.instance.sys.configuration.termsOfUse.lastUpdated);
 
     const localeDateString: string = date.toLocaleDateString("en-GB", {
       day: "numeric",
@@ -602,8 +561,7 @@ ${opt.ctx.instance.sys.configuration.termsOfUse.message}`;
           ),
         )
         .query(async (opt) => {
-          let applications =
-            opt.ctx.instance.sys.applications.getEnabledApplications();
+          const applications = opt.ctx.instance.sys.applications.getEnabledApplications();
 
           return applications.map((app) => {
             let icon = {
@@ -634,16 +592,15 @@ ${opt.ctx.instance.sys.configuration.termsOfUse.message}`;
           });
         }),
       getQuickShortcuts: procedure.query(async (opt) => {
-        const a = opt.ctx.instance.sys.settings.applicationSettings[
-          "core"
-        ].find((s) => s.id === "quick_shortcuts");
+        const a = opt.ctx.instance.sys.settings.applicationSettings["core"].find(
+          (s) => s.id === "quick_shortcuts",
+        );
 
         if (!a) throw "The core:quick_shortcuts setting is somehow missing???";
 
         const quickShortcuts = (await a.getValue(opt.ctx.userId)) as string[];
 
-        let applications =
-          opt.ctx.instance.sys.applications.getEnabledApplications();
+        const applications = opt.ctx.instance.sys.applications.getEnabledApplications();
 
         return quickShortcuts
           .map((shortcut) => {
@@ -717,20 +674,23 @@ ${opt.ctx.instance.sys.configuration.termsOfUse.message}`;
           }),
         )
         .mutation(async (opt) => {
-          const notification = notifications.find(
-            (n) => n.uuid === opt.input.uuid,
-          );
+          const notification = notifications.find((n) => n.uuid === opt.input.uuid);
 
           if (notification) {
-            let output;
+            let output:
+              | {
+                  type: "navigate";
+                  value: string;
+                }
+              | {
+                  type: "reload";
+                };
 
             if (opt.input.responseType === "button") {
               output = notification.optionsCallbacks?.onButton(opt.input.value);
             }
 
-            notifications = notifications.filter(
-              (n) => n.uuid !== notification.uuid,
-            );
+            notifications = notifications.filter((n) => n.uuid !== notification.uuid);
 
             if (output !== undefined) {
               return { ok: true, action: output.action };
