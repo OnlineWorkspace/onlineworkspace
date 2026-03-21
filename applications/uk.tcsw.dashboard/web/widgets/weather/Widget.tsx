@@ -4,9 +4,9 @@ import UKText from "@tcsw/uikit-solid/src/components/text/UKText.tsx";
 import type { Component } from "solid-js";
 import Hour from "./components/hour/Hour";
 import styles from "./Widget.module.scss";
-import CLOUD_ICON from "@material-symbols/svg/cloud.svg?url"
-import SUNNY_ICON from "@material-symbols/svg/sunny.svg?url"
-import RAINY_ICON from "@material-symbols/svg/rainy.svg?url"
+import CLOUD_ICON from "@material-symbols/svg-500/outlined/cloud.svg?url"
+import SUNNY_ICON from "@material-symbols/svg-500/outlined/sunny.svg?url"
+import RAINY_ICON from "@material-symbols/svg-500/outlined/rainy.svg?url"
 
 const Widget: Component = () => {
   return (

@@ -7,6 +7,7 @@ import { type Component, createResource, Show } from "solid-js";
 import backend from "../../../lib/backend";
 import trpc from "../../../lib/trpc";
 import styles from "./NavigationRailAvatar.module.scss";
+import LOGOUT_ICON from "@material-symbols/svg-500/outlined/logout.svg?url"
 
 const NavigationRailAvatar: Component<{ expanded: boolean }> = (props) => {
   const navigate = useNavigate();
@@ -35,7 +36,7 @@ const NavigationRailAvatar: Component<{ expanded: boolean }> = (props) => {
         </div>
         <UKIconButton
           class={styles.logout}
-          icon={"logout"}
+          icon={LOGOUT_ICON}
           alt={"Logout"}
           color={"filled"}
           shape={"round"}
@@ -46,7 +47,7 @@ const NavigationRailAvatar: Component<{ expanded: boolean }> = (props) => {
 
             navigate("/");
           }}
-        ></UKIconButton>
+        />
       </Show>
     </div>
   );

@@ -1,4 +1,4 @@
-import APPS_ICON from "@material-symbols/svg/apps.svg";
+import APPS_ICON from "@material-symbols/svg-500/outlined/apps.svg";
 import { useNavigate } from "@solidjs/router";
 import { DividerDirection } from "@tcsw/uikit-solid/src/components/divider/lib/direction.js";
 import UKDivider from "@tcsw/uikit-solid/src/components/divider/UKDivider.jsx";

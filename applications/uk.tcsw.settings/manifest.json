@@ -3,7 +3,7 @@
   "displayName": "Settings",
   "icon": {
     "type": "icon",
-    "value": "settings"
+    "value": "./icon.svg"
   },
   "description": "The Workspaces Settings Manager",
   "authors": ["Tricolor Software <https://tcsw.uk>"],

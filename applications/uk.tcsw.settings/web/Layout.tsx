@@ -9,6 +9,8 @@ import {
 import styles from "./Layout.module.scss";
 import trpc from "./lib/trpc";
 import UKSideBar from "@tcsw/uikit-solid/src/components/sideBar/UKSideBar.tsx";
+import SETTINGS_APPLICATIONS_ICON from "@material-symbols/svg-500/outlined/settings_applications.svg?url"
+import APPS_ICON from "@material-symbols/svg-500/outlined/apps.svg?url"
 
 const Layout: Component<ParentProps> = (props) => {
   const [isAdministrator] = createResource(() =>
@@ -75,7 +77,7 @@ const Layout: Component<ParentProps> = (props) => {
         },
         {
           type: "button",
-          icon: { type: "icon", value: "apps" },
+          icon: {type: "icon", value: APPS_ICON},
           label: "Applications",
           onClick() {
             navigate("/app/uk.tcsw.settings/applications");
@@ -87,7 +89,7 @@ const Layout: Component<ParentProps> = (props) => {
         isAdministrator()
           ? {
               type: "button",
-              icon: { type: "icon", value: "settings_applications" },
+            icon: {type: "icon", value: SETTINGS_APPLICATIONS_ICON},
               label: "Configure Instance",
               onClick() {
                 navigate("/app/uk.tcsw.settings/instance");

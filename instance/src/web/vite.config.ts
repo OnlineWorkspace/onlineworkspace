@@ -20,8 +20,7 @@ export default defineConfig({
     alias: {
       "@solidjs/router": "/../../../node_modules/@solidjs/router",
       "@tcsw/uikit-solid": "/../../../uikit-solid",
-      "@tcsw/workspaces-applications": "/../../../fs/Applications.tsx",
-      "@material-symbols/svg": "/../../../node_modules/@material-symbols/svg-500/outlined",
+      "@tcsw/workspaces-applications": "/../../../fs/Applications.tsx"
     },
   },
 });
