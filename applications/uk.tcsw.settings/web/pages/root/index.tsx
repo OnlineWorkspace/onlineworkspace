@@ -1,3 +1,11 @@
+import APPS_ICON from "@material-symbols/svg-500/outlined/apps.svg";
+import KEY_ICON from "@material-symbols/svg-500/outlined/key.svg";
+import LOGOUT_ICON from "@material-symbols/svg-500/outlined/logout.svg";
+import PASSKEY_ICON from "@material-symbols/svg-500/outlined/passkey.svg";
+import PERSON_ICON from "@material-symbols/svg-500/outlined/person.svg";
+import SETTINGS_APPLICATIONS_ICON from "@material-symbols/svg-500/outlined/settings_applications.svg";
+import STORAGE_ICON from "@material-symbols/svg-500/outlined/storage.svg";
+import WALLPAPER_ICON from "@material-symbols/svg-500/outlined/wallpaper.svg";
 import { useNavigate } from "@solidjs/router";
 import UKAvatar from "@tcsw/uikit-solid/src/components/avatar/UKAvatar.jsx";
 import UKButton from "@tcsw/uikit-solid/src/components/button/UKButton.jsx";
@@ -47,7 +55,7 @@ const RootPage: Component = () => {
           <div class={styles.quickActions}>
             <UKButton
               color="tonal"
-              leadingIcon={"logout"}
+              leadingIcon={LOGOUT_ICON}
               onClick={async () => {
                 await webInstanceTRPC.authorization.logout.mutate();
                 navigate("/");
@@ -57,7 +65,7 @@ const RootPage: Component = () => {
             </UKButton>
             <UKButton
               color="tonal"
-              leadingIcon={"key"}
+              leadingIcon={KEY_ICON}
               onClick={() =>
                 navigate("/app/uk.tcsw.settings/authentication/?change-passsword=true")
               }
@@ -74,38 +82,38 @@ const RootPage: Component = () => {
             <Shortcut
               title="Profile"
               description="View & Manage your profile"
-              icon="person"
+              icon={PERSON_ICON}
               path="/app/uk.tcsw.settings/profile"
             />
             <Shortcut
               title="Authentication"
               description="View & Manage your login sessions & credentials"
-              icon="passkey"
+              icon={PASSKEY_ICON}
               path="/app/uk.tcsw.settings/authentication"
             />
             <Shortcut
               title="Storage"
               description="Visualise storage usage & clean up duplicates"
-              icon="storage"
+              icon={STORAGE_ICON}
               path="/app/uk.tcsw.settings/storage"
             />
             <Shortcut
               title="Customization"
               description="Choose a wallpaper and color theme"
-              icon="wallpaper"
+              icon={WALLPAPER_ICON}
               path="/app/uk.tcsw.settings/customization"
             />
             <Shortcut
               title="Applications"
               description="Manage application settings"
-              icon="apps"
+              icon={APPS_ICON}
               path="/app/uk.tcsw.settings/applications"
             />
             {role() === "Administrator" && (
               <Shortcut
                 title="Configure Instance"
                 description="(ADMINISTRATORS ONLY) Manage the instance & it’s users"
-                icon="settings_applications"
+                icon={SETTINGS_APPLICATIONS_ICON}
                 path="/app/uk.tcsw.settings/instance"
               />
             )}

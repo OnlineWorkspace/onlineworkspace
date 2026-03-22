@@ -1,49 +1,51 @@
-import UKStackItem from "@tcsw/uikit-solid/src/components/stack/UKStackItem.jsx";
-import { createResource, type Component } from "solid-js";
-import trpc from "../../../../lib/trpc";
-import UKTextField from "@tcsw/uikit-solid/src/components/textField/UKTextField.jsx";
-import styles from "./Name.module.scss";
+import ASSIGNMENT_IND_ICON from "@material-symbols/svg-500/outlined/assignment_ind.svg";
 import UKButton from "@tcsw/uikit-solid/src/components/button/UKButton.jsx";
+import UKStackItem from "@tcsw/uikit-solid/src/components/stack/UKStackItem.jsx";
+import UKTextField from "@tcsw/uikit-solid/src/components/textField/UKTextField.jsx";
+import { type Component, createResource } from "solid-js";
+import trpc from "../../../../lib/trpc";
+import styles from "./Name.module.scss";
 
 const Name: Component<{ refetchName(): void }> = (props) => {
-    const [name, { mutate: setName, refetch: refetchName }] = createResource(() =>
-        trpc.profile.getName.query(),
-    );
+  const [name, { mutate: setName, refetch: refetchName }] = createResource(() =>
+    trpc.profile.getName.query(),
+  );
 
-    return (
-        <UKStackItem
-            leading={{
-                type: "icon",
-                value: "assignment_ind",
-            }}
-            labelText="Name"
-            supportingText={name()}
-            onCollapse={() => {
-                refetchName();
-            }}
-            expandedComponent={
-                <div class={styles.expanded}>
-                    <UKTextField
-                        color="outlined"
-                        getValue={setName}
-                        defaultValue={name()}
-                        label="Name"
-                    />
-                    <UKButton
-                        class={styles.button}
-                        onClick={async () => {
-                            await trpc.profile.setName.mutate(name() || "");
+  return (
+    <UKStackItem
+      leading={{
+        type: "icon",
+        value: ASSIGNMENT_IND_ICON,
+      }}
+      labelText="Name"
+      supportingText={name()}
+      onCollapse={() => {
+        refetchName();
+      }}
+      expandedComponent={
+        <div class={styles.expanded}>
+          <UKTextField
+            color="outlined"
+            getValue={setName}
+            defaultValue={name()}
+            setValue={name() || "Untitled User"}
+            label="Name"
+          />
+          <UKButton
+            class={styles.button}
+            onClick={async () => {
+              await trpc.profile.setName.mutate(name() || "");
 
-                            refetchName();
-                            props.refetchName();
-                        }}
-                    >
-                        Save
-                    </UKButton>
-                </div>
-            }
-        />
-    );
+              refetchName();
+              props.refetchName();
+            }}
+          >
+            Save
+          </UKButton>
+        </div>
+      }
+    />
+  );
 };
 
 export default Name;

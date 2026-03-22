@@ -1,3 +1,4 @@
+import PHOTO_CAMERA_ICON from "@material-symbols/svg-500/outlined/photo_camera.svg";
 import UKButton from "@tcsw/uikit-solid/src/components/button/UKButton.tsx";
 import UKStackItem from "@tcsw/uikit-solid/src/components/stack/UKStackItem.jsx";
 import { type Component, createSignal } from "solid-js";
@@ -13,7 +14,7 @@ const ProfilePicture: Component<{ refetchAvatar(): void }> = (props) => {
       <UKStackItem
         leading={{
           type: "icon",
-          value: "photo_camera",
+          value: PHOTO_CAMERA_ICON,
         }}
         labelText="Profile picture"
         supportingText="Help people identify you at a glance"

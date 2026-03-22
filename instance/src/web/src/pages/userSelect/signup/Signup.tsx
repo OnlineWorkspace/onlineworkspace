@@ -90,6 +90,7 @@ const UserSelectPage: Component = () => {
               color={"outlined"}
               label={"Password*"}
               defaultValue={password()}
+              setValue={password()}
               getValue={setPassword}
               supportingText={"*required"}
               error={password() !== confirmedPassword()}
@@ -99,6 +100,7 @@ const UserSelectPage: Component = () => {
               color={"outlined"}
               label={"Confirm Password*"}
               defaultValue={confirmedPassword()}
+              setValue={confirmedPassword()}
               getValue={setConfirmedPassword}
               supportingText={"*required"}
               error={password() !== confirmedPassword()}
@@ -178,6 +180,7 @@ const UserSelectPage: Component = () => {
               color={"outlined"}
               label={"Display Name"}
               defaultValue={displayName()}
+              setValue={displayName()}
               getValue={setDisplayName}
             />
             <UKSearchableDropdownMenu
@@ -208,6 +211,7 @@ const UserSelectPage: Component = () => {
               color={"outlined"}
               label={"Bio"}
               as={"textarea"}
+              setValue={bio()}
               defaultValue={bio()}
               getValue={setBio}
             />
@@ -251,7 +255,9 @@ const UserSelectPage: Component = () => {
               });
 
               if (resp.type === "success") {
-                setStage(UserSelectStage.TwoFactorAuthentication);
+                return () => {
+                  setStage(UserSelectStage.TwoFactorAuthentication);
+                }
               } else {
                 // TODO: add an error toast here instead of a console message (When implemented in UIKit of course)
                 console.error(resp);

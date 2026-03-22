@@ -7,7 +7,7 @@ import { type Component, createResource, Show } from "solid-js";
 import backend from "../../../lib/backend";
 import trpc from "../../../lib/trpc";
 import styles from "./NavigationRailAvatar.module.scss";
-import LOGOUT_ICON from "@material-symbols/svg-500/outlined/logout.svg?url"
+import LOGOUT_ICON from "@material-symbols/svg-500/outlined/logout.svg"
 
 const NavigationRailAvatar: Component<{ expanded: boolean }> = (props) => {
   const navigate = useNavigate();

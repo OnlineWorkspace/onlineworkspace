@@ -1,8 +1,8 @@
+import { randomUUIDv7 } from "bun";
+import fs from "fs";
 import path from "path";
 import type { Instance } from "../index.js";
 import System from "../system.js";
-import fs from "fs";
-import { randomUUIDv7 } from "bun";
 
 export default class FilesystemSystem extends System {
   readonly SRC_ROOT = path.resolve("./instance/src/");
@@ -32,11 +32,7 @@ export default class FilesystemSystem extends System {
     }
 
     if (!fs.existsSync(path.join(this.FS_ROOT, "assets/login/banner.png"))) {
-      if (
-        !fs.existsSync(
-          path.join(this.AUTOINSTALL_PATH, "assets/login/banner.png"),
-        )
-      ) {
+      if (!fs.existsSync(path.join(this.AUTOINSTALL_PATH, "assets/login/banner.png"))) {
         fs.cpSync(
           path.join(this.SRC_ROOT, "assets/placeholder/banner.png"),
           path.join(this.FS_ROOT, "assets/login/banner.png"),
@@ -49,9 +45,7 @@ export default class FilesystemSystem extends System {
       }
     }
 
-    if (
-      !fs.existsSync(path.join(this.FS_ROOT, "assets/login/background.png"))
-    ) {
+    if (!fs.existsSync(path.join(this.FS_ROOT, "assets/login/background.png"))) {
       fs.cpSync(
         path.join(this.SRC_ROOT, "assets/wallpapers/stars_wallpaper.png"),
         path.join(this.FS_ROOT, "assets/login/background.png"),
@@ -99,6 +93,7 @@ export default class FilesystemSystem extends System {
 
     switch (extension) {
       case "avif":
+      case "webp":
       case "jpg":
       case "jpeg":
       case "png":
@@ -146,8 +141,7 @@ export default class FilesystemSystem extends System {
       const existingAsset = this._internalAssetPaths.get(fsPath);
 
       if (existingAsset) {
-        this._internalAssets.get(existingAsset)!.validUntil =
-          Date.now() + validMs;
+        this._internalAssets.get(existingAsset)!.validUntil = Date.now() + validMs;
 
         return `/api/asset/raw/${existingAsset}`;
       }

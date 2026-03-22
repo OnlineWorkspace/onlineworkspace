@@ -4,6 +4,8 @@
   "private": true,
   "version": "0.0.1",
   "dependencies": {
+    "@tcsw/workspaces-instance-web": "workspace:*",
+    "@tcsw/workspaces-instance": "workspace:*",
     "@material/material-color-utilities": "^0.3.0",
     "@solid-primitives/upload": "^0.1.3",
     "@solidjs/router": "^0.15.3",

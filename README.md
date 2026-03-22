@@ -147,5 +147,5 @@ Store Application Page
         3. Create the `tricolor_workspaces` table
     - MacOS
         1. Using Orbstack with Ubuntu follow the Ubuntu Linux instructions above
-2. Run `bun run hoist-install` inside the project root directory to install all NPM dependencies
+2. Run `bun install` inside the project root directory to install all NPM dependencies
 3. Run `bun run dev` to start up the web interface and backend in development mode

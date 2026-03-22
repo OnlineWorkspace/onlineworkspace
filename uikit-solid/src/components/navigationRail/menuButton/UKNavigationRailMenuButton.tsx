@@ -2,8 +2,8 @@ import type { Component } from "solid-js";
 import styles from "./UKNavigationRailMenuButton.module.scss";
 import UKIconButton from "../../iconButton/UKIconButton";
 import clsx from "clsx";
-import MENU_OPEN_ICON from "@material-symbols/svg-500/outlined/menu_open.svg?url"
-import MENU_ICON from "@material-symbols/svg-500/outlined/menu.svg?url"
+import MENU_OPEN_ICON from "@material-symbols/svg-500/outlined/menu_open.svg"
+import MENU_ICON from "@material-symbols/svg-500/outlined/menu.svg"
 
 const UKNavigationRailMenuButton: Component<{ expanded: boolean; setExpanded: (expanded: boolean) => void }> = (props) => {
     return (

@@ -16,8 +16,7 @@
   "scripts": {
     "dev": "bun --watch --no-clear-screen instance/src/index.ts",
     "build-web": "bun run --cwd instance/src/web build",
-    "uikit": "bun run --cwd uikit-solid dev",
-    "hoist-install": "bun install --linker hoisted"
+    "uikit": "bun run --cwd uikit-solid dev"
   },
   "private": true,
   "dependencies": {

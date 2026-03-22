@@ -1,3 +1,5 @@
+import PERSON_ICON from "@material-symbols/svg-500/outlined/person.svg";
+import SHIELD_PERSON_ICON from "@material-symbols/svg-500/outlined/shield_person.svg";
 import UKButton from "@tcsw/uikit-solid/src/components/button/UKButton.jsx";
 import UKButtonGroup from "@tcsw/uikit-solid/src/components/buttonGroup/UKButtonGroup.jsx";
 import UKDialog from "@tcsw/uikit-solid/src/components/dialog/UKDialog.jsx";
@@ -56,7 +58,7 @@ const User: Component<{
       <UKStackItem
         leading={{
           type: "icon",
-          value: isAdministrator() ? "shield_person" : "person",
+          value: isAdministrator() ? SHIELD_PERSON_ICON : PERSON_ICON,
         }}
         labelText={`${isMe() ? "(YOU) - " : ""} ${forename()} ${surname() !== "undefined" ? surname() : ""}`}
         supportingText={`(${props.userId}) ${username()}`}

@@ -1,15 +1,10 @@
-import {
-  type Accessor,
-  type Component,
-  type ParentProps,
-  useContext,
-} from "solid-js";
+import { type Accessor, type Component, type ParentProps, useContext } from "solid-js";
 import { Portal } from "solid-js/web";
+import useIsMobile from "../../core/useIsMobile.ts";
 import { RootContext } from "../../rootContext.ts";
+import type { CardColor } from "../card/lib/color.ts";
 import UKCard from "../card/UKCard.tsx";
 import styles from "./UKDialog.module.scss";
-import useIsMobile from "../../core/useIsMobile.ts";
-import type { CardColor } from "../card/lib/color.ts";
 
 const UKDialog: Component<
   ParentProps<{
@@ -26,11 +21,8 @@ const UKDialog: Component<
   return (
     <>
       {props.show() && (
-        <Portal
-          mount={
-            rootContext!.root.closest("[data-uikit-root]") || document.body
-          }
-        >
+        <Portal mount={rootContext!.root.closest("[data-uikit-root]") || document.body}>
+          {/** biome-ignore lint/a11y/noStaticElementInteractions: clickable background */}
           <div
             class={styles.component}
             data-mobile={isMobile() && props.adaptToMobile}

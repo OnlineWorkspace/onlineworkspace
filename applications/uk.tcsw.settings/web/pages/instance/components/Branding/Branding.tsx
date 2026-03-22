@@ -1,3 +1,5 @@
+import REFRESH_ICON from "@material-symbols/svg-500/outlined/refresh.svg";
+import UPLOAD_ICON from "@material-symbols/svg-500/outlined/upload.svg";
 import UKButton from "@tcsw/uikit-solid/src/components/button/UKButton.jsx";
 import UKIconButton from "@tcsw/uikit-solid/src/components/iconButton/UKIconButton.jsx";
 import UKStack from "@tcsw/uikit-solid/src/components/stack/UKStack.jsx";
@@ -19,7 +21,7 @@ const Branding: Component = () => {
             <>
               <UKButton
                 class={styles.uploadButton}
-                leadingIcon={"upload"}
+                leadingIcon={UPLOAD_ICON}
                 disabled
                 onClick={() => 0}
                 color="filled"
@@ -29,7 +31,7 @@ const Branding: Component = () => {
               <UKIconButton
                 disabled
                 alt="Reset"
-                icon="refresh"
+                icon={REFRESH_ICON}
                 onClick={() => 0}
                 color="standard"
               />
@@ -43,7 +45,7 @@ const Branding: Component = () => {
             <>
               <UKButton
                 class={styles.uploadButton}
-                leadingIcon={"upload"}
+                leadingIcon={UPLOAD_ICON}
                 disabled
                 onClick={() => 0}
                 color="filled"
@@ -53,7 +55,7 @@ const Branding: Component = () => {
               <UKIconButton
                 disabled
                 alt="Reset"
-                icon="refresh"
+                icon={REFRESH_ICON}
                 onClick={() => 0}
                 color="standard"
               />
@@ -67,7 +69,7 @@ const Branding: Component = () => {
             <>
               <UKButton
                 class={styles.uploadButton}
-                leadingIcon={"upload"}
+                leadingIcon={UPLOAD_ICON}
                 disabled
                 onClick={() => 0}
                 color="filled"
@@ -77,7 +79,7 @@ const Branding: Component = () => {
               <UKIconButton
                 disabled
                 alt="Reset"
-                icon="refresh"
+                icon={REFRESH_ICON}
                 onClick={() => 0}
                 color="standard"
               />
@@ -91,7 +93,7 @@ const Branding: Component = () => {
             <>
               <UKButton
                 class={styles.uploadButton}
-                leadingIcon={"upload"}
+                leadingIcon={UPLOAD_ICON}
                 disabled
                 onClick={() => 0}
                 color="filled"
@@ -101,7 +103,7 @@ const Branding: Component = () => {
               <UKIconButton
                 disabled
                 alt="Reset"
-                icon="refresh"
+                icon={REFRESH_ICON}
                 onClick={() => 0}
                 color="standard"
               />
@@ -115,7 +117,7 @@ const Branding: Component = () => {
             <>
               <UKButton
                 class={styles.uploadButton}
-                leadingIcon={"upload"}
+                leadingIcon={UPLOAD_ICON}
                 disabled
                 onClick={() => 0}
                 color="filled"
@@ -125,7 +127,7 @@ const Branding: Component = () => {
               <UKIconButton
                 disabled
                 alt="Reset"
-                icon="refresh"
+                icon={REFRESH_ICON}
                 onClick={() => 0}
                 color="standard"
               />

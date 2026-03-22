@@ -10,6 +10,9 @@ import { DividerDirection } from "@tcsw/uikit-solid/src/components/divider/lib/d
 import UKButton from "@tcsw/uikit-solid/src/components/button/UKButton.jsx";
 import UKStack from "@tcsw/uikit-solid/src/components/stack/UKStack.jsx";
 import UKStackItem from "@tcsw/uikit-solid/src/components/stack/UKStackItem.jsx";
+import CHEVRON_LEFT_ICON from "@material-symbols/svg-500/outlined/chevron_left.svg";
+import DELETE_ICON from "@material-symbols/svg-500/outlined/delete.svg";
+import DOWNLOAD_ICON from "@material-symbols/svg-500/outlined/download.svg";
 
 const ApplicationPage: Component = () => {
     const { applicationId, repository } = useParams();
@@ -21,7 +24,7 @@ const ApplicationPage: Component = () => {
       <div class={styles.root}>
         <UKButton
           class={styles.backButton}
-          leadingIcon="chevron_left"
+          leadingIcon={CHEVRON_LEFT_ICON}
           color="tonal"
           onClick={() => {
             navigate(searchParams.origin?.toString() ?? "../../../");
@@ -60,7 +63,7 @@ const ApplicationPage: Component = () => {
               !application()?.canBeUninstalled
             }
             class={styles.headerContentButton}
-            leadingIcon={application()?.isInstalled ? "delete" : "download"}
+            leadingIcon={application()?.isInstalled ? DELETE_ICON : DOWNLOAD_ICON}
             onClick={async () => {
               const app = application();
 

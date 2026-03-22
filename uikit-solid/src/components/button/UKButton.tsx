@@ -5,6 +5,8 @@ import type { ButtonColor } from "./lib/color.ts";
 import type { ButtonShape } from "./lib/shape.ts";
 import type { ButtonSize } from "./lib/size.ts";
 import styles from "./UKButton.module.scss";
+import PROGRESS_ACTIVITY_ICON from "@material-symbols/svg-500/outlined/progress_activity.svg";
+import CHECK_ICON from "@material-symbols/svg-500/outlined/check.svg";
 
 type ButtonProps =
   | {
@@ -113,10 +115,10 @@ const UKButton: Component<ParentProps<ButtonProps>> = (props) => {
               affirmativeState() === "unset" && styles.leadingIconNoWidth,
             )}
           >
-            {affirmativeState() === "affirmative" ? "check" : ""}
+            {affirmativeState() === "affirmative" ? CHECK_ICON : ""}
           </UKIcon>
         ) : affirmativeState() === "in-progress" ? (
-          <UKIcon class={clsx(styles.iconClass, styles.leadingIconSpin)}>progress_activity</UKIcon>
+          <UKIcon class={clsx(styles.iconClass, styles.leadingIconSpin)}>{PROGRESS_ACTIVITY_ICON}</UKIcon>
         ) : null
       ) : (
         props.leadingIcon && <UKIcon class={styles.iconClass}>{props.leadingIcon}</UKIcon>

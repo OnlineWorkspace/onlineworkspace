@@ -13,6 +13,8 @@ import {
 import trpc from "../../../../lib/trpc";
 import ResetPasswordDialogue from "./components/ResetPasswordDialogue/ResetPasswordDialogue.tsx";
 import styles from "./MethodPassword.module.scss";
+import CHECK_ICON from "@material-symbols/svg-500/outlined/check.svg"
+import PASSWORD_ICON from "@material-symbols/svg-500/outlined/password.svg"
 
 const MethodPassword: Component = () => {
   const [hasPassword, { refetch: refetchHasPassword }] = createResource(() =>
@@ -28,7 +30,7 @@ const MethodPassword: Component = () => {
       <UKStackItem
         leading={{
           type: "icon",
-          value: "password",
+          value: PASSWORD_ICON,
           alt: "Password",
         }}
         labelText="Login with Password"
@@ -38,7 +40,7 @@ const MethodPassword: Component = () => {
             : "Setup password authentication"
         }
         inlineComponent={
-          hasPassword() && <UKIcon class={styles.enabledIcon}>check</UKIcon>
+          hasPassword() && <UKIcon class={styles.enabledIcon}>{CHECK_ICON}</UKIcon>
         }
         expandedComponent={
           <div class={styles.expanded}>

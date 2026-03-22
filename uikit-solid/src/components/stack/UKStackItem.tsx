@@ -4,6 +4,7 @@ import UKIcon from "../icon/UKIcon";
 import UKText from "../text/UKText";
 import clsx from "clsx";
 import UKIconButton from "../iconButton/UKIconButton.tsx";
+import CHEVRON_RIGHT_ICON from "@material-symbols/svg-500/outlined/chevron_right.svg"
 
 interface LeadingIconOrImage {
     type: "image" | "icon";
@@ -141,7 +142,7 @@ const UKStackItem: Component<{
                         styles.toggleIndicator,
                       )}
                     >
-                      chevron_right
+                      {CHEVRON_RIGHT_ICON}
                     </UKIcon>
                   )}
             </Suspense>

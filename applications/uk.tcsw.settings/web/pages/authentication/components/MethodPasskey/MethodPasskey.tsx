@@ -5,6 +5,8 @@ import trpc from "../../../../lib/trpc";
 import styles from "./MethodPasskey.module.scss";
 import UKText from "@tcsw/uikit-solid/src/components/text/UKText.jsx";
 import UKIcon from "@tcsw/uikit-solid/src/components/icon/UKIcon.jsx";
+import PASSKEY_ICON from "@material-symbols/svg-500/outlined/passkey.svg"
+import CHECK_ICON from "@material-symbols/svg-500/outlined/check.svg"
 
 const MethodPasskey: Component = () => {
   const [hasPasskey, { refetch: refetchHasPasskey }] = createResource(() =>
@@ -15,7 +17,7 @@ const MethodPasskey: Component = () => {
     <UKStackItem
       leading={{
         type: "icon",
-        value: "passkey",
+        value: PASSKEY_ICON,
         alt: "Passkey",
       }}
       labelText="Login with Passkey"
@@ -25,7 +27,7 @@ const MethodPasskey: Component = () => {
           : "Setup passkey authentication"
       }
       inlineComponent={
-        hasPasskey() && <UKIcon class={styles.enabledIcon}>check</UKIcon>
+        hasPasskey() && <UKIcon class={styles.enabledIcon}>{CHECK_ICON}</UKIcon>
       }
       expandedComponent={
         <Suspense>

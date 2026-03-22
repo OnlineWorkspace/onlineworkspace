@@ -7,6 +7,7 @@ import styles from "./ResetPasswordDialogue.module.scss";
 import UKButton from "@tcsw/uikit-solid/src/components/button/UKButton.jsx";
 import trpc from "../../../../../../lib/trpc";
 import UKButtonGroup from "@tcsw/uikit-solid/src/components/buttonGroup/UKButtonGroup.tsx";
+import CHECK_ICON from "@material-symbols/svg-500/outlined/check.svg";
 
 const ResetPasswordDialogue: Component<{ closeDialogue: () => void }> = (
   props,
@@ -25,6 +26,7 @@ const ResetPasswordDialogue: Component<{ closeDialogue: () => void }> = (
         color="outlined"
         shouldMask
         getValue={setPasswordOne}
+        setValue={passwordOne()}
         defaultValue={passwordOne()}
       />
       <UKTextField
@@ -32,6 +34,7 @@ const ResetPasswordDialogue: Component<{ closeDialogue: () => void }> = (
         color="outlined"
         shouldMask
         getValue={setPasswordTwo}
+        setValue={passwordTwo()}
         defaultValue={passwordTwo()}
       />
       <UKButtonGroup size={"s"}>
@@ -44,7 +47,7 @@ const ResetPasswordDialogue: Component<{ closeDialogue: () => void }> = (
           Cancel
         </UKButton>
         <UKButton
-          leadingIcon="check"
+          leadingIcon={CHECK_ICON}
           color="filled"
           class={styles.confirmButton}
           onClick={async () => {

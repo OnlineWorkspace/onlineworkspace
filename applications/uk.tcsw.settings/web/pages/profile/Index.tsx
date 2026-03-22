@@ -1,3 +1,5 @@
+import CHEVRON_LEFT_ICON from "@material-symbols/svg-500/outlined/chevron_left.svg";
+import LOGOUT_ICON from "@material-symbols/svg-500/outlined/logout.svg";
 import { useNavigate } from "@solidjs/router";
 import UKAvatar from "@tcsw/uikit-solid/src/components/avatar/UKAvatar.tsx";
 import UKStack from "@tcsw/uikit-solid/src/components/stack/UKStack.tsx";
@@ -31,7 +33,7 @@ const ProfilePage: Component = () => {
         type="small"
         headline={"Profile"}
         leadingButton={{
-          icon: "chevron_left",
+          icon: CHEVRON_LEFT_ICON,
           onClick() {
             navigate("/app/uk.tcsw.settings");
           },
@@ -78,7 +80,7 @@ const ProfilePage: Component = () => {
             <UKStack>
               <UKStackItem
                 labelText={"Logout"}
-                leading={{ type: "icon", value: "logout" }}
+                leading={{ type: "icon", value: LOGOUT_ICON }}
                 onClick={async () => {
                   await webInstanceTRPC.authorization.logout.mutate();
                   navigate("/");

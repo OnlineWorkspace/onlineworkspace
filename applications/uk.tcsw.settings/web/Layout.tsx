@@ -9,8 +9,13 @@ import {
 import styles from "./Layout.module.scss";
 import trpc from "./lib/trpc";
 import UKSideBar from "@tcsw/uikit-solid/src/components/sideBar/UKSideBar.tsx";
-import SETTINGS_APPLICATIONS_ICON from "@material-symbols/svg-500/outlined/settings_applications.svg?url"
-import APPS_ICON from "@material-symbols/svg-500/outlined/apps.svg?url"
+import SETTINGS_APPLICATIONS_ICON from "@material-symbols/svg-500/outlined/settings_applications.svg"
+import APPS_ICON from "@material-symbols/svg-500/outlined/apps.svg"
+import HOME_ICON from "@material-symbols/svg-500/outlined/home.svg"
+import PERSON_ICON from "@material-symbols/svg-500/outlined/person.svg"
+import PASSKEY_ICON from "@material-symbols/svg-500/outlined/passkey.svg"
+import STORAGE_ICON from "@material-symbols/svg-500/outlined/storage.svg"
+import WALLPAPER_ICON from "@material-symbols/svg-500/outlined/wallpaper.svg"
 
 const Layout: Component<ParentProps> = (props) => {
   const [isAdministrator] = createResource(() =>
@@ -28,7 +33,7 @@ const Layout: Component<ParentProps> = (props) => {
         },
         {
           type: "button",
-          icon: { type: "icon", value: "home" },
+          icon: { type: "icon", value: HOME_ICON },
           label: "Overview",
           onClick() {
             navigate("/app/uk.tcsw.settings");
@@ -37,7 +42,7 @@ const Layout: Component<ParentProps> = (props) => {
         },
         {
           type: "button",
-          icon: { type: "icon", value: "person" },
+          icon: { type: "icon", value: PERSON_ICON },
           label: "Profile",
           onClick() {
             navigate("/app/uk.tcsw.settings/profile");
@@ -46,7 +51,7 @@ const Layout: Component<ParentProps> = (props) => {
         },
         {
           type: "button",
-          icon: { type: "icon", value: "passkey" },
+          icon: { type: "icon", value: PASSKEY_ICON },
           label: "Authentication",
           onClick() {
             navigate("/app/uk.tcsw.settings/authentication");
@@ -57,7 +62,7 @@ const Layout: Component<ParentProps> = (props) => {
         },
         {
           type: "button",
-          icon: { type: "icon", value: "storage" },
+          icon: { type: "icon", value: STORAGE_ICON },
           label: "Storage",
           onClick() {
             navigate("/app/uk.tcsw.settings/storage");
@@ -66,7 +71,7 @@ const Layout: Component<ParentProps> = (props) => {
         },
         {
           type: "button",
-          icon: { type: "icon", value: "wallpaper" },
+          icon: { type: "icon", value: WALLPAPER_ICON },
           label: "Customization",
           onClick() {
             navigate("/app/uk.tcsw.settings/customization");

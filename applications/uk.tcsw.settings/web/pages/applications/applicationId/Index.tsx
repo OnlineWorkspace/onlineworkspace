@@ -1,19 +1,21 @@
-import { createResource, For, type Component } from "solid-js";
-import styles from "./Index.module.scss";
+import CHEVRON_LEFT_ICON from "@material-symbols/svg-500/outlined/chevron_left.svg";
+import ERROR_ICON from "@material-symbols/svg-500/outlined/error.svg";
+import { useNavigate, useParams, useSearchParams } from "@solidjs/router";
+import UKButton from "@tcsw/uikit-solid/src/components/button/UKButton.jsx";
+import UKButtonGroup from "@tcsw/uikit-solid/src/components/buttonGroup/UKButtonGroup.tsx";
+import UKDivider from "@tcsw/uikit-solid/src/components/divider/UKDivider.tsx";
+import UKIcon from "@tcsw/uikit-solid/src/components/icon/UKIcon.tsx";
+import UKStack from "@tcsw/uikit-solid/src/components/stack/UKStack.tsx";
+import UKStackItem from "@tcsw/uikit-solid/src/components/stack/UKStackItem.tsx";
+import UKStackLabel from "@tcsw/uikit-solid/src/components/stack/UKStackLabel.jsx";
 import UKText from "@tcsw/uikit-solid/src/components/text/UKText.jsx";
 import UKTopAppBar from "@tcsw/uikit-solid/src/components/topAppBar/UKTopAppBar.jsx";
-import { useNavigate, useParams, useSearchParams } from "@solidjs/router";
+import { type Component, createResource, For } from "solid-js";
 import trpc from "../../../lib/trpc.ts";
-import UKStackItem from "@tcsw/uikit-solid/src/components/stack/UKStackItem.tsx";
-import UKStack from "@tcsw/uikit-solid/src/components/stack/UKStack.tsx";
 import BooleanSetting from "./components/BooleanSetting/BooleanSetting";
-import StringSetting from "./components/StringSetting/StringSetting.tsx";
-import UKDivider from "@tcsw/uikit-solid/src/components/divider/UKDivider.tsx";
-import UKButtonGroup from "@tcsw/uikit-solid/src/components/buttonGroup/UKButtonGroup.tsx";
-import UKButton from "@tcsw/uikit-solid/src/components/button/UKButton.jsx";
-import UKIcon from "@tcsw/uikit-solid/src/components/icon/UKIcon.tsx";
 import StringListSetting from "./components/StringListSetting/StringListSetting.tsx";
-import UKStackLabel from "@tcsw/uikit-solid/src/components/stack/UKStackLabel.jsx";
+import StringSetting from "./components/StringSetting/StringSetting.tsx";
+import styles from "./Index.module.scss";
 
 const ApplicationPage: Component = () => {
   const navigate = useNavigate();
@@ -29,12 +31,9 @@ const ApplicationPage: Component = () => {
         type="small"
         headline={data()?.displayName}
         leadingButton={{
-          icon: "chevron_left",
+          icon: CHEVRON_LEFT_ICON,
           onClick() {
-            navigate(
-              searchParams.origin?.toString() ??
-                "/app/uk.tcsw.settings/applications",
-            );
+            navigate(searchParams.origin?.toString() ?? "/app/uk.tcsw.settings/applications");
           },
           accessibleLabel: "Go back",
         }}
@@ -42,14 +41,12 @@ const ApplicationPage: Component = () => {
       <div class={styles.page}>
         <div class={styles.pageHeader}>
           {data()?.icon.type === "icon" ? (
-            <UKIcon class={styles.icon}>{data()?.icon.value || "error"}</UKIcon>
+            <UKIcon class={styles.icon}>{data()?.icon.value || ERROR_ICON}</UKIcon>
           ) : (
             <img
               class={styles.image}
               alt={""}
-              src={
-                data()?.icon.value || "/assets/tricolor/tricolor_icon@4x.png"
-              }
+              src={data()?.icon.value || "/assets/tricolor/tricolor_icon@4x.png"}
             />
           )}
           <div class={styles.headerContent}>
@@ -127,10 +124,7 @@ const ApplicationPage: Component = () => {
                   );
                 default:
                   return (
-                    <UKStackItem
-                      labelText={setting.displayName}
-                      supportingText={setting.id}
-                    />
+                    <UKStackItem labelText={setting.displayName} supportingText={setting.id} />
                   );
               }
             }}
@@ -179,10 +173,7 @@ const ApplicationPage: Component = () => {
                   );
                 default:
                   return (
-                    <UKStackItem
-                      labelText={setting.displayName}
-                      supportingText={setting.id}
-                    />
+                    <UKStackItem labelText={setting.displayName} supportingText={setting.id} />
                   );
               }
             }}

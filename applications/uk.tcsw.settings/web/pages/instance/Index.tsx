@@ -1,3 +1,4 @@
+import CHEVRON_LEFT_ICON from "@material-symbols/svg-500/outlined/chevron_left.svg";
 import { useNavigate } from "@solidjs/router";
 import UKTopAppBar from "@tcsw/uikit-solid/src/components/topAppBar/UKTopAppBar.jsx";
 import type { Component } from "solid-js";
@@ -18,7 +19,7 @@ const InstancePage: Component = () => {
         headline={"Configure Instance"}
         subtitle={"Caution: Advanced users only, change at your own risk."}
         leadingButton={{
-          icon: "chevron_left",
+          icon: CHEVRON_LEFT_ICON,
           onClick() {
             navigate("/app/uk.tcsw.settings");
           },

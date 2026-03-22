@@ -1,16 +1,17 @@
+import CHEVRON_LEFT_ICON from "@material-symbols/svg-500/outlined/chevron_left.svg";
 import { useNavigate } from "@solidjs/router";
-import UKTopAppBar from "@tcsw/uikit-solid/src/components/topAppBar/UKTopAppBar.jsx";
-import { type Component, createResource, useContext } from "solid-js";
-import styles from "./Index.module.scss";
-import trpc from "../../../lib/trpc";
-import UKStack from "@tcsw/uikit-solid/src/components/stack/UKStack.tsx";
-import UKIcon from "@tcsw/uikit-solid/src/components/icon/UKIcon.tsx";
-import UKText from "@tcsw/uikit-solid/src/components/text/UKText.tsx";
-import ResetToDefaultsButton from "./components/resetToDefaultsButton/ResetToDefaultsButton.tsx";
-import AddShortcutButton from "./components/addShortcutButton/AddShortcutButton.tsx";
 import UKDivider from "@tcsw/uikit-solid/src/components/divider/UKDivider.tsx";
-import QuickShortcuts from "./components/quickShortcuts/QuickShortcuts.tsx";
+import UKIcon from "@tcsw/uikit-solid/src/components/icon/UKIcon.tsx";
+import UKStack from "@tcsw/uikit-solid/src/components/stack/UKStack.tsx";
+import UKText from "@tcsw/uikit-solid/src/components/text/UKText.tsx";
+import UKTopAppBar from "@tcsw/uikit-solid/src/components/topAppBar/UKTopAppBar.jsx";
 import CoreApplicationLayoutContext from "@tcsw/workspaces-instance-web/src/pages/app/CoreApplicationLayoutContext.ts";
+import { type Component, createResource, useContext } from "solid-js";
+import trpc from "../../../lib/trpc";
+import AddShortcutButton from "./components/addShortcutButton/AddShortcutButton.tsx";
+import QuickShortcuts from "./components/quickShortcuts/QuickShortcuts.tsx";
+import ResetToDefaultsButton from "./components/resetToDefaultsButton/ResetToDefaultsButton.tsx";
+import styles from "./Index.module.scss";
 
 const QuickShortcutsPage: Component = () => {
   const navigate = useNavigate();
@@ -26,7 +27,7 @@ const QuickShortcutsPage: Component = () => {
         headline={"Quick Shortcuts"}
         leadingButton={{
           accessibleLabel: "Back",
-          icon: "chevron_left",
+          icon: CHEVRON_LEFT_ICON,
           onClick() {
             navigate("/app/uk.tcsw.settings/customization");
           },
@@ -40,8 +41,7 @@ const QuickShortcutsPage: Component = () => {
         {/*  />*/}
         {/*)}*/}
         <UKText role={"body"} size={"l"}>
-          Quick shortcuts are the application shortcuts displayed inside the
-          navigation bar.
+          Quick shortcuts are the application shortcuts displayed inside the navigation bar.
           <br />
           The navigation bar can be found on the left or bottom of the screen.
         </UKText>
@@ -62,13 +62,11 @@ const QuickShortcutsPage: Component = () => {
               currentValue={data()?.currentValue}
               defaultValue={data()?.defaultValue ?? []}
               setShortcuts={async (shortcuts) => {
-                await trpc.application.setApplicationStringListSettingValue.mutate(
-                  {
-                    applicationId: "core",
-                    id: "quick_shortcuts",
-                    value: shortcuts,
-                  },
-                );
+                await trpc.application.setApplicationStringListSettingValue.mutate({
+                  applicationId: "core",
+                  id: "quick_shortcuts",
+                  value: shortcuts,
+                });
 
                 refetchData();
                 coreApplicationLayoutContext.refetchQuickShortcuts();
@@ -89,13 +87,11 @@ const QuickShortcutsPage: Component = () => {
               coreApplicationLayoutContext.refetchQuickShortcuts();
             }}
             addShortcut={async (shortcutId) => {
-              await trpc.application.setApplicationStringListSettingValue.mutate(
-                {
-                  applicationId: "core",
-                  id: "quick_shortcuts",
-                  value: [...(data()?.currentValue ?? []), shortcutId],
-                },
-              );
+              await trpc.application.setApplicationStringListSettingValue.mutate({
+                applicationId: "core",
+                id: "quick_shortcuts",
+                value: [...(data()?.currentValue ?? []), shortcutId],
+              });
               refetchData();
               coreApplicationLayoutContext.refetchQuickShortcuts();
             }}

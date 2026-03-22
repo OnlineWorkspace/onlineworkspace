@@ -5,6 +5,8 @@ import trpc from "../../../../lib/trpc";
 import styles from "./MethodTwoFactor.module.scss";
 import UKText from "@tcsw/uikit-solid/src/components/text/UKText.jsx";
 import UKIcon from "@tcsw/uikit-solid/src/components/icon/UKIcon.jsx";
+import SHIELD_LOCK_ICON from "@material-symbols/svg-500/outlined/shield_lock.svg"
+import CHECK_ICON from "@material-symbols/svg-500/outlined/check.svg"
 
 const MethodTwoFactor: Component = () => {
   const [hasTwoFactor, { refetch: refetchHasTwoFactor }] = createResource(() =>
@@ -15,7 +17,7 @@ const MethodTwoFactor: Component = () => {
     <UKStackItem
       leading={{
         type: "icon",
-        value: "shield_lock",
+        value: SHIELD_LOCK_ICON,
         alt: "two factor authentication",
       }}
       labelText="Two Factor Authentication"
@@ -25,7 +27,7 @@ const MethodTwoFactor: Component = () => {
           : "Setup OTP two-factor authentication"
       }
       inlineComponent={
-        hasTwoFactor() && <UKIcon class={styles.enabledIcon}>check</UKIcon>
+        hasTwoFactor() && <UKIcon class={styles.enabledIcon}>{CHECK_ICON}</UKIcon>
       }
       expandedComponent={
         <Suspense>

@@ -12,7 +12,7 @@ import trpc from "../../../../../lib/trpc";
 
 const TermsOfUse: Component<{
     setStage(stage: UserSelectStage): void;
-    signup(): void;
+    signup(): Promise<void | (() => void)>;
 }> = (props) => {
     const navigate = useNavigate();
 
@@ -36,7 +36,7 @@ const TermsOfUse: Component<{
                     <UKButton onClick={() => navigate("/")} color={"tonal"}>
                         Deny
                     </UKButton>
-                    <UKButton onClick={props.signup} color={"filled"}>
+                    <UKButton affirmative={true} onClick={props.signup} color={"filled"}>
                         Agree and Continue
                     </UKButton>
                 </div>
