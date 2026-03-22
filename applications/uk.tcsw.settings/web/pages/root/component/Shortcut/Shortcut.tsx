@@ -1,3 +1,4 @@
+import ARROW_RIGHT_ICON from "@material-symbols/svg-500/outlined/arrow_right.svg";
 import { useNavigate } from "@solidjs/router";
 import UKIcon from "@tcsw/uikit-solid/src/components/icon/UKIcon.jsx";
 import UKStackItem from "@tcsw/uikit-solid/src/components/stack/UKStackItem.tsx";
@@ -25,7 +26,7 @@ const Shortcut: Component<{
       }}
       labelText={props.title}
       supportingText={props.description}
-      inlineComponent={<UKIcon class={styles.iconButton}>arrow_right</UKIcon>}
+      inlineComponent={<UKIcon class={styles.iconButton}>{ARROW_RIGHT_ICON}</UKIcon>}
     />
   );
 };

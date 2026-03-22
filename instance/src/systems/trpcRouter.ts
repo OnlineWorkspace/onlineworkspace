@@ -610,6 +610,7 @@ ${opt.ctx.instance.sys.configuration.termsOfUse.message}`;
 
             let icon = {
               type: "icon" as "icon" | "image",
+              // TODO: replace this with an image link!
               value: "indeterminate_question_box",
             };
 
@@ -620,7 +621,10 @@ ${opt.ctx.instance.sys.configuration.termsOfUse.message}`;
                   value: `${opt.ctx.rawRequest.destinationHostname}/api/application/${app.manifest.id}/icon/`,
                 };
               } else {
-                icon = app.manifest.icon;
+                icon = {
+                  type: "icon",
+                  value: `${opt.ctx.rawRequest.destinationHostname}/api/application/${app.manifest.id}/icon/`,
+                };
               }
             }
 

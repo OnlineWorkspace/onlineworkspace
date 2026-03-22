@@ -1,22 +1,22 @@
-import { createSignal, Match, Suspense, Switch, type Component, type JSXElement } from "solid-js";
-import styles from "./UKStackItem.module.scss";
-import UKIcon from "../icon/UKIcon";
-import UKText from "../text/UKText";
+import CHEVRON_RIGHT_ICON from "@material-symbols/svg-500/outlined/chevron_right.svg";
 import clsx from "clsx";
+import { type Component, createSignal, type JSXElement, Match, Suspense, Switch } from "solid-js";
+import UKIcon from "../icon/UKIcon";
 import UKIconButton from "../iconButton/UKIconButton.tsx";
-import CHEVRON_RIGHT_ICON from "@material-symbols/svg-500/outlined/chevron_right.svg"
+import UKText from "../text/UKText";
+import styles from "./UKStackItem.module.scss";
 
 interface LeadingIconOrImage {
-    type: "image" | "icon";
-    value: string;
-    alt?: string;
+  type: "image" | "icon";
+  value: string;
+  alt?: string;
 }
 
 interface LeadingIconButton {
-    type: "iconButton";
-    value: string;
-    alt: string;
-    onClick: () => void;
+  type: "iconButton";
+  value: string;
+  alt: string;
+  onClick: () => void;
 }
 
 const UKStackItem: Component<{
@@ -33,23 +33,17 @@ const UKStackItem: Component<{
   const [expanded, setExpanded] = createSignal<boolean>(props.defaultExpanded ?? false);
 
   if (!!props.expandedComponent && props.onClick) {
-    console.error(
-      "Cannot have a UKStackItem with both expandedComponent & onClick",
-    );
+    console.error("Cannot have a UKStackItem with both expandedComponent & onClick");
     return <>Incompatible props, check console!</>;
   }
 
   if (!props.expandedComponent) {
-    if (!!props.onExpand) {
-      console.error(
-        "Cannot have a UKStackItem with onExpand without expandedComponent",
-      );
+    if (props.onExpand) {
+      console.error("Cannot have a UKStackItem with onExpand without expandedComponent");
       return <>Incompatible props, check console!</>;
     }
-    if (!!props.onCollapse) {
-      console.error(
-        "Cannot have a UKStackItem with onCollapse without expandedComponent",
-      );
+    if (props.onCollapse) {
+      console.error("Cannot have a UKStackItem with onCollapse without expandedComponent");
       return <>Incompatible props, check console!</>;
     }
   }
@@ -59,10 +53,11 @@ const UKStackItem: Component<{
       <Switch>
         <Match when={!!props.onClick || !!props.expandedComponent}>
           <button
+            type={"button"}
             class={styles.collapsedArea}
             data-clickable={true}
             onClick={
-              !!props.expandedComponent
+              props.expandedComponent
                 ? () => {
                     if (expanded()) {
                       props.onCollapse?.();
@@ -109,21 +104,13 @@ const UKStackItem: Component<{
                 </Suspense>
                 <Suspense
                   fallback={
-                    <UKText
-                      role={"body"}
-                      size={"m"}
-                      class={styles.supportingText}
-                    >
+                    <UKText role={"body"} size={"m"} class={styles.supportingText}>
                       ...
                     </UKText>
                   }
                 >
                   {props.supportingText && (
-                    <UKText
-                      role={"body"}
-                      size={"m"}
-                      class={styles.supportingText}
-                    >
+                    <UKText role={"body"} size={"m"} class={styles.supportingText}>
                       {props.supportingText}
                     </UKText>
                   )}
@@ -136,9 +123,7 @@ const UKStackItem: Component<{
                 : !!props.expandedComponent && (
                     <UKIcon
                       class={clsx(
-                        expanded()
-                          ? styles.indicatorExpanded
-                          : styles.indicatorCollapsed,
+                        expanded() ? styles.indicatorExpanded : styles.indicatorCollapsed,
                         styles.toggleIndicator,
                       )}
                     >
@@ -177,21 +162,13 @@ const UKStackItem: Component<{
                 </Suspense>
                 <Suspense
                   fallback={
-                    <UKText
-                      role={"body"}
-                      size={"m"}
-                      class={styles.supportingText}
-                    >
+                    <UKText role={"body"} size={"m"} class={styles.supportingText}>
                       ...
                     </UKText>
                   }
                 >
                   {props.supportingText && (
-                    <UKText
-                      role={"body"}
-                      size={"m"}
-                      class={styles.supportingText}
-                    >
+                    <UKText role={"body"} size={"m"} class={styles.supportingText}>
                       {props.supportingText}
                     </UKText>
                   )}

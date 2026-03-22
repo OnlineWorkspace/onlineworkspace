@@ -221,7 +221,14 @@ class Instance {
                 application.manifest?.icon?.value || "",
               );
 
-              return new Response(file(path.join(applicationIconPath)));
+              return new Response(file(path.join(applicationIconPath)), {
+                headers: {
+                  "Access-Control-Allow-Origin": "http://localhost:5173", // TODO: change this according to a config file
+                  "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+                  "Access-Control-Allow-Headers": "Content-Type, Authorization",
+                  "Access-Control-Allow-Credentials": "true",
+                },
+              });
             },
           },
           "/api/asset/image/:imageId/:resolution": {
