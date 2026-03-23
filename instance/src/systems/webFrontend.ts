@@ -12,12 +12,12 @@ export default class WebFrontendSystem extends System {
 
   async startup(): Promise<boolean> {
     if (this.instance.sys.configuration.isDevMode) {
-      // this.viteServer = await createViteServer({
-      //   configFile: path.join(this.instance.sys.filesystem.SRC_ROOT, "web/vite.config.ts"),
-      //   root: path.join(this.instance.sys.filesystem.SRC_ROOT, "web"),
-      //   clearScreen: false,
-      // });
-      // await this.viteServer.listen();
+      this.viteServer = await createViteServer({
+        configFile: path.join(this.instance.sys.filesystem.SRC_ROOT, "web/vite.config.ts"),
+        root: path.join(this.instance.sys.filesystem.SRC_ROOT, "web"),
+        clearScreen: false,
+      });
+      await this.viteServer.listen();
       this.log.info("Listening for web requests:");
     }
     return true;
