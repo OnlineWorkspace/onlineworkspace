@@ -1,4 +1,4 @@
-import ARROW_RIGHT_ICON from "@material-symbols/svg-500/outlined/arrow_right.svg";
+import ARROW_RIGHT_ICON from "@material-symbols/svg-700/outlined/arrow_right.svg";
 import { useNavigate } from "@solidjs/router";
 import UKIcon from "@tcsw/uikit-solid/src/components/icon/UKIcon.jsx";
 import UKStackItem from "@tcsw/uikit-solid/src/components/stack/UKStackItem.tsx";

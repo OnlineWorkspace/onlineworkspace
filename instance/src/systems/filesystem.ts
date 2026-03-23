@@ -54,8 +54,6 @@ export default class FilesystemSystem extends System {
 
     this._internalAssets = new Map();
     this._internalAssetPaths = new Map();
-
-    return this;
   }
 
   getApplicationSrc(applicationId: string) {

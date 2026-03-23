@@ -1,26 +1,19 @@
 /// <reference path="./global.d.ts" />
 
-import {
-  createTRPCContext,
-  procedure,
-} from "@tcsw/workspaces-instance/src/systems/trpcRouter.js";
-import { initTRPC } from "@trpc/server";
-import z from "zod";
-import ApplicationRepository from "./repository/applicationRepository.js";
-import LocalApplicationRepository from "./repository/localRepository.js";
 import { WorkspacesFeatureFlags } from "@tcsw/workspaces-instance/src/systems/configuration.js";
+import { createTRPCContext, procedure } from "@tcsw/workspaces-instance/src/systems/trpcRouter.js";
+import { initTRPC } from "@trpc/server";
 import fastFolderSizeSync from "fast-folder-size/sync.js";
 import fs from "fs/promises";
+import z from "zod";
+import type ApplicationRepository from "./repository/applicationRepository.js";
+import LocalApplicationRepository from "./repository/localRepository.js";
 
 const log = instance.log.createLogger("uk.tcsw.store");
 
-export const t = initTRPC
-  .context<ReturnType<typeof createTRPCContext>>()
-  .create();
+export const t = initTRPC.context<ReturnType<typeof createTRPCContext>>().create();
 
-let applicationRepositories: ApplicationRepository[] = [
-  new LocalApplicationRepository(),
-];
+const applicationRepositories: ApplicationRepository[] = [new LocalApplicationRepository()];
 
 const router = t.router({
   homepage: {
@@ -41,20 +34,16 @@ const router = t.router({
     getPromotedApplication: procedure
       .input(z.object({ applicationId: z.string(), repository: z.string() }))
       .query(async (opt) => {
-        let repository = applicationRepositories.find(
-          (repo) => repo.id === opt.input.repository,
-        );
+        const repository = applicationRepositories.find((repo) => repo.id === opt.input.repository);
 
         if (!repository) return undefined;
 
-        let app = await repository.getApplicationSummaryById(
-          opt.input.applicationId,
-        );
+        const app = await repository.getApplicationSummaryById(opt.input.applicationId);
 
         if (!app) return undefined;
 
         if (app.bannerImage) {
-          app.bannerImage = `${opt.ctx.rawRequest.destinationHostname}${await instance.sys.image.serveImage(opt.ctx.userId, app.bannerImage)}`;
+          app.bannerImage = `${opt.ctx.instance.sys.configuration.backendUrl}${await instance.sys.image.serveImage(opt.ctx.userId, app.bannerImage)}`;
         }
 
         return app;
@@ -96,10 +85,13 @@ const router = t.router({
                 if (app.manifest.icon.type === "image") {
                   icon = {
                     type: "image",
-                    value: `${opt.ctx.rawRequest.destinationHostname}/api/application/${app.manifest.id}/icon/`,
+                    value: `${opt.ctx.instance.sys.configuration.backendUrl}/api/application/${app.manifest.id}/icon/`,
                   };
                 } else {
-                  icon = app.manifest.icon;
+                  icon = {
+                    type: "icon",
+                    value: `${opt.ctx.instance.sys.configuration.backendUrl}/api/application/${app.manifest.id}/icon/`,
+                  };
                 }
               }
 
@@ -108,8 +100,7 @@ const router = t.router({
                 displayName: app.manifest.displayName || app.manifest.id,
                 version: app.manifest.version || "rolling",
                 icon: icon,
-                description:
-                  app.manifest.description || "Description not supplied",
+                description: app.manifest.description || "Description not supplied",
                 // Todo: use the actual repo not just local
                 repository: "local",
               };
@@ -126,8 +117,7 @@ const router = t.router({
     setEnabledApplications: procedure
       .input(z.object({ enabledApplications: z.string().array() }))
       .mutation(async (opt) => {
-        const currentlyEnabledApplications =
-          instance.sys.applications.enabledApplications;
+        const currentlyEnabledApplications = instance.sys.applications.enabledApplications;
 
         for (const app of currentlyEnabledApplications) {
           if (opt.input.enabledApplications.includes(app)) continue;
@@ -161,9 +151,7 @@ const router = t.router({
   search: {
     searchFor: procedure
       .input(z.string())
-      .output(
-        z.object({ applicationId: z.string(), repository: z.string() }).array(),
-      )
+      .output(z.object({ applicationId: z.string(), repository: z.string() }).array())
       .query(async (opt) => {
         let results: { applicationId: string; repository: string }[] = [];
 
@@ -181,20 +169,16 @@ const router = t.router({
     getResult: procedure
       .input(z.object({ applicationId: z.string(), repository: z.string() }))
       .query(async (opt) => {
-        let repository = applicationRepositories.find(
-          (repo) => repo.id === opt.input.repository,
-        );
+        const repository = applicationRepositories.find((repo) => repo.id === opt.input.repository);
 
         if (!repository) return undefined;
 
-        let app = await repository.getApplicationSummaryById(
-          opt.input.applicationId,
-        );
+        const app = await repository.getApplicationSummaryById(opt.input.applicationId);
 
         if (!app) return undefined;
 
         if (app.bannerImage) {
-          app.bannerImage = `${opt.ctx.rawRequest.destinationHostname}${await instance.sys.image.serveImage(opt.ctx.userId, app.bannerImage)}`;
+          app.bannerImage = `${opt.ctx.instance.sys.configuration.backendUrl}${await instance.sys.image.serveImage(opt.ctx.userId, app.bannerImage)}`;
         }
 
         return app;
@@ -204,22 +188,18 @@ const router = t.router({
     get: procedure
       .input(z.object({ applicationId: z.string(), repository: z.string() }))
       .query(async (opt) => {
-        let repository = applicationRepositories.find(
-          (repo) => repo.id === opt.input.repository,
-        );
+        const repository = applicationRepositories.find((repo) => repo.id === opt.input.repository);
 
         if (!repository) return undefined;
 
-        let app = await repository.getApplicationById(opt.input.applicationId);
+        const app = await repository.getApplicationById(opt.input.applicationId);
 
         if (!app) return undefined;
 
-        if (app.icon.type === "image") {
-          app.icon.value = `${opt.ctx.rawRequest.destinationHostname}${await instance.sys.image.serveImage(opt.ctx.userId, app.icon.value)}`;
-        }
+        app.icon.value = `${opt.ctx.instance.sys.configuration.backendUrl}${await instance.sys.image.serveImage(opt.ctx.userId, app.icon.value)}`;
 
         if (app.bannerImage) {
-          app.bannerImage = `${opt.ctx.rawRequest.destinationHostname}${await instance.sys.image.serveImage(opt.ctx.userId, app.bannerImage)}`;
+          app.bannerImage = `${opt.ctx.instance.sys.configuration.backendUrl}${await instance.sys.image.serveImage(opt.ctx.userId, app.bannerImage)}`;
         }
 
         return {
@@ -228,14 +208,9 @@ const router = t.router({
           canBeUninstalled: instance.sys.configuration.defaultApplications.some(
             (a) => a.id === app.id,
           )
-            ? instance.sys.configuration.hasFeature(
-                WorkspacesFeatureFlags.ShootYourselfInTheFoot,
-              )
+            ? instance.sys.configuration.hasFeature(WorkspacesFeatureFlags.ShootYourselfInTheFoot)
             : true,
-          isInstalled:
-            opt.ctx.instance.sys.applications.enabledApplications.includes(
-              app.id,
-            ),
+          isInstalled: opt.ctx.instance.sys.applications.enabledApplications.includes(app.id),
           installSize:
             repository instanceof LocalApplicationRepository
               ? fastFolderSizeSync(await repository.getSourcePath(app.id))
@@ -246,13 +221,11 @@ const router = t.router({
     install: procedure
       .input(z.object({ applicationId: z.string(), repository: z.string() }))
       .mutation(async (opt) => {
-        let repository = applicationRepositories.find(
-          (repo) => repo.id === opt.input.repository,
-        );
+        const repository = applicationRepositories.find((repo) => repo.id === opt.input.repository);
 
         if (!repository) return undefined;
 
-        let app = await repository.getApplicationById(opt.input.applicationId);
+        const app = await repository.getApplicationById(opt.input.applicationId);
 
         if (!app) return undefined;
 
@@ -266,42 +239,30 @@ const router = t.router({
 
         return true;
       }),
-    uninstall: procedure
-      .input(z.object({ applicationId: z.string() }))
-      .mutation(async (opt) => {
-        // the user must be administrator
-        if (!(await (await opt.ctx.user())?.isAdministrator())) return false;
-        // the application must not be protected if ShootYourselfInTheFoot is enabled
-        if (
-          instance.sys.configuration.defaultApplications.some(
-            (a) => a.id === opt.input.applicationId,
-          )
-        ) {
-          if (
-            !instance.sys.configuration.hasFeature(
-              WorkspacesFeatureFlags.ShootYourselfInTheFoot,
-            )
-          ) {
-            return false;
-          }
+    uninstall: procedure.input(z.object({ applicationId: z.string() })).mutation(async (opt) => {
+      // the user must be administrator
+      if (!(await (await opt.ctx.user())?.isAdministrator())) return false;
+      // the application must not be protected if ShootYourselfInTheFoot is enabled
+      if (
+        instance.sys.configuration.defaultApplications.some((a) => a.id === opt.input.applicationId)
+      ) {
+        if (!instance.sys.configuration.hasFeature(WorkspacesFeatureFlags.ShootYourselfInTheFoot)) {
+          return false;
         }
+      }
 
-        await opt.ctx.instance.sys.applications.disableApplication(
-          opt.input.applicationId,
-        );
-        await opt.ctx.instance.sys.applications.uninstallApplication(
-          opt.input.applicationId,
-        );
+      await opt.ctx.instance.sys.applications.disableApplication(opt.input.applicationId);
+      await opt.ctx.instance.sys.applications.uninstallApplication(opt.input.applicationId);
 
-        return true;
-      }),
+      return true;
+    }),
   },
 });
 
 export type TRPCRouter = typeof router;
 
 instance.sys.tRPC.registeredRouters.push({
-  basePath: "/app/uk.tcsw.store",
+  basePath: "/api/app/uk.tcsw.store",
   router: router,
   createContext: createTRPCContext(instance),
 });

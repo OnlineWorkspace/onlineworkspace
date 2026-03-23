@@ -1,4 +1,4 @@
-import PERSON_ICON from "@material-symbols/svg-500/outlined/person.svg";
+import PERSON_ICON from "@material-symbols/svg-700/outlined/person.svg";
 import UKButton from "@tcsw/uikit-solid/src/components/button/UKButton.jsx";
 import UKSearchableDropdownMenu from "@tcsw/uikit-solid/src/components/searchableDropdownMenu/UKSearchableDropdownMenu.jsx";
 import UKStackItem from "@tcsw/uikit-solid/src/components/stack/UKStackItem.jsx";

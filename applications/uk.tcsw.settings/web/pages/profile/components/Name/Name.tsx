@@ -1,4 +1,4 @@
-import ASSIGNMENT_IND_ICON from "@material-symbols/svg-500/outlined/assignment_ind.svg";
+import ASSIGNMENT_IND_ICON from "@material-symbols/svg-700/outlined/assignment_ind.svg";
 import UKButton from "@tcsw/uikit-solid/src/components/button/UKButton.jsx";
 import UKStackItem from "@tcsw/uikit-solid/src/components/stack/UKStackItem.jsx";
 import UKTextField from "@tcsw/uikit-solid/src/components/textField/UKTextField.jsx";

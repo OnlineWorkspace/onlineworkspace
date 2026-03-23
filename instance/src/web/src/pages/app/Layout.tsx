@@ -1,48 +1,36 @@
-import {
-  type Component,
-  createResource,
-  createSignal,
-  Show,
-  Suspense,
-} from "solid-js";
-import styles from "./Layout.module.scss";
-import {
-  type RouteSectionProps,
-  useLocation,
-  useNavigate,
-} from "@solidjs/router";
+import { type RouteSectionProps, useLocation, useNavigate } from "@solidjs/router";
 import UKIndeterminateSpinner from "@tcsw/uikit-solid/src/components/indeterminateSpinner/UKIndeterminateSpinner.jsx";
 import UKNavigationRail from "@tcsw/uikit-solid/src/components/navigationRail/UKNavigationRail.jsx";
-import NavigationRailAvatar from "./navigationRailAvatar/NavigationRailAvatar";
-import trpc from "../../lib/trpc";
-import NavigationRailClock from "./navigationRailClock/NavigationRailClock.tsx";
 import UKText from "@tcsw/uikit-solid/src/components/text/UKText.tsx";
-import NavigationRailNotifications from "./navigationRailNotifications/NavigationRailNotifications.tsx";
-import NavigationRailApplications from "./navigationRailApplications/NavigationRailApplications.tsx";
 import useIsMobile from "@tcsw/uikit-solid/src/core/useIsMobile.ts";
+import { type Component, createResource, createSignal, Show, Suspense } from "solid-js";
+import trpc from "../../lib/trpc";
 import CoreApplicationLayoutContext from "./CoreApplicationLayoutContext.ts";
+import styles from "./Layout.module.scss";
+import NavigationRailApplications from "./navigationRailApplications/NavigationRailApplications.tsx";
+import NavigationRailAvatar from "./navigationRailAvatar/NavigationRailAvatar";
+import NavigationRailClock from "./navigationRailClock/NavigationRailClock.tsx";
+import NavigationRailNotifications from "./navigationRailNotifications/NavigationRailNotifications.tsx";
 
 const AppLayout: Component<RouteSectionProps<unknown>> = (props) => {
   const location = useLocation();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
 
-  const [quickShortcuts, { refetch: refetchQuickShortcuts }] = createResource(
-    () => trpc.app.navigation.getQuickShortcuts.query(),
+  const [quickShortcuts, { refetch: refetchQuickShortcuts }] = createResource(() =>
+    trpc.app.navigation.getQuickShortcuts.query(),
   );
   const [expanded, setExpanded] = createSignal<boolean>(false);
-  const [toggledDrawer, setToggledDrawer] = createSignal<
-    "applications" | "notifications" | false
-  >(false);
+  const [toggledDrawer, setToggledDrawer] = createSignal<"applications" | "notifications" | false>(
+    false,
+  );
 
   return (
     <>
       <CoreApplicationLayoutContext.Provider
         value={{ refetchQuickShortcuts: () => refetchQuickShortcuts() }}
       >
-        {window.localStorage.getItem(
-          "tricolor_workspaces_no_app_navigation_rail",
-        ) !== "true" ? (
+        {window.localStorage.getItem("tricolor_workspaces_no_app_navigation_rail") !== "true" ? (
           <UKNavigationRail
             class={styles.rail}
             expanded={expanded()}
@@ -126,16 +114,12 @@ const AppLayout: Component<RouteSectionProps<unknown>> = (props) => {
             }}
           >
             <div class={styles.page}>
-              <Suspense fallback={<UKIndeterminateSpinner />}>
-                {props.children}
-              </Suspense>
+              <Suspense fallback={<UKIndeterminateSpinner />}>{props.children}</Suspense>
             </div>
           </UKNavigationRail>
         ) : (
           <div class={styles.page}>
-            <Suspense fallback={<UKIndeterminateSpinner />}>
-              {props.children}
-            </Suspense>
+            <Suspense fallback={<UKIndeterminateSpinner />}>{props.children}</Suspense>
           </div>
         )}
       </CoreApplicationLayoutContext.Provider>

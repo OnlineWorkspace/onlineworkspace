@@ -8,7 +8,7 @@ import clsx from "clsx";
 import PLACEHOLDER_WALLPAPER from "./../../assets/placeholder_wallpaper.png";
 import UKButton from "@tcsw/uikit-solid/src/components/button/UKButton.jsx";
 import { useNavigate } from "@solidjs/router";
-import EDIT_ICON from "@material-symbols/svg-500/outlined/edit.svg"
+import EDIT_ICON from "@material-symbols/svg-700/outlined/edit.svg"
 
 const RootPage: Component = () => {
   const navigate = useNavigate();

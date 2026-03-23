@@ -1,4 +1,4 @@
-import MAIL_ICON from "@material-symbols/svg-500/outlined/mail.svg";
+import MAIL_ICON from "@material-symbols/svg-700/outlined/mail.svg";
 import UKButton from "@tcsw/uikit-solid/src/components/button/UKButton.jsx";
 import UKStackItem from "@tcsw/uikit-solid/src/components/stack/UKStackItem.jsx";
 import UKTextField from "@tcsw/uikit-solid/src/components/textField/UKTextField.jsx";

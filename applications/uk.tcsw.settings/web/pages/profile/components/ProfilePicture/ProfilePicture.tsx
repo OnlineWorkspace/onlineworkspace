@@ -1,4 +1,4 @@
-import PHOTO_CAMERA_ICON from "@material-symbols/svg-500/outlined/photo_camera.svg";
+import PHOTO_CAMERA_ICON from "@material-symbols/svg-700/outlined/photo_camera.svg";
 import UKButton from "@tcsw/uikit-solid/src/components/button/UKButton.tsx";
 import UKStackItem from "@tcsw/uikit-solid/src/components/stack/UKStackItem.jsx";
 import { type Component, createSignal } from "solid-js";

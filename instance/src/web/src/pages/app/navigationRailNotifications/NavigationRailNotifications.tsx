@@ -8,8 +8,8 @@ import UKText from "@tcsw/uikit-solid/src/components/text/UKText.jsx";
 import UKDivider from "@tcsw/uikit-solid/src/components/divider/UKDivider.jsx";
 import {DividerDirection} from "@tcsw/uikit-solid/src/components/divider/lib/direction.js";
 import {useNavigate} from "@solidjs/router";
-import NOTIFICATIONS_UNREAD_ICON from "@material-symbols/svg-500/outlined/notifications_unread.svg"
-import NOTIFICATIONS_ICON from "@material-symbols/svg-500/outlined/notifications.svg"
+import NOTIFICATIONS_UNREAD_ICON from "@material-symbols/svg-700/outlined/notifications_unread.svg"
+import NOTIFICATIONS_ICON from "@material-symbols/svg-700/outlined/notifications.svg"
 
 // const FLYOUT_NOTIFICATION_TIMEOUT = 10_000;
 

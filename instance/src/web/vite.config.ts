@@ -1,6 +1,6 @@
 // import devtools from "solid-devtools/vite";
 import { defineConfig } from "vite";
-import {compression} from "vite-plugin-compression2";
+import { compression } from "vite-plugin-compression2";
 import solid from "vite-plugin-solid";
 
 export default defineConfig({
@@ -18,9 +18,9 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      "@solidjs/router": "/../../../node_modules/@solidjs/router",
-      "@tcsw/uikit-solid": "/../../../uikit-solid",
-      "@tcsw/workspaces-applications": "/../../../fs/Applications.tsx"
+      "@solidjs/router": "/node_modules/@solidjs/router",
+      "@tcsw/uikit-solid": "/node_modules/@tcsw/uikit-solid",
+      "@tcsw/workspaces-applications": "/../../../fs/Applications.tsx",
     },
   },
 });

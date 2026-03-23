@@ -1,5 +1,5 @@
-import REMOVE_ICON from "@material-symbols/svg-500/outlined/remove.svg";
-import RESET_WRENCH_ICON from "@material-symbols/svg-500/outlined/reset_wrench.svg";
+import REMOVE_ICON from "@material-symbols/svg-700/outlined/remove.svg";
+import RESET_WRENCH_ICON from "@material-symbols/svg-700/outlined/reset_wrench.svg";
 import { useParams } from "@solidjs/router";
 import UKButton from "@tcsw/uikit-solid/src/components/button/UKButton.jsx";
 import UKIconButton from "@tcsw/uikit-solid/src/components/iconButton/UKIconButton.jsx";

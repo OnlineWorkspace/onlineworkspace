@@ -46,7 +46,7 @@ const router = t.router({
 export type TRPCRouter = typeof router;
 
 instance.sys.tRPC.registeredRouters.push({
-  basePath: "/app/uk.tcsw.console",
+  basePath: "/api/app/uk.tcsw.console",
   router: router,
   createContext: createTRPCContext(instance),
 });

@@ -17,17 +17,10 @@ import type { WorkspacesUser } from "./users.js";
 
 export const createTRPCContext =
   (instance: Instance) => (opt: FetchCreateContextFnOptions, server: Server<object>) => {
-    const originUrl = new URL(opt.req.url);
-
-    originUrl.pathname = "";
-    originUrl.search = "";
-    originUrl.hash = "";
-
     return {
       rawRequest: {
         req: opt.req,
         resHeaders: opt.resHeaders,
-        destinationHostname: originUrl.toString().slice(0, -1),
         server: server,
       },
       instance: instance,
@@ -573,10 +566,13 @@ ${opt.ctx.instance.sys.configuration.termsOfUse.message}`;
               if (app.manifest.icon.type === "image") {
                 icon = {
                   type: "image",
-                  value: `${opt.ctx.rawRequest.destinationHostname}/api/application/${app.manifest.id}/icon/`,
+                  value: `${opt.ctx.instance.sys.configuration.backendUrl}/api/application/${app.manifest.id}/icon/`,
                 };
               } else {
-                icon = app.manifest.icon;
+                icon = {
+                  type: "icon",
+                  value: `${opt.ctx.instance.sys.configuration.backendUrl}/api/application/${app.manifest.id}/icon/`,
+                };
               }
             }
 
@@ -618,12 +614,12 @@ ${opt.ctx.instance.sys.configuration.termsOfUse.message}`;
               if (app.manifest.icon.type === "image") {
                 icon = {
                   type: "image",
-                  value: `${opt.ctx.rawRequest.destinationHostname}/api/application/${app.manifest.id}/icon/`,
+                  value: `${opt.ctx.instance.sys.configuration.backendUrl}/api/application/${app.manifest.id}/icon/`,
                 };
               } else {
                 icon = {
                   type: "icon",
-                  value: `${opt.ctx.rawRequest.destinationHostname}/api/application/${app.manifest.id}/icon/`,
+                  value: `${opt.ctx.instance.sys.configuration.backendUrl}/api/application/${app.manifest.id}/icon/`,
                 };
               }
             }

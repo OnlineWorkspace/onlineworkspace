@@ -18,8 +18,7 @@ export default class WebFrontendSystem extends System {
         clearScreen: false,
       });
       await this.viteServer.listen();
-      this.log.info("Listening for web requests at:");
-      this.viteServer.printUrls();
+      this.log.info("Listening for web requests:");
     }
     return true;
   }

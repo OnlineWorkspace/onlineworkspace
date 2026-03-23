@@ -1,11 +1,8 @@
+import * as os from "node:os";
+import { promises as fs, existsSync as fsExistsSync, readFileSync as fsReadFileSync } from "fs";
+import path from "path";
 import type { Instance } from "../index.js";
 import System from "../system.js";
-import path from "path";
-import {
-  promises as fs,
-  readFileSync as fsReadFileSync,
-  existsSync as fsExistsSync,
-} from "fs";
 
 export enum WorkspacesFeatureFlags {
   SlashCommands = "slash_commands",
@@ -33,9 +30,9 @@ export default class ConfigurationSystem extends System {
       database: string;
     };
   };
-  // http://localhost:3563
+  // https://localhost
   backendUrl: string;
-  // http://localhost:5173
+  // https://localhost
   webUrl: string[];
   enabledFeatures: (WorkspacesFeatureFlags | string)[];
   signupRequirements: {
@@ -73,8 +70,9 @@ export default class ConfigurationSystem extends System {
     if (process.env.POSTGRES_DATABASE_HOST)
       this.databases.postgres.host = process.env.POSTGRES_DATABASE_HOST;
 
-    this.backendUrl = "http://localhost:3563";
-    this.webUrl = ["http://localhost:5173", "http://192.168.1.118:5173"];
+    this.backendUrl = "https://localhost";
+    // localhost and the current machine's local ip
+    this.webUrl = ["https://localhost", `https://${os.networkInterfaces().eth0?.[0].address}`];
     this.signupRequirements = {
       email: false,
       twoFactorAuthentication: false,
@@ -128,48 +126,33 @@ export default class ConfigurationSystem extends System {
     ];
 
     if (
-      fsExistsSync(
-        path.join(
-          this.instance.sys.filesystem.AUTOINSTALL_PATH,
-          "configuration.json",
-        ),
-      )
+      fsExistsSync(path.join(this.instance.sys.filesystem.AUTOINSTALL_PATH, "configuration.json"))
     ) {
       this.log.info(
         "Auto-install configuration detected. Loading configuration from auto-install.",
       );
 
-      let autoInstallConfig = JSON.parse(
+      const autoInstallConfig = JSON.parse(
         fsReadFileSync(
-          path.join(
-            this.instance.sys.filesystem.AUTOINSTALL_PATH,
-            "configuration.json",
-          ),
+          path.join(this.instance.sys.filesystem.AUTOINSTALL_PATH, "configuration.json"),
         ).toString(),
       );
 
       if (autoInstallConfig.enabledFeatures)
         this.enabledFeatures = autoInstallConfig.enabledFeatures;
-      if (autoInstallConfig.databases)
-        this.databases = autoInstallConfig.databases;
-      if (autoInstallConfig.backendUrl)
-        this.backendUrl = autoInstallConfig.backendUrl;
+      if (autoInstallConfig.databases) this.databases = autoInstallConfig.databases;
+      if (autoInstallConfig.backendUrl) this.backendUrl = autoInstallConfig.backendUrl;
       if (autoInstallConfig.webUrl) this.webUrl = autoInstallConfig.webUrl;
       if (autoInstallConfig.signupRequirements)
         this.signupRequirements = autoInstallConfig.signupRequirements;
-      if (autoInstallConfig.displayName)
-        this.displayName = autoInstallConfig.displayName;
-      if (autoInstallConfig.mailserver)
-        this.mailServer = autoInstallConfig.mailserver;
-      if (autoInstallConfig.termsOfUse)
-        this.termsOfUse = autoInstallConfig.termsOfUse;
+      if (autoInstallConfig.displayName) this.displayName = autoInstallConfig.displayName;
+      if (autoInstallConfig.mailserver) this.mailServer = autoInstallConfig.mailserver;
+      if (autoInstallConfig.termsOfUse) this.termsOfUse = autoInstallConfig.termsOfUse;
       if (autoInstallConfig.defaultQuickShortcuts)
         this.defaultQuickShortcuts = autoInstallConfig.defaultQuickShortcuts;
       if (autoInstallConfig.defaultApplications)
         this.defaultApplications = autoInstallConfig.defaultApplications;
     }
-
-    return this;
   }
 
   hasFeature(feature: WorkspacesFeatureFlags | string): boolean {
@@ -177,8 +160,7 @@ export default class ConfigurationSystem extends System {
   }
 
   async enableFeature(feature: WorkspacesFeatureFlags | string) {
-    if (!this.enabledFeatures.includes(feature))
-      this.enabledFeatures.push(feature);
+    if (!this.enabledFeatures.includes(feature)) this.enabledFeatures.push(feature);
 
     await this.saveConfiguration();
 
@@ -186,9 +168,7 @@ export default class ConfigurationSystem extends System {
   }
 
   async disableFeature(feature: WorkspacesFeatureFlags | string) {
-    this.enabledFeatures = this.enabledFeatures.filter(
-      (feat) => feat !== feature,
-    );
+    this.enabledFeatures = this.enabledFeatures.filter((feat) => feat !== feature);
 
     await this.saveConfiguration();
 
@@ -233,25 +213,17 @@ export default class ConfigurationSystem extends System {
       await this.saveConfiguration();
     }
 
-    const configurationFile = JSON.parse(
-      (await fs.readFile(CONFIGURATION_FILE_PATH)).toString(),
-    );
+    const configurationFile = JSON.parse((await fs.readFile(CONFIGURATION_FILE_PATH)).toString());
 
-    if (configurationFile.enabledFeatures)
-      this.enabledFeatures = configurationFile.enabledFeatures;
-    if (configurationFile.databases)
-      this.databases = configurationFile.databases;
-    if (configurationFile.backendUrl)
-      this.backendUrl = configurationFile.backendUrl;
+    if (configurationFile.enabledFeatures) this.enabledFeatures = configurationFile.enabledFeatures;
+    if (configurationFile.databases) this.databases = configurationFile.databases;
+    if (configurationFile.backendUrl) this.backendUrl = configurationFile.backendUrl;
     if (configurationFile.webUrl) this.webUrl = configurationFile.webUrl;
     if (configurationFile.signupRequirements)
       this.signupRequirements = configurationFile.signupRequirements;
-    if (configurationFile.displayName)
-      this.displayName = configurationFile.displayName;
-    if (configurationFile.mailserver)
-      this.mailServer = configurationFile.mailserver;
-    if (configurationFile.termsOfUse)
-      this.termsOfUse = configurationFile.termsOfUse;
+    if (configurationFile.displayName) this.displayName = configurationFile.displayName;
+    if (configurationFile.mailserver) this.mailServer = configurationFile.mailserver;
+    if (configurationFile.termsOfUse) this.termsOfUse = configurationFile.termsOfUse;
     if (configurationFile.defaultQuickShortcuts)
       this.defaultQuickShortcuts = configurationFile.defaultQuickShortcuts;
     if (configurationFile.defaultApplications)

@@ -1,4 +1,4 @@
-import CHEVRON_RIGHT_ICON from "@material-symbols/svg-500/outlined/chevron_right.svg";
+import CHEVRON_RIGHT_ICON from "@material-symbols/svg-700/outlined/chevron_right.svg";
 import clsx from "clsx";
 import { type Component, createSignal, type JSXElement, Match, Suspense, Switch } from "solid-js";
 import UKIcon from "../icon/UKIcon";

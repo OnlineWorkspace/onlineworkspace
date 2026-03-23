@@ -1,5 +1,5 @@
 import { Route } from "@solidjs/router";
-import { type Component, createEffect, createSignal } from "solid-js";
+import { type Component, createEffect, createSignal, ErrorBoundary } from "solid-js";
 import { AppContext } from "./appContext.ts";
 import Layout from "./Layout";
 import trpc from "./lib/trpc.ts";
@@ -17,14 +17,11 @@ import StoragePage from "./pages/storage/Index";
 
 const App: Component = () => {
   const [isAdministrator, setIsAdministrator] = createSignal<boolean>(false);
-  const [shootYourselfInTheFoot, setShootYourselfInTheFoot] =
-    createSignal<boolean>(false);
+  const [shootYourselfInTheFoot, setShootYourselfInTheFoot] = createSignal<boolean>(false);
 
   createEffect(async () => {
     setIsAdministrator(await trpc.instance.isUserAdministrator.query());
-    setShootYourselfInTheFoot(
-      await trpc.instance.hasFeature.query("shoot_yourself_in_the_foot"),
-    );
+    setShootYourselfInTheFoot(await trpc.instance.hasFeature.query("shoot_yourself_in_the_foot"));
   });
 
   return (
@@ -51,7 +48,9 @@ const App: Component = () => {
         <Route path={"/instance"} component={InstancePage} />
         <Route path={"/applications"}>
           <Route path={"/"} component={ApplicationsPage} />
-          <Route path={":applicationId"} component={ApplicationPage} />
+          <ErrorBoundary fallback={() => <div>Failed</div>}>
+            <Route path={":applicationId"} component={ApplicationPage} />
+          </ErrorBoundary>
         </Route>
       </Route>
     </AppContext.Provider>

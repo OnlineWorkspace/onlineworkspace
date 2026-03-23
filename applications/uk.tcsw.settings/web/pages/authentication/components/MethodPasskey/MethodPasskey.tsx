@@ -5,8 +5,8 @@ import trpc from "../../../../lib/trpc";
 import styles from "./MethodPasskey.module.scss";
 import UKText from "@tcsw/uikit-solid/src/components/text/UKText.jsx";
 import UKIcon from "@tcsw/uikit-solid/src/components/icon/UKIcon.jsx";
-import PASSKEY_ICON from "@material-symbols/svg-500/outlined/passkey.svg"
-import CHECK_ICON from "@material-symbols/svg-500/outlined/check.svg"
+import PASSKEY_ICON from "@material-symbols/svg-700/outlined/passkey.svg"
+import CHECK_ICON from "@material-symbols/svg-700/outlined/check.svg"
 
 const MethodPasskey: Component = () => {
   const [hasPasskey, { refetch: refetchHasPasskey }] = createResource(() =>

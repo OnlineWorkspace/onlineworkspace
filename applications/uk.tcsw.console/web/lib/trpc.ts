@@ -6,13 +6,13 @@ const trpc = createTRPCClient<TRPCRouter>({
         splitLink({
             condition: (op: { type: string }) => op.type === "subscription",
             true: httpSubscriptionLink({
-                url: "http://localhost:3563/app/uk.tcsw.console",
+                url: "https://localhost/api/app/uk.tcsw.console",
                 eventSourceOptions: {
                     withCredentials: true,
                 },
             }),
             false: httpBatchLink({
-                url: "http://localhost:3563/app/uk.tcsw.console",
+                url: "https://localhost/api/app/uk.tcsw.console",
                 fetch(input, init) {
                     return fetch(input, { credentials: "include", ...init });
                 },

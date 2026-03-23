@@ -187,6 +187,8 @@ class Instance {
               const cookieString = req.headers?.get("cookie");
 
               if (cookieString === null) {
+                this.log.system.warning("Missing auth cookie in request for application icon");
+
                 return Response.json({
                   code: "UNAUTHORIZED",
                   message: "missing auth cookie",
@@ -200,6 +202,8 @@ class Instance {
               );
 
               if (userId === undefined) {
+                this.log.system.warning("Invalid session in request for application icon");
+
                 return Response.json({
                   code: "UNAUTHORIZED",
                   message: "invalid session",
@@ -221,14 +225,7 @@ class Instance {
                 application.manifest?.icon?.value || "",
               );
 
-              return new Response(file(path.join(applicationIconPath)), {
-                headers: {
-                  "Access-Control-Allow-Origin": "http://localhost:5173", // TODO: change this according to a config file
-                  "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-                  "Access-Control-Allow-Headers": "Content-Type, Authorization",
-                  "Access-Control-Allow-Credentials": "true",
-                },
-              });
+              return new Response(file(applicationIconPath));
             },
           },
           "/api/asset/image/:imageId/:resolution": {
@@ -282,14 +279,7 @@ class Instance {
                 this.sys.image.log.info(
                   `Served Image -> '${(req.params as { imageId: string }).imageId} @ ${resolutionParam}'`,
                 );
-                return new Response(file(sourceImage.path), {
-                  headers: {
-                    "Access-Control-Allow-Origin": "http://localhost:5173", // TODO: change this according to a config file
-                    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-                    "Access-Control-Allow-Headers": "Content-Type, Authorization",
-                    "Access-Control-Allow-Credentials": "true",
-                  },
-                });
+                return new Response(file(sourceImage.path));
               } else {
                 const outputPath = path.join(
                   this.sys.filesystem.CACHE_PATH,
@@ -302,14 +292,7 @@ class Instance {
                   this.sys.image.log.info(
                     `Served Image -> '${(req.params as { imageId: string }).imageId} @ ${resolutionParam}'`,
                   );
-                  return new Response(file(outputPath), {
-                    headers: {
-                      "Access-Control-Allow-Origin": "http://localhost:5173", // TODO: change this according to a config file
-                      "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-                      "Access-Control-Allow-Headers": "Content-Type, Authorization",
-                      "Access-Control-Allow-Credentials": "true",
-                    },
-                  });
+                  return new Response(file(outputPath));
                 }
 
                 if (!(await fs.exists(path.join(outputPath, "..")))) {
@@ -328,14 +311,7 @@ class Instance {
                 this.sys.image.log.info(
                   `Served Image -> '${(req.params as { imageId: string }).imageId} @ ${resolutionParam}'`,
                 );
-                return new Response(file(outputPath), {
-                  headers: {
-                    "Access-Control-Allow-Origin": "http://localhost:5173", // TODO: change this according to a config file
-                    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-                    "Access-Control-Allow-Headers": "Content-Type, Authorization",
-                    "Access-Control-Allow-Credentials": "true",
-                  },
-                });
+                return new Response(file(outputPath));
               }
             },
           },
@@ -374,18 +350,11 @@ class Instance {
                 }
               }
 
-              return new Response(file(asset.path), {
-                headers: {
-                  "Access-Control-Allow-Origin": "http://localhost:5173", // TODO: change this according to a config file
-                  "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-                  "Access-Control-Allow-Headers": "Content-Type, Authorization",
-                  "Access-Control-Allow-Credentials": "true",
-                },
-              });
+              return new Response(file(asset.path));
             },
           },
         },
-        fetch(_request, _server) {
+        fetch() {
           // will be executed if it's not a TRPC request
           return new Response("Unknown path");
         },
@@ -394,7 +363,7 @@ class Instance {
     );
 
     this.sys.tRPC.registeredRouters.push({
-      basePath: "/instance/workspaces/trpc",
+      basePath: "/api/trpc",
       router: workspacesRouter,
       createContext: createWorkspacesTRPCContext(this),
     });

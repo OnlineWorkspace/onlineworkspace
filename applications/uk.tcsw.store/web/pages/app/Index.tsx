@@ -10,9 +10,9 @@ import { DividerDirection } from "@tcsw/uikit-solid/src/components/divider/lib/d
 import UKButton from "@tcsw/uikit-solid/src/components/button/UKButton.jsx";
 import UKStack from "@tcsw/uikit-solid/src/components/stack/UKStack.jsx";
 import UKStackItem from "@tcsw/uikit-solid/src/components/stack/UKStackItem.jsx";
-import CHEVRON_LEFT_ICON from "@material-symbols/svg-500/outlined/chevron_left.svg";
-import DELETE_ICON from "@material-symbols/svg-500/outlined/delete.svg";
-import DOWNLOAD_ICON from "@material-symbols/svg-500/outlined/download.svg";
+import CHEVRON_LEFT_ICON from "@material-symbols/svg-700/outlined/chevron_left.svg";
+import DELETE_ICON from "@material-symbols/svg-700/outlined/delete.svg";
+import DOWNLOAD_ICON from "@material-symbols/svg-700/outlined/download.svg";
 
 const ApplicationPage: Component = () => {
     const { applicationId, repository } = useParams();

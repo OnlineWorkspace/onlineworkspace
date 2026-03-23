@@ -2,7 +2,7 @@ import UKIconButton from "@tcsw/uikit-solid/src/components/iconButton/UKIconButt
 import UKTextField from "@tcsw/uikit-solid/src/components/textField/UKTextField.jsx";
 import { type Component, createSignal } from "solid-js";
 import styles from "./Widget.module.scss";
-import SEARCH_ICON from "@material-symbols/svg-500/outlined/search.svg"
+import SEARCH_ICON from "@material-symbols/svg-700/outlined/search.svg"
 
 const Widget: Component = () => {
   const [searchQuery, setSearchQuery] = createSignal<string>("");

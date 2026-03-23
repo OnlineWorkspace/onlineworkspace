@@ -7,7 +7,7 @@ import styles from "./ResetPasswordDialogue.module.scss";
 import UKButton from "@tcsw/uikit-solid/src/components/button/UKButton.jsx";
 import trpc from "../../../../../../lib/trpc";
 import UKButtonGroup from "@tcsw/uikit-solid/src/components/buttonGroup/UKButtonGroup.tsx";
-import CHECK_ICON from "@material-symbols/svg-500/outlined/check.svg";
+import CHECK_ICON from "@material-symbols/svg-700/outlined/check.svg";
 
 const ResetPasswordDialogue: Component<{ closeDialogue: () => void }> = (
   props,

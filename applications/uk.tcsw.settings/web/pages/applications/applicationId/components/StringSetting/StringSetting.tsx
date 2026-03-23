@@ -1,4 +1,4 @@
-import RESET_WRENCH_ICON from "@material-symbols/svg-500/outlined/reset_wrench.svg";
+import RESET_WRENCH_ICON from "@material-symbols/svg-700/outlined/reset_wrench.svg";
 import { useParams } from "@solidjs/router";
 import UKStackItem from "@tcsw/uikit-solid/src/components/stack/UKStackItem.jsx";
 import UKTextField from "@tcsw/uikit-solid/src/components/textField/UKTextField.tsx";

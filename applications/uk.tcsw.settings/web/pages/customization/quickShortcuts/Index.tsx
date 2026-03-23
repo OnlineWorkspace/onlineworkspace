@@ -1,4 +1,4 @@
-import CHEVRON_LEFT_ICON from "@material-symbols/svg-500/outlined/chevron_left.svg";
+import CHEVRON_LEFT_ICON from "@material-symbols/svg-700/outlined/chevron_left.svg";
 import { useNavigate } from "@solidjs/router";
 import UKDivider from "@tcsw/uikit-solid/src/components/divider/UKDivider.tsx";
 import UKIcon from "@tcsw/uikit-solid/src/components/icon/UKIcon.tsx";

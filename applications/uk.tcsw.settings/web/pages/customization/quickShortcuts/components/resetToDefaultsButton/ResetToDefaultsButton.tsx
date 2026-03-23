@@ -1,6 +1,7 @@
-import { type Component, createSignal } from "solid-js";
+import REFRESH_ICON from "@material-symbols/svg-700/outlined/refresh.svg";
 import UKButton from "@tcsw/uikit-solid/src/components/button/UKButton.tsx";
 import UKNoPointOfReturnDialog from "@tcsw/uikit-solid/src/components/dialog/prefabs/noPointOfReturn/UKNoPointOfReturnDialog.tsx";
+import { type Component, createSignal } from "solid-js";
 import trpc from "../../../../../lib/trpc.ts";
 
 const ResetToDefaultsButton: Component<{ refetchData: () => void }> = (props) => {
@@ -10,7 +11,7 @@ const ResetToDefaultsButton: Component<{ refetchData: () => void }> = (props) =>
     <>
       <UKButton
         size={"s"}
-        leadingIcon={"refresh"}
+        leadingIcon={REFRESH_ICON}
         color={"standard"}
         onClick={() => {
           setShowDialog(true);

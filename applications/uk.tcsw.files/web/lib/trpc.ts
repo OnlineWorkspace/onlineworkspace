@@ -1,42 +1,42 @@
 import {
-    createTRPCClient,
-    httpBatchLink,
-    httpLink,
-    httpSubscriptionLink,
-    isNonJsonSerializable,
-    splitLink,
+  createTRPCClient,
+  httpBatchLink,
+  httpLink,
+  httpSubscriptionLink,
+  isNonJsonSerializable,
+  splitLink,
 } from "@trpc/client";
 import type { TRPCRouter } from "../../backend/index";
 
-const ENDPOINT_URL = "http://localhost:3563/app/uk.tcsw.files";
+const ENDPOINT_URL = "https://localhost/api/app/uk.tcsw.files";
 
 const trpc = createTRPCClient<TRPCRouter>({
-    links: [
-        splitLink({
-            condition: (op) => isNonJsonSerializable(op.input),
-            true: httpLink({
-                url: ENDPOINT_URL,
-                fetch(input, init) {
-                    return fetch(input, { credentials: "include", ...init });
-                },
-            }),
-            false: splitLink({
-                condition: (op: { type: string }) => op.type === "subscription",
-                true: httpSubscriptionLink({
-                    url: ENDPOINT_URL,
-                    eventSourceOptions: {
-                        withCredentials: true,
-                    },
-                }),
-                false: httpBatchLink({
-                    url: ENDPOINT_URL,
-                    fetch(input, init) {
-                        return fetch(input, { credentials: "include", ...init });
-                    },
-                }),
-            }),
+  links: [
+    splitLink({
+      condition: (op) => isNonJsonSerializable(op.input),
+      true: httpLink({
+        url: ENDPOINT_URL,
+        fetch(input, init) {
+          return fetch(input, { credentials: "include", ...init });
+        },
+      }),
+      false: splitLink({
+        condition: (op: { type: string }) => op.type === "subscription",
+        true: httpSubscriptionLink({
+          url: ENDPOINT_URL,
+          eventSourceOptions: {
+            withCredentials: true,
+          },
         }),
-    ],
+        false: httpBatchLink({
+          url: ENDPOINT_URL,
+          fetch(input, init) {
+            return fetch(input, { credentials: "include", ...init });
+          },
+        }),
+      }),
+    }),
+  ],
 });
 
 export default trpc;

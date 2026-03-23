@@ -1,7 +1,7 @@
+import util from "node:util";
 import chalk from "chalk";
 import type { Instance } from "./index.js";
 import { WorkspacesFeatureFlags } from "./systems/configuration.js";
-import util from "node:util";
 
 export enum LogType {
   INFO,
@@ -26,23 +26,21 @@ class Logger {
     this.level = level;
     this.log = log;
 
+    // biome-ignore lint/suspicious/noExplicitAny: data could be of any type
     global.console.log = (...data: any[]): void => {
-      if (!!process.stdout.cursorTo) {
+      if (process.stdout.cursorTo) {
         process.stdout.cursorTo(0, this._internal_getWindowSize()[1], () => {
           process.stdout.clearLine(1, () => {
             let writtenData = "";
             for (const d of data) {
-              if (d.toString !== undefined) {
+              if (d?.toString !== undefined) {
                 writtenData += util.format(d);
               } else {
                 writtenData += util.inspect(d, {
                   compact: false,
                   colors: true,
                   depth: 3,
-                  breakLength:
-                    this._internal_getWindowSize()[0] -
-                    this.log.META_LENGTH +
-                    6,
+                  breakLength: this._internal_getWindowSize()[0] - this.log.META_LENGTH + 6,
                 });
               }
               writtenData += " ";
@@ -52,7 +50,7 @@ class Logger {
                 this._internal_writePrompt();
               });
             } else {
-              process.stdout.write(writtenData + "\n", () => {
+              process.stdout.write(`${writtenData}\n`, () => {
                 this._internal_writePrompt();
               });
             }
@@ -68,8 +66,7 @@ class Logger {
               compact: false,
               colors: true,
               depth: 3,
-              breakLength:
-                this._internal_getWindowSize()[0] - this.log.META_LENGTH + 6,
+              breakLength: this._internal_getWindowSize()[0] - this.log.META_LENGTH + 6,
             });
           }
           writtenData += " ";
@@ -77,12 +74,10 @@ class Logger {
         if (writtenData.endsWith("\n")) {
           process.stdout.write(writtenData);
         } else {
-          process.stdout.write(writtenData + "\n");
+          process.stdout.write(`${writtenData}\n`);
         }
       }
     };
-
-    return this;
   }
 
   emphasis(...message: (string | Uint8Array)[]) {
@@ -149,11 +144,7 @@ class Logger {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   error(...message: any[]) {
     if (message.length === 0) {
-      this.logMessage(
-        LogType.ERROR,
-        "log",
-        new Error("log message is empty").stack,
-      );
+      this.logMessage(LogType.ERROR, "log", new Error("log message is empty").stack);
     }
 
     this.logMessage(LogType.ERROR, ...message);
@@ -213,16 +204,14 @@ class Logger {
   }
 
   _internal_getWindowSize(): [number, number] {
-    let size = process?.stdout?.getWindowSize?.();
+    const size = process?.stdout?.getWindowSize?.();
 
     return [size?.[0] || 120, size?.[1] || 60];
   }
 
   _internal_writePrompt() {
     if (
-      !this.log.instance?.sys.configuration?.hasFeature(
-        WorkspacesFeatureFlags.SlashCommands,
-      ) ||
+      !this.log.instance?.sys.configuration?.hasFeature(WorkspacesFeatureFlags.SlashCommands) ||
       !process.stdout.cursorTo
     )
       return this;
@@ -247,11 +236,7 @@ class Logger {
     });
   }
 
-  private writeMessage(
-    logType: LogType,
-    typeString: string,
-    ...message: any[]
-  ) {
+  private writeMessage(logType: LogType, typeString: string, ...message: any[]) {
     if (logType === LogType.RAW) {
       process.stdout.write(
         chalk.bold(
@@ -303,8 +288,6 @@ export default class Log {
   constructor(instance: Instance) {
     this.instance = instance;
     this.system = this.createLogger("system");
-
-    return this;
   }
 
   createLogger(prefix: string): Logger {

@@ -1,5 +1,5 @@
-import CHEVRON_LEFT_ICON from "@material-symbols/svg-500/outlined/chevron_left.svg";
-import LOGOUT_ICON from "@material-symbols/svg-500/outlined/logout.svg";
+import CHEVRON_LEFT_ICON from "@material-symbols/svg-700/outlined/chevron_left.svg";
+import LOGOUT_ICON from "@material-symbols/svg-700/outlined/logout.svg";
 import { useNavigate } from "@solidjs/router";
 import UKAvatar from "@tcsw/uikit-solid/src/components/avatar/UKAvatar.tsx";
 import UKStack from "@tcsw/uikit-solid/src/components/stack/UKStack.tsx";

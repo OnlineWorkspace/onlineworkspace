@@ -5,8 +5,8 @@ import type { ButtonColor } from "./lib/color.ts";
 import type { ButtonShape } from "./lib/shape.ts";
 import type { ButtonSize } from "./lib/size.ts";
 import styles from "./UKButton.module.scss";
-import PROGRESS_ACTIVITY_ICON from "@material-symbols/svg-500/outlined/progress_activity.svg";
-import CHECK_ICON from "@material-symbols/svg-500/outlined/check.svg";
+import PROGRESS_ACTIVITY_ICON from "@material-symbols/svg-700/outlined/progress_activity.svg";
+import CHECK_ICON from "@material-symbols/svg-700/outlined/check.svg";
 
 type ButtonProps =
   | {

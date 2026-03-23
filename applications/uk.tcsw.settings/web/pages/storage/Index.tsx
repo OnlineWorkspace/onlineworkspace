@@ -6,7 +6,7 @@ import { useNavigate } from "@solidjs/router";
 import DuplicateFiles from "./components/DuplicateFiles/DuplicateFiles";
 import TemporaryFiles from "./components/TemporaryFiles/TemporaryFiles";
 import UKStackLabel from "@tcsw/uikit-solid/src/components/stack/UKStackLabel.tsx";
-import CHEVRON_LEFT_ICON from "@material-symbols/svg-500/outlined/chevron_left.svg";
+import CHEVRON_LEFT_ICON from "@material-symbols/svg-700/outlined/chevron_left.svg";
 
 const StoragePage: Component = () => {
   const navigate = useNavigate();

@@ -9,13 +9,13 @@ import {
 import styles from "./Layout.module.scss";
 import trpc from "./lib/trpc";
 import UKSideBar from "@tcsw/uikit-solid/src/components/sideBar/UKSideBar.tsx";
-import SETTINGS_APPLICATIONS_ICON from "@material-symbols/svg-500/outlined/settings_applications.svg"
-import APPS_ICON from "@material-symbols/svg-500/outlined/apps.svg"
-import HOME_ICON from "@material-symbols/svg-500/outlined/home.svg"
-import PERSON_ICON from "@material-symbols/svg-500/outlined/person.svg"
-import PASSKEY_ICON from "@material-symbols/svg-500/outlined/passkey.svg"
-import STORAGE_ICON from "@material-symbols/svg-500/outlined/storage.svg"
-import WALLPAPER_ICON from "@material-symbols/svg-500/outlined/wallpaper.svg"
+import SETTINGS_APPLICATIONS_ICON from "@material-symbols/svg-700/outlined/settings_applications.svg"
+import APPS_ICON from "@material-symbols/svg-700/outlined/apps.svg"
+import HOME_ICON from "@material-symbols/svg-700/outlined/home.svg"
+import PERSON_ICON from "@material-symbols/svg-700/outlined/person.svg"
+import PASSKEY_ICON from "@material-symbols/svg-700/outlined/passkey.svg"
+import STORAGE_ICON from "@material-symbols/svg-700/outlined/storage.svg"
+import WALLPAPER_ICON from "@material-symbols/svg-700/outlined/wallpaper.svg"
 
 const Layout: Component<ParentProps> = (props) => {
   const [isAdministrator] = createResource(() =>

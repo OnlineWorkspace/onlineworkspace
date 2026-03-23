@@ -1,7 +1,9 @@
+import APPS_ICON from "@material-symbols/svg-700/outlined/apps.svg";
+import SEARCH_ICON from "@material-symbols/svg-700/outlined/search.svg";
 import { useLocation, useNavigate } from "@solidjs/router";
-import { type Component, type ParentProps, Suspense } from "solid-js";
-import UKSideBar from "@tcsw/uikit-solid/src/components/sideBar/UKSideBar.tsx";
 import UKIndeterminateSpinner from "@tcsw/uikit-solid/src/components/indeterminateSpinner/UKIndeterminateSpinner.tsx";
+import UKSideBar from "@tcsw/uikit-solid/src/components/sideBar/UKSideBar.tsx";
+import { type Component, type ParentProps, Suspense } from "solid-js";
 import styles from "./Layout.module.scss";
 
 const Layout: Component<ParentProps> = (props) => {
@@ -17,7 +19,7 @@ const Layout: Component<ParentProps> = (props) => {
         },
         {
           type: "button",
-          icon: { type: "icon", value: "search" },
+          icon: { type: "icon", value: SEARCH_ICON },
           label: "Search",
           onClick() {
             navigate("/app/uk.tcsw.store/search");
@@ -28,7 +30,7 @@ const Layout: Component<ParentProps> = (props) => {
         },
         {
           type: "button",
-          icon: { type: "icon", value: "apps" },
+          icon: { type: "icon", value: APPS_ICON },
           label: "Installed",
           onClick() {
             navigate("/app/uk.tcsw.store/manage-installed");

@@ -1,4 +1,4 @@
-import KEY_ICON from "@material-symbols/svg-500/outlined/key.svg";
+import KEY_ICON from "@material-symbols/svg-700/outlined/key.svg";
 import { useNavigate } from "@solidjs/router";
 import UKButton from "@tcsw/uikit-solid/src/components/button/UKButton.tsx";
 import UKCard from "@tcsw/uikit-solid/src/components/card/UKCard.tsx";

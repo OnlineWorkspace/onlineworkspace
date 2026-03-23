@@ -54,7 +54,7 @@ const router = t.router({
           switch (instance.sys.filesystem.getFileType(itemPath)) {
             case "image": {
               icon =
-                opt.ctx.rawRequest.destinationHostname +
+                opt.ctx.instance.sys.configuration.backendUrl +
                 (await instance.sys.image.serveImage(opt.ctx.userId, itemPath, {
                   resize: {
                     dimensions: (dimensions) => {
@@ -153,7 +153,7 @@ const router = t.router({
           switch (instance.sys.filesystem.getFileType(itemPath)) {
             case "image": {
               icon =
-                opt.ctx.rawRequest.destinationHostname +
+                opt.ctx.instance.sys.configuration.backendUrl +
                 (await instance.sys.image.serveImage(opt.ctx.userId, itemPath, {
                   resize: {
                     dimensions: (dimensions) => {
@@ -218,7 +218,7 @@ const router = t.router({
     }
 
     return (
-      opt.ctx.rawRequest.destinationHostname +
+      opt.ctx.instance.sys.configuration.backendUrl +
       instance.sys.filesystem.serveFile(opt.ctx.userId, finalPath)
     );
   }),
@@ -394,7 +394,7 @@ const router = t.router({
 export type TRPCRouter = typeof router;
 
 instance.sys.tRPC.registeredRouters.push({
-  basePath: "/app/uk.tcsw.files",
+  basePath: "/api/app/uk.tcsw.files",
   router: router,
   createContext: createTRPCContext(instance),
 });

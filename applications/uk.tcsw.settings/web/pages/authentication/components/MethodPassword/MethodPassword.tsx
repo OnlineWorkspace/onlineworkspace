@@ -13,8 +13,8 @@ import {
 import trpc from "../../../../lib/trpc";
 import ResetPasswordDialogue from "./components/ResetPasswordDialogue/ResetPasswordDialogue.tsx";
 import styles from "./MethodPassword.module.scss";
-import CHECK_ICON from "@material-symbols/svg-500/outlined/check.svg"
-import PASSWORD_ICON from "@material-symbols/svg-500/outlined/password.svg"
+import CHECK_ICON from "@material-symbols/svg-700/outlined/check.svg"
+import PASSWORD_ICON from "@material-symbols/svg-700/outlined/password.svg"
 
 const MethodPassword: Component = () => {
   const [hasPassword, { refetch: refetchHasPassword }] = createResource(() =>

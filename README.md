@@ -89,12 +89,11 @@ Store Application Page
 
 ### Dependencies
 
-| Dependency | External Installation Guide | Optional |
-| ---------- | --------------------------- | -------- |
-| Bun        | https://bun.sh              | No       |
-| PostgreSQL | https://www.postgresql.org/ | No       |
+| Dependency | External Installation Guide      | Optional |
+| ---------- | -------------------------------- | -------- |
+| Bun        | https://bun.sh                   | No       |
+| PostgreSQL | https://www.postgresql.org/      | No       |
 
-### Installation
 
 1. Ensure all dependencies are installed before continuing
 2. Ensure that the installation environment is running a supported version of Linux
@@ -123,10 +122,11 @@ Store Application Page
 
 ### Dependencies
 
-| Dependency | NPM Package       | External Installation Guide | Optional |
-| ---------- | ----------------- | --------------------------- | -------- |
-| Bun        |                   | https://bun.sh              | No       |
-| PostgreSQL |                   | https://www.postgresql.org/ | No       |
+| Dependency | NPM Package | External Installation Guide      | Optional |
+|------------|-------------|----------------------------------|----------|
+| Bun        |             | https://bun.sh                   | No       |
+| PostgreSQL |             | https://www.postgresql.org/      | No       |
+| Caddy      |             | https://caddyserver.com/download | No       |
 
 > [!IMPORTANT]
 > Please ensure all non-optional dependencies are installed before proceeding.
@@ -141,11 +141,68 @@ Store Application Page
         6. Change the PostgreSQL password with the following query -> `ALTER USER postgres WITH PASSWORD 'postgres';`
         7. Exit psql -> `exit;`
         8. Logout from the postgres user -> `exit`
+        9. Install Caddy -> `sudo apt install caddy`
     - Windows
         1. Simply install postgreSQL with the setup file downloaded from the postgreSQL website
         2. Open your database viewer of choice (DBeaver Community Edition is recommended)
         3. Create the `tricolor_workspaces` table
+        4. Download the caddy executable from the caddy website, this can be placed anywhere but in the repo root directory is recommended for ease of use
     - MacOS
-        1. Using Orbstack with Ubuntu follow the Ubuntu Linux instructions above
+        1. Using Orbstack with an Ubuntu container, follow the Ubuntu Linux instructions above
 2. Run `bun install` inside the project root directory to install all NPM dependencies
-3. Run `bun run dev` to start up the web interface and backend in development mode
+3. Ensure all autoinstall configuration is set before proceeding, if you want a vanilla setup this step can be skipped (see [Autoinstall Configuration](#autoinstall-configuration) section in the documentation for more details)
+4. Run `bun run dev` to start up the web interface and backend in development mode
+5. Run `caddy run`(Linux) or `.\caddy.exe run`(Windows) to start the caddy server with the provided configuration (this will serve the web interface on `https://localhost` by default)
+
+## Autoinstall Configuration
+
+---
+
+To automatically configure a workspaces instance on the first run, create a directory called `autoinstall` in the project root and place a `config.json` file inside with the following structure:
+
+```json
+{
+  "enabledFeatures": ["slash_commands"],
+  "databases": {
+    "postgres": {
+      "user": "postgres",
+      "password": "postgres",
+      "host": "localhost",
+      "port": 5432,
+      "database": "tricolor_workspaces"
+    }
+  },
+  "backendUrl": "https://localhost",
+  "webUrl": ["https://localhost"],
+  "signupRequirements": {
+    "email": false,
+    "twoFactorAuthentication": false
+  },
+  "displayName": "Workspace",
+  "mailserver": {
+    "host": "smtp.example.com",
+    "port": 587,
+    "secure": true,
+    "auth": {
+      "user": "user",
+      "pass": "password"
+    }
+  },
+  "termsOfUse": {
+    "message": "1. Acceptance of Terms\n    - By logging in, you agree to these rules. If you do not agree, please do not use the service.\n2. Account Security\n    - You are the gatekeeper of your account. Keep your password private, as you are responsible for all activity that happens under your login.\n3. Content Ownership\n    - What is yours remains yours. We claim no ownership over the files, photos, or data you upload to this instance.\n4. Acceptable Use\n    - Do not use this space for anything illegal, malicious, or harmful. This includes uploading malware or attempting to disrupt the service for others.\n5. Privacy and Access\n    - We value your privacy. We will not access your stored data unless it is strictly necessary for technical support or required by legal authorities.\n6. Storage and Maintenance\n    - While we strive for 100% uptime, this service is provided \"as is.\" We may occasionally perform maintenance that results in temporary downtime.\n7. Personal Responsibility\n    - Hardware and software can fail. You agree to maintain your own external backups of any mission-critical data. We are not liable for data loss.\n8. Termination\n    - We reserve the right to suspend or close accounts that violate these terms or compromise the security of the server.\n9. Policy Updates\n    - These terms may change. If we make significant updates, we will post a notification within the app or send an email.",
+    "lastUpdated": 1774139372136
+  },
+  "defaultQuickShortcuts": [
+    "uk.tcsw.dashboard",
+    "uk.tcsw.store",
+    "uk.tcsw.settings",
+    "uk.tcsw.photos",
+    "uk.tcsw.files"
+  ]
+}
+```
+
+Any fields provided in the `config.json` file will override the default settings. By leaving out any fields, the default values will be used instead. This allows you to only modify the settings you want to change while leaving the rest of the default configuration intact.
+
+Instance branding assets can be added to the `autoinstall` directory and should be located and named as follows:
+- `autoinstall/assets/login/banner.png`

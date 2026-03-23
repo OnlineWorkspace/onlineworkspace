@@ -1,19 +1,19 @@
 import type { Instance } from "./index.js";
 import type { Logger } from "./log.js";
+import type ApplicationsSubsystem from "./systems/applications.js";
 import type AuthorizationSubsystem from "./systems/authorization.js";
 import type ConfigurationSubsystem from "./systems/configuration.js";
 import type ConsoleCommandsSubsystem from "./systems/consoleCommands.js";
+import type DatabaseSubsystem from "./systems/database.js";
+import type EmailSystem from "./systems/email.js";
+import type EventSystem from "./systems/events.js";
 import type FilesystemSubsystem from "./systems/filesystem.js";
+import type ImageSubsystem from "./systems/image.js";
 import type NotificationsSubsystem from "./systems/notifications.js";
-import type UsersSubsystem from "./systems/users.js";
-import DatabaseSubsystem from "./systems/database.js";
-import ApplicationsSubsystem from "./systems/applications.js";
-import TRPCSubsystem from "./systems/trpc.js";
-import ImageSubsystem from "./systems/image.js";
 import type SettingsSubsystem from "./systems/settings.js";
+import type TRPCSubsystem from "./systems/trpc.js";
+import type UsersSubsystem from "./systems/users.js";
 import type WebFrontendSubsystem from "./systems/webFrontend.js";
-import EmailSystem from "./systems/email.js";
-import EventSystem from "./systems/events.js";
 
 export type Sys = {
   users: UsersSubsystem;
@@ -41,8 +41,6 @@ export default abstract class System {
     this.instance = instance;
     this.id = id;
     this.log = instance.log.createLogger(this.id);
-
-    return this;
   }
 
   async startup(): Promise<boolean> {

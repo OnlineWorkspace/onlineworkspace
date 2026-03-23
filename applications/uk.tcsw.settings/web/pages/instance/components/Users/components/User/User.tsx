@@ -1,5 +1,5 @@
-import PERSON_ICON from "@material-symbols/svg-500/outlined/person.svg";
-import SHIELD_PERSON_ICON from "@material-symbols/svg-500/outlined/shield_person.svg";
+import PERSON_ICON from "@material-symbols/svg-700/outlined/person.svg";
+import SHIELD_PERSON_ICON from "@material-symbols/svg-700/outlined/shield_person.svg";
 import UKButton from "@tcsw/uikit-solid/src/components/button/UKButton.jsx";
 import UKButtonGroup from "@tcsw/uikit-solid/src/components/buttonGroup/UKButtonGroup.jsx";
 import UKDialog from "@tcsw/uikit-solid/src/components/dialog/UKDialog.jsx";

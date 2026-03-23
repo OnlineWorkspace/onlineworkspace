@@ -39,11 +39,11 @@ const router = t.router({
             return {
               displayName: `${forename} ${surname}`,
               username: username,
-              avatar: `${opt.ctx.rawRequest.destinationHostname}/api/user/me/avatar/m`,
+              avatar: `${opt.ctx.instance.sys.configuration.backendUrl}/api/user/me/avatar/m`,
             };
           }),
         avatar: procedure.output(z.string()).query(async (opt) => {
-          return `${opt.ctx.rawRequest.destinationHostname}/api/user/me/avatar/2xl`;
+          return `${opt.ctx.instance.sys.configuration.backendUrl}/api/user/me/avatar/2xl`;
         }),
       },
     },
@@ -207,7 +207,7 @@ const router = t.router({
         }
 
         return (
-          opt.ctx.rawRequest.destinationHostname +
+          opt.ctx.instance.sys.configuration.backendUrl +
           (await opt.ctx.instance.sys.image.serveImage(
             opt.ctx.userId,
             requiredResizedWallpaperPath,
@@ -220,7 +220,7 @@ const router = t.router({
 export type TRPCRouter = typeof router;
 
 instance.sys.tRPC.registeredRouters.push({
-  basePath: "/app/uk.tcsw.dashboard",
+  basePath: "/api/app/uk.tcsw.dashboard",
   router: router,
   createContext: createTRPCContext(instance),
 });

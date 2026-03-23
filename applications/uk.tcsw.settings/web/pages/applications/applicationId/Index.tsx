@@ -1,5 +1,5 @@
-import CHEVRON_LEFT_ICON from "@material-symbols/svg-500/outlined/chevron_left.svg";
-import ERROR_ICON from "@material-symbols/svg-500/outlined/error.svg";
+import CHEVRON_LEFT_ICON from "@material-symbols/svg-700/outlined/chevron_left.svg";
+import ERROR_ICON from "@material-symbols/svg-700/outlined/error.svg";
 import { useNavigate, useParams, useSearchParams } from "@solidjs/router";
 import UKButton from "@tcsw/uikit-solid/src/components/button/UKButton.jsx";
 import UKButtonGroup from "@tcsw/uikit-solid/src/components/buttonGroup/UKButtonGroup.tsx";

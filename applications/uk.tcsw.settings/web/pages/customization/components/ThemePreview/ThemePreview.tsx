@@ -1,5 +1,5 @@
-import ARROW_CIRCLE_RIGHT_ICON from "@material-symbols/svg-500/outlined/arrow_circle_right.svg";
-import MENU_ICON from "@material-symbols/svg-500/outlined/menu.svg";
+import ARROW_CIRCLE_RIGHT_ICON from "@material-symbols/svg-700/outlined/arrow_circle_right.svg";
+import MENU_ICON from "@material-symbols/svg-700/outlined/menu.svg";
 import UKIcon from "@tcsw/uikit-solid/src/components/icon/UKIcon.tsx";
 import UKIndeterminateSpinner from "@tcsw/uikit-solid/src/components/indeterminateSpinner/UKIndeterminateSpinner.tsx";
 import clsx from "clsx";

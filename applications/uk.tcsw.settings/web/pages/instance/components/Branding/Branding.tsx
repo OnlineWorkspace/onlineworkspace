@@ -1,5 +1,5 @@
-import REFRESH_ICON from "@material-symbols/svg-500/outlined/refresh.svg";
-import UPLOAD_ICON from "@material-symbols/svg-500/outlined/upload.svg";
+import REFRESH_ICON from "@material-symbols/svg-700/outlined/refresh.svg";
+import UPLOAD_ICON from "@material-symbols/svg-700/outlined/upload.svg";
 import UKButton from "@tcsw/uikit-solid/src/components/button/UKButton.jsx";
 import UKIconButton from "@tcsw/uikit-solid/src/components/iconButton/UKIconButton.jsx";
 import UKStack from "@tcsw/uikit-solid/src/components/stack/UKStack.jsx";

@@ -3,7 +3,7 @@
   "displayName": "Files",
   "icon": {
     "type": "icon",
-    "value": "folder"
+    "value": "./web/node_modules/@material-symbols/svg-700/outlined/folder.svg"
   },
   "description": "Navigate and manage files in your Workspace",
   "authors": ["Tricolor Software <https://tcsw.uk>"],

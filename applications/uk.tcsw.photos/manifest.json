@@ -3,7 +3,7 @@
   "displayName": "Photos",
   "icon": {
     "type": "icon",
-    "value": "photo_prints"
+    "value": "./web/node_modules/@material-symbols/svg-700/outlined/photo_prints.svg"
   },
   "description": "Manage & View your photos and videos",
   "authors": ["Tricolor Software <https://tcsw.uk>"],

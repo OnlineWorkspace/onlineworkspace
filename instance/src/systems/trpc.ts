@@ -68,52 +68,17 @@ export default class TRPCSystem extends System {
       port: 3563,
       hostname: "0.0.0.0",
       async fetch(req: BunRequest, server: Server<ReturnType<typeof createTRPCContext>>) {
-        const requestOriginDomain = req.headers.get("Origin");
-
-        if (!requestOriginDomain) return new Response("Invalid request");
-
-        if (!self.instance.sys.configuration.webUrl.includes(requestOriginDomain))
-          return new Response("Invalid request");
-
-        if (req.method === "OPTIONS") {
-          return new Response("TricolorSoftware", {
-            headers: {
-              "Access-Control-Allow-Origin": requestOriginDomain,
-              "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-              "Access-Control-Allow-Headers": "Content-Type, Authorization",
-              "Access-Control-Allow-Credentials": "true",
-            },
-          });
-        }
-
         try {
           const trpcResponse = await self.attemptTRPCRequest(req, server);
-
           if (trpcResponse) {
-            trpcResponse.headers.set("Access-Control-Allow-Origin", requestOriginDomain);
-            trpcResponse.headers.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-            trpcResponse.headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
-            trpcResponse.headers.set("Access-Control-Allow-Credentials", "true");
             return trpcResponse;
+          } else {
+            return new Response("Hello from Workspaces!");
           }
         } catch (err) {
           self.log.error(err);
           console.error(new Error("tRPC -----").stack);
           return new Response("TRPC failed");
-        }
-
-        try {
-          const resp = options?.fetch?.call(server, req, server);
-          resp.headers.set("Access-Control-Allow-Origin", requestOriginDomain);
-          resp.headers.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-          resp.headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
-          resp.headers.set("Access-Control-Allow-Credentials", "true");
-
-          return resp;
-        } catch (err) {
-          self.log.error(err);
-          console.error(new Error("Generic -----").stack);
-          return new Response("Generic request error failed");
         }
       },
       onError: (...p: any[]) => {

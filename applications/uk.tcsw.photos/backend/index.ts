@@ -130,7 +130,7 @@ const router = t.router({
 export type TRPCRouter = typeof router;
 
 instance.sys.tRPC.registeredRouters.push({
-  basePath: "/app/uk.tcsw.photos",
+  basePath: "/api/app/uk.tcsw.photos",
   router: router,
   createContext: createTRPCContext(instance),
 });

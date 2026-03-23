@@ -25,6 +25,7 @@
     --icon-size: 24px;
     color: rgb(var(--uk-sys-color-on-surface-variant));
     margin: 0;
+    flex-shrink: 0;
 
     transition: width var(--uk-sys-motion-duration-250) var(--uk-sys-motion-easing-emphasized-decelerate),
     height var(--uk-sys-motion-duration-250) var(--uk-sys-motion-easing-emphasized-decelerate),
@@ -41,6 +42,7 @@
 
     width: 24px;
     height: 24px;
+    flex-shrink: 0;
 
     transition: width var(--uk-sys-motion-duration-250) var(--uk-sys-motion-easing-emphasized-decelerate),
     height var(--uk-sys-motion-duration-250) var(--uk-sys-motion-easing-emphasized-decelerate),
@@ -84,7 +86,6 @@
     }
 
     & .icon {
-      width: 1.5rem;
       margin-right: 0.5rem;
     }
 
@@ -104,7 +105,6 @@
       margin-bottom: 0.25rem;
       margin-left: 1.25rem;
       margin-right: 0;
-      border-radius: 10rem;
     }
 
     & .imageIcon {

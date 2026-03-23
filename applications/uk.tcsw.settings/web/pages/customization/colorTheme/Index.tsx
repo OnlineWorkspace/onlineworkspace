@@ -1,5 +1,5 @@
 import { themeFromImage } from "@material/material-color-utilities";
-import CHEVRON_LEFT_ICON from "@material-symbols/svg-500/outlined/chevron_left.svg";
+import CHEVRON_LEFT_ICON from "@material-symbols/svg-700/outlined/chevron_left.svg";
 import { useNavigate } from "@solidjs/router";
 import UKTopAppBar from "@tcsw/uikit-solid/src/components/topAppBar/UKTopAppBar.jsx";
 import { type Component, createEffect, createResource } from "solid-js";
@@ -16,7 +16,7 @@ const ColorThemePage: Component = () => {
     if (wallpaperSrc() === undefined) return;
 
     const sourceImage = new Image();
-    sourceImage.crossOrigin = "http://localhost:5173";
+    sourceImage.crossOrigin = "https://localhost";
     sourceImage.src = wallpaperSrc()!;
 
     console.log(await themeFromImage(sourceImage));

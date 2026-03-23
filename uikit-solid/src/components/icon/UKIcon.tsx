@@ -3,8 +3,6 @@ import type { Component } from "solid-js";
 import styles from "./UKIcon.module.scss";
 
 const UKIcon: Component<{ children: string; class?: string; onClick?: () => void }> = (props) => {
-  console.log(props.children);
-
   return (
     <>
       {/* biome-ignore lint/a11y/noStaticElementInteractions: icon lmao */}
