@@ -152,7 +152,8 @@ Store Application Page
 2. Run `bun install` inside the project root directory to install all NPM dependencies
 3. Ensure all autoinstall configuration is set before proceeding, if you want a vanilla setup this step can be skipped (see [Autoinstall Configuration](#autoinstall-configuration) section in the documentation for more details)
 4. Run `bun run dev` to start up the web interface and backend in development mode
-5. Run `caddy run`(Linux) or `.\caddy.exe run`(Windows) to start the caddy server with the provided configuration (this will serve the web interface on `https://localhost` by default)
+5. If on Linux or MacOS, ensure that caddy is allowed to bind to ports lower than 1024 by running `sudo setcap 'cap_net_bind_service=+ep' $(which caddy)`.
+6. Run `caddy run`(Linux) or `.\caddy.exe run`(Windows) to start the caddy server with the provided configuration (this will serve the web interface on `https://localhost` by default)
 
 ## Autoinstall Configuration
 
