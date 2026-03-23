@@ -1,8 +1,8 @@
-import { type Component } from "solid-js";
 import { Route } from "@solidjs/router";
-import Layout from "./Layout.tsx";
+import type { Component } from "solid-js";
 import Redirect from "./components/Redirect.tsx";
 import ViewContainer from "./components/ViewContainer/ViewContainer.tsx";
+import Layout from "./Layout.tsx";
 
 const App: Component = () => {
   return (

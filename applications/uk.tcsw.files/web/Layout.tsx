@@ -1,28 +1,22 @@
-import { createSignal, type Component, type ParentProps } from "solid-js";
+import { type Component, createSignal, type ParentProps } from "solid-js";
 import PathBar from "./components/PathBar/PathBar.tsx";
 import SideBar from "./components/SideBar/SideBar.tsx";
 import StatusBar from "./components/StatusBar/StatusBar.tsx";
-import styles from "./Layout.module.scss";
 import { ViewContext } from "./components/ViewContainer/ViewContext.ts";
+import styles from "./Layout.module.scss";
 
 const Layout: Component<ParentProps> = (props) => {
   const [selectedItems, setSelectedItems] = createSignal<string[]>([]);
-  const [lastSelectionIndex, setLastSelectionIndex] = createSignal<
-    number | undefined
-  >(undefined);
+  const [lastSelectionIndex, setLastSelectionIndex] = createSignal<number | undefined>(undefined);
   const [viewItems, setViewItems] = createSignal<
     { name: string; path: string; type: "directory" | "file" | "alias" }[]
   >([]);
   const [viewType, setViewType] = createSignal<"grid" | "list">("grid");
-  const [renameEntry, setRenameEntry] = createSignal<string | undefined>(
-    undefined,
-  );
+  const [renameEntry, setRenameEntry] = createSignal<string | undefined>(undefined);
   const [cutItems, setCutItems] = createSignal<string[]>([]);
   const [copyItems, setCopyItems] = createSignal<string[]>([]);
   const [reload, setReload] = createSignal<number>(0);
-  const [activeTasks, setActiveTasks] = createSignal<
-    { taskId: string; message: string }[]
-  >([]);
+  const [activeTasks, setActiveTasks] = createSignal<{ taskId: string; message: string }[]>([]);
 
   return (
     <ViewContext.Provider
