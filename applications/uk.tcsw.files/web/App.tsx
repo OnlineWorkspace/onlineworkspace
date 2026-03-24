@@ -1,8 +1,9 @@
 import { Route } from "@solidjs/router";
-import type { Component } from "solid-js";
-import Redirect from "./components/Redirect.tsx";
-import ViewContainer from "./components/ViewContainer/ViewContainer.tsx";
-import Layout from "./Layout.tsx";
+import { type Component, lazy } from "solid-js";
+
+const Redirect = lazy(() => import("./components/Redirect.tsx"));
+const ViewContainer = lazy(() => import("./components/ViewContainer/ViewContainer.tsx"));
+const Layout = lazy(() => import("./Layout.tsx"));
 
 const App: Component = () => {
   return (
