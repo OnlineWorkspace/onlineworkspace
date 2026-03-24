@@ -3,5 +3,5 @@ export default function backend(path: string): string {
     return `https://localhost${path}`;
   }
 
-  return `https://${window.location.hostname}${path}`;
+  return `${window.location.origin}${path}`;
 }

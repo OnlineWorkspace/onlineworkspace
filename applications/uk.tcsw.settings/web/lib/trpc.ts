@@ -8,7 +8,7 @@ import {
 } from "@trpc/client";
 import type { TRPCRouter } from "../../backend";
 
-const ENDPOINT_URL = "https://localhost/api/app/uk.tcsw.settings";
+const ENDPOINT_URL = `${window.location.origin}/api/app/uk.tcsw.settings`;
 
 const trpc = createTRPCClient<TRPCRouter>({
   links: [

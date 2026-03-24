@@ -1,4 +1,8 @@
+import CHECK_ICON from "@material-symbols/svg-700/outlined/check.svg";
 import CHEVRON_LEFT_ICON from "@material-symbols/svg-700/outlined/chevron_left.svg";
+import DELETE_ICON from "@material-symbols/svg-700/outlined/delete.svg";
+import FOLDER_ICON from "@material-symbols/svg-700/outlined/folder.svg";
+import UPLOAD_ICON from "@material-symbols/svg-700/outlined/upload.svg";
 import { createFileUploader } from "@solid-primitives/upload";
 import { useNavigate } from "@solidjs/router";
 import UKButton from "@tcsw/uikit-solid/src/components/button/UKButton.tsx";
@@ -120,7 +124,7 @@ const WallpaperPage: Component = () => {
         <div class={styles.configureWallpaper}>
           <UKButtonGroup size={"s"} connected={true}>
             <UKButton
-              leadingIcon={wallpaperFit() === "fill" ? "check" : undefined}
+              leadingIcon={wallpaperFit() === "fill" ? CHECK_ICON : undefined}
               onClick={() => {
                 setWallpaperFit("fill");
               }}
@@ -129,7 +133,7 @@ const WallpaperPage: Component = () => {
               Fill
             </UKButton>
             <UKButton
-              leadingIcon={wallpaperFit() === "cover" ? "check" : undefined}
+              leadingIcon={wallpaperFit() === "cover" ? CHECK_ICON : undefined}
               onClick={() => {
                 setWallpaperFit("cover");
               }}
@@ -138,7 +142,7 @@ const WallpaperPage: Component = () => {
               Cover
             </UKButton>
             <UKButton
-              leadingIcon={wallpaperFit() === "contain" ? "check" : undefined}
+              leadingIcon={wallpaperFit() === "contain" ? CHECK_ICON : undefined}
               onClick={() => {
                 setWallpaperFit("contain");
               }}
@@ -156,7 +160,7 @@ const WallpaperPage: Component = () => {
           <UKButtonGroup size={"s"} connected={true}>
             <UKButton
               disabled={wallpaperFit() === "fill"}
-              leadingIcon={wallpaperAlignVertical() === "top" ? "check" : undefined}
+              leadingIcon={wallpaperAlignVertical() === "top" ? CHECK_ICON : undefined}
               onClick={() => {
                 setWallpaperAlignVertical("top");
               }}
@@ -166,7 +170,7 @@ const WallpaperPage: Component = () => {
             </UKButton>
             <UKButton
               disabled={wallpaperFit() === "fill"}
-              leadingIcon={wallpaperAlignVertical() === "middle" ? "check" : undefined}
+              leadingIcon={wallpaperAlignVertical() === "middle" ? CHECK_ICON : undefined}
               onClick={() => {
                 setWallpaperAlignVertical("middle");
               }}
@@ -176,7 +180,7 @@ const WallpaperPage: Component = () => {
             </UKButton>
             <UKButton
               disabled={wallpaperFit() === "fill"}
-              leadingIcon={wallpaperAlignVertical() === "bottom" ? "check" : undefined}
+              leadingIcon={wallpaperAlignVertical() === "bottom" ? CHECK_ICON : undefined}
               onClick={() => {
                 setWallpaperAlignVertical("bottom");
               }}
@@ -188,7 +192,7 @@ const WallpaperPage: Component = () => {
           <UKButtonGroup size={"s"} connected={true}>
             <UKButton
               disabled={wallpaperFit() === "fill"}
-              leadingIcon={wallpaperAlignHorizontal() === "left" ? "check" : undefined}
+              leadingIcon={wallpaperAlignHorizontal() === "left" ? CHECK_ICON : undefined}
               onClick={() => {
                 setWallpaperAlignHorizontal("left");
               }}
@@ -198,7 +202,7 @@ const WallpaperPage: Component = () => {
             </UKButton>
             <UKButton
               disabled={wallpaperFit() === "fill"}
-              leadingIcon={wallpaperAlignHorizontal() === "center" ? "check" : undefined}
+              leadingIcon={wallpaperAlignHorizontal() === "center" ? CHECK_ICON : undefined}
               onClick={() => {
                 setWallpaperAlignHorizontal("center");
               }}
@@ -208,7 +212,7 @@ const WallpaperPage: Component = () => {
             </UKButton>
             <UKButton
               disabled={wallpaperFit() === "fill"}
-              leadingIcon={wallpaperAlignHorizontal() === "right" ? "check" : undefined}
+              leadingIcon={wallpaperAlignHorizontal() === "right" ? CHECK_ICON : undefined}
               onClick={() => {
                 setWallpaperAlignHorizontal("right");
               }}
@@ -225,7 +229,7 @@ const WallpaperPage: Component = () => {
         <div class={styles.selectWallpaper}>
           <UKButton
             color={"filled"}
-            leadingIcon={"upload"}
+            leadingIcon={UPLOAD_ICON}
             onClick={() => {
               selectWallpaperUpload(async (files) => {
                 for (const file of files) {
@@ -247,7 +251,7 @@ const WallpaperPage: Component = () => {
           <UKButton
             disabled={true}
             color={"tonal"}
-            leadingIcon={"folder"}
+            leadingIcon={FOLDER_ICON}
             onClick={() => {
               return 0;
             }}
@@ -286,7 +290,7 @@ const WallpaperPage: Component = () => {
                       <UKIconButton
                         size={"xs"}
                         class={styles.deleteWallpaper}
-                        icon={"delete"}
+                        icon={DELETE_ICON}
                         color={"tonal"}
                         onClick={async () => {
                           await trpc.customization.wallpaper.delete.mutate({

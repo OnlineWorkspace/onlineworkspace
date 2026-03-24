@@ -4,7 +4,7 @@ import type { TRPCRouter } from "../../backend/index";
 const trpc = createTRPCClient<TRPCRouter>({
   links: [
     httpBatchLink({
-      url: "https://localhost/api/app/uk.tcsw.dashboard",
+      url: `${window.location.origin}/api/app/uk.tcsw.dashboard`,
       fetch(input, init) {
         return fetch(input, { credentials: "include", ...init });
       },

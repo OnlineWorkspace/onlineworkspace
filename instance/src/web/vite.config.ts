@@ -15,6 +15,7 @@ export default defineConfig({
   ],
   server: {
     host: true,
+    allowedHosts: [process.env.ALLOW_HOST || "localhost", "localhost"],
   },
   resolve: {
     alias: {
