@@ -13,6 +13,8 @@ const UKDialog: Component<
     maxWidth?: string;
     adaptToMobile?: boolean;
     dialogColor?: CardColor;
+    bottomAttach?: boolean;
+    noDarken?: boolean;
   }>
 > = (props) => {
   const rootContext = useContext(RootContext);
@@ -25,7 +27,9 @@ const UKDialog: Component<
           {/** biome-ignore lint/a11y/noStaticElementInteractions: clickable background */}
           <div
             class={styles.component}
+            data-no-darken={props.noDarken}
             data-mobile={isMobile() && props.adaptToMobile}
+            data-bottom-attach={props.bottomAttach}
             style={{ "--dialog-max-width": props.maxWidth }}
             onMouseDown={(e) => {
               e.stopPropagation();

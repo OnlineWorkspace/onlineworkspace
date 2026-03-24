@@ -28,7 +28,7 @@ const StringSetting: Component<{
 
   return (
     <UKStackItem
-      labelText={`${props.displayName} (${props.id})`}
+      labelText={`${props.displayName}`}
       supportingText={props.description}
       leading={
         value() !== props.defaultValue

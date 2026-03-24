@@ -33,7 +33,7 @@ const StringListSetting: Component<{
 
   return (
     <UKStackItem
-      labelText={`${props.displayName} (${props.id})`}
+      labelText={`${props.displayName}`}
       supportingText={props.description}
       leading={
         items() !== props.defaultValue

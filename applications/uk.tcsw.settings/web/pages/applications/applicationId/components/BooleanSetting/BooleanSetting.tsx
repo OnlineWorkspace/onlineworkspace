@@ -1,41 +1,41 @@
+import { useParams } from "@solidjs/router";
 import UKStackItem from "@tcsw/uikit-solid/src/components/stack/UKStackItem.jsx";
 import UKSwitch from "@tcsw/uikit-solid/src/components/switch/UKSwitch.jsx";
-import { createEffect, createSignal, type Component } from "solid-js";
+import { type Component, createEffect, createSignal } from "solid-js";
 import trpc from "../../../../../lib/trpc.ts";
-import { useParams } from "@solidjs/router";
 import styles from "./BooleanSetting.module.scss";
 
 const BooleanSetting: Component<{
-    displayName: string;
-    id: string;
-    defaultValue: boolean;
-    currentValue: boolean;
-    description: string;
+  displayName: string;
+  id: string;
+  defaultValue: boolean;
+  currentValue: boolean;
+  description: string;
 }> = (props) => {
-    const params = useParams();
-    const [value, setValue] = createSignal(props.currentValue ?? props.defaultValue);
+  const params = useParams();
+  const [value, setValue] = createSignal(props.currentValue ?? props.defaultValue);
 
-    createEffect(async () => {
-        if (!params.applicationId) return;
+  createEffect(async () => {
+    if (!params.applicationId) return;
 
-        await trpc.application.setApplicationBooleanSettingValue.mutate({
-            applicationId: params.applicationId as string,
-            id: props.id,
-            value: value(),
-        });
+    await trpc.application.setApplicationBooleanSettingValue.mutate({
+      applicationId: params.applicationId as string,
+      id: props.id,
+      value: value(),
     });
+  });
 
-    return (
-        <UKStackItem
-            labelText={`${props.displayName} (${props.id})`}
-            supportingText={props.description}
-            inlineComponent={
-                <>
-                    <UKSwitch class={styles.switch} getValue={setValue} value={value()} />
-                </>
-            }
-        />
-    );
+  return (
+    <UKStackItem
+      labelText={`${props.displayName}`}
+      supportingText={props.description}
+      inlineComponent={
+        <>
+          <UKSwitch class={styles.switch} getValue={setValue} value={value()} />
+        </>
+      }
+    />
+  );
 };
 
 export default BooleanSetting;

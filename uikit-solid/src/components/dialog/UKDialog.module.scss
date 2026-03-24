@@ -44,6 +44,22 @@
       }
     }
   }
+
+  &[data-bottom-attach="true"] > .card {
+    position: absolute;
+    bottom: 0;
+    border-bottom-left-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+  }
+
+  &[data-no-darken="true"] {
+    pointer-events: none;
+    background-color: transparent !important;
+
+    > .card {
+      pointer-events: auto;
+    }
+  }
 }
 
 @keyframes fadeBackground {

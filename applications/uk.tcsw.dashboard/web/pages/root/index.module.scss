@@ -144,3 +144,9 @@
   height: 100% !important;
   aspect-ratio: 1;
 }
+
+.editButtonContainer {
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
+}

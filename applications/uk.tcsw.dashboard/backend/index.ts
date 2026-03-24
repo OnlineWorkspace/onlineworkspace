@@ -3,6 +3,7 @@
 import { WorkspacesEvent } from "@tcsw/workspaces-instance/src/systems/events.js";
 import { BooleanApplicationSetting } from "@tcsw/workspaces-instance/src/systems/settings/applicationSetting/booleanSetting.js";
 import { StringListApplicationSetting } from "@tcsw/workspaces-instance/src/systems/settings/applicationSetting/stringListSetting.js";
+import { StringApplicationSetting } from "@tcsw/workspaces-instance/src/systems/settings/applicationSetting/stringSetting.js";
 import { createTRPCContext, procedure } from "@tcsw/workspaces-instance/src/systems/trpcRouter.js";
 import { initTRPC } from "@trpc/server";
 import fs from "fs/promises";
@@ -54,7 +55,7 @@ const router = t.router({
         "widgets",
       );
     }),
-    welcomeMessage: procedure
+    getWelcomeMessage: procedure
       .input(z.number())
       .output(z.string().or(z.undefined()))
       .query(async (opt) => {
@@ -122,25 +123,39 @@ const router = t.router({
 
         return undefined;
       }),
-    contentBackground: procedure.output(z.boolean()).query(async (opt) => {
+    getShowContentBackground: procedure.output(z.boolean()).query(async (opt) => {
       return await opt.ctx.instance.sys.settings.getUserApplicationSetting<BooleanApplicationSetting>(
         opt.ctx.userId,
         "uk.tcsw.dashboard",
         "content_background",
       );
     }),
-    showEditButton: procedure.output(z.boolean()).query(async (opt) => {
+    getShowEditButton: procedure.output(z.boolean()).query(async (opt) => {
       return await opt.ctx.instance.sys.settings.getUserApplicationSetting<BooleanApplicationSetting>(
         opt.ctx.userId,
         "uk.tcsw.dashboard",
         "show_edit_button",
       );
     }),
-    showSearchBar: procedure.output(z.boolean()).query(async (opt) => {
+    getShowSearchBar: procedure.output(z.boolean()).query(async (opt) => {
       return await opt.ctx.instance.sys.settings.getUserApplicationSetting<BooleanApplicationSetting>(
         opt.ctx.userId,
         "uk.tcsw.dashboard",
         "show_search_bar",
+      );
+    }),
+    getSearchBarSearchEngine: procedure.output(z.string()).query(async (opt) => {
+      return await opt.ctx.instance.sys.settings.getUserApplicationSetting<StringApplicationSetting>(
+        opt.ctx.userId,
+        "uk.tcsw.dashboard",
+        "search_bar_search_engine",
+      );
+    }),
+    getOpenSearchInNewTab: procedure.output(z.boolean()).query(async (opt) => {
+      return await opt.ctx.instance.sys.settings.getUserApplicationSetting<BooleanApplicationSetting>(
+        opt.ctx.userId,
+        "uk.tcsw.dashboard",
+        "open_search_in_new_tab",
       );
     }),
     getWallpaperOptions: procedure
@@ -263,9 +278,27 @@ instance.sys.event.on(WorkspacesEvent.BeforeStartupComplete, () => {
   );
   instance.sys.settings.registerApplicationSetting(
     new BooleanApplicationSetting("uk.tcsw.dashboard", "show_search_bar", false)
-      .setDisplayName("Show Search Bar on Dashboard")
+      .setDisplayName("Show a search bar on the Dashboard")
       .setDescription(
         "Should a search bar be displayed on the dashboard to allow for quick web searches.",
+      ),
+  );
+  instance.sys.settings.registerApplicationSetting(
+    new BooleanApplicationSetting("uk.tcsw.dashboard", "open_search_in_new_tab", false)
+      .setDisplayName("Open search results in a new tab")
+      .setDescription(
+        "When using the dashboard search bar, should the search results be opened in a new tab or in the current tab?",
+      ),
+  );
+  instance.sys.settings.registerApplicationSetting(
+    new StringApplicationSetting(
+      "uk.tcsw.dashboard",
+      "search_bar_search_engine",
+      "https://duckduckgo.com/?q=%s",
+    )
+      .setDisplayName("Search engine for the dashboard search bar")
+      .setDescription(
+        "The search engine URL template for the dashboard search bar. Use %s as a placeholder for the search query. For example, https://duckduckgo.com/?q=%s",
       ),
   );
 });
