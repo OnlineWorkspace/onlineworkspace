@@ -1,116 +1,146 @@
 .root {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 2rem;
-    padding: 1rem;
-    width: 100%;
-    height: 100%;
-    //background-position: center;
-    background-repeat: no-repeat;
-    background-size: cover;
-    background-position: center;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 1rem;
+  width: 100%;
+  height: 100%;
+  //background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
 
-    animation: fadeIn forwards 0.25s var(--uk-sys-motion-easing-standard-decelerate);
+  animation: fadeIn forwards 0.25s
+    var(--uk-sys-motion-easing-standard-decelerate);
 
-    @keyframes fadeIn {
-        from {
-            opacity: 0;
-            filter: blur(0.25rem);
-        }
-        to {
-            opacity: 1;
-            filter: blur(0);
-        }
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      filter: blur(0.25rem);
     }
+    to {
+      opacity: 1;
+      filter: blur(0);
+    }
+  }
 }
 
 .wallpaper {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    user-select: none;
-    pointer-events: none;
-    z-index: -1;
-    animation: fadeIn forwards 0.25s var(--uk-sys-motion-easing-standard-decelerate);
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  user-select: none;
+  pointer-events: none;
+  z-index: -1;
+  animation: fadeIn forwards 0.25s
+    var(--uk-sys-motion-easing-standard-decelerate);
 
-    @keyframes fadeIn {
-        from {
-            opacity: 0;
-            filter: blur(0.25rem);
-        }
-        to {
-            opacity: 1;
-            filter: blur(0);
-        }
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      filter: blur(0.25rem);
     }
-
-    --transform-x: 0;
-    --transform-y: 0;
-
-    .left {
-        left: 0.25rem;
+    to {
+      opacity: 1;
+      filter: blur(0);
     }
+  }
 
-    .center {
-        left: 50%;
-        --transform-x: -50%;
-    }
+  --transform-x: 0;
+  --transform-y: 0;
 
-    .right {
-        right: 0.25rem;
-    }
+  .left {
+    left: 0.25rem;
+  }
 
-    .top {
-        top: 0.25rem;
-    }
+  .center {
+    left: 50%;
+    --transform-x: -50%;
+  }
 
-    .middle {
-        top: 50%;
-        --transform-y: -50%;
-    }
+  .right {
+    right: 0.25rem;
+  }
 
-    .bottom {
-        bottom: 0.25rem;
-    }
+  .top {
+    top: 0.25rem;
+  }
 
-    transform: translateX(var(--transform-x, 0)) translateY(var(--transform-y, 0));
+  .middle {
+    top: 50%;
+    --transform-y: -50%;
+  }
+
+  .bottom {
+    bottom: 0.25rem;
+  }
+
+  transform: translateX(var(--transform-x, 0)) translateY(var(--transform-y, 0));
 }
 
 .wallpaperSpinner {
-    position: absolute;
-    top: 50%;
-    left: calc(50% + 24px);
-    transform: translate(-50%, -50%);
-    z-index: -1;
+  position: absolute;
+  top: 50%;
+  left: calc(50% + 24px);
+  transform: translate(-50%, -50%);
+  z-index: -1;
 }
 
 .welcomeMessage {
-    padding: 1.5rem;
+  padding: 1.5rem;
 }
 
 .widgets {
-    width: max-content;
-    max-width: calc(100% - 2rem);
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(16rem, 23rem));
-    grid-auto-rows: 7rem;
-    padding: 1rem;
-    gap: 1rem;
+  width: max-content;
+  max-width: calc(100% - 2rem);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 23rem));
+  grid-auto-rows: 7rem;
+  padding: 1rem;
+  gap: 1rem;
 }
 
 .root[data-show-background="true"] {
-    .welcomeMessage {
-        border-radius: var(--uk-sys-shape-corner-medium);
-        background: #0004;
-        backdrop-filter: blur(2rem);
-    }
+  .welcomeMessage {
+    border-radius: var(--uk-sys-shape-corner-medium);
+    background: #0004;
+    backdrop-filter: blur(2rem);
+  }
 
-    .widgets {
-        border-radius: calc(var(--uk-sys-shape-corner-medium) + 1rem);
-        backdrop-filter: blur(2rem);
-        background: #0004;
-    }
+  .widgets {
+    border-radius: calc(var(--uk-sys-shape-corner-medium) + 1rem);
+    backdrop-filter: blur(2rem);
+    background: #0004;
+  }
+}
+
+.searchBar {
+  width: 100%;
+  max-width: 32rem;
+  display: flex;
+  border-radius: calc(var(--uk-sys-shape-corner-medium) + 0.5rem);
+  backdrop-filter: blur(2rem);
+  background: #0004;
+  padding: 0.5rem;
+  gap: 0.5rem;
+}
+
+.searchBarInput {
+  flex: 1;
+  padding: 1rem 1rem;
+
+  border: none;
+  outline: none;
+  background-color: rgb(var(--uk-sys-color-surface-container-highest));
+  color: rgb(var(--uk-sys-color-on-surface));
+  box-shadow: 0 0 1px rgb(var(--uk-sys-color-shadow));
+  border-radius: var(--uk-sys-shape-corner-medium);
+}
+
+.searchBarSearch {
+  height: 100% !important;
+  aspect-ratio: 1;
 }

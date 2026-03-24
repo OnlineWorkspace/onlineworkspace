@@ -1,0 +1,24 @@
+.versionLabel {
+  margin-bottom: 0.5rem;
+  user-select: none;
+}
+
+.rail {
+  border-right: 1px solid rgb(var(--uk-sys-color-outline-variant));
+
+  *[data-navigation-rail-mobile-mode="true"] > & {
+    border-top: 1px solid rgb(var(--uk-sys-color-outline-variant));
+    border-right: none;
+  }
+}
+
+.page {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+
+  /* remove later */
+  align-items: center;
+  justify-content: center;
+}

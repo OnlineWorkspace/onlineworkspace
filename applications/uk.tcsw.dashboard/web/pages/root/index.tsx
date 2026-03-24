@@ -1,14 +1,16 @@
-import { createResource, For, Suspense, type Component } from "solid-js";
+import EDIT_ICON from "@material-symbols/svg-700/outlined/edit.svg";
+import SEARCH_ICON from "@material-symbols/svg-700/outlined/search.svg";
+import { useNavigate } from "@solidjs/router";
+import UKButton from "@tcsw/uikit-solid/src/components/button/UKButton.jsx";
+import UKIconButton from "@tcsw/uikit-solid/src/components/iconButton/UKIconButton.jsx";
+import UKIndeterminateSpinner from "@tcsw/uikit-solid/src/components/indeterminateSpinner/UKIndeterminateSpinner.jsx";
+import UKText from "@tcsw/uikit-solid/src/components/text/UKText.jsx";
+import clsx from "clsx";
+import { type Component, createResource, createSignal, For, Suspense } from "solid-js";
+import PLACEHOLDER_WALLPAPER from "./../../assets/placeholder_wallpaper.png";
+import trpc from "../../lib/trpc";
 import Widgets from "../../widgets/widgets";
 import styles from "./index.module.scss";
-import UKText from "@tcsw/uikit-solid/src/components/text/UKText.jsx";
-import trpc from "../../lib/trpc";
-import UKIndeterminateSpinner from "@tcsw/uikit-solid/src/components/indeterminateSpinner/UKIndeterminateSpinner.jsx";
-import clsx from "clsx";
-import PLACEHOLDER_WALLPAPER from "./../../assets/placeholder_wallpaper.png";
-import UKButton from "@tcsw/uikit-solid/src/components/button/UKButton.jsx";
-import { useNavigate } from "@solidjs/router";
-import EDIT_ICON from "@material-symbols/svg-700/outlined/edit.svg"
 
 const RootPage: Component = () => {
   const navigate = useNavigate();
@@ -19,24 +21,16 @@ const RootPage: Component = () => {
     }),
   );
   const [widgets] = createResource(() => trpc.dashboard.getWidgets.query());
-  const [wallpaperOptions] = createResource(() =>
-    trpc.dashboard.getWallpaperOptions.query(),
-  );
-  const [welcomeMessage] = createResource(() =>
-    trpc.dashboard.welcomeMessage.query(Date.now()),
-  );
-  const [contentBackground] = createResource(() =>
-    trpc.dashboard.contentBackground.query(),
-  );
-  const [showEditButton] = createResource(() =>
-    trpc.dashboard.showEditButton.query(),
-  );
+  const [wallpaperOptions] = createResource(() => trpc.dashboard.getWallpaperOptions.query());
+  const [welcomeMessage] = createResource(() => trpc.dashboard.welcomeMessage.query(Date.now()));
+  const [contentBackground] = createResource(() => trpc.dashboard.contentBackground.query());
+  const [showEditButton] = createResource(() => trpc.dashboard.showEditButton.query());
+  const [showSearchBar] = createResource(() => trpc.dashboard.showSearchBar.query());
+  const [searchQuery, setSearchQuery] = createSignal("");
 
   return (
     <div class={styles.root} data-show-background={contentBackground()}>
-      <Suspense
-        fallback={<UKIndeterminateSpinner class={styles.wallpaperSpinner} />}
-      >
+      <Suspense fallback={<UKIndeterminateSpinner class={styles.wallpaperSpinner} />}>
         <img
           alt={""}
           src={wallpaper() || PLACEHOLDER_WALLPAPER}
@@ -52,15 +46,34 @@ const RootPage: Component = () => {
         />
       </Suspense>
       {welcomeMessage() && (
-        <UKText
-          emphasized
-          role="display"
-          size="l"
-          align="center"
-          class={styles.welcomeMessage}
-        >
+        <UKText emphasized role="display" size="l" align="center" class={styles.welcomeMessage}>
           {welcomeMessage()}
         </UKText>
+      )}
+      {showSearchBar() && (
+        <div class={styles.searchBar}>
+          <input
+            type="text"
+            class={styles.searchBarInput}
+            placeholder="Search..."
+            onKeyDown={(e) => {
+              setSearchQuery(e.currentTarget.value);
+              if (e.key === "Enter") {
+                window.location.href = `https://duckduckgo.com/?q=${encodeURIComponent(searchQuery())}`;
+              }
+            }}
+          />
+          <UKIconButton
+            class={styles.searchBarSearch}
+            icon={SEARCH_ICON}
+            shape="square"
+            color={"filled"}
+            onClick={() => {
+              window.location.href = `https://duckduckgo.com/?q=${encodeURIComponent(searchQuery())}`;
+            }}
+            alt="search"
+          />
+        </div>
       )}
       <div class={styles.widgets}>
         <For each={widgets()}>

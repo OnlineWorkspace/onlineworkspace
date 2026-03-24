@@ -136,6 +136,13 @@ const router = t.router({
         "show_edit_button",
       );
     }),
+    showSearchBar: procedure.output(z.boolean()).query(async (opt) => {
+      return await opt.ctx.instance.sys.settings.getUserApplicationSetting<BooleanApplicationSetting>(
+        opt.ctx.userId,
+        "uk.tcsw.dashboard",
+        "show_search_bar",
+      );
+    }),
     getWallpaperOptions: procedure
       .output(
         z.object({
@@ -252,6 +259,13 @@ instance.sys.event.on(WorkspacesEvent.BeforeStartupComplete, () => {
       .setDisplayName("Show Edit Button on Dashboard")
       .setDescription(
         "Should the edit button be displayed on the dashboard to allow quick navigation to this settings page.",
+      ),
+  );
+  instance.sys.settings.registerApplicationSetting(
+    new BooleanApplicationSetting("uk.tcsw.dashboard", "show_search_bar", false)
+      .setDisplayName("Show Search Bar on Dashboard")
+      .setDescription(
+        "Should a search bar be displayed on the dashboard to allow for quick web searches.",
       ),
   );
 });

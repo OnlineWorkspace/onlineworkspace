@@ -5,7 +5,6 @@ import UKIcon from "@tcsw/uikit-solid/src/components/icon/UKIcon.tsx";
 import UKStack from "@tcsw/uikit-solid/src/components/stack/UKStack.tsx";
 import UKText from "@tcsw/uikit-solid/src/components/text/UKText.tsx";
 import UKTopAppBar from "@tcsw/uikit-solid/src/components/topAppBar/UKTopAppBar.jsx";
-import CoreApplicationLayoutContext from "@tcsw/workspaces-instance-web/src/pages/app/CoreApplicationLayoutContext.ts";
 import { type Component, createResource, useContext } from "solid-js";
 import trpc from "../../../lib/trpc";
 import AddShortcutButton from "./components/addShortcutButton/AddShortcutButton.tsx";
@@ -15,7 +14,6 @@ import styles from "./Index.module.scss";
 
 const QuickShortcutsPage: Component = () => {
   const navigate = useNavigate();
-  const coreApplicationLayoutContext = useContext(CoreApplicationLayoutContext);
   const [data, { refetch: refetchData }] = createResource(() =>
     trpc.customization.quickShortcuts.get.query(),
   );
@@ -69,7 +67,6 @@ const QuickShortcutsPage: Component = () => {
                 });
 
                 refetchData();
-                coreApplicationLayoutContext.refetchQuickShortcuts();
               }}
             />
           )}
@@ -78,13 +75,11 @@ const QuickShortcutsPage: Component = () => {
           <ResetToDefaultsButton
             refetchData={() => {
               refetchData();
-              coreApplicationLayoutContext.refetchQuickShortcuts();
             }}
           />
           <AddShortcutButton
             refetchData={() => {
               refetchData();
-              coreApplicationLayoutContext.refetchQuickShortcuts();
             }}
             addShortcut={async (shortcutId) => {
               await trpc.application.setApplicationStringListSettingValue.mutate({
@@ -93,7 +88,6 @@ const QuickShortcutsPage: Component = () => {
                 value: [...(data()?.currentValue ?? []), shortcutId],
               });
               refetchData();
-              coreApplicationLayoutContext.refetchQuickShortcuts();
             }}
           />
         </div>

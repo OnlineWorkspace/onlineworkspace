@@ -16,6 +16,11 @@ export default defineConfig({
   server: {
     host: true,
     allowedHosts: [process.env.ALLOW_HOST || "localhost", "localhost"],
+    hmr: {
+      clientPort: 443,
+      protocol: "wss",
+      host: process.env.ALLOW_HOST || "localhost",
+    },
   },
   resolve: {
     alias: {
