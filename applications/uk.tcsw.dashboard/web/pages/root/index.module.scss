@@ -138,6 +138,12 @@
   color: rgb(var(--uk-sys-color-on-surface));
   box-shadow: 0 0 1px rgb(var(--uk-sys-color-shadow));
   border-radius: var(--uk-sys-shape-corner-medium);
+
+  font-size: var(--uk-sys-typescale-body-large-size);
+  font-weight: var(--uk-sys-typescale-body-large-weight);
+  font-family: var(--uk-sys-typescale-body-large-font);
+  line-height: var(--uk-sys-typescale-body-large-line-height);
+  letter-spacing: var(--uk-sys-typescale-body-large-tracking);
 }
 
 .searchBarSearch {
