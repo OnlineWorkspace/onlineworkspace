@@ -2323,7 +2323,6 @@ function applyTheme(theme: UKDesignTheme, element: HTMLDivElement, mode: "light"
   }
 
   function recurseLevel(rootObject: Record<string, string | object>, rawRootObject: Record<string, string | object>) {
-    console.log(rawRootObject);
     switch (typeof rawRootObject) {
       case "function": {
         // @ts-expect-error
