@@ -46,6 +46,12 @@ const UserSelectPage: Component = () => {
                 });
 
                 if (resp.type === "success") {
+                  const redirect = new URLSearchParams(window.location.search).get("redirect");
+                  if (redirect) {
+                    navigate(redirect);
+                    return;
+                  }
+
                   navigate("/app");
                 }
               }
@@ -56,21 +62,8 @@ const UserSelectPage: Component = () => {
       ) : (
         <>
           <form>
-            <UKTextField
-              color={"outlined"}
-              label={"Username"}
-              setValue={username()}
-              getValue={setUsername}
-              autocomplete="username"
-            />
-            <UKTextField
-              shouldMask={true}
-              color={"outlined"}
-              label={"Password"}
-              autocomplete="password"
-              setValue={password()}
-              getValue={setPassword}
-            />
+            <UKTextField color={"outlined"} label={"Username"} setValue={username()} getValue={setUsername} autocomplete="username" />
+            <UKTextField shouldMask={true} color={"outlined"} label={"Password"} autocomplete="password" setValue={password()} getValue={setPassword} />
             <div class={styles.loginButtons}>
               <UKButton onClick={() => 0} disabled={username() === ""} color={"standard"}>
                 Forgot password?
@@ -89,6 +82,12 @@ const UserSelectPage: Component = () => {
                   }
 
                   if (resp.type === "success") {
+                    const redirect = new URLSearchParams(window.location.search).get("redirect");
+                    if (redirect) {
+                      navigate(redirect);
+                      return;
+                    }
+
                     navigate("/app");
                     return;
                   }
