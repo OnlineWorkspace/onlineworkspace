@@ -5,7 +5,6 @@ const Widgets = {
   "user.avatar": lazy(() => import("./user/avatar/Widget")),
   notifications: lazy(() => import("./notifications/Widget")),
   weather: lazy(() => import("./weather/Widget")),
-  search: lazy(() => import("./search/Widget")),
 };
 
 export default Widgets;
