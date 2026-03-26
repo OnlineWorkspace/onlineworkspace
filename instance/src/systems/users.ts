@@ -35,8 +35,7 @@ export class WorkspacesUser {
     const db = this.instance.sys.database.postgres();
 
     try {
-      if ((await db`SELECT username FROM public.users WHERE username = ${username}`).count !== 0)
-        return false;
+      if ((await db`SELECT username FROM public.users WHERE username = ${username}`).count !== 0) return false;
 
       await db`UPDATE public.users SET username = ${username} WHERE id = ${this.userId}`;
       return true;
@@ -54,10 +53,7 @@ export class WorkspacesUser {
   async getUsername(): Promise<string | undefined> {
     const db = this.instance.sys.database.postgres();
 
-    return (
-      (await db`SELECT username FROM public.users WHERE id = ${this.userId}`)?.[0]?.username ||
-      undefined
-    );
+    return (await db`SELECT username FROM public.users WHERE id = ${this.userId}`)?.[0]?.username || undefined;
   }
 
   /**
@@ -86,10 +82,7 @@ export class WorkspacesUser {
   async getForename(): Promise<string | undefined> {
     const db = this.instance.sys.database.postgres();
 
-    return (
-      (await db`SELECT forename FROM public.users WHERE id = ${this.userId}`)?.[0]?.forename ||
-      undefined
-    );
+    return (await db`SELECT forename FROM public.users WHERE id = ${this.userId}`)?.[0]?.forename || undefined;
   }
 
   /**
@@ -118,10 +111,7 @@ export class WorkspacesUser {
   async getSurname(): Promise<string | undefined> {
     const db = this.instance.sys.database.postgres();
 
-    return (
-      (await db`SELECT surname FROM public.users WHERE id = ${this.userId}`)?.[0]?.surname ||
-      undefined
-    );
+    return (await db`SELECT surname FROM public.users WHERE id = ${this.userId}`)?.[0]?.surname || undefined;
   }
 
   /**
@@ -171,10 +161,7 @@ export class WorkspacesUser {
   async getQuota(): Promise<number | undefined> {
     const db = this.instance.sys.database.postgres();
 
-    return (
-      (await db`SELECT storage_quota FROM public.users WHERE id = ${this.userId}`)?.[0]
-        ?.storage_quota || undefined
-    );
+    return (await db`SELECT storage_quota FROM public.users WHERE id = ${this.userId}`)?.[0]?.storage_quota || undefined;
   }
 
   /**
@@ -202,9 +189,7 @@ export class WorkspacesUser {
   async getBio(): Promise<string | undefined> {
     const db = this.instance.sys.database.postgres();
 
-    return (
-      (await db`SELECT bio FROM public.users WHERE id = ${this.userId}`)?.[0]?.bio || undefined
-    );
+    return (await db`SELECT bio FROM public.users WHERE id = ${this.userId}`)?.[0]?.bio || undefined;
   }
 
   /**
@@ -231,9 +216,7 @@ export class WorkspacesUser {
   async getEmail(): Promise<string | undefined> {
     const db = this.instance.sys.database.postgres();
 
-    return (
-      (await db`SELECT email FROM public.users WHERE id = ${this.userId}`)?.[0]?.email || undefined
-    );
+    return (await db`SELECT email FROM public.users WHERE id = ${this.userId}`)?.[0]?.email || undefined;
   }
 
   /**
@@ -261,10 +244,7 @@ export class WorkspacesUser {
   async getGender(): Promise<string | undefined> {
     const db = this.instance.sys.database.postgres();
 
-    return (
-      (await db`SELECT gender FROM public.users WHERE id = ${this.userId}`)?.[0]?.gender ||
-      undefined
-    );
+    return (await db`SELECT gender FROM public.users WHERE id = ${this.userId}`)?.[0]?.gender || undefined;
   }
 
   /**
@@ -340,10 +320,7 @@ export class WorkspacesUser {
   async isAdministrator(): Promise<boolean> {
     const db = this.instance.sys.database.postgres();
 
-    return (
-      (await db`SELECT is_administrator FROM public.users WHERE id = ${this.userId}`)?.[0]
-        ?.is_administrator || false
-    );
+    return (await db`SELECT is_administrator FROM public.users WHERE id = ${this.userId}`)?.[0]?.is_administrator || false;
   }
 
   /**
@@ -395,19 +372,12 @@ export class WorkspacesUser {
 
     try {
       for (const size of AVATAR_SIZES) {
-        if (
-          override ||
-          !(await fs.exists(path.join(this.getPath(), `assets/avatar/${size.name}.webp`)))
-        ) {
-          this.instance.sys.users.log.info(
-            `Generating avatar for user '${this.userId}' @ ${size.name}`,
-          );
+        if (override || !(await fs.exists(path.join(this.getPath(), `assets/avatar/${size.name}.webp`)))) {
+          this.instance.sys.users.log.info(`Generating avatar for user '${this.userId}' @ ${size.name}`);
           await sharp(path.join(this.getPath(), "assets/avatar/avatar.webp"))
             .resize(size.width, size.height)
             .toFile(path.join(this.getPath(), `assets/avatar/${size.name}.webp`));
-          this.instance.sys.users.log.success(
-            `Generated avatar for user '${this.userId}' @ ${size.name}`,
-          );
+          this.instance.sys.users.log.success(`Generated avatar for user '${this.userId}' @ ${size.name}`);
         }
       }
     } catch (_) {
@@ -444,23 +414,17 @@ export class WorkspacesUser {
     ];
 
     for (const dir of USER_DIRECTORIES) {
-      await this.instance.sys.filesystem.createDirectoryIfNotExists(
-        path.join(this.instance.sys.filesystem.FS_ROOT, `users/${this.userId}`, dir),
-      );
+      await this.instance.sys.filesystem.createDirectoryIfNotExists(path.join(this.instance.sys.filesystem.FS_ROOT, `users/${this.userId}`, dir));
     }
 
     if (!(await fs.exists(path.join(this.getPath(), "assets/avatar/avatar.webp")))) {
-      await this.setAvatar(
-        path.join(this.instance.sys.filesystem.SRC_ROOT, "assets/placeholder/avatar.png"),
-      );
+      await this.setAvatar(path.join(this.instance.sys.filesystem.SRC_ROOT, "assets/placeholder/avatar.png"));
     }
 
     await this.generateAvatars();
 
     if (!(await this.instance.sys.authorization.hasPassword(this.userId))) {
-      this.instance.sys.users.log.warning(
-        `user (${this.userId})${username} has no password set! Without a password, this account cannot be accessed.`,
-      );
+      this.instance.sys.users.log.warning(`user (${this.userId})${username} has no password set! Without a password, this account cannot be accessed.`);
     }
 
     this.instance.sys.users.log.success(`Verified user (${this.userId})${username}`);
@@ -534,22 +498,26 @@ export default class UsersSystem extends System {
                passkeys JSONB DEFAULT '[]'::JSONB
              )`;
 
-    const administratorUserId = await this.createUser("admin");
+    if (!(await this.getAllUsers()).find((u) => u.isAdministrator())) {
+      this.log.warning("No administrator account exists, creating default administrator account with username 'admin' and password 'password'");
 
-    // if the account is newly-created
-    if (administratorUserId !== undefined) {
-      const adminUser = await this.getUserById(administratorUserId);
+      const administratorUserId = await this.createUser("admin");
 
-      if (!adminUser) {
-        this.log.error("Admin user didn't exist and couldn't be created!");
-      } else {
-        await adminUser.setFullName("Admin", "Istrator");
-        await adminUser.setIsAdministrator(true);
+      // if the account is newly-created
+      if (administratorUserId !== undefined) {
+        const adminUser = await this.getUserById(administratorUserId);
 
-        const defaultPassword = "password";
+        if (!adminUser) {
+          this.log.error("Admin user didn't exist and couldn't be created!");
+        } else {
+          await adminUser.setFullName("Admin", "Istrator");
+          await adminUser.setIsAdministrator(true);
 
-        await this.instance.sys.authorization.setPassword(adminUser.userId, defaultPassword);
-        this.log.info(`The default admin user has a password of '${defaultPassword}'`);
+          const defaultPassword = "password";
+
+          await this.instance.sys.authorization.setPassword(adminUser.userId, defaultPassword);
+          this.log.info(`The default admin user has a password of '${defaultPassword}'`);
+        }
       }
     }
 
@@ -570,8 +538,7 @@ export default class UsersSystem extends System {
   async createUser(username: string, password?: string): Promise<number | undefined> {
     const db = this.instance.sys.database.postgres();
 
-    if ((await db`SELECT username FROM public.users WHERE username = ${username}`).count !== 0)
-      return undefined;
+    if ((await db`SELECT username FROM public.users WHERE username = ${username}`).count !== 0) return undefined;
 
     const user = {
       username,
@@ -590,9 +557,7 @@ export default class UsersSystem extends System {
 
     if (password) await this.instance.sys.authorization.setPassword(id, password);
 
-    await ubi.setAvatar(
-      path.join(this.instance.sys.filesystem.SRC_ROOT, "assets/placeholder/avatar.png"),
-    );
+    await ubi.setAvatar(path.join(this.instance.sys.filesystem.SRC_ROOT, "assets/placeholder/avatar.png"));
 
     await ubi.verify();
 
@@ -618,9 +583,7 @@ export default class UsersSystem extends System {
     const db = this.instance.sys.database.postgres();
 
     try {
-      return (await db`SELECT id FROM public.users`).map(
-        (u: { id: number }) => new WorkspacesUser(this.instance, u.id),
-      );
+      return (await db`SELECT id FROM public.users`).map((u: { id: number }) => new WorkspacesUser(this.instance, u.id));
     } catch (err) {
       this.log.error("Failed to getAllUsers()", err);
 
