@@ -1,84 +1,98 @@
 import { ApplicationSetting, GlobalApplicationSetting } from "./applicationSetting.js";
 
 export class BooleanApplicationSetting extends ApplicationSetting<boolean> {
-    constructor(applicationId: string, id: string, defaultValue: boolean) {
-        super();
+  constructor(applicationId: string, id: string, defaultValue: boolean) {
+    super();
 
-        this.applicationId = applicationId;
-        this.id = id;
-        this.defaultValue = defaultValue;
-        this.displayName = id;
-        this.type = "boolean";
-        this.description = "No description provided";
-    }
+    this.applicationId = applicationId;
+    this.id = id;
+    this.defaultValue = defaultValue;
+    this.displayName = id;
+    this.type = "boolean";
+    this.description = "No description provided";
+    this.hidden = false;
+  }
 
-    async setValue(userId: number, value: boolean) {
-        let userSettings = await this.instance.sys.settings.getUserSettings(userId);
+  async setValue(userId: number, value: boolean) {
+    const userSettings = await this.instance.sys.settings.getUserSettings(userId);
 
-        userSettings[`app:${this.applicationId}:${this.id}`] = value;
+    userSettings[`app:${this.applicationId}:${this.id}`] = value;
 
-        await this.instance.sys.settings.setUserSettings(userId, userSettings);
+    await this.instance.sys.settings.setUserSettings(userId, userSettings);
 
-        return true;
-    }
+    return true;
+  }
 
-    async getValue(userId: number): Promise<boolean> {
-        let userSettings = await this.instance.sys.settings.getUserSettings(userId);
+  async getValue(userId: number): Promise<boolean> {
+    const userSettings = await this.instance.sys.settings.getUserSettings(userId);
 
-        const settingValue = userSettings[`app:${this.applicationId}:${this.id}`];
+    const settingValue = userSettings[`app:${this.applicationId}:${this.id}`];
 
-        if (settingValue === undefined) return this.defaultValue;
+    if (settingValue === undefined) return this.defaultValue;
 
-        return settingValue;
-    }
+    return settingValue;
+  }
 
-    setDisplayName(displayName: string): this {
-        this.displayName = displayName;
+  setDisplayName(displayName: string): this {
+    this.displayName = displayName;
 
-        return this;
-    }
+    return this;
+  }
 
-    setDescription(description: string): this {
-        this.description = description;
+  setDescription(description: string): this {
+    this.description = description;
 
-        return this;
-    }
+    return this;
+  }
+
+  setHidden(hidden: boolean) {
+    this.hidden = hidden;
+
+    return this;
+  }
 }
 
 export class GlobalBooleanApplicationSetting extends GlobalApplicationSetting<boolean> {
-    constructor(applicationId: string, id: string, defaultValue: boolean) {
-        super();
+  constructor(applicationId: string, id: string, defaultValue: boolean) {
+    super();
 
-        this.applicationId = applicationId;
-        this.id = id;
-        this.defaultValue = defaultValue;
-        this.type = "boolean";
-        this.description = "No description provided";
-    }
+    this.applicationId = applicationId;
+    this.id = id;
+    this.defaultValue = defaultValue;
+    this.type = "boolean";
+    this.description = "No description provided";
+    this.hidden = false;
+  }
 
-    async setValue(value: boolean) {
-        await this.instance.sys.settings.setGlobalSetting(`app:${this.applicationId}:${this.id}`, value);
+  async setValue(value: boolean) {
+    await this.instance.sys.settings.setGlobalSetting(`app:${this.applicationId}:${this.id}`, value);
 
-        return true;
-    }
+    return true;
+  }
 
-    async getValue(): Promise<boolean> {
-        const settingValue = await this.instance.sys.settings.getGlobalSetting(`app:${this.applicationId}:${this.id}`);
+  async getValue(): Promise<boolean> {
+    const settingValue = await this.instance.sys.settings.getGlobalSetting(`app:${this.applicationId}:${this.id}`);
 
-        if (settingValue === undefined) return this.defaultValue;
+    if (settingValue === undefined) return this.defaultValue;
 
-        return settingValue;
-    }
+    return settingValue;
+  }
 
-    setDisplayName(displayName: string): this {
-        this.displayName = displayName;
+  setDisplayName(displayName: string): this {
+    this.displayName = displayName;
 
-        return this;
-    }
+    return this;
+  }
 
-    setDescription(description: string): this {
-        this.description = description;
+  setDescription(description: string): this {
+    this.description = description;
 
-        return this;
-    }
+    return this;
+  }
+
+  setHidden(hidden: boolean) {
+    this.hidden = hidden;
+
+    return this;
+  }
 }

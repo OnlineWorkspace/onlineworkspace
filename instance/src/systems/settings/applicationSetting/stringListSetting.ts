@@ -1,166 +1,153 @@
 import { ApplicationSetting, GlobalApplicationSetting } from "./applicationSetting.js";
 
 export class StringListApplicationSetting extends ApplicationSetting<string[]> {
-    allowedValues?: string[];
-    allowDuplicateValues?: boolean;
+  allowedValues?: string[];
+  allowDuplicateValues?: boolean;
 
-    constructor(
-        applicationId: string,
-        id: string,
-        defaultValue: string[],
-        options?: { allowedValues: string[]; allowDuplicateValues?: boolean },
-    ) {
-        super();
+  constructor(applicationId: string, id: string, defaultValue: string[], options?: { allowedValues: string[]; allowDuplicateValues?: boolean }) {
+    super();
 
-        this.applicationId = applicationId;
-        this.id = id;
-        this.defaultValue = defaultValue;
-        this.displayName = id;
-        this.type = "stringList";
-        this.description = "No description provided";
-        this.allowedValues = options?.allowedValues;
-        this.allowDuplicateValues = options?.allowDuplicateValues;
+    this.applicationId = applicationId;
+    this.id = id;
+    this.defaultValue = defaultValue;
+    this.displayName = id;
+    this.type = "stringList";
+    this.description = "No description provided";
+    this.allowedValues = options?.allowedValues;
+    this.allowDuplicateValues = options?.allowDuplicateValues;
+    this.hidden = false;
+  }
 
-        return this;
-    }
-
-    async setValue(userId: number, value: string[]) {
-        if (this.allowedValues) {
-            for (const val of value) {
-                if (!this.allowedValues.includes(val)) {
-                    this.instance.log.system.warning(
-                        `Unable to set setting '${this.applicationId}:${this.id}' for user ${userId} as it contains invalid value '${value}'`,
-                    );
-                    return false;
-                }
-            }
+  async setValue(userId: number, value: string[]) {
+    if (this.allowedValues) {
+      for (const val of value) {
+        if (!this.allowedValues.includes(val)) {
+          this.instance.log.system.warning(
+            `Unable to set setting '${this.applicationId}:${this.id}' for user ${userId} as it contains invalid value '${value}'`,
+          );
+          return false;
         }
-
-        let userSettings = await this.instance.sys.settings.getUserSettings(userId);
-
-        userSettings[`app:${this.applicationId}:${this.id}`] = JSON.stringify(value);
-
-        await this.instance.sys.settings.setUserSettings(userId, userSettings);
-
-        return true;
+      }
     }
 
-    async addValue(userId: number, value: string) {
-        let userSettings = await this.instance.sys.settings.getUserSettings(userId);
+    const userSettings = await this.instance.sys.settings.getUserSettings(userId);
 
-        userSettings[`app:${this.applicationId}:${this.id}`] = JSON.stringify([
-            ...JSON.parse(userSettings[`app:${this.applicationId}:${this.id}`]),
-            value,
-        ]);
+    userSettings[`app:${this.applicationId}:${this.id}`] = JSON.stringify(value);
 
-        await this.instance.sys.settings.setUserSettings(userId, userSettings);
+    await this.instance.sys.settings.setUserSettings(userId, userSettings);
 
-        return this;
-    }
+    return true;
+  }
 
-    async getValue(userId: number): Promise<string[]> {
-        let userSettings = await this.instance.sys.settings.getUserSettings(userId);
+  async addValue(userId: number, value: string) {
+    const userSettings = await this.instance.sys.settings.getUserSettings(userId);
 
-        const settingValue = userSettings[`app:${this.applicationId}:${this.id}`];
+    userSettings[`app:${this.applicationId}:${this.id}`] = JSON.stringify([...JSON.parse(userSettings[`app:${this.applicationId}:${this.id}`]), value]);
 
-        if (settingValue === undefined) return this.defaultValue;
+    await this.instance.sys.settings.setUserSettings(userId, userSettings);
 
-        return JSON.parse(settingValue);
-    }
+    return this;
+  }
 
-    setDisplayName(displayName: string): this {
-        this.displayName = displayName;
+  async getValue(userId: number): Promise<string[]> {
+    const userSettings = await this.instance.sys.settings.getUserSettings(userId);
 
-        return this;
-    }
+    const settingValue = userSettings[`app:${this.applicationId}:${this.id}`];
 
-    setDescription(description: string): this {
-        this.description = description;
+    if (settingValue === undefined) return this.defaultValue;
 
-        return this;
-    }
+    return JSON.parse(settingValue);
+  }
+
+  setDisplayName(displayName: string): this {
+    this.displayName = displayName;
+
+    return this;
+  }
+
+  setDescription(description: string): this {
+    this.description = description;
+
+    return this;
+  }
+
+  setHidden(hidden: boolean) {
+    this.hidden = hidden;
+
+    return this;
+  }
 }
 
 export class GlobalStringListApplicationSetting extends GlobalApplicationSetting<string[]> {
-    allowedValues?: string[];
-    allowDuplicateValues?: boolean;
+  allowedValues?: string[];
+  allowDuplicateValues?: boolean;
 
-    constructor(
-        applicationId: string,
-        id: string,
-        defaultValue: string[],
-        options?: { allowedValues: string[]; allowDuplicateValues?: boolean },
-    ) {
-        super();
+  constructor(applicationId: string, id: string, defaultValue: string[], options?: { allowedValues: string[]; allowDuplicateValues?: boolean }) {
+    super();
 
-        this.applicationId = applicationId;
-        this.id = id;
-        this.defaultValue = defaultValue;
-        this.type = "string";
-        this.description = "No description provided";
-        this.allowedValues = options?.allowedValues;
-        this.allowDuplicateValues = options?.allowDuplicateValues;
+    this.applicationId = applicationId;
+    this.id = id;
+    this.defaultValue = defaultValue;
+    this.type = "string";
+    this.description = "No description provided";
+    this.allowedValues = options?.allowedValues;
+    this.allowDuplicateValues = options?.allowDuplicateValues;
+    this.hidden = false;
+  }
 
-        return this;
-    }
-
-    async setValue(value: string[]) {
-        if (this.allowedValues) {
-            for (const val of value) {
-                if (!this.allowedValues.includes(val)) {
-                    this.instance.log.system.warning(
-                        `Unable to set setting '${this.applicationId}:${this.id}' as it contains invalid value '${value}'`,
-                    );
-                    return false;
-                }
-            }
+  async setValue(value: string[]) {
+    if (this.allowedValues) {
+      for (const val of value) {
+        if (!this.allowedValues.includes(val)) {
+          this.instance.log.system.warning(`Unable to set setting '${this.applicationId}:${this.id}' as it contains invalid value '${value}'`);
+          return false;
         }
-
-        await this.instance.sys.settings.setGlobalSetting(
-            `app:${this.applicationId}:${this.id}`,
-            JSON.stringify(value),
-        );
-
-        return true;
+      }
     }
 
-    async addValue(value: string) {
-        const rawSettingValue = await this.instance.sys.settings.getGlobalSetting(
-            `app:${this.applicationId}:${this.id}`,
-        );
-        let settingValue: string[];
+    await this.instance.sys.settings.setGlobalSetting(`app:${this.applicationId}:${this.id}`, JSON.stringify(value));
 
-        if (rawSettingValue === undefined) {
-            settingValue = [];
-        } else {
-            settingValue = JSON.parse(rawSettingValue);
-        }
+    return true;
+  }
 
-        await this.instance.sys.settings.setGlobalSetting(
-            `app:${this.applicationId}:${this.id}`,
-            JSON.stringify([...settingValue, value]),
-        );
+  async addValue(value: string) {
+    const rawSettingValue = await this.instance.sys.settings.getGlobalSetting(`app:${this.applicationId}:${this.id}`);
+    let settingValue: string[];
 
-        return this;
+    if (rawSettingValue === undefined) {
+      settingValue = [];
+    } else {
+      settingValue = JSON.parse(rawSettingValue);
     }
 
-    async getValue(): Promise<string[]> {
-        const settingValue = await this.instance.sys.settings.getGlobalSetting(`app:${this.applicationId}:${this.id}`);
+    await this.instance.sys.settings.setGlobalSetting(`app:${this.applicationId}:${this.id}`, JSON.stringify([...settingValue, value]));
 
-        if (settingValue === undefined) return this.defaultValue;
+    return this;
+  }
 
-        return JSON.parse(settingValue);
-    }
+  async getValue(): Promise<string[]> {
+    const settingValue = await this.instance.sys.settings.getGlobalSetting(`app:${this.applicationId}:${this.id}`);
 
-    setDisplayName(displayName: string): this {
-        this.displayName = displayName;
+    if (settingValue === undefined) return this.defaultValue;
 
-        return this;
-    }
+    return JSON.parse(settingValue);
+  }
 
-    setDescription(description: string): this {
-        this.description = description;
+  setDisplayName(displayName: string): this {
+    this.displayName = displayName;
 
-        return this;
-    }
+    return this;
+  }
+
+  setDescription(description: string): this {
+    this.description = description;
+
+    return this;
+  }
+
+  setHidden(hidden: boolean) {
+    this.hidden = hidden;
+
+    return this;
+  }
 }
