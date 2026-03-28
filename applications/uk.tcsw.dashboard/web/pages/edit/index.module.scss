@@ -1,0 +1,55 @@
+.backButton {
+  position: absolute;
+  left: 1rem;
+  top: 1rem;
+}
+
+.page {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: -2rem;
+  user-select: none;
+}
+
+.widgets {
+  min-width: 100%;
+  height: max-content;
+  min-width: max-content;
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 23rem));
+  grid-auto-rows: 7rem;
+  padding: 1rem;
+  gap: 1rem;
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
+*[data-show-background="true"] {
+  .widgets {
+    border-radius: calc(var(--uk-sys-shape-corner-medium) + 1rem);
+    backdrop-filter: blur(2rem);
+    background: #0004;
+  }
+}
+
+.drawer {
+  border-bottom: unset !important;
+  border-bottom-left-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+  animation: slideIn 0.3s ease-out;
+
+  @keyframes slideIn {
+    from {
+      transform: translateY(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+}

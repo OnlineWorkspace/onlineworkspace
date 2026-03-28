@@ -1,24 +1,14 @@
 /// <reference path="./global.d.ts" />
 
-import {
-  AuthorizedDeviceType,
-  SESSION_VALID_TERM_MS,
-} from "@tcsw/workspaces-instance/src/systems/authorization.js";
-import {
-  FEATURE_FLAG_DESCRIPTIONS,
-  WorkspacesFeatureFlags,
-} from "@tcsw/workspaces-instance/src/systems/configuration.js";
+import fs from "node:fs/promises";
+import path from "node:path";
+import { AuthorizedDeviceType, SESSION_VALID_TERM_MS } from "@tcsw/workspaces-instance/src/systems/authorization.js";
+import { FEATURE_FLAG_DESCRIPTIONS, WorkspacesFeatureFlags } from "@tcsw/workspaces-instance/src/systems/configuration.js";
 import { WorkspacesNotificationPriority } from "@tcsw/workspaces-instance/src/systems/notifications.js";
 import { GlobalApplicationSetting } from "@tcsw/workspaces-instance/src/systems/settings/applicationSetting/applicationSetting.js";
-import {
-  adminProcedure,
-  createTRPCContext,
-  procedure,
-} from "@tcsw/workspaces-instance/src/systems/trpcRouter.js";
+import { adminProcedure, createTRPCContext, procedure } from "@tcsw/workspaces-instance/src/systems/trpcRouter.js";
 import { initTRPC, TRPCError } from "@trpc/server";
 import { octetInputParser } from "@trpc/server/http";
-import fs from "fs/promises";
-import path from "path";
 import sharp from "sharp";
 import z from "zod";
 
@@ -30,16 +20,12 @@ const router = t.router({
   overview: {
     user: {
       fullName: procedure.output(z.string()).query(async (opt) => {
-        const fullName = await (
-          await opt.ctx.instance.sys.users.getUserById(opt.ctx.userId)
-        )?.getFullName();
+        const fullName = await (await opt.ctx.instance.sys.users.getUserById(opt.ctx.userId))?.getFullName();
 
         return `${fullName?.forename} ${fullName?.surname || ""}` || "Unknown User";
       }),
       role: procedure.output(z.string()).query(async (opt) => {
-        const isAdministrator = await (
-          await opt.ctx.instance.sys.users.getUserById(opt.ctx.userId)
-        )?.isAdministrator();
+        const isAdministrator = await (await opt.ctx.instance.sys.users.getUserById(opt.ctx.userId))?.isAdministrator();
 
         return isAdministrator ? "Administrator" : "User";
       }),
@@ -50,40 +36,29 @@ const router = t.router({
   },
   profile: {
     getName: procedure.output(z.string()).query(async (opt) => {
-      const fullName = await (
-        await opt.ctx.instance.sys.users.getUserById(opt.ctx.userId)
-      )?.getFullName();
+      const fullName = await (await opt.ctx.instance.sys.users.getUserById(opt.ctx.userId))?.getFullName();
 
       return `${fullName?.forename} ${fullName?.surname || ""}` || "Unknown User";
     }),
     setName: procedure.input(z.string()).mutation(async (opt) => {
       const fullNameSplit = opt.input.split(" ");
 
-      await (await opt.ctx.instance.sys.users.getUserById(opt.ctx.userId))?.setFullName(
-        fullNameSplit.shift() || "Unknown",
-        fullNameSplit.join(" "),
-      );
+      await (await opt.ctx.instance.sys.users.getUserById(opt.ctx.userId))?.setFullName(fullNameSplit.shift() || "Unknown", fullNameSplit.join(" "));
 
       return true;
     }),
     getUsername: procedure.output(z.string()).query(async (opt) => {
-      const username = await (
-        await opt.ctx.instance.sys.users.getUserById(opt.ctx.userId)
-      )?.getUsername();
+      const username = await (await opt.ctx.instance.sys.users.getUserById(opt.ctx.userId))?.getUsername();
 
       return username || "unknown";
     }),
     setUsername: procedure.input(z.string()).mutation(async (opt) => {
-      await (await opt.ctx.instance.sys.users.getUserById(opt.ctx.userId))?.setUsername(
-        opt.input.toLowerCase(),
-      );
+      await (await opt.ctx.instance.sys.users.getUserById(opt.ctx.userId))?.setUsername(opt.input.toLowerCase());
 
       return true;
     }),
     getGender: procedure.output(z.string()).query(async (opt) => {
-      const gender = await (
-        await opt.ctx.instance.sys.users.getUserById(opt.ctx.userId)
-      )?.getGender();
+      const gender = await (await opt.ctx.instance.sys.users.getUserById(opt.ctx.userId))?.getGender();
 
       return gender || "female";
     }),
@@ -95,9 +70,7 @@ const router = t.router({
       return true;
     }),
     getEmail: procedure.output(z.string()).query(async (opt) => {
-      const email = await (
-        await opt.ctx.instance.sys.users.getUserById(opt.ctx.userId)
-      )?.getEmail();
+      const email = await (await opt.ctx.instance.sys.users.getUserById(opt.ctx.userId))?.getEmail();
 
       return email || "unknown";
     }),
@@ -117,9 +90,7 @@ const router = t.router({
       return true;
     }),
     getRole: procedure.output(z.string()).query(async (opt) => {
-      const isAdministrator = await (
-        await opt.ctx.instance.sys.users.getUserById(opt.ctx.userId)
-      )?.isAdministrator();
+      const isAdministrator = await (await opt.ctx.instance.sys.users.getUserById(opt.ctx.userId))?.isAdministrator();
 
       return isAdministrator ? "Administrator" : "User";
     }),
@@ -294,59 +265,41 @@ const router = t.router({
         .input(z.number())
         .output(z.string())
         .query(async (opt) => {
-          const forename = await (
-            await opt.ctx.instance.sys.users.getUserById(opt.input)
-          )?.getForename();
+          const forename = await (await opt.ctx.instance.sys.users.getUserById(opt.input))?.getForename();
 
           return `${forename}`;
         }),
-      setForename: adminProcedure
-        .input(z.object({ userId: z.number(), forename: z.string() }))
-        .mutation(async (opt) => {
-          await (await opt.ctx.instance.sys.users.getUserById(opt.input.userId))?.setForename(
-            opt.input.forename,
-          );
+      setForename: adminProcedure.input(z.object({ userId: z.number(), forename: z.string() })).mutation(async (opt) => {
+        await (await opt.ctx.instance.sys.users.getUserById(opt.input.userId))?.setForename(opt.input.forename);
 
-          return true;
-        }),
+        return true;
+      }),
       getSurname: adminProcedure
         .input(z.number())
         .output(z.string())
         .query(async (opt) => {
-          const surname = await (
-            await opt.ctx.instance.sys.users.getUserById(opt.input)
-          )?.getSurname();
+          const surname = await (await opt.ctx.instance.sys.users.getUserById(opt.input))?.getSurname();
 
           return `${surname}`;
         }),
-      setSurname: adminProcedure
-        .input(z.object({ userId: z.number(), surname: z.string() }))
-        .mutation(async (opt) => {
-          await (await opt.ctx.instance.sys.users.getUserById(opt.input.userId))?.setSurname(
-            opt.input.surname,
-          );
+      setSurname: adminProcedure.input(z.object({ userId: z.number(), surname: z.string() })).mutation(async (opt) => {
+        await (await opt.ctx.instance.sys.users.getUserById(opt.input.userId))?.setSurname(opt.input.surname);
 
-          return true;
-        }),
+        return true;
+      }),
       getUsername: adminProcedure
         .input(z.number())
         .output(z.string())
         .query(async (opt) => {
-          const username = await (
-            await opt.ctx.instance.sys.users.getUserById(opt.input)
-          )?.getUsername();
+          const username = await (await opt.ctx.instance.sys.users.getUserById(opt.input))?.getUsername();
 
           return username || "unknown";
         }),
-      setUsername: adminProcedure
-        .input(z.object({ userId: z.number(), username: z.string() }))
-        .mutation(async (opt) => {
-          await (await opt.ctx.instance.sys.users.getUserById(opt.input.userId))?.setUsername(
-            opt.input.username.toLowerCase(),
-          );
+      setUsername: adminProcedure.input(z.object({ userId: z.number(), username: z.string() })).mutation(async (opt) => {
+        await (await opt.ctx.instance.sys.users.getUserById(opt.input.userId))?.setUsername(opt.input.username.toLowerCase());
 
-          return true;
-        }),
+        return true;
+      }),
       getEmail: adminProcedure
         .input(z.number())
         .output(z.string())
@@ -363,9 +316,7 @@ const router = t.router({
           }),
         )
         .mutation(async (opt) => {
-          await (await opt.ctx.instance.sys.users.getUserById(opt.input.userId))?.setEmail(
-            opt.input.email,
-          );
+          await (await opt.ctx.instance.sys.users.getUserById(opt.input.userId))?.setEmail(opt.input.email);
 
           return true;
         }),
@@ -373,21 +324,15 @@ const router = t.router({
         .input(z.number())
         .output(z.boolean())
         .query(async (opt) => {
-          const isAdministrator = await (
-            await opt.ctx.instance.sys.users.getUserById(opt.input)
-          )?.isAdministrator();
+          const isAdministrator = await (await opt.ctx.instance.sys.users.getUserById(opt.input))?.isAdministrator();
 
           return isAdministrator || false;
         }),
-      setIsAdministrator: adminProcedure
-        .input(z.object({ userId: z.number(), administrator: z.boolean() }))
-        .mutation(async (opt) => {
-          await (
-            await opt.ctx.instance.sys.users.getUserById(opt.input.userId)
-          )?.setIsAdministrator(opt.input.administrator);
+      setIsAdministrator: adminProcedure.input(z.object({ userId: z.number(), administrator: z.boolean() })).mutation(async (opt) => {
+        await (await opt.ctx.instance.sys.users.getUserById(opt.input.userId))?.setIsAdministrator(opt.input.administrator);
 
-          return true;
-        }),
+        return true;
+      }),
       getIsMe: adminProcedure
         .input(z.number())
         .output(z.boolean())
@@ -437,16 +382,11 @@ const router = t.router({
 
       return false;
     }),
-    createUser: procedure
-      .input(z.object({ username: z.string(), password: z.string() }))
-      .mutation(async (opt) => {
-        await opt.ctx.instance.sys.users.createUser(
-          opt.input.username.toLowerCase(),
-          opt.input.password,
-        );
+    createUser: procedure.input(z.object({ username: z.string(), password: z.string() })).mutation(async (opt) => {
+      await opt.ctx.instance.sys.users.createUser(opt.input.username.toLowerCase(), opt.input.password);
 
-        return true;
-      }),
+      return true;
+    }),
     getFeatures: procedure
       .output(
         z
@@ -475,17 +415,15 @@ const router = t.router({
           };
         });
       }),
-    setFeature: procedure
-      .input(z.object({ id: z.string(), value: z.boolean() }))
-      .mutation(async (opt) => {
-        if (opt.input.value) {
-          await instance.sys.configuration.enableFeature(opt.input.id);
-        } else {
-          await instance.sys.configuration.disableFeature(opt.input.id);
-        }
+    setFeature: procedure.input(z.object({ id: z.string(), value: z.boolean() })).mutation(async (opt) => {
+      if (opt.input.value) {
+        await instance.sys.configuration.enableFeature(opt.input.id);
+      } else {
+        await instance.sys.configuration.disableFeature(opt.input.id);
+      }
 
-        return true;
-      }),
+      return true;
+    }),
     mailserver: {
       get: procedure
         .output(
@@ -520,66 +458,52 @@ const router = t.router({
   },
   customization: {
     wallpaper: {
-      wallpaperHistory: procedure
-        .output(z.object({ name: z.string(), previewSrc: z.string() }).array())
-        .query(async (opt) => {
-          const wallpapersPath = path.join((await opt.ctx.user()).getPath(), "assets/wallpapers");
+      wallpaperHistory: procedure.output(z.object({ name: z.string(), previewSrc: z.string() }).array()).query(async (opt) => {
+        const wallpapersPath = path.join((await opt.ctx.user()).getPath(), "assets/wallpapers");
 
-          const output: {
-            name: string;
-            previewSrc: string;
-          }[] = [];
+        const output: {
+          name: string;
+          previewSrc: string;
+        }[] = [];
 
-          for (const wallpaperName of await fs.readdir(wallpapersPath)) {
-            if (
-              wallpaperName === "current.webp" ||
-              wallpaperName === "resized" ||
-              !wallpaperName.endsWith(".webp")
-            )
-              continue;
+        for (const wallpaperName of await fs.readdir(wallpapersPath)) {
+          if (wallpaperName === "current.webp" || wallpaperName === "resized" || !wallpaperName.endsWith(".webp")) continue;
 
-            const wallpaperPath = path.join(wallpapersPath, wallpaperName);
+          const wallpaperPath = path.join(wallpapersPath, wallpaperName);
 
-            output.push({
-              name: wallpaperName,
-              previewSrc:
-                opt.ctx.instance.sys.configuration.backendUrl +
-                (await instance.sys.image.serveImage(opt.ctx.userId, wallpaperPath, {
-                  resize: {
-                    dimensions: { width: 296, height: 192 },
-                  },
-                })),
-            });
-          }
+          output.push({
+            name: wallpaperName,
+            previewSrc:
+              opt.ctx.instance.sys.configuration.backendUrl +
+              (await instance.sys.image.serveImage(opt.ctx.userId, wallpaperPath, {
+                resize: {
+                  dimensions: { width: 296, height: 192 },
+                },
+              })),
+          });
+        }
 
-          return output;
-        }),
-      officialWallpapers: procedure
-        .output(z.object({ name: z.string(), previewSrc: z.string() }).array())
-        .query(async (opt) => {
-          const officialWallpapersPath = path.join(
-            instance.sys.filesystem.SRC_ROOT,
-            "assets/wallpapers",
-          );
+        return output;
+      }),
+      officialWallpapers: procedure.output(z.object({ name: z.string(), previewSrc: z.string() }).array()).query(async (opt) => {
+        const officialWallpapersPath = path.join(instance.sys.filesystem.SRC_ROOT, "assets/wallpapers");
 
-          const output: {
-            name: string;
-            previewSrc: string;
-          }[] = [];
+        const output: {
+          name: string;
+          previewSrc: string;
+        }[] = [];
 
-          for (const wallpaperName of await fs.readdir(officialWallpapersPath)) {
-            const wallpaperPath = path.join(officialWallpapersPath, wallpaperName);
+        for (const wallpaperName of await fs.readdir(officialWallpapersPath)) {
+          const wallpaperPath = path.join(officialWallpapersPath, wallpaperName);
 
-            output.push({
-              name: wallpaperName,
-              previewSrc:
-                opt.ctx.instance.sys.configuration.backendUrl +
-                (await instance.sys.image.serveImage(opt.ctx.userId, wallpaperPath)),
-            });
-          }
+          output.push({
+            name: wallpaperName,
+            previewSrc: opt.ctx.instance.sys.configuration.backendUrl + (await instance.sys.image.serveImage(opt.ctx.userId, wallpaperPath)),
+          });
+        }
 
-          return output;
-        }),
+        return output;
+      }),
       currentWallpaper: procedure.query(async (opt) => {
         const wallpapersRootPath = path.join((await opt.ctx.user()).getPath(), "assets/wallpapers");
         const rawWallpaperPath = path.join(wallpapersRootPath, "current.webp");
@@ -591,9 +515,7 @@ const router = t.router({
         }
 
         if (!(await fs.exists(requiredResizedWallpaperPath))) {
-          const options = JSON.parse(
-            (await fs.readFile(path.join(wallpapersRootPath, "config.json"))).toString(),
-          );
+          const options = JSON.parse((await fs.readFile(path.join(wallpapersRootPath, "config.json"))).toString());
 
           await instance.sys.image.resizeImage(
             rawWallpaperPath,
@@ -610,14 +532,10 @@ const router = t.router({
 
         return (
           opt.ctx.instance.sys.configuration.backendUrl +
-          (await opt.ctx.instance.sys.image.serveImage(
-            opt.ctx.userId,
-            requiredResizedWallpaperPath,
-            {
-              isPublic: false,
-              dontCachePath: true,
-            },
-          ))
+          (await opt.ctx.instance.sys.image.serveImage(opt.ctx.userId, requiredResizedWallpaperPath, {
+            isPublic: false,
+            dontCachePath: true,
+          }))
         );
       }),
       upload: procedure.input(octetInputParser).mutation(async (opt) => {
@@ -656,9 +574,7 @@ const router = t.router({
           const wallpaperPath = path.join((await opt.ctx.user()).getPath(), "assets/wallpapers");
 
           if (await fs.exists(path.join(wallpaperPath, "config.json"))) {
-            const options = JSON.parse(
-              (await fs.readFile(path.join(wallpaperPath, "config.json"))).toString(),
-            );
+            const options = JSON.parse((await fs.readFile(path.join(wallpaperPath, "config.json"))).toString());
 
             options.position = options.position.split(" ");
 
@@ -701,42 +617,27 @@ const router = t.router({
           await fs.rm(path.join(resizedWallpapersPath, resizedWallpaper));
         }
 
-        await fs.copyFile(
-          path.join(wallpaperPath, opt.input.name.replace(".preview", "")),
-          path.join(wallpaperPath, "current.webp"),
-        );
+        await fs.copyFile(path.join(wallpaperPath, opt.input.name.replace(".preview", "")), path.join(wallpaperPath, "current.webp"));
 
         return true;
       }),
-      setOfficialWallpaper: procedure
-        .input(z.object({ name: z.string() }))
-        .mutation(async (opt) => {
-          const wallpaperPath = path.join((await opt.ctx.user()).getPath(), "assets/wallpapers");
-          const officialWallpaperPath = path.join(
-            instance.sys.filesystem.SRC_ROOT,
-            "assets/wallpapers",
-          );
-          const resizedWallpapersPath = path.join(wallpaperPath, "resized");
+      setOfficialWallpaper: procedure.input(z.object({ name: z.string() })).mutation(async (opt) => {
+        const wallpaperPath = path.join((await opt.ctx.user()).getPath(), "assets/wallpapers");
+        const officialWallpaperPath = path.join(instance.sys.filesystem.SRC_ROOT, "assets/wallpapers");
+        const resizedWallpapersPath = path.join(wallpaperPath, "resized");
 
-          for (const resizedWallpaper of await fs.readdir(resizedWallpapersPath)) {
-            await fs.rm(path.join(resizedWallpapersPath, resizedWallpaper));
-          }
+        for (const resizedWallpaper of await fs.readdir(resizedWallpapersPath)) {
+          await fs.rm(path.join(resizedWallpapersPath, resizedWallpaper));
+        }
 
-          await fs.copyFile(
-            path.join(officialWallpaperPath, opt.input.name),
-            path.join(wallpaperPath, "current.webp"),
-          );
+        await fs.copyFile(path.join(officialWallpaperPath, opt.input.name), path.join(wallpaperPath, "current.webp"));
 
-          return true;
-        }),
+        return true;
+      }),
     },
     colorTheme: {
       wallpaperPixeldata: procedure.output(z.number().array()).query(async (opt) => {
-        const wallpaperPath = path.join(
-          (await opt.ctx.user()).getPath(),
-          "assets/wallpapers/resized",
-          `${504}x${280}.webp`,
-        );
+        const wallpaperPath = path.join((await opt.ctx.user()).getPath(), "assets/wallpapers/resized", `${504}x${280}.webp`);
 
         const buf = (await sharp(wallpaperPath).raw().toBuffer({ resolveWithObject: true })).data;
         const newBuf = [];
@@ -765,9 +666,7 @@ const router = t.router({
           }),
         )
         .query(async (opt) => {
-          const a = instance.sys.settings.applicationSettings["core"].find(
-            (s) => s.id === "quick_shortcuts",
-          );
+          const a = instance.sys.settings.applicationSettings["core"].find((s) => s.id === "quick_shortcuts");
 
           if (!a) throw "The core:quick_shortcuts setting is somehow missing???";
 
@@ -780,9 +679,7 @@ const router = t.router({
           };
         }),
       resetToDefaults: procedure.mutation(async (opt) => {
-        const a = instance.sys.settings.applicationSettings["core"].find(
-          (s) => s.id === "quick_shortcuts",
-        );
+        const a = instance.sys.settings.applicationSettings["core"].find((s) => s.id === "quick_shortcuts");
 
         if (!a) throw "The core:quick_shortcuts setting is somehow missing???";
 
@@ -799,17 +696,13 @@ const router = t.router({
           icon: { type: "icon" | "image"; value: string };
         }[] = [];
 
-        const quickShortcutsSetting = instance.sys.settings.applicationSettings["core"]?.find(
-          (s) => s.id === "quick_shortcuts",
-        );
+        const quickShortcutsSetting = instance.sys.settings.applicationSettings["core"]?.find((s) => s.id === "quick_shortcuts");
 
         if (!quickShortcutsSetting) return [];
         const userShortcuts = (await quickShortcutsSetting.getValue(opt.ctx.userId)) || [];
 
         for (const applicationId of applications) {
-          const application = instance.sys.applications.availableApplications.find(
-            (aa) => aa.manifest?.id === applicationId,
-          );
+          const application = instance.sys.applications.availableApplications.find((aa) => aa.manifest?.id === applicationId);
 
           if (!application) continue;
 
@@ -937,19 +830,16 @@ const router = t.router({
       }),
   },
   application: {
-    getApplications: procedure
-      .output(z.object({ displayName: z.string(), id: z.string() }).array())
-      .query(async (opt) => {
-        return instance.sys.applications.enabledApplications.map((enabledApplication) => {
-          return {
-            displayName:
-              instance.sys.applications.availableApplications.find(
-                (availableApplication) => availableApplication.manifest?.id === enabledApplication,
-              )?.manifest?.displayName || `Failed to find application '${enabledApplication}'`,
-            id: enabledApplication,
-          };
-        });
-      }),
+    getApplications: procedure.output(z.object({ displayName: z.string(), id: z.string() }).array()).query(async (opt) => {
+      return instance.sys.applications.enabledApplications.map((enabledApplication) => {
+        return {
+          displayName:
+            instance.sys.applications.availableApplications.find((availableApplication) => availableApplication.manifest?.id === enabledApplication)?.manifest
+              ?.displayName || `Failed to find application '${enabledApplication}'`,
+          id: enabledApplication,
+        };
+      });
+    }),
     getApplication: procedure
       .input(z.object({ id: z.string() }))
       .output(
@@ -973,9 +863,7 @@ const router = t.router({
         }),
       )
       .query(async (opt) => {
-        const application = instance.sys.applications.availableApplications.find(
-          (aa) => aa.manifest?.id === opt.input.id,
-        );
+        const application = instance.sys.applications.availableApplications.find((aa) => aa.manifest?.id === opt.input.id);
 
         if (!application) throw { error: true };
 
@@ -1002,6 +890,8 @@ const router = t.router({
           await Promise.all(
             instance.sys.settings.applicationSettings[opt.input.id]?.map(async (a) => {
               if (!(a instanceof GlobalApplicationSetting)) {
+                if (a.hidden) return undefined;
+
                 return {
                   displayName: a.displayName,
                   defaultValue: a.defaultValue,
@@ -1012,8 +902,26 @@ const router = t.router({
                   description: a.description || "No description provided.",
                 };
               }
+            }) || [],
+          )
+        ).filter((a) => a !== undefined);
 
-              console.log("HANDLE GLOBAL SETTINGS!!!");
+        const globalSettings = (
+          await Promise.all(
+            instance.sys.settings.applicationSettings[opt.input.id]?.map(async (a) => {
+              if (a instanceof GlobalApplicationSetting) {
+                if (a.hidden) return undefined;
+
+                return {
+                  displayName: a.displayName,
+                  defaultValue: a.defaultValue,
+                  currentValue: await a.getValue(),
+                  type: a.type,
+                  id: a.id,
+                  global: false,
+                  description: a.description || "No description provided.",
+                };
+              }
             }) || [],
           )
         ).filter((a) => a !== undefined);
@@ -1022,6 +930,7 @@ const router = t.router({
           displayName: application?.manifest?.displayName || opt.input.id,
           icon: icon,
           settings: settings || [],
+          globalSettings: globalSettings || [],
         };
       }),
     setApplicationBooleanSettingValue: procedure
@@ -1033,12 +942,7 @@ const router = t.router({
         }),
       )
       .mutation(async (opt) => {
-        await instance.sys.settings.setUserApplicationSetting(
-          opt.ctx.userId,
-          opt.input.applicationId,
-          opt.input.id,
-          opt.input.value,
-        );
+        await instance.sys.settings.setUserApplicationSetting(opt.ctx.userId, opt.input.applicationId, opt.input.id, opt.input.value);
 
         return true;
       }),
@@ -1051,12 +955,7 @@ const router = t.router({
         }),
       )
       .mutation(async (opt) => {
-        await instance.sys.settings.setUserApplicationSetting(
-          opt.ctx.userId,
-          opt.input.applicationId,
-          opt.input.id,
-          opt.input.value,
-        );
+        await instance.sys.settings.setUserApplicationSetting(opt.ctx.userId, opt.input.applicationId, opt.input.id, opt.input.value);
 
         return true;
       }),
@@ -1069,12 +968,7 @@ const router = t.router({
         }),
       )
       .mutation(async (opt) => {
-        await instance.sys.settings.setUserApplicationSetting(
-          opt.ctx.userId,
-          opt.input.applicationId,
-          opt.input.id,
-          opt.input.value,
-        );
+        await instance.sys.settings.setUserApplicationSetting(opt.ctx.userId, opt.input.applicationId, opt.input.id, opt.input.value);
 
         return true;
       }),

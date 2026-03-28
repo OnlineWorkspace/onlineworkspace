@@ -8,7 +8,6 @@ const Layout = lazy(() => import("./Layout"));
 const ApplicationPage = lazy(() => import("./pages/app/Index"));
 
 const App: Component = () => {
-  1;
   return (
     <Route component={Layout}>
       {/*<Route path="/" component={RootPage} />*/}

@@ -1,7 +1,10 @@
 .root {
+  grid-row: span 2;
+}
+
+.card {
   display: flex;
   flex-direction: column;
-  grid-row: span 2;
   gap: 0.5rem;
 }
 

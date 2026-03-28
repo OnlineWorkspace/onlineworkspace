@@ -1,8 +1,11 @@
 .root {
+  grid-row: span 3;
+}
+
+.card {
   display: flex;
   align-items: center;
   justify-content: center;
-  grid-row: span 3;
 }
 
 .avatar {

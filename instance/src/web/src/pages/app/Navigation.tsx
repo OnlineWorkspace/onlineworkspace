@@ -3,14 +3,7 @@ import UKIndeterminateSpinner from "@tcsw/uikit-solid/src/components/indetermina
 import UKNavigationRail from "@tcsw/uikit-solid/src/components/navigationRail/UKNavigationRail.jsx";
 import UKText from "@tcsw/uikit-solid/src/components/text/UKText.jsx";
 import useIsMobile from "@tcsw/uikit-solid/src/core/useIsMobile.js";
-import {
-  type Component,
-  createResource,
-  createSignal,
-  type ParentProps,
-  Show,
-  Suspense,
-} from "solid-js";
+import { type Component, createResource, createSignal, type ParentProps, Show, Suspense } from "solid-js";
 import trpc from "../../lib/trpc";
 import styles from "./Navigation.module.scss";
 import NavigationRailApplications from "./navigationRailApplications/NavigationRailApplications";
@@ -25,14 +18,12 @@ const AppNavigation: Component<ParentProps> = (props) => {
 
   const [quickShortcuts] = createResource(() => trpc.app.navigation.getQuickShortcuts.query());
   const [expanded, setExpanded] = createSignal<boolean>(false);
-  const [toggledDrawer, setToggledDrawer] = createSignal<"applications" | "notifications" | false>(
-    false,
-  );
+  const [toggledDrawer, setToggledDrawer] = createSignal<"applications" | "notifications" | false>(false);
 
   return (
     <UKNavigationRail
       class={styles.rail}
-      expanded={expanded()}
+      expanded={!isMobile() ? expanded() : false}
       items={[
         ...(quickShortcuts() || []).map((sc) => {
           return {
@@ -59,7 +50,7 @@ const AppNavigation: Component<ParentProps> = (props) => {
           };
         }),
       ]}
-      setExpanded={(exp) => setExpanded(exp)}
+      setExpanded={!isMobile() ? (exp) => setExpanded(exp) : undefined}
       anchorPoints={{
         topMost: (
           <>
@@ -87,13 +78,7 @@ const AppNavigation: Component<ParentProps> = (props) => {
               expanded={expanded()}
             />
             <Show when={!isMobile()}>
-              <UKText
-                class={styles.versionLabel}
-                role={"label"}
-                size={"s"}
-                emphasized={true}
-                align={"center"}
-              >
+              <UKText class={styles.versionLabel} role={"label"} size={"s"} emphasized={true} align={"center"}>
                 Dev Build
               </UKText>
             </Show>

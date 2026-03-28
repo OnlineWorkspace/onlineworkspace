@@ -1,7 +1,7 @@
 import CHEVRON_LEFT_ICON from "@material-symbols/svg-700/outlined/chevron_left.svg";
 import { useNavigate } from "@solidjs/router";
 import UKTopAppBar from "@tcsw/uikit-solid/src/components/topAppBar/UKTopAppBar.jsx";
-import type { Component } from "solid-js";
+import { type Component, Suspense } from "solid-js";
 import Branding from "./components/Branding/Branding";
 import FeatureFlags from "./components/FeatureFlags/FeatureFlags";
 import InstalledApplications from "./components/InstalledApplications/InstalledApplications";
@@ -26,13 +26,15 @@ const InstancePage: Component = () => {
           accessibleLabel: "Go back",
         }}
       />
-      <div class={styles.root}>
-        <Users />
-        <InstalledApplications />
-        <Mailserver />
-        <FeatureFlags />
-        <Branding />
-      </div>
+      <Suspense>
+        <div class={styles.root}>
+          <Users />
+          <InstalledApplications />
+          <Mailserver />
+          <FeatureFlags />
+          <Branding />
+        </div>
+      </Suspense>
     </>
   );
 };

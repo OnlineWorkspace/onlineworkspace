@@ -8,7 +8,8 @@ import UKText from "@tcsw/uikit-solid/src/components/text/UKText.tsx";
 import UKTopAppBar from "@tcsw/uikit-solid/src/components/topAppBar/UKTopAppBar.jsx";
 import useIsMobile from "@tcsw/uikit-solid/src/core/useIsMobile.js";
 import webInstanceTRPC from "@tcsw/workspaces-instance-web/src/lib/trpc.ts";
-import { type Component, createResource } from "solid-js";
+import clsx from "clsx";
+import { type Component, createResource, Suspense } from "solid-js";
 import trpc from "../../lib/trpc";
 import Bio from "./components/Bio/Bio.tsx";
 import Email from "./components/Email/Email";
@@ -23,9 +24,7 @@ const ProfilePage: Component = () => {
   const isMobile = useIsMobile();
   const [name, { refetch: refetchName }] = createResource(() => trpc.profile.getName.query());
   const [role] = createResource(() => trpc.profile.getRole.query());
-  const [avatar, { refetch: refetchAvatar }] = createResource(() =>
-    trpc.profile.getProfilePicture.query(),
-  );
+  const [avatar, { refetch: refetchAvatar }] = createResource(() => trpc.profile.getProfilePicture.query());
 
   return (
     <>
@@ -40,56 +39,54 @@ const ProfilePage: Component = () => {
           accessibleLabel: "Go back",
         }}
       />
-      <div class={styles.root}>
-        <div class={styles.header}>
-          <UKAvatar
-            username="username"
-            avatar={avatar() ? `${avatar()}?t=${Date.now()}` : "/assets/placeholder/avatar.png"}
-            size="l"
-          />
-          <div>
-            <UKText role="display" size="l" emphasized class={styles.fullName}>
-              {name() || "Unknown"}
-            </UKText>
-            <UKText role="label" size="l" class={styles.permissionLevel}>
-              {role() || "Unknown"}
-            </UKText>
+      <Suspense>
+        <div class={clsx(styles.root)}>
+          <div class={styles.header}>
+            <UKAvatar username="username" avatar={avatar() ? `${avatar()}?t=${Date.now()}` : "/assets/placeholder/avatar.png"} size="l" />
+            <div>
+              <UKText role="display" size="l" emphasized class={styles.fullName}>
+                {name() || "Unknown"}
+              </UKText>
+              <UKText role="label" size="l" class={styles.permissionLevel}>
+                {role() || "Unknown"}
+              </UKText>
+            </div>
           </div>
+          <UKText class={styles.subheading} role="title" size="m" align="start">
+            Basic info
+          </UKText>
+          <UKStack>
+            <ProfilePicture refetchAvatar={refetchAvatar} />
+            <Username />
+            <Name refetchName={refetchName} />
+            <Gender />
+            <Bio />
+          </UKStack>
+          <UKText class={styles.subheading} role="title" size="m" align="start">
+            Contact info
+          </UKText>
+          <UKStack>
+            <Email />
+          </UKStack>
+          {isMobile() ? (
+            <>
+              <UKText class={styles.subheading} role="title" size="m" align="start">
+                Session
+              </UKText>
+              <UKStack>
+                <UKStackItem
+                  labelText={"Logout"}
+                  leading={{ type: "icon", value: LOGOUT_ICON }}
+                  onClick={async () => {
+                    await webInstanceTRPC.authorization.logout.mutate();
+                    navigate("/");
+                  }}
+                />
+              </UKStack>
+            </>
+          ) : null}
         </div>
-        <UKText class={styles.subheading} role="title" size="m" align="start">
-          Basic info
-        </UKText>
-        <UKStack>
-          <ProfilePicture refetchAvatar={refetchAvatar} />
-          <Username />
-          <Name refetchName={refetchName} />
-          <Gender />
-          <Bio />
-        </UKStack>
-        <UKText class={styles.subheading} role="title" size="m" align="start">
-          Contact info
-        </UKText>
-        <UKStack>
-          <Email />
-        </UKStack>
-        {isMobile() ? (
-          <>
-            <UKText class={styles.subheading} role="title" size="m" align="start">
-              Session
-            </UKText>
-            <UKStack>
-              <UKStackItem
-                labelText={"Logout"}
-                leading={{ type: "icon", value: LOGOUT_ICON }}
-                onClick={async () => {
-                  await webInstanceTRPC.authorization.logout.mutate();
-                  navigate("/");
-                }}
-              />
-            </UKStack>
-          </>
-        ) : null}
-      </div>
+      </Suspense>
     </>
   );
 };

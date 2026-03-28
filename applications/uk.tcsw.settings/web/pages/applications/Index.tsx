@@ -1,10 +1,11 @@
 import CHEVRON_LEFT_ICON from "@material-symbols/svg-700/outlined/chevron_left.svg";
 import { useNavigate } from "@solidjs/router";
+import UKIndeterminateSpinner from "@tcsw/uikit-solid/src/components/indeterminateSpinner/UKIndeterminateSpinner.jsx";
 import UKStack from "@tcsw/uikit-solid/src/components/stack/UKStack.tsx";
 import UKStackItem from "@tcsw/uikit-solid/src/components/stack/UKStackItem.tsx";
 import UKStackLabel from "@tcsw/uikit-solid/src/components/stack/UKStackLabel.tsx";
 import UKTopAppBar from "@tcsw/uikit-solid/src/components/topAppBar/UKTopAppBar.jsx";
-import { type Component, createResource, For } from "solid-js";
+import { type Component, createResource, For, Suspense } from "solid-js";
 import trpc from "../../lib/trpc.ts";
 import styles from "./Index.module.scss";
 
@@ -27,19 +28,17 @@ const ApplicationsPage: Component = () => {
       />
       <div class={styles.page}>
         <UKStackLabel>Applications</UKStackLabel>
-        <UKStack>
-          <For each={applications()}>
-            {(app) => {
-              return (
-                <UKStackItem
-                  labelText={app.displayName}
-                  supportingText={app.id}
-                  onClick={() => navigate(`/app/uk.tcsw.settings/applications/${app.id}`)}
-                />
-              );
-            }}
-          </For>
-        </UKStack>
+        <Suspense fallback={<UKIndeterminateSpinner />}>
+          <UKStack>
+            <For each={applications()}>
+              {(app) => {
+                return (
+                  <UKStackItem labelText={app.displayName} supportingText={app.id} onClick={() => navigate(`/app/uk.tcsw.settings/applications/${app.id}`)} />
+                );
+              }}
+            </For>
+          </UKStack>
+        </Suspense>
       </div>
     </>
   );

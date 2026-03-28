@@ -15,7 +15,8 @@ import UKStack from "@tcsw/uikit-solid/src/components/stack/UKStack.tsx";
 import UKText from "@tcsw/uikit-solid/src/components/text/UKText.jsx";
 import UKTopAppBar from "@tcsw/uikit-solid/src/components/topAppBar/UKTopAppBar.jsx";
 import webInstanceTRPC from "@tcsw/workspaces-instance-web/src/lib/trpc.ts";
-import { type Component, createResource } from "solid-js";
+import clsx from "clsx";
+import { type Component, createResource, Suspense } from "solid-js";
 import trpc from "../../lib/trpc";
 import Shortcut from "./component/Shortcut/Shortcut";
 import styles from "./index.module.scss";
@@ -29,97 +30,70 @@ const RootPage: Component = () => {
   return (
     <>
       <UKTopAppBar type="small" headline={"Overview"} />
-      <div class={styles.root}>
-        <div class={styles.content}>
-          <button
-            type="button"
-            class={styles.header}
-            onClick={() => {
-              navigate("/app/uk.tcsw.settings/profile");
-            }}
-          >
-            <UKAvatar
-              username="username"
-              avatar={avatar() || "/assets/placeholder/avatar.png"}
-              size="l"
-            />
-            <div>
-              <UKText role="display" size="l" emphasized class={styles.fullName}>
-                {fullName() || "Unknown"}
-              </UKText>
-              <UKText role="label" size="l" class={styles.permissionLevel}>
-                {role() || "Unknown"}
-              </UKText>
-            </div>
-          </button>
-          <div class={styles.quickActions}>
-            <UKButton
-              color="tonal"
-              leadingIcon={LOGOUT_ICON}
-              onClick={async () => {
-                await webInstanceTRPC.authorization.logout.mutate();
-                navigate("/");
+      <Suspense>
+        <div class={styles.root}>
+          <div class={clsx(styles.content)}>
+            <button
+              type="button"
+              class={styles.header}
+              onClick={() => {
+                navigate("/app/uk.tcsw.settings/profile");
               }}
             >
-              Logout
-            </UKButton>
-            <UKButton
-              color="tonal"
-              leadingIcon={KEY_ICON}
-              onClick={() =>
-                navigate("/app/uk.tcsw.settings/authentication/?change-passsword=true")
-              }
-            >
-              Change Password
-            </UKButton>
-          </div>
-          <UKDivider
-            class={styles.divider}
-            direction={DividerDirection.horizontal}
-            width="middle-inset"
-          />
-          <UKStack>
-            <Shortcut
-              title="Profile"
-              description="View & Manage your profile"
-              icon={PERSON_ICON}
-              path="/app/uk.tcsw.settings/profile"
-            />
-            <Shortcut
-              title="Authentication"
-              description="View & Manage your login sessions & credentials"
-              icon={PASSKEY_ICON}
-              path="/app/uk.tcsw.settings/authentication"
-            />
-            <Shortcut
-              title="Storage"
-              description="Visualise storage usage & clean up duplicates"
-              icon={STORAGE_ICON}
-              path="/app/uk.tcsw.settings/storage"
-            />
-            <Shortcut
-              title="Customization"
-              description="Choose a wallpaper and color theme"
-              icon={WALLPAPER_ICON}
-              path="/app/uk.tcsw.settings/customization"
-            />
-            <Shortcut
-              title="Applications"
-              description="Manage application settings"
-              icon={APPS_ICON}
-              path="/app/uk.tcsw.settings/applications"
-            />
-            {role() === "Administrator" && (
+              <UKAvatar username="username" avatar={avatar() || "/assets/placeholder/avatar.png"} size="l" />
+              <div>
+                <UKText role="display" size="l" emphasized class={styles.fullName}>
+                  {fullName() || "Unknown"}
+                </UKText>
+                <UKText role="label" size="l" class={styles.permissionLevel}>
+                  {role() || "Unknown"}
+                </UKText>
+              </div>
+            </button>
+            <div class={styles.quickActions}>
+              <UKButton
+                color="tonal"
+                leadingIcon={LOGOUT_ICON}
+                onClick={async () => {
+                  await webInstanceTRPC.authorization.logout.mutate();
+                  navigate("/");
+                }}
+              >
+                Logout
+              </UKButton>
+              <UKButton color="tonal" leadingIcon={KEY_ICON} onClick={() => navigate("/app/uk.tcsw.settings/authentication/?change-passsword=true")}>
+                Change Password
+              </UKButton>
+            </div>
+            <UKDivider class={styles.divider} direction={DividerDirection.horizontal} width="middle-inset" />
+            <UKStack>
+              <Shortcut title="Profile" description="View & Manage your profile" icon={PERSON_ICON} path="/app/uk.tcsw.settings/profile" />
               <Shortcut
-                title="Configure Instance"
-                description="(ADMINISTRATORS ONLY) Manage the instance & it’s users"
-                icon={SETTINGS_APPLICATIONS_ICON}
-                path="/app/uk.tcsw.settings/instance"
+                title="Authentication"
+                description="View & Manage your login sessions & credentials"
+                icon={PASSKEY_ICON}
+                path="/app/uk.tcsw.settings/authentication"
               />
-            )}
-          </UKStack>
+              <Shortcut title="Storage" description="Visualise storage usage & clean up duplicates" icon={STORAGE_ICON} path="/app/uk.tcsw.settings/storage" />
+              <Shortcut
+                title="Customization"
+                description="Choose a wallpaper and color theme"
+                icon={WALLPAPER_ICON}
+                path="/app/uk.tcsw.settings/customization"
+              />
+              <Shortcut title="Applications" description="Manage application settings" icon={APPS_ICON} path="/app/uk.tcsw.settings/applications" />
+              {role() === "Administrator" && (
+                <Shortcut
+                  title="Configure Instance"
+                  description="(ADMINISTRATORS ONLY) Manage the instance & it’s users"
+                  icon={SETTINGS_APPLICATIONS_ICON}
+                  path="/app/uk.tcsw.settings/instance"
+                />
+              )}
+            </UKStack>
+          </div>
         </div>
-      </div>
+      </Suspense>
     </>
   );
 };

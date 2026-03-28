@@ -1,0 +1,90 @@
+.root {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 1rem;
+  width: 100%;
+  height: 100%;
+  //background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+
+  animation: fadeIn forwards 0.25s
+    var(--uk-sys-motion-easing-standard-decelerate);
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      filter: blur(0.25rem);
+    }
+    to {
+      opacity: 1;
+      filter: blur(0);
+    }
+  }
+}
+
+.wallpaper {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  user-select: none;
+  pointer-events: none;
+  z-index: -1;
+  animation: fadeIn forwards 0.25s
+    var(--uk-sys-motion-easing-standard-decelerate);
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      filter: blur(0.25rem);
+    }
+    to {
+      opacity: 1;
+      filter: blur(0);
+    }
+  }
+
+  --transform-x: 0;
+  --transform-y: 0;
+
+  .left {
+    left: 0.25rem;
+  }
+
+  .center {
+    left: 50%;
+    --transform-x: -50%;
+  }
+
+  .right {
+    right: 0.25rem;
+  }
+
+  .top {
+    top: 0.25rem;
+  }
+
+  .middle {
+    top: 50%;
+    --transform-y: -50%;
+  }
+
+  .bottom {
+    bottom: 0.25rem;
+  }
+
+  transform: translateX(var(--transform-x, 0)) translateY(var(--transform-y, 0));
+}
+
+.wallpaperSpinner {
+  position: absolute;
+  top: 50%;
+  left: calc(50% + 24px);
+  transform: translate(-50%, -50%);
+  z-index: -1;
+}
