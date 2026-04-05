@@ -276,6 +276,7 @@
         "@tcsw/uikit-solid": "workspace:*",
         "@tcsw/workspaces-instance": "workspace:*",
         "@tcsw/workspaces-instance-web": "workspace:*",
+        "@thisbeyond/solid-dnd": "^0.7.5",
         "@trpc/client": "^11.6.0",
         "@trpc/server": "^11.6.0",
         "clsx": "^2.1.1",

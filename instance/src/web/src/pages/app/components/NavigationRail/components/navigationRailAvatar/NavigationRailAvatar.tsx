@@ -1,13 +1,13 @@
+import LOGOUT_ICON from "@material-symbols/svg-700/outlined/logout.svg";
 import { useNavigate } from "@solidjs/router";
 import UKAvatar from "@tcsw/uikit-solid/src/components/avatar/UKAvatar.jsx";
 import UKIconButton from "@tcsw/uikit-solid/src/components/iconButton/UKIconButton.tsx";
 import UKText from "@tcsw/uikit-solid/src/components/text/UKText.jsx";
 import useIsMobile from "@tcsw/uikit-solid/src/core/useIsMobile.ts";
 import { type Component, createResource, Show } from "solid-js";
-import backend from "../../../lib/backend";
-import trpc from "../../../lib/trpc";
+import backend from "../../../../../../lib/backend";
+import trpc from "../../../../../../lib/trpc";
 import styles from "./NavigationRailAvatar.module.scss";
-import LOGOUT_ICON from "@material-symbols/svg-700/outlined/logout.svg"
 
 const NavigationRailAvatar: Component<{ expanded: boolean }> = (props) => {
   const navigate = useNavigate();

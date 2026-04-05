@@ -1,15 +1,14 @@
 import { useLocation, useNavigate } from "@solidjs/router";
-import UKIndeterminateSpinner from "@tcsw/uikit-solid/src/components/indeterminateSpinner/UKIndeterminateSpinner.jsx";
 import UKNavigationRail from "@tcsw/uikit-solid/src/components/navigationRail/UKNavigationRail.jsx";
 import UKText from "@tcsw/uikit-solid/src/components/text/UKText.jsx";
 import useIsMobile from "@tcsw/uikit-solid/src/core/useIsMobile.js";
-import { type Component, createResource, createSignal, type ParentProps, Show, Suspense } from "solid-js";
+import { type Component, createResource, createSignal, type ParentProps, Show } from "solid-js";
 import trpc from "../../lib/trpc";
+import NavigationRailApplications from "./components/NavigationRail/components/navigationRailApplications/NavigationRailApplications";
+import NavigationRailAvatar from "./components/NavigationRail/components/navigationRailAvatar/NavigationRailAvatar";
+import NavigationRailClock from "./components/NavigationRail/components/navigationRailClock/NavigationRailClock";
+import NavigationRailNotifications from "./components/NavigationRail/components/navigationRailNotifications/NavigationRailNotifications";
 import styles from "./Navigation.module.scss";
-import NavigationRailApplications from "./navigationRailApplications/NavigationRailApplications";
-import NavigationRailAvatar from "./navigationRailAvatar/NavigationRailAvatar";
-import NavigationRailClock from "./navigationRailClock/NavigationRailClock";
-import NavigationRailNotifications from "./navigationRailNotifications/NavigationRailNotifications";
 
 const AppNavigation: Component<ParentProps> = (props) => {
   const location = useLocation();
@@ -50,7 +49,7 @@ const AppNavigation: Component<ParentProps> = (props) => {
           };
         }),
       ]}
-      setExpanded={!isMobile() ? (exp) => setExpanded(exp) : undefined}
+      setExpanded={!isMobile() ? (expandedState) => setExpanded(expandedState) : undefined}
       anchorPoints={{
         topMost: (
           <>
@@ -84,11 +83,11 @@ const AppNavigation: Component<ParentProps> = (props) => {
             </Show>
             <NavigationRailNotifications
               isToggled={toggledDrawer() === "notifications"}
-              toggle={(str) => {
+              toggle={(drawerState) => {
                 if (toggledDrawer() === "notifications") {
                   setToggledDrawer(false);
                 } else {
-                  setToggledDrawer(str);
+                  setToggledDrawer(drawerState);
                 }
               }}
               expanded={expanded()}
@@ -97,9 +96,7 @@ const AppNavigation: Component<ParentProps> = (props) => {
         ),
       }}
     >
-      <div class={styles.page}>
-        <Suspense fallback={<UKIndeterminateSpinner />}>{props.children}</Suspense>
-      </div>
+      <div class={styles.page}>{props.children}</div>
     </UKNavigationRail>
   );
 };

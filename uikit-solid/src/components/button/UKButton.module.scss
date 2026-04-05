@@ -43,6 +43,7 @@
   user-select: none;
   display: flex;
   align-items: center;
+  justify-content: center;
   width: max-content;
   interpolate-size: allow-keywords;
 
@@ -434,7 +435,8 @@
 }
 
 .iconClass {
-  font-size: var(--icon-size);
+  height: var(--icon-size);
+  width: var(--icon-size);
   margin-right: 0px;
 }
 

@@ -7,7 +7,7 @@ import UKList from "@tcsw/uikit-solid/src/components/list/UKList.jsx";
 import UKListItem from "@tcsw/uikit-solid/src/components/list/UKListItem.jsx";
 import UKText from "@tcsw/uikit-solid/src/components/text/UKText.jsx";
 import { type Component, createResource, For } from "solid-js";
-import trpc from "../../../lib/trpc";
+import trpc from "../../../../../../lib/trpc";
 import styles from "./NavigationRailApplications.module.scss";
 
 const NavigationRailApplications: Component<{

@@ -1,27 +1,35 @@
 .root {
-    width: var(--size);
-    height: var(--size);
-    border-radius: 100rem;
-    user-select: none;
-    -webkit-user-drag: none;
+  padding: 0;
+  margin: 0;
+  background-color: transparent;
+  border: none;
+  border-radius: 100rem;
+}
 
-    &[data-size="xs"] {
-        --size: 1rem;
-    }
+.image {
+  width: var(--size);
+  height: var(--size);
+  border-radius: 100rem;
+  user-select: none;
+  -webkit-user-drag: none;
 
-    &[data-size="s"] {
-        --size: 2rem;
-    }
+  &[data-size="xs"] {
+    --size: 1rem;
+  }
 
-    &[data-size="m"] {
-        --size: 4rem;
-    }
+  &[data-size="s"] {
+    --size: 2rem;
+  }
 
-    &[data-size="l"] {
-        --size: 8rem;
-    }
+  &[data-size="m"] {
+    --size: 4rem;
+  }
 
-    &[data-size="xl"] {
-        --size: 16rem;
-    }
+  &[data-size="l"] {
+    --size: 8rem;
+  }
+
+  &[data-size="xl"] {
+    --size: 16rem;
+  }
 }

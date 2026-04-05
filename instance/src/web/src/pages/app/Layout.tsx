@@ -9,7 +9,9 @@ const AppLayout: Component<RouteSectionProps<unknown>> = (props) => {
   return (
     <>
       {window.localStorage.getItem("tricolor_workspaces_no_app_navigation_rail") !== "true" ? (
-        <AppNavigation>{props.children}</AppNavigation>
+        <AppNavigation>
+          <Suspense fallback={<UKIndeterminateSpinner />}>{props.children}</Suspense>
+        </AppNavigation>
       ) : (
         <div class={styles.page}>
           <Suspense fallback={<UKIndeterminateSpinner />}>{props.children}</Suspense>

@@ -1,4 +1,4 @@
-import { promises as fs } from "node:fs";
+import { promises as fs, existsSync as fsExistsSync } from "node:fs";
 import path from "node:path";
 import type { AnyRouter } from "@trpc/server";
 import { type BunRequest, file } from "bun";
@@ -20,10 +20,7 @@ import NotificationsSystem from "./systems/notifications.js";
 import { StringListApplicationSetting } from "./systems/settings/applicationSetting/stringListSetting.js";
 import SettingsSystem from "./systems/settings.js";
 import TRPCSystem from "./systems/trpc.js";
-import {
-  createTRPCContext as createWorkspacesTRPCContext,
-  workspacesRouter,
-} from "./systems/trpcRouter.js";
+import { createTRPCContext as createWorkspacesTRPCContext, workspacesRouter } from "./systems/trpcRouter.js";
 import UsersSystem from "./systems/users.js";
 import WebFrontendSystem from "./systems/webFrontend.js";
 
@@ -65,21 +62,13 @@ class Instance {
   }
 
   async startup() {
-    this.log.system.info(
-      `--------------------------------------------------------------------------`,
-    );
-    this.log.system.info(
-      `   ${chalk.hex("FF002E")("/XXX/")}${chalk.hex("70FF00")("/XXX/")}${chalk.hex("0066FF")("/XXX/")}`,
-    );
+    this.log.system.info(`--------------------------------------------------------------------------`);
+    this.log.system.info(`   ${chalk.hex("FF002E")("/XXX/")}${chalk.hex("70FF00")("/XXX/")}${chalk.hex("0066FF")("/XXX/")}`);
     this.log.system.info(
       `  ${chalk.hex("FF002E")("/XXX/")}${chalk.hex("70FF00")("/XXX/")}${chalk.hex("0066FF")("/XXX/")}  Workspaces © 2026 Tricolor Software -> https://tcsw.uk`,
     );
-    this.log.system.info(
-      ` ${chalk.hex("FF002E")("/XXX/")}${chalk.hex("70FF00")("/XXX/")}${chalk.hex("0066FF")("/XXX/")}`,
-    );
-    this.log.system.info(
-      `--------------------------------------------------------------------------`,
-    );
+    this.log.system.info(` ${chalk.hex("FF002E")("/XXX/")}${chalk.hex("70FF00")("/XXX/")}${chalk.hex("0066FF")("/XXX/")}`);
+    this.log.system.info(`--------------------------------------------------------------------------`);
     this.log.system.info(`Starting up...`);
 
     if (this.status !== InstanceStatus.Offline) {
@@ -99,11 +88,7 @@ class Instance {
 
     this.sys.event.on(WorkspacesEvent.BeforeStartupComplete, () => {
       this.sys.settings.registerApplicationSetting(
-        new StringListApplicationSetting(
-          "core",
-          "quick_shortcuts",
-          this.sys.configuration.defaultQuickShortcuts,
-        ).setDisplayName("Quick Shortcuts"),
+        new StringListApplicationSetting("core", "quick_shortcuts", this.sys.configuration.defaultQuickShortcuts).setDisplayName("Quick Shortcuts"),
       );
     });
 
@@ -115,16 +100,12 @@ class Instance {
         routes: {
           "/api/instance/login/banner": {
             GET: async (_: BunRequest) => {
-              return new Response(
-                file(path.join(this.sys.filesystem.FS_ROOT, "assets/login/banner.png")),
-              );
+              return new Response(file(path.join(this.sys.filesystem.FS_ROOT, "assets/login/banner.png")));
             },
           },
           "/api/instance/login/background": {
             GET: async (_: BunRequest) => {
-              return new Response(
-                file(path.join(this.sys.filesystem.FS_ROOT, "assets/login/background.png")),
-              );
+              return new Response(file(path.join(this.sys.filesystem.FS_ROOT, "assets/login/background.png")));
             },
           },
           "/api/user/me/avatar/:size": {
@@ -142,9 +123,7 @@ class Instance {
 
               const parsedCookie = Bun.Cookie.parse(cookieString);
 
-              const userId = await this.sys.authorization.verifySession(
-                decodeURIComponent(parsedCookie.value),
-              );
+              const userId = await this.sys.authorization.verifySession(decodeURIComponent(parsedCookie.value));
 
               if (userId === undefined) {
                 return Response.json({
@@ -160,23 +139,9 @@ class Instance {
                 case "l":
                 case "xl":
                 case "2xl":
-                  return new Response(
-                    file(
-                      path.join(
-                        this.sys.filesystem.FS_ROOT,
-                        `users/${userId}/assets/avatar/${size}.webp`,
-                      ),
-                    ),
-                  );
+                  return new Response(file(path.join(this.sys.filesystem.FS_ROOT, `users/${userId}/assets/avatar/${size}.webp`)));
                 default:
-                  return new Response(
-                    file(
-                      path.join(
-                        this.sys.filesystem.FS_ROOT,
-                        `users/${userId}/assets/avatar/xs.webp`,
-                      ),
-                    ),
-                  );
+                  return new Response(file(path.join(this.sys.filesystem.FS_ROOT, `users/${userId}/assets/avatar/xs.webp`)));
               }
             },
           },
@@ -197,9 +162,7 @@ class Instance {
 
               const parsedCookie = Bun.Cookie.parse(cookieString);
 
-              const userId = await this.sys.authorization.verifySession(
-                decodeURIComponent(parsedCookie.value),
-              );
+              const userId = await this.sys.authorization.verifySession(decodeURIComponent(parsedCookie.value));
 
               if (userId === undefined) {
                 this.log.system.warning("Invalid session in request for application icon");
@@ -210,9 +173,7 @@ class Instance {
                 });
               }
 
-              const application = this.sys.applications.availableApplications.find(
-                (a) => a.manifest?.id === app,
-              );
+              const application = this.sys.applications.availableApplications.find((a) => a.manifest?.id === app);
 
               if (!application)
                 return Response.json({
@@ -220,10 +181,7 @@ class Instance {
                   message: "Invalid application!",
                 });
 
-              const applicationIconPath = path.join(
-                application.path,
-                application.manifest?.icon?.value || "",
-              );
+              const applicationIconPath = path.join(application.path, application.manifest?.icon?.value || "");
 
               return new Response(file(applicationIconPath));
             },
@@ -251,9 +209,7 @@ class Instance {
 
                 const parsedCookie = Bun.Cookie.parse(cookieString);
 
-                const userId = await this.sys.authorization.verifySession(
-                  decodeURIComponent(parsedCookie.value),
-                );
+                const userId = await this.sys.authorization.verifySession(decodeURIComponent(parsedCookie.value));
 
                 if (userId === undefined) {
                   return Response.json({
@@ -276,41 +232,26 @@ class Instance {
               }
 
               if (resolutionParam === "raw") {
-                this.sys.image.log.info(
-                  `Served Image -> '${(req.params as { imageId: string }).imageId} @ ${resolutionParam}'`,
-                );
+                this.sys.image.log.info(`Served Image -> '${(req.params as { imageId: string }).imageId} @ ${resolutionParam}'`);
                 return new Response(file(sourceImage.path));
               } else {
-                const outputPath = path.join(
-                  this.sys.filesystem.CACHE_PATH,
-                  sourceImage.path,
-                  resolutionParam,
-                );
+                const outputPath = path.join(this.sys.filesystem.CACHE_PATH, sourceImage.path, resolutionParam);
 
                 // FIXME!: IF THE IMAGE AT THE SOURCE PATH IS REPLACED WITH ANOTHER, IT WILL CONTINUE TO SEND THE OLD IMAGE
-                if (await fs.exists(outputPath)) {
-                  this.sys.image.log.info(
-                    `Served Image -> '${(req.params as { imageId: string }).imageId} @ ${resolutionParam}'`,
-                  );
+                if (fsExistsSync(outputPath)) {
+                  this.sys.image.log.info(`Served Image -> '${(req.params as { imageId: string }).imageId} @ ${resolutionParam}'`);
                   return new Response(file(outputPath));
                 }
 
-                if (!(await fs.exists(path.join(outputPath, "..")))) {
+                if (!fsExistsSync(path.join(outputPath, ".."))) {
                   await fs.mkdir(path.join(outputPath, ".."), {
                     recursive: true,
                   });
                 }
 
-                await this.sys.image.resizeImage(
-                  sourceImage.path,
-                  outputPath,
-                  sourceImage.resize!.dimensions,
-                  sourceImage.resize!,
-                );
+                await this.sys.image.resizeImage(sourceImage.path, outputPath, sourceImage.resize!.dimensions, sourceImage.resize!);
 
-                this.sys.image.log.info(
-                  `Served Image -> '${(req.params as { imageId: string }).imageId} @ ${resolutionParam}'`,
-                );
+                this.sys.image.log.info(`Served Image -> '${(req.params as { imageId: string }).imageId} @ ${resolutionParam}'`);
                 return new Response(file(outputPath));
               }
             },
@@ -338,9 +279,7 @@ class Instance {
 
                 const parsedCookie = Bun.Cookie.parse(cookieString);
 
-                const userId = await this.sys.authorization.verifySession(
-                  decodeURIComponent(parsedCookie.value),
-                );
+                const userId = await this.sys.authorization.verifySession(decodeURIComponent(parsedCookie.value));
 
                 if (userId === undefined) {
                   return Response.json({
@@ -376,9 +315,7 @@ class Instance {
   }
 
   async promptForRestart(reason: string): Promise<this> {
-    this.log.system.warning(
-      `Hey Server Admin, THE INSTANCE HAS BEEN PROMPTED FOR RESTART DUE TO '${reason}' please restart when possible.`,
-    );
+    this.log.system.warning(`Hey Server Admin, THE INSTANCE HAS BEEN PROMPTED FOR RESTART DUE TO '${reason}' please restart when possible.`);
     return this;
   }
 
@@ -395,30 +332,7 @@ class Instance {
       process.stdout.cursorTo(0, 0);
     }
 
-    const goodbye = [
-      "Goodbye!",
-      "Chao",
-      "Salut",
-      "Ciao",
-      "Tschüss",
-      "じゃあね",
-      "拜拜",
-      "Tchau",
-      "Пока",
-      "잘 가",
-      "Hej då",
-      "Doei",
-      "Γεια",
-      "Na razie",
-      "Güle güle",
-      "Adeus",
-      "Tot ziens",
-      "Hẹn gặp lại",
-    ];
-
-    process.stdout.write("Shutdown completed! -> ");
-    process.stdout.write(goodbye[Math.floor(Math.random() * goodbye.length)]);
-    process.stdout.write(" 👋\n");
+    process.stdout.write("Shutdown complete!\n");
     process.exit(0);
   }
 }

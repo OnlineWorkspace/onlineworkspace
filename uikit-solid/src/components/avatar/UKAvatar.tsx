@@ -7,18 +7,12 @@ const UKAvatar: Component<{
   username: string;
   avatar: string;
   class?: string;
-  onClick?: () => void;
+  onClick?: (e: MouseEvent) => void;
 }> = (props) => {
   return (
-    // biome-ignore lint/a11y/useKeyWithClickEvents: avatar lmao
-    <img
-      onClick={props.onClick}
-      draggable={false}
-      src={props.avatar}
-      class={clsx(styles.root, props.class)}
-      alt={`${props.username}'s avatar`}
-      data-size={props.size}
-    ></img>
+    <button class={styles.root} type="button" onClick={props.onClick}>
+      <img draggable={false} src={props.avatar} class={clsx(styles.image, props.class)} alt={`${props.username}'s avatar`} data-size={props.size}></img>
+    </button>
   );
 };
 
