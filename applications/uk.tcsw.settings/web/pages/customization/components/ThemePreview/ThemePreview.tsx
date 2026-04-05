@@ -1,7 +1,6 @@
 import ARROW_CIRCLE_RIGHT_ICON from "@material-symbols/svg-700/outlined/arrow_circle_right.svg";
 import MENU_ICON from "@material-symbols/svg-700/outlined/menu.svg";
 import UKIcon from "@tcsw/uikit-solid/src/components/icon/UKIcon.tsx";
-import UKIndeterminateSpinner from "@tcsw/uikit-solid/src/components/indeterminateSpinner/UKIndeterminateSpinner.tsx";
 import clsx from "clsx";
 import { type Component, createResource, For, Suspense } from "solid-js";
 import PLACEHOLDER_WALLPAPER from "./../../../../assets/placeholder_wallpaper.png";
@@ -13,24 +12,22 @@ const ThemePreview: Component<{
   align?: ["left" | "center" | "right", "top" | "middle" | "bottom"];
   fillStyle?: "cover" | "fill" | "contain";
 }> = (props) => {
-  const [currentWallpaper] = createResource(() =>
-    trpc.customization.wallpaper.currentWallpaper.query(),
-  );
+  const [currentWallpaper] = createResource(() => trpc.customization.wallpaper.getCurrentWallpaper.query());
 
   return (
     <div class={styles.root}>
-      <Suspense fallback={<UKIndeterminateSpinner class={styles.wallpaperSpinner} />}>
+      <Suspense>
         <img
+          onLoad={(e) => {
+            e.currentTarget.style.opacity = "1";
+            e.currentTarget.style.filter = "blur(0)";
+          }}
           alt={""}
           src={props.wallpaperOverride ?? currentWallpaper() ?? PLACEHOLDER_WALLPAPER}
           style={{
             "object-fit": props.fillStyle || "cover",
           }}
-          class={clsx(
-            styles.wallpaper,
-            styles[props.align?.[0] || "center"],
-            styles[props.align?.[1] || "middle"],
-          )}
+          class={clsx(styles.wallpaper, styles[props.align?.[0] || "center"], styles[props.align?.[1] || "middle"])}
         />
       </Suspense>
       <div class={styles.sidebar}>
