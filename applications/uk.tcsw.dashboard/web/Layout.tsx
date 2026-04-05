@@ -19,6 +19,10 @@ const DashboardLayout: Component<ParentProps> = (props) => {
     <div class={styles.root} data-show-background={contentBackground()}>
       <Suspense fallback={<UKIndeterminateSpinner class={styles.wallpaperSpinner} />}>
         <img
+          onLoad={(e) => {
+            e.currentTarget.style.opacity = "1";
+            e.currentTarget.style.filter = "blur(0)";
+          }}
           alt={""}
           src={wallpaper() || PLACEHOLDER_WALLPAPER}
           style={{

@@ -12,20 +12,6 @@
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
-
-  animation: fadeIn forwards 0.25s
-    var(--uk-sys-motion-easing-standard-decelerate);
-
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-      filter: blur(0.25rem);
-    }
-    to {
-      opacity: 1;
-      filter: blur(0);
-    }
-  }
 }
 
 .wallpaper {
@@ -34,20 +20,9 @@
   height: 100%;
   user-select: none;
   pointer-events: none;
-  z-index: -1;
-  animation: fadeIn forwards 0.25s
-    var(--uk-sys-motion-easing-standard-decelerate);
-
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-      filter: blur(0.25rem);
-    }
-    to {
-      opacity: 1;
-      filter: blur(0);
-    }
-  }
+  transition: opacity 0.5s var(--uk-sys-motion-easing-standard-decelerate), filter 0.5s var(--uk-sys-motion-easing-standard-decelerate);
+  opacity: 0;
+  filter: blur(0.25rem);
 
   --transform-x: 0;
   --transform-y: 0;

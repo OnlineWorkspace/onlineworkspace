@@ -11,6 +11,9 @@ import { DividerDirection } from "@tcsw/uikit-solid/src/components/divider/lib/d
 import UKDivider from "@tcsw/uikit-solid/src/components/divider/UKDivider.jsx";
 import UKIconButton from "@tcsw/uikit-solid/src/components/iconButton/UKIconButton.tsx";
 import UKIndeterminateSpinner from "@tcsw/uikit-solid/src/components/indeterminateSpinner/UKIndeterminateSpinner.tsx";
+import UKStack from "@tcsw/uikit-solid/src/components/stack/UKStack.jsx";
+import UKStackItem from "@tcsw/uikit-solid/src/components/stack/UKStackItem.jsx";
+import UKStackLabel from "@tcsw/uikit-solid/src/components/stack/UKStackLabel.jsx";
 import UKText from "@tcsw/uikit-solid/src/components/text/UKText.tsx";
 import UKTopAppBar from "@tcsw/uikit-solid/src/components/topAppBar/UKTopAppBar.jsx";
 import type { Component } from "solid-js";
@@ -25,24 +28,12 @@ const WallpaperPage: Component = () => {
     accept: "image/*",
     multiple: true,
   });
-  const [currentWallpaper, { refetch: refetchCurrentWallpaper }] = createResource(() =>
-    trpc.customization.wallpaper.currentWallpaper.query(),
-  );
-  const [previousWallpapers, { refetch: refetchWallpapers }] = createResource(() =>
-    trpc.customization.wallpaper.wallpaperHistory.query(),
-  );
-  const [officialWallpapers] = createResource(() =>
-    trpc.customization.wallpaper.officialWallpapers.query(),
-  );
-  const [wallpaperAlignHorizontal, setWallpaperAlignHorizontal] = createSignal<
-    "left" | "center" | "right" | undefined
-  >(undefined);
-  const [wallpaperAlignVertical, setWallpaperAlignVertical] = createSignal<
-    "top" | "middle" | "bottom" | undefined
-  >(undefined);
-  const [wallpaperFit, setWallpaperFit] = createSignal<"fill" | "cover" | "contain" | undefined>(
-    undefined,
-  );
+  const [currentWallpaper, { refetch: refetchCurrentWallpaper }] = createResource(() => trpc.customization.wallpaper.getCurrentWallpaper.query());
+  const [previousWallpapers, { refetch: refetchWallpapers }] = createResource(() => trpc.customization.wallpaper.wallpaperHistory.query());
+  const [officialWallpapers] = createResource(() => trpc.customization.wallpaper.getDefaultWallpapers.query());
+  const [wallpaperAlignHorizontal, setWallpaperAlignHorizontal] = createSignal<"left" | "center" | "right" | undefined>(undefined);
+  const [wallpaperAlignVertical, setWallpaperAlignVertical] = createSignal<"top" | "middle" | "bottom" | undefined>(undefined);
+  const [wallpaperFit, setWallpaperFit] = createSignal<"fill" | "cover" | "contain" | undefined>(undefined);
 
   onMount(async () => {
     const options = await trpc.customization.wallpaper.getOptions.query();
@@ -118,111 +109,117 @@ const WallpaperPage: Component = () => {
           <UKDivider direction={DividerDirection.horizontal} width={"middle-inset"} />
         </div>
 
-        <UKText role={"title"} size={"m"} class={styles.subheading}>
-          Wallpaper Fit
-        </UKText>
-        <div class={styles.configureWallpaper}>
-          <UKButtonGroup size={"s"} connected={true}>
-            <UKButton
-              leadingIcon={wallpaperFit() === "fill" ? CHECK_ICON : undefined}
-              onClick={() => {
-                setWallpaperFit("fill");
-              }}
-              color={wallpaperFit() === "fill" ? "filled" : "tonal"}
-            >
-              Fill
-            </UKButton>
-            <UKButton
-              leadingIcon={wallpaperFit() === "cover" ? CHECK_ICON : undefined}
-              onClick={() => {
-                setWallpaperFit("cover");
-              }}
-              color={wallpaperFit() === "cover" ? "filled" : "tonal"}
-            >
-              Cover
-            </UKButton>
-            <UKButton
-              leadingIcon={wallpaperFit() === "contain" ? CHECK_ICON : undefined}
-              onClick={() => {
-                setWallpaperFit("contain");
-              }}
-              color={wallpaperFit() === "contain" ? "filled" : "tonal"}
-            >
-              Contain
-            </UKButton>
-          </UKButtonGroup>
-        </div>
-
-        <UKText role={"title"} size={"m"} class={styles.subheading}>
-          Wallpaper Alignment
-        </UKText>
-        <div class={styles.configureWallpaper}>
-          <UKButtonGroup size={"s"} connected={true}>
-            <UKButton
-              disabled={wallpaperFit() === "fill"}
-              leadingIcon={wallpaperAlignVertical() === "top" ? CHECK_ICON : undefined}
-              onClick={() => {
-                setWallpaperAlignVertical("top");
-              }}
-              color={wallpaperAlignVertical() === "top" ? "filled" : "tonal"}
-            >
-              Top
-            </UKButton>
-            <UKButton
-              disabled={wallpaperFit() === "fill"}
-              leadingIcon={wallpaperAlignVertical() === "middle" ? CHECK_ICON : undefined}
-              onClick={() => {
-                setWallpaperAlignVertical("middle");
-              }}
-              color={wallpaperAlignVertical() === "middle" ? "filled" : "tonal"}
-            >
-              Middle
-            </UKButton>
-            <UKButton
-              disabled={wallpaperFit() === "fill"}
-              leadingIcon={wallpaperAlignVertical() === "bottom" ? CHECK_ICON : undefined}
-              onClick={() => {
-                setWallpaperAlignVertical("bottom");
-              }}
-              color={wallpaperAlignVertical() === "bottom" ? "filled" : "tonal"}
-            >
-              Bottom
-            </UKButton>
-          </UKButtonGroup>
-          <UKButtonGroup size={"s"} connected={true}>
-            <UKButton
-              disabled={wallpaperFit() === "fill"}
-              leadingIcon={wallpaperAlignHorizontal() === "left" ? CHECK_ICON : undefined}
-              onClick={() => {
-                setWallpaperAlignHorizontal("left");
-              }}
-              color={wallpaperAlignHorizontal() === "left" ? "filled" : "tonal"}
-            >
-              Left
-            </UKButton>
-            <UKButton
-              disabled={wallpaperFit() === "fill"}
-              leadingIcon={wallpaperAlignHorizontal() === "center" ? CHECK_ICON : undefined}
-              onClick={() => {
-                setWallpaperAlignHorizontal("center");
-              }}
-              color={wallpaperAlignHorizontal() === "center" ? "filled" : "tonal"}
-            >
-              Center
-            </UKButton>
-            <UKButton
-              disabled={wallpaperFit() === "fill"}
-              leadingIcon={wallpaperAlignHorizontal() === "right" ? CHECK_ICON : undefined}
-              onClick={() => {
-                setWallpaperAlignHorizontal("right");
-              }}
-              color={wallpaperAlignHorizontal() === "right" ? "filled" : "tonal"}
-            >
-              Right
-            </UKButton>
-          </UKButtonGroup>
-        </div>
-
+        <UKStackLabel>Wallpaper Options</UKStackLabel>
+        <UKStack>
+          <UKStackItem
+            labelText="Wallpaper Size"
+            inlineComponent={
+              <UKButtonGroup size={"s"} connected={true} align="end">
+                <UKButton
+                  leadingIcon={wallpaperFit() === "fill" ? CHECK_ICON : undefined}
+                  onClick={() => {
+                    setWallpaperFit("fill");
+                  }}
+                  color={wallpaperFit() === "fill" ? "filled" : "tonal"}
+                >
+                  Fill
+                </UKButton>
+                <UKButton
+                  leadingIcon={wallpaperFit() === "cover" ? CHECK_ICON : undefined}
+                  onClick={() => {
+                    setWallpaperFit("cover");
+                  }}
+                  color={wallpaperFit() === "cover" ? "filled" : "tonal"}
+                >
+                  Cover
+                </UKButton>
+                <UKButton
+                  leadingIcon={wallpaperFit() === "contain" ? CHECK_ICON : undefined}
+                  onClick={() => {
+                    setWallpaperFit("contain");
+                  }}
+                  color={wallpaperFit() === "contain" ? "filled" : "tonal"}
+                >
+                  Contain
+                </UKButton>
+              </UKButtonGroup>
+            }
+          />
+          <UKStackItem
+            labelText="Wallpaper Vertical Alignment"
+            inlineComponent={
+              <UKButtonGroup size={"s"} connected={true} align="end">
+                <UKButton
+                  disabled={wallpaperFit() === "fill"}
+                  leadingIcon={wallpaperAlignVertical() === "top" ? CHECK_ICON : undefined}
+                  onClick={() => {
+                    setWallpaperAlignVertical("top");
+                  }}
+                  color={wallpaperAlignVertical() === "top" ? "filled" : "tonal"}
+                >
+                  Top
+                </UKButton>
+                <UKButton
+                  disabled={wallpaperFit() === "fill"}
+                  leadingIcon={wallpaperAlignVertical() === "middle" ? CHECK_ICON : undefined}
+                  onClick={() => {
+                    setWallpaperAlignVertical("middle");
+                  }}
+                  color={wallpaperAlignVertical() === "middle" ? "filled" : "tonal"}
+                >
+                  Middle
+                </UKButton>
+                <UKButton
+                  disabled={wallpaperFit() === "fill"}
+                  leadingIcon={wallpaperAlignVertical() === "bottom" ? CHECK_ICON : undefined}
+                  onClick={() => {
+                    setWallpaperAlignVertical("bottom");
+                  }}
+                  color={wallpaperAlignVertical() === "bottom" ? "filled" : "tonal"}
+                >
+                  Bottom
+                </UKButton>
+              </UKButtonGroup>
+            }
+          />
+          <UKStackItem
+            labelText="Wallpaper Vertical Alignment"
+            inlineComponent={
+              <UKButtonGroup size={"s"} connected={true} align="end">
+                <UKButton
+                  disabled={wallpaperFit() === "fill"}
+                  leadingIcon={wallpaperAlignHorizontal() === "left" ? CHECK_ICON : undefined}
+                  onClick={() => {
+                    setWallpaperAlignHorizontal("left");
+                  }}
+                  color={wallpaperAlignHorizontal() === "left" ? "filled" : "tonal"}
+                >
+                  Left
+                </UKButton>
+                <UKButton
+                  disabled={wallpaperFit() === "fill"}
+                  leadingIcon={wallpaperAlignHorizontal() === "center" ? CHECK_ICON : undefined}
+                  onClick={() => {
+                    setWallpaperAlignHorizontal("center");
+                  }}
+                  color={wallpaperAlignHorizontal() === "center" ? "filled" : "tonal"}
+                >
+                  Center
+                </UKButton>
+                <UKButton
+                  disabled={wallpaperFit() === "fill"}
+                  leadingIcon={wallpaperAlignHorizontal() === "right" ? CHECK_ICON : undefined}
+                  onClick={() => {
+                    setWallpaperAlignHorizontal("right");
+                  }}
+                  color={wallpaperAlignHorizontal() === "right" ? "filled" : "tonal"}
+                >
+                  Right
+                </UKButton>
+              </UKButtonGroup>
+            }
+          />
+        </UKStack>
         <UKText role={"title"} size={"m"} class={styles.subheading}>
           Select New Wallpaper
         </UKText>
@@ -237,7 +234,7 @@ const WallpaperPage: Component = () => {
                   await refetchWallpapers();
 
                   if (files.length === 1) {
-                    await trpc.customization.wallpaper.setWallpaper.mutate({
+                    await trpc.customization.wallpaper.setWallpaperToCustomWallpaper.mutate({
                       name: name,
                     });
                     await refetchCurrentWallpaper();
@@ -260,54 +257,48 @@ const WallpaperPage: Component = () => {
           </UKButton>
         </div>
 
-        <UKText role={"title"} size={"m"} class={styles.subheading}>
-          Previous Wallpapers
-        </UKText>
-        <div class={styles.wallpaperHistory}>
-          <Suspense fallback={<UKIndeterminateSpinner />}>
-            {previousWallpapers()?.length === 0 ? (
-              <div class={styles.noWallpapersMessage}>
-                <UKText role={"title"} size={"l"} align={"center"}>
-                  No Wallpapers
-                </UKText>
-                <UKText role={"body"} size={"l"} align={"center"}>
-                  You have no previous wallpapers, please upload a wallpaper to see it here
-                </UKText>
-              </div>
-            ) : (
-              <For each={previousWallpapers() || []}>
-                {(wallpaper) => {
-                  return (
-                    <div
-                      class={styles.wallpaper}
-                      onClick={async () => {
-                        await trpc.customization.wallpaper.setWallpaper.mutate({
-                          name: wallpaper.name,
-                        });
-                        refetchCurrentWallpaper();
-                      }}
-                    >
-                      <UKIconButton
-                        size={"xs"}
-                        class={styles.deleteWallpaper}
-                        icon={DELETE_ICON}
-                        color={"tonal"}
+        {previousWallpapers()?.length !== 0 ? (
+          <>
+            <UKText role={"title"} size={"m"} class={styles.subheading}>
+              Previous Wallpapers
+            </UKText>
+            <div class={styles.wallpaperHistory}>
+              <Suspense fallback={<UKIndeterminateSpinner />}>
+                <For each={previousWallpapers() || []}>
+                  {(wallpaper) => {
+                    return (
+                      <button
+                        type="button"
+                        class={styles.wallpaper}
                         onClick={async () => {
-                          await trpc.customization.wallpaper.delete.mutate({
+                          await trpc.customization.wallpaper.setWallpaperToCustomWallpaper.mutate({
                             name: wallpaper.name,
                           });
-                          refetchWallpapers();
+                          refetchCurrentWallpaper();
                         }}
-                        alt={"delete"}
-                      />
-                      <img src={wallpaper.previewSrc} loading={"lazy"} alt={"wallpaper preview"} />
-                    </div>
-                  );
-                }}
-              </For>
-            )}
-          </Suspense>
-        </div>
+                      >
+                        <UKIconButton
+                          size={"xs"}
+                          class={styles.deleteWallpaper}
+                          icon={DELETE_ICON}
+                          color={"tonal"}
+                          onClick={async () => {
+                            await trpc.customization.wallpaper.delete.mutate({
+                              name: wallpaper.name,
+                            });
+                            refetchWallpapers();
+                          }}
+                          alt={"delete"}
+                        />
+                        <img src={wallpaper.previewSrc} loading={"lazy"} alt={"wallpaper preview"} />
+                      </button>
+                    );
+                  }}
+                </For>
+              </Suspense>
+            </div>
+          </>
+        ) : null}
 
         <UKText role={"title"} size={"m"} class={styles.subheading}>
           Official Wallpapers
@@ -316,10 +307,11 @@ const WallpaperPage: Component = () => {
           <For each={officialWallpapers() || []}>
             {(wallpaper) => {
               return (
-                <div
+                <button
+                  type="button"
                   class={styles.wallpaper}
                   onClick={async () => {
-                    await trpc.customization.wallpaper.setOfficialWallpaper.mutate({
+                    await trpc.customization.wallpaper.setWallpaperToDefaultWallpaper.mutate({
                       name: wallpaper.name,
                     });
 
@@ -327,7 +319,7 @@ const WallpaperPage: Component = () => {
                   }}
                 >
                   <img src={wallpaper.previewSrc} loading={"lazy"} alt={"wallpaper preview"} />
-                </div>
+                </button>
               );
             }}
           </For>

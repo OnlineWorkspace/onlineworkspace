@@ -1,130 +1,109 @@
 .root {
-    margin-left: auto;
-    margin-right: auto;
-    width: 100%;
-    max-width: 64rem;
-    padding-top: 2rem;
-    padding-bottom: 2rem;
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%;
+  max-width: 64rem;
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 
 .header {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
 }
 
 .backButton {
-    margin-left: 1rem;
-    margin-top: 1rem;
+  margin-left: 1rem;
+  margin-top: 1rem;
 }
 
 .subheading {
-    width: 100%;
-    max-width: 64rem;
-    padding-left: 1.5rem;
-    padding-right: 1.5rem;
+  width: 100%;
+  max-width: 64rem;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
 }
 
 .noWallpapersMessage {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    margin-left: auto;
-    margin-right: auto;
-    text-wrap: wrap;
-    width: 100%;
-    overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-left: auto;
+  margin-right: auto;
+  text-wrap: wrap;
+  width: 100%;
+  overflow: hidden;
 }
 
 .wallpaperHistory {
-    display: flex;
-    flex-direction: row;
-    gap: 0.5rem;
-    padding: 1rem;
-    flex-wrap: wrap;
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
+  flex-wrap: wrap;
 }
 
 .officialWallpapers {
-    display: flex;
-    flex-direction: row;
-    gap: 0.5rem;
-    padding-left: 1rem;
-    padding-right: 1rem;
-    flex-wrap: wrap;
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
+  flex-wrap: wrap;
 }
 
 .wallpaper {
-    aspect-ratio: 16 / 9;
-    max-height: 8rem;
+  aspect-ratio: 16 / 9;
+  height: 8rem;
+  background-color: transparent;
+  border: none;
+  margin: 0;
+  padding: 0;
+  border-radius: var(--uk-sys-shape-corner-medium);
+  overflow: hidden;
+  position: relative;
+
+  > img {
     height: 100%;
-    border-radius: var(--uk-sys-shape-corner-large);
-    overflow: hidden;
-    position: relative;
-    flex-grow: 1;
+    width: 100%;
+    object-fit: cover;
 
+    transition: transform var(--uk-sys-motion-duration-250)
+      var(--uk-sys-motion-easing-emphasized-decelerate);
+  }
+
+  &:hover {
     > img {
-        height: 100%;
-        width: 100%;
-        object-fit: cover;
-
-        transition:
-            width var(--uk-sys-motion-duration-250)
-                var(--uk-sys-motion-easing-emphasized-decelerate),
-            height var(--uk-sys-motion-duration-250)
-                var(--uk-sys-motion-easing-emphasized-decelerate),
-            margin-top var(--uk-sys-motion-duration-250)
-                var(--uk-sys-motion-easing-emphasized-decelerate),
-            margin-left var(--uk-sys-motion-duration-250)
-                var(--uk-sys-motion-easing-emphasized-decelerate);
+      transform: scale(1.1);
     }
 
-    &:hover {
-        > img {
-            --zoom: 2rem;
-
-            margin-top: calc(var(--zoom) * -0.5);
-            margin-left: calc(var(--zoom) * -0.5);
-            height: calc(100% + var(--zoom));
-            width: calc(100% + var(--zoom));
-        }
-
-        .deleteWallpaper {
-            opacity: 1;
-        }
+    .deleteWallpaper {
+      opacity: 1;
     }
+  }
 }
 
 .deleteWallpaper {
-    position: absolute;
-    top: 0.5rem;
-    right: 0.5rem;
-    opacity: 0;
-}
-
-.configureWallpaper {
-    display: flex;
-    flex-direction: row;
-    gap: 0.5rem;
-    align-items: center;
-    justify-content: center;
-    flex-wrap: wrap;
-    padding-left: 1rem;
-    padding-right: 1rem;
+  position: absolute;
+  top: 0.25rem;
+  right: 0.25rem;
+  opacity: 0;
+  z-index: 1;
 }
 
 .selectWallpaper {
-    display: flex;
-    flex-direction: row;
-    gap: 0.5rem;
-    align-items: center;
-    justify-content: center;
-    flex-wrap: wrap;
-    padding-left: 1rem;
-    padding-right: 1rem;
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  padding-left: 1rem;
+  padding-right: 1rem;
 }

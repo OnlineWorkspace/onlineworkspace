@@ -1,6 +1,8 @@
 import CHEVRON_LEFT from "@material-symbols/svg-700/outlined/chevron_left.svg";
 import { useNavigate } from "@solidjs/router";
+import UKButton from "@tcsw/uikit-solid/src/components/button/UKButton.jsx";
 import UKCard from "@tcsw/uikit-solid/src/components/card/UKCard.jsx";
+import UKDivider from "@tcsw/uikit-solid/src/components/divider/UKDivider.jsx";
 import UKIconButton from "@tcsw/uikit-solid/src/components/iconButton/UKIconButton.jsx";
 import UKText from "@tcsw/uikit-solid/src/components/text/UKText.jsx";
 import { closestCenter, createSortable, DragDropProvider, DragDropSensors, DragOverlay, SortableProvider } from "@thisbeyond/solid-dnd";
@@ -52,7 +54,9 @@ const EditWidgets: Component = () => {
       <DragDropProvider onDragStart={onDragStart} onDragEnd={onDragEnd} collisionDetector={closestCenter}>
         <DragDropSensors />
 
-        <UKIconButton class={styles.backButton} icon={CHEVRON_LEFT} alt="Go Back" onClick={() => navigate("/app/uk.tcsw.dashboard")} color="tonal" />
+        <UKButton class={styles.backButton} leadingIcon={CHEVRON_LEFT} onClick={() => navigate("/app/uk.tcsw.dashboard")} color="filled">
+          Confirm Changes
+        </UKButton>
 
         <div class={styles.widgets}>
           <SortableProvider ids={items()}>
@@ -85,6 +89,17 @@ const EditWidgets: Component = () => {
           <UKText role="title" size="l">
             Widgets
           </UKText>
+          <UKDivider direction="horizontal" />
+          <div>
+            {Object.keys(Widgets).map((widgetId) => (
+              <div>
+                <UKText role="body" size="m">
+                  {/* TODO: display the widgets but using sample placeholder data */}
+                  {widgetId}
+                </UKText>
+              </div>
+            ))}
+          </div>
         </UKCard>
       </DragDropProvider>
     </div>
