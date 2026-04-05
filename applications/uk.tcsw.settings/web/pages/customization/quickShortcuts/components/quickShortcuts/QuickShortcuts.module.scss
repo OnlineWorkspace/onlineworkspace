@@ -1,4 +1,16 @@
+.sortable {
+  cursor: grab;
+}
+
+.dragging {
+  opacity: 0.65;
+}
+
 .item {
+  user-select: none;
+}
+
+.itemInline {
   display: flex;
   flex-direction: row;
   gap: 0.5rem;

@@ -6,31 +6,22 @@ import UKDivider from "@tcsw/uikit-solid/src/components/divider/UKDivider.jsx";
 import UKIcon from "@tcsw/uikit-solid/src/components/icon/UKIcon.tsx";
 import UKIndeterminateSpinner from "@tcsw/uikit-solid/src/components/indeterminateSpinner/UKIndeterminateSpinner.jsx";
 import UKText from "@tcsw/uikit-solid/src/components/text/UKText.tsx";
-import {
-  type Component,
-  createEffect,
-  createResource,
-  createSignal,
-  For,
-  Suspense,
-} from "solid-js";
-import trpc from "../../../../../lib/trpc.ts";
+import { type Component, createSignal, For, Suspense } from "solid-js";
 import styles from "./AddShortcutButton.module.scss";
 
 const AddShortcutButton: Component<{
-  refetchData: () => void;
   addShortcut: (shortcutId: string) => void;
+  enabledShortcuts: string[];
+  shortcutMetadata: Record<
+    string,
+    {
+      id: string;
+      displayName: string;
+      icon: { type: "icon" | "image"; value: string };
+    }
+  >;
 }> = (props) => {
   const [showDialog, setShowDialog] = createSignal<boolean>(false);
-  const [availableShortcuts, { refetch: refetchAvailableShortcuts }] = createResource(() =>
-    trpc.customization.quickShortcuts.availableShortcuts.query(),
-  );
-
-  createEffect(() => {
-    if (showDialog()) {
-      refetchAvailableShortcuts();
-    }
-  });
 
   return (
     <>
@@ -56,14 +47,12 @@ const AddShortcutButton: Component<{
               </div>
             }
           >
-            {availableShortcuts()?.length === 0 ? (
-              <>
-                <UKText role={"body"} size={"l"}>
-                  No more Quick Shortcuts are available
-                </UKText>
-              </>
+            {props.enabledShortcuts?.length === Object.keys(props.shortcutMetadata).length ? (
+              <UKText role={"body"} size={"l"}>
+                No more Application Quick Shortcuts are available
+              </UKText>
             ) : (
-              <For each={availableShortcuts()}>
+              <For each={Object.values(props.shortcutMetadata).filter((shortcut) => !props.enabledShortcuts.includes(shortcut.id))}>
                 {(shortcut) => {
                   return (
                     <UKCard
@@ -73,12 +62,8 @@ const AddShortcutButton: Component<{
                         setShowDialog(false);
                       }}
                     >
-                      {shortcut.icon.type === "icon" && (
-                        <UKIcon class={styles.shortcutIcon}>{shortcut.icon.value}</UKIcon>
-                      )}
-                      {shortcut.icon.type === "image" && (
-                        <img class={styles.shortcutImage} src={shortcut.icon.value} alt={""} />
-                      )}
+                      {shortcut.icon.type === "icon" && <UKIcon class={styles.shortcutIcon}>{shortcut.icon.value}</UKIcon>}
+                      {shortcut.icon.type === "image" && <img class={styles.shortcutImage} src={shortcut.icon.value} alt={""} />}
                       <UKText align={"center"} role={"label"} size={"l"}>
                         {shortcut.displayName}
                       </UKText>

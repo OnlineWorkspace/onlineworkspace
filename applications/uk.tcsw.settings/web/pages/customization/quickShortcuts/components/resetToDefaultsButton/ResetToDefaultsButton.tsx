@@ -2,9 +2,8 @@ import REFRESH_ICON from "@material-symbols/svg-700/outlined/refresh.svg";
 import UKButton from "@tcsw/uikit-solid/src/components/button/UKButton.tsx";
 import UKNoPointOfReturnDialog from "@tcsw/uikit-solid/src/components/dialog/prefabs/noPointOfReturn/UKNoPointOfReturnDialog.tsx";
 import { type Component, createSignal } from "solid-js";
-import trpc from "../../../../../lib/trpc.ts";
 
-const ResetToDefaultsButton: Component<{ refetchData: () => void }> = (props) => {
+const ResetToDefaultsButton: Component<{ onReset: () => Promise<void> }> = (props) => {
   const [showDialog, setShowDialog] = createSignal<boolean>(false);
 
   return (
@@ -23,9 +22,8 @@ const ResetToDefaultsButton: Component<{ refetchData: () => void }> = (props) =>
         message={"Reset quick shortcuts to defaults?"}
         show={showDialog}
         onConfirm={async () => {
+          await props.onReset();
           setShowDialog(false);
-          await trpc.customization.quickShortcuts.resetToDefaults.mutate();
-          props.refetchData();
         }}
         onDeny={() => {
           setShowDialog(false);

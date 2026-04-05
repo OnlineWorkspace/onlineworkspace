@@ -1,11 +1,15 @@
 import CHEVRON_LEFT_ICON from "@material-symbols/svg-700/outlined/chevron_left.svg";
+import REFRESH_ICON from "@material-symbols/svg-700/outlined/refresh.svg";
 import { useNavigate } from "@solidjs/router";
+import UKButton from "@tcsw/uikit-solid/src/components/button/UKButton.jsx";
+import UKButtonGroup from "@tcsw/uikit-solid/src/components/buttonGroup/UKButtonGroup.jsx";
+import UKCard from "@tcsw/uikit-solid/src/components/card/UKCard.jsx";
 import UKDivider from "@tcsw/uikit-solid/src/components/divider/UKDivider.tsx";
 import UKIcon from "@tcsw/uikit-solid/src/components/icon/UKIcon.tsx";
 import UKStack from "@tcsw/uikit-solid/src/components/stack/UKStack.tsx";
 import UKText from "@tcsw/uikit-solid/src/components/text/UKText.tsx";
 import UKTopAppBar from "@tcsw/uikit-solid/src/components/topAppBar/UKTopAppBar.jsx";
-import { type Component, createResource, useContext } from "solid-js";
+import { type Component, createResource, createSignal } from "solid-js";
 import trpc from "../../../lib/trpc";
 import AddShortcutButton from "./components/addShortcutButton/AddShortcutButton.tsx";
 import QuickShortcuts from "./components/quickShortcuts/QuickShortcuts.tsx";
@@ -14,9 +18,8 @@ import styles from "./Index.module.scss";
 
 const QuickShortcutsPage: Component = () => {
   const navigate = useNavigate();
-  const [data, { refetch: refetchData }] = createResource(() =>
-    trpc.customization.quickShortcuts.get.query(),
-  );
+  const [data, { mutate: mutateData }] = createResource(() => trpc.customization.quickShortcuts.getSettingData.query());
+  const [hasBeenModified, setHasBeenModified] = createSignal<boolean>(false);
 
   return (
     <>
@@ -43,9 +46,32 @@ const QuickShortcutsPage: Component = () => {
           <br />
           The navigation bar can be found on the left or bottom of the screen.
         </UKText>
+        {hasBeenModified() ? (
+          <>
+            <UKDivider width={"middle-inset"} direction={"horizontal"} />
+            <UKCard color="elevated" class={styles.hasBeenModifiedCard}>
+              <UKText role={"title"} size={"l"}>
+                Quick Shortcuts have been modified
+              </UKText>
+              <UKText role={"body"} size={"l"}>
+                To see your quick shortcut changes in the navigation bar, you will need to reload the page.
+              </UKText>
+              <UKButtonGroup align="end" size="s">
+                <UKButton
+                  leadingIcon={REFRESH_ICON}
+                  onClick={() => {
+                    window.location.reload();
+                  }}
+                >
+                  Reload
+                </UKButton>
+              </UKButtonGroup>
+            </UKCard>
+          </>
+        ) : null}
         <UKDivider width={"middle-inset"} direction={"horizontal"} />
         <UKStack>
-          {data()?.currentValue.length === 0 ? (
+          {(data()?.enabledShortcuts ?? []).length === 0 ? (
             <div class={styles.noQuickShortcutsContainer}>
               <UKIcon class={styles.noQuickShortcutsIcon}>broken_image</UKIcon>
               <UKText role={"title"} size={"l"} align={"center"}>
@@ -57,37 +83,51 @@ const QuickShortcutsPage: Component = () => {
             </div>
           ) : (
             <QuickShortcuts
-              currentValue={data()?.currentValue}
-              defaultValue={data()?.defaultValue ?? []}
+              currentValue={data()?.enabledShortcuts}
+              defaultValue={data()?.defaultShortcuts ?? []}
               setShortcuts={async (shortcuts) => {
-                await trpc.application.setApplicationStringListSettingValue.mutate({
-                  applicationId: "core",
-                  id: "quick_shortcuts",
-                  value: shortcuts,
+                mutateData((previousData) => {
+                  return {
+                    ...previousData!,
+                    enabledShortcuts: shortcuts,
+                  };
                 });
-
-                refetchData();
+                setHasBeenModified(true);
+                await trpc.application.setApplicationStringListSettingValue.mutate({ applicationId: "core", id: "quick_shortcuts", value: shortcuts });
               }}
             />
           )}
         </UKStack>
         <div class={styles.shortcutActionButtons}>
           <ResetToDefaultsButton
-            refetchData={() => {
-              refetchData();
-            }}
-          />
-          <AddShortcutButton
-            refetchData={() => {
-              refetchData();
-            }}
-            addShortcut={async (shortcutId) => {
+            onReset={async () => {
+              mutateData((previousData) => {
+                return { ...previousData!, enabledShortcuts: previousData!.defaultShortcuts };
+              });
+              setHasBeenModified(true);
               await trpc.application.setApplicationStringListSettingValue.mutate({
                 applicationId: "core",
                 id: "quick_shortcuts",
-                value: [...(data()?.currentValue ?? []), shortcutId],
+                value: data()!.defaultShortcuts,
               });
-              refetchData();
+            }}
+          />
+          <AddShortcutButton
+            enabledShortcuts={data()?.enabledShortcuts || []}
+            shortcutMetadata={data()?.shortcutMetadata || {}}
+            addShortcut={async (shortcutId) => {
+              mutateData((previousData) => {
+                return {
+                  ...previousData!,
+                  enabledShortcuts: [...previousData!.enabledShortcuts!, shortcutId],
+                };
+              });
+              setHasBeenModified(true);
+              await trpc.application.setApplicationStringListSettingValue.mutate({
+                applicationId: "core",
+                id: "quick_shortcuts",
+                value: [...data()!.enabledShortcuts!, shortcutId],
+              });
             }}
           />
         </div>
