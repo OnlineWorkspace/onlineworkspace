@@ -6,7 +6,12 @@
     "value": "./web/node_modules/@material-symbols/svg-700/outlined/settings.svg"
   },
   "description": "The Workspaces Settings Manager",
-  "authors": ["Tricolor Software <https://tcsw.uk>"],
+  "authors": [
+    {
+      "name": "Ewsgit",
+      "link": "<https://ewsgit.uk>"
+    }
+  ],
   "license": "MIT",
   "source": "https://github.com/tricolorsoftware/workspaces/src/branch/main/packages/applications/uk.tcsw.settings",
   "modules": {

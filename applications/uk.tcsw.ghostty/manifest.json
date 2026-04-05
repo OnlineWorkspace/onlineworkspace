@@ -8,9 +8,10 @@
   "bannerImage": "./banner.svg",
   "description": "The Ghostty Terminal for Workspaces",
   "authors": [
-    "Ghostty <https://github.com/ghostty-org>",
-    "Coder for ghostty-web <https://github.com/coder>",
-    "Tricolor Software <https://tcsw.uk>"
+    {
+      "name": "Ewsgit",
+      "link": "<https://ewsgit.uk>"
+    }
   ],
   "license": "MIT",
   "source": "https://github.com/tricolorsoftware/workspaces/src/branch/main/packages/applications/uk.tcsw.ghostty",
