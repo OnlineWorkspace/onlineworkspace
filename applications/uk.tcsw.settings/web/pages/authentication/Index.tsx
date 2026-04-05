@@ -37,11 +37,7 @@ const AuthenticationPage: Component = () => {
           </Suspense>
         </UKStack>
         <UKStackLabel>Logged in devices</UKStackLabel>
-        <UKStack>
-          <Suspense fallback={<UKIndeterminateSpinner class={styles.spinner} />}>
             <Sessions />
-          </Suspense>
-        </UKStack>
       </div>
     </>
   );
