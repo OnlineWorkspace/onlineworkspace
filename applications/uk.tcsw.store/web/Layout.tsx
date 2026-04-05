@@ -5,6 +5,7 @@ import UKIndeterminateSpinner from "@tcsw/uikit-solid/src/components/indetermina
 import UKSideBar from "@tcsw/uikit-solid/src/components/sideBar/UKSideBar.tsx";
 import { type Component, type ParentProps, Suspense } from "solid-js";
 import styles from "./Layout.module.scss";
+import REWARDED_ADS_ICON from "@material-symbols/svg-700/outlined/rewarded_ads.svg";
 
 const Layout: Component<ParentProps> = (props) => {
   const location = useLocation();
@@ -19,14 +20,21 @@ const Layout: Component<ParentProps> = (props) => {
         },
         {
           type: "button",
+          icon: { type: "icon", value: REWARDED_ADS_ICON },
+          label: "Promoted Applications",
+          onClick() {
+            navigate("/app/uk.tcsw.store/");
+          },
+          active: location.pathname === "/app/uk.tcsw.store" || location.pathname === "/app/uk.tcsw.store/",
+        },
+        {
+          type: "button",
           icon: { type: "icon", value: SEARCH_ICON },
           label: "Search",
           onClick() {
             navigate("/app/uk.tcsw.store/search");
           },
-          active:
-            location.pathname === "/app/uk.tcsw.store/search" ||
-            location.pathname === "/app/uk.tcsw.store",
+          active: location.pathname === "/app/uk.tcsw.store/search",
         },
         {
           type: "button",
@@ -39,9 +47,7 @@ const Layout: Component<ParentProps> = (props) => {
         },
       ]}
     >
-      <Suspense fallback={<UKIndeterminateSpinner class={styles.spinner} />}>
-        {props.children}
-      </Suspense>
+      <Suspense fallback={<UKIndeterminateSpinner class={styles.spinner} />}>{props.children}</Suspense>
     </UKSideBar>
   );
 };

@@ -1,5 +1,5 @@
-import fs from "fs/promises";
-import path from "path";
+import fs from "node:fs/promises";
+import path from "node:path";
 import ApplicationRepository, {
   type RepositoryApplication,
   type RepositoryApplicationSummary,
@@ -7,10 +7,6 @@ import ApplicationRepository, {
 
 export default class LocalApplicationRepository extends ApplicationRepository {
   id = "local";
-
-  constructor() {
-    super();
-  }
 
   async getApplicationById(applicationId: string): Promise<RepositoryApplication | undefined> {
     if (
@@ -40,42 +36,37 @@ export default class LocalApplicationRepository extends ApplicationRepository {
 
     return {
       displayName: applicationManifest.displayName,
-      authors: applicationManifest.authors.map((a: string) => {
-        return {
-          name: a,
-          link: "[not implemented for this application repository]",
-        };
-      }),
+      authors: applicationManifest.authors,
       description: applicationManifest.description,
       icon:
         applicationManifest.icon.type === "image"
           ? {
-              type: "image",
-              value: path.join(
-                instance.sys.filesystem.SRC_ROOT,
-                "../../applications/",
-                applicationId,
-                applicationManifest.icon.value,
-              ),
-            }
+            type: "image",
+            value: path.join(
+              instance.sys.filesystem.SRC_ROOT,
+              "../../applications/",
+              applicationId,
+              applicationManifest.icon.value,
+            ),
+          }
           : {
-              type: "icon",
-              value: path.join(
-                instance.sys.filesystem.SRC_ROOT,
-                "../../applications/",
-                applicationId,
-                applicationManifest.icon.value,
-              ),
-            },
+            type: "icon",
+            value: path.join(
+              instance.sys.filesystem.SRC_ROOT,
+              "../../applications/",
+              applicationId,
+              applicationManifest.icon.value,
+            ),
+          },
       id: applicationId,
       modules: Object.keys(applicationManifest.modules),
       bannerImage: applicationManifest.bannerImage
         ? path.join(
-            instance.sys.filesystem.SRC_ROOT,
-            "../../applications/",
-            applicationId,
-            applicationManifest.bannerImage,
-          )
+          instance.sys.filesystem.SRC_ROOT,
+          "../../applications/",
+          applicationId,
+          applicationManifest.bannerImage,
+        )
         : undefined,
     };
   }
@@ -95,15 +86,16 @@ export default class LocalApplicationRepository extends ApplicationRepository {
 
     return {
       id: applicationId,
-      authors: app.authors.map((a) => a.name),
+      authors: app.authors,
       displayName: app.displayName,
       icon: app.icon,
       bannerImage: app.bannerImage,
+      description: app.description
     };
   }
 
   async getPromotedApplications(): Promise<string[]> {
-    return ["uk.tcsw.dashboard", "uk.tcsw.settings", "uk.tcsw.ghostty"];
+    return [ "uk.tcsw.dashboard", "uk.tcsw.settings", "uk.tcsw.ghostty" ];
   }
 
   async getInstallURI(applicationId: string): Promise<string> {

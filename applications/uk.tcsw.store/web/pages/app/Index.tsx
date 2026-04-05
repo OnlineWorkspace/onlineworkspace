@@ -33,7 +33,7 @@ const ApplicationPage: Component = () => {
         Back
       </UKButton>
       <div class={styles.header}>
-        <img alt={""} class={styles.headerImage} src={application()?.bannerImage || "/assets/generic_background.svg"} />
+        <img alt={""} class={styles.headerImage} src={application()?.bannerImage || "/assets/placeholder/placeholder_image.svg"} />
       </div>
       <div class={styles.headerContent}>
         {application()?.icon.type === "image" ? (
@@ -73,6 +73,9 @@ const ApplicationPage: Component = () => {
           {application()?.description}
         </UKText>
       </UKCard>
+      {!application()?.isUserAdministrator && (
+        <UKCard color="elevated">Info: You are not an administrator and lack the permission to install or uninstall applications.</UKCard>
+      )}
       {/*TODO: implement this*/}
       {/*<UKCarousel>*/}
       {/*  <UKCard>*/}

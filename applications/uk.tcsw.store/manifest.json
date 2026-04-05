@@ -6,7 +6,12 @@
     "value": "./web/node_modules/@material-symbols/svg-700/outlined/store.svg"
   },
   "description": "Manage and install Applications",
-  "authors": ["Tricolor Software <https://tcsw.uk>"],
+  "authors": [
+    {
+      "name": "Ewsgit",
+      "link": "<https://ewsgit.uk>"
+    }
+  ],
   "graphicsAcceleration": "Recommended",
   "license": "MIT",
   "source": "https://github.com/tricolorsoftware/workspaces/src/branch/main/packages/applications/uk.tcsw.store",

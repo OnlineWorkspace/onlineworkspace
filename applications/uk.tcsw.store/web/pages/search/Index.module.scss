@@ -1,42 +1,46 @@
-.page {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    height: 100%;
-    padding: 1rem;
-}
-
 .topBar {
-    display: flex;
-    flex-direction: row;
-    gap: 1rem;
-    align-items: center;
-    justify-content: center;
-    height: 4.5rem;
-    padding: 1rem;
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  align-items: center;
+  justify-content: center;
+  height: 4.5rem;
+  padding: 1rem;
 
-    > *:first-child {
-        margin-right: auto;
-    }
+  > *:first-child {
+    margin-right: auto;
+  }
 }
 
 .resultGrid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(24rem, 1fr));
-    grid-auto-rows: max-content;
-    gap: 1rem;
-    max-height: max-content;
-    height: 100%;
-    width: 100%;
-    max-width: 96rem;
-    margin-left: auto;
-    margin-right: auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(24rem, 1fr));
+  grid-auto-rows: max-content;
+  gap: 1rem;
+  padding: 1rem;
+  width: 100%;
+  max-width: 96rem;
+  margin-left: auto;
+  margin-right: auto;
+}
 
-    &:has(.spinner) {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        max-height: unset;
-    }
+.spinner {
+  margin: auto;
+}
+
+.missingResultsMessage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 1rem;
+  margin-top: 2.5rem;
+
+  .icon {
+    --icon-size: 5rem;
+  }
+
+  .clearSearchButton {
+    margin-top: 1rem;
+  }
 }

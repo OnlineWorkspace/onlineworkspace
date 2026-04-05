@@ -17,6 +17,7 @@ import {
 } from "solid-js";
 import trpc from "../../lib/trpc";
 import styles from "./Index.module.scss";
+import UKCard from "@tcsw/uikit-solid/src/components/card/UKCard.jsx";
 
 const ManageInstalledPage: Component = () => {
   const navigate = useNavigate();
