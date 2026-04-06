@@ -125,7 +125,7 @@ export default class ApplicationsSystem extends System {
 
         // @ts-ignore
         for await (const msg of child.stderr) {
-          this.log.error("Applications Initial Startup -> " + Buffer.from(msg).toString());
+          this.log.info("Applications Initial Startup -> " + Buffer.from(msg).toString());
         }
 
         await fs.cp(
