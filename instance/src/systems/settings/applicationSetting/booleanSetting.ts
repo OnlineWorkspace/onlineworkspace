@@ -23,7 +23,7 @@ export class BooleanApplicationSetting extends ApplicationSetting<boolean> {
     return true;
   }
 
-  async getValue(userId: number): Promise<boolean> {
+  async onValueChange(userId: number): Promise<boolean> {
     const userSettings = await this.instance.sys.settings.getUserSettings(userId);
 
     const settingValue = userSettings[`app:${this.applicationId}:${this.id}`];
@@ -70,7 +70,7 @@ export class GlobalBooleanApplicationSetting extends GlobalApplicationSetting<bo
     return true;
   }
 
-  async getValue(): Promise<boolean> {
+  async onValueChange(): Promise<boolean> {
     const settingValue = await this.instance.sys.settings.getGlobalSetting(`app:${this.applicationId}:${this.id}`);
 
     if (settingValue === undefined) return this.defaultValue;

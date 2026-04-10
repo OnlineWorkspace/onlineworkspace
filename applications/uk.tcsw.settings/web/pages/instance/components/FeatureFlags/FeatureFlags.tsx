@@ -1,14 +1,13 @@
-import { createResource, For, Suspense, type Component } from "solid-js";
-import trpc from "../../../../lib/trpc";
 import UKStack from "@tcsw/uikit-solid/src/components/stack/UKStack.jsx";
 import UKStackItem from "@tcsw/uikit-solid/src/components/stack/UKStackItem.jsx";
-import UKSwitch from "@tcsw/uikit-solid/src/components/switch/UKSwitch.jsx";
-import styles from "./FeatureFlags.module.scss";
 import UKStackLabel from "@tcsw/uikit-solid/src/components/stack/UKStackLabel.tsx";
+import UKSwitch from "@tcsw/uikit-solid/src/components/switch/UKSwitch.jsx";
+import { type Component, createResource, For, Suspense } from "solid-js";
+import trpc from "../../../../lib/trpc";
+import styles from "./FeatureFlags.module.scss";
 
 const FeatureFlags: Component = () => {
-  const [features, { mutate: mutateFeatures }] =
-    createResource(() => trpc.instance.getFeatures.query());
+  const [features, { mutate: mutateFeatures }] = createResource(() => trpc.instance.getFeatures.query());
 
   return (
     <>
@@ -25,7 +24,7 @@ const FeatureFlags: Component = () => {
                     <UKSwitch
                       class={styles.switch}
                       value={feature.enabled}
-                      getValue={async (val) => {
+                      onValueChange={async (val) => {
                         await trpc.instance.setFeature.mutate({
                           id: feature.id,
                           value: val,

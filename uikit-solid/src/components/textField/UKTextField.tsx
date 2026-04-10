@@ -1,8 +1,8 @@
-import { type Component, createEffect, createSignal } from "solid-js";
-import styles from "./UKTextField.module.scss";
-import type { DOMElement } from "solid-js/jsx-runtime";
 import clsx from "clsx";
+import { type Component, createEffect, createSignal } from "solid-js";
+import type { DOMElement } from "solid-js/jsx-runtime";
 import UKIcon from "../icon/UKIcon";
+import styles from "./UKTextField.module.scss";
 
 // TODO: add reveal password 'eye' icon
 const UKTextField: Component<{
@@ -12,13 +12,13 @@ const UKTextField: Component<{
   label: string;
   trailingIcon?: { icon: string; onClick?: () => void };
   supportingText?: string;
-  getValue: (value: string) => void;
+  onValueChange: (value: string) => void;
   onEscape?: () => void;
   onSubmit?: () => void;
   onFocus?: () => void;
   onBlur?: () => void;
   defaultValue?: string;
-  setValue: string;
+  value?: string;
   maximumCharacterCount?: number;
   shouldMask?: boolean;
   forceFocussed?: boolean;
@@ -51,7 +51,7 @@ const UKTextField: Component<{
 
       setCharacterLength(e.currentTarget.value.length);
 
-      props.getValue(e.currentTarget.value);
+      props.onValueChange(e.currentTarget.value);
     },
     onSubmit: props.onSubmit,
     value: props.defaultValue,
@@ -68,60 +68,38 @@ const UKTextField: Component<{
       didMount = true;
       return;
     }
-    if (props.setValue === undefined) return;
+    if (props.value === undefined) return;
 
     if (textAreaRef) {
-      textAreaRef.value = props.setValue;
+      textAreaRef.value = props.value;
 
       setCharacterLength(textAreaRef.value.length);
 
-      props.getValue(textAreaRef.value);
+      props.onValueChange(textAreaRef.value);
     }
     if (inputRef) {
-      inputRef.value = props.setValue;
+      inputRef.value = props.value;
 
       setCharacterLength(inputRef.value.length);
 
-      props.getValue(inputRef.value);
+      props.onValueChange(inputRef.value);
     }
-  }, [props.setValue]);
+  }, [props.value]);
 
   return (
     <div class={clsx(styles.container, props.containerClass)}>
-      <div
-        class={styles.root}
-        data-error={props.error}
-        data-color={props.color}
-        data-populated={characterLength() > 0}
-        data-force-focus={props.forceFocussed}
-      >
+      <div class={styles.root} data-error={props.error} data-color={props.color} data-populated={characterLength() > 0} data-force-focus={props.forceFocussed}>
         {props.leadingIcon && (
-          <UKIcon
-            onClick={props.leadingIcon.onClick}
-            class={styles.leadingIcon}
-          >
+          <UKIcon onClick={props.leadingIcon.onClick} class={styles.leadingIcon}>
             {props.leadingIcon.icon}
           </UKIcon>
         )}
         <div class={styles.inputContainer}>
-          {props.as === "textarea" ? (
-            <textarea ref={textAreaRef} {...elementProperties} />
-          ) : (
-            <input ref={inputRef} {...elementProperties} />
-          )}
-          <span class={styles.labelText}>
-            {props.labelEmpty !== undefined
-              ? characterLength() > 0
-                ? props.label
-                : props.labelEmpty
-              : props.label}
-          </span>
+          {props.as === "textarea" ? <textarea ref={textAreaRef} {...elementProperties} /> : <input ref={inputRef} {...elementProperties} />}
+          <span class={styles.labelText}>{props.labelEmpty !== undefined ? (characterLength() > 0 ? props.label : props.labelEmpty) : props.label}</span>
         </div>
         {props.trailingIcon && (
-          <UKIcon
-            onClick={props.trailingIcon.onClick}
-            class={styles.trailingIcon}
-          >
+          <UKIcon onClick={props.trailingIcon.onClick} class={styles.trailingIcon}>
             {props.trailingIcon.icon}
           </UKIcon>
         )}

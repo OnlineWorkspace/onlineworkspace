@@ -1,13 +1,13 @@
+import INDETERMINATE_QUESTION_BOX_ICON from "@material-symbols/svg-700/outlined/indeterminate_question_box.svg";
+import UKButton from "@tcsw/uikit-solid/src/components/button/UKButton.jsx";
+import UKIcon from "@tcsw/uikit-solid/src/components/icon/UKIcon.jsx";
 import UKIndeterminateSpinner from "@tcsw/uikit-solid/src/components/indeterminateSpinner/UKIndeterminateSpinner.jsx";
+import UKText from "@tcsw/uikit-solid/src/components/text/UKText.jsx";
 import UKTopAppBar from "@tcsw/uikit-solid/src/components/topAppBar/UKTopAppBar.jsx";
 import { type Component, createResource, createSignal, For, Suspense } from "solid-js";
 import trpc from "../../lib/trpc";
 import SearchResult from "./components/SearchResult/SearchResult";
 import styles from "./Index.module.scss";
-import UKIcon from "@tcsw/uikit-solid/src/components/icon/UKIcon.jsx";
-import INDETERMINATE_QUESTION_BOX_ICON from "@material-symbols/svg-700/outlined/indeterminate_question_box.svg";
-import UKText from "@tcsw/uikit-solid/src/components/text/UKText.jsx";
-import UKButton from "@tcsw/uikit-solid/src/components/button/UKButton.jsx";
 
 const Page: Component = () => {
   const [searchQuery, setSearchQuery] = createSignal<string>("");
@@ -17,7 +17,7 @@ const Page: Component = () => {
     <>
       <UKTopAppBar
         type="search"
-        getValue={(val) => {
+        onValueChange={(val) => {
           if (val.length > searchQuery().length && results()?.length === 0) {
             setSearchQuery(val);
             mutateResults([]);

@@ -9,23 +9,19 @@ import z from "zod";
 import type { Instance } from "../index.js";
 import { AuthorizedDeviceType } from "./authorization.js";
 import { WorkspacesFeatureFlags } from "./configuration.js";
-import {
-  type WorkspacesNotification,
-  WorkspacesNotificationEventEmitterEvent,
-} from "./notifications.js";
+import { type WorkspacesNotification, WorkspacesNotificationEventEmitterEvent } from "./notifications.js";
 import type { WorkspacesUser } from "./users.js";
 
-export const createTRPCContext =
-  (instance: Instance) => (opt: FetchCreateContextFnOptions, server: Server<object>) => {
-    return {
-      rawRequest: {
-        req: opt.req,
-        resHeaders: opt.resHeaders,
-        server: server,
-      },
-      instance: instance,
-    };
+export const createTRPCContext = (instance: Instance) => (opt: FetchCreateContextFnOptions, server: Server<object>) => {
+  return {
+    rawRequest: {
+      req: opt.req,
+      resHeaders: opt.resHeaders,
+      server: server,
+    },
+    instance: instance,
   };
+};
 
 export const t = initTRPC.context<ReturnType<typeof createTRPCContext>>().create({
   sse: {
@@ -68,9 +64,7 @@ export const procedure = t.procedure.use(async (opt) => {
 
   const parsedCookie = Bun.Cookie.parse(cookieString);
 
-  const userId = await opt.ctx.instance.sys.authorization.verifySession(
-    decodeURIComponent(parsedCookie.value),
-  );
+  const userId = await opt.ctx.instance.sys.authorization.verifySession(decodeURIComponent(parsedCookie.value));
 
   if (userId === undefined) {
     throw new TRPCError({ code: "UNAUTHORIZED", message: "invalid session" });
@@ -129,35 +123,28 @@ export const workspacesRouter = t.router({
         let emailCode = "";
         const CODE_LENGTH = 8;
         const CODE_VALID_CHARS = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        for (let i = CODE_LENGTH; i > 0; --i)
-          emailCode += CODE_VALID_CHARS[Math.floor(Math.random() * CODE_VALID_CHARS.length)];
+        for (let i = CODE_LENGTH; i > 0; --i) emailCode += CODE_VALID_CHARS[Math.floor(Math.random() * CODE_VALID_CHARS.length)];
 
         emailSignupVerificationCodes.set(opt.input.emailAddress, emailCode);
         // TODO: send an email...
-        opt.ctx.instance.log.system.info(
-          `Email code for email '${opt.input.emailAddress}' is '${emailCode}'`,
-        );
+        opt.ctx.instance.log.system.info(`Email code for email '${opt.input.emailAddress}' is '${emailCode}'`);
 
         return true;
       }),
-    validateEmailCode: publicProcedure
-      .input(z.object({ emailAddress: z.string(), emailCode: z.string() }))
-      .query(async (opt) => {
-        if (emailSignupVerificationCodes.get(opt.input.emailAddress) === opt.input.emailCode) {
-          return true;
-        }
+    validateEmailCode: publicProcedure.input(z.object({ emailAddress: z.string(), emailCode: z.string() })).query(async (opt) => {
+      if (emailSignupVerificationCodes.get(opt.input.emailAddress) === opt.input.emailCode) {
+        return true;
+      }
 
-        return false;
-      }),
+      return false;
+    }),
     isUsernameValid: publicProcedure.input(z.string()).query(async (opt) => {
-      if ((await opt.ctx.instance.sys.users.getUserByUsername(opt.input)) === undefined)
-        return true;
+      if ((await opt.ctx.instance.sys.users.getUserByUsername(opt.input)) === undefined) return true;
 
       return false;
     }),
     canSignup: publicProcedure.query(async (opt) => {
-      if (opt.ctx.instance.sys.configuration.hasFeature(WorkspacesFeatureFlags.AllowUserSignups))
-        return true;
+      if (opt.ctx.instance.sys.configuration.hasFeature(WorkspacesFeatureFlags.AllowUserSignups)) return true;
 
       return false;
     }),
@@ -241,12 +228,7 @@ export const workspacesRouter = t.router({
 
         await user.setBio(opt.input.bio);
 
-        if (
-          opt.input.gender === "male" ||
-          opt.input.gender === "female" ||
-          opt.input.gender === "other"
-        )
-          await user.setGender(opt.input.gender);
+        if (opt.input.gender === "male" || opt.input.gender === "female" || opt.input.gender === "other") await user.setGender(opt.input.gender);
 
         // TODO: get default quota size from the instance config
         await user.setQuota(20);
@@ -278,43 +260,36 @@ export const workspacesRouter = t.router({
           sessionToken: session,
         };
       }),
-    confirmTwoFactor: procedure
-      .input(z.object({ twoFactorCode: z.string() }))
-      .mutation(async (opt) => {
-        const user = await opt.ctx.user();
-        const secretString = temporaryTwoFactorSecrets.get(user.userId);
+    confirmTwoFactor: procedure.input(z.object({ twoFactorCode: z.string() })).mutation(async (opt) => {
+      const user = await opt.ctx.user();
+      const secretString = temporaryTwoFactorSecrets.get(user.userId);
 
-        if (secretString === undefined) {
-          opt.ctx.instance.log.system.warning(
-            `(${user.userId})${await user.getUsername()} Tried to confirm a two factor code, but they lacked a temporary secret?`,
-          );
-
-          return false;
-        }
-
-        const totp = new OTPAuth.TOTP({
-          issuer: opt.ctx.instance.sys.configuration.webUrl[0],
-          label: `${opt.ctx.instance.sys.configuration.displayName} (Workspace)`,
-          algorithm: "SHA1",
-          digits: 6,
-          secret: secretString,
-        });
-
-        if (totp.validate({ token: opt.input.twoFactorCode }) !== null) {
-          temporaryTwoFactorSecrets.delete(user.userId);
-          await opt.ctx.instance.sys.authorization.setTwoFactorAuthenticationSecret(
-            user.userId,
-            secretString,
-          );
-          opt.ctx.instance.log.system.success(
-            `(${user.userId})${await user.getUsername()} Setup two-factor authentication on their account!`,
-          );
-
-          return true;
-        }
+      if (secretString === undefined) {
+        opt.ctx.instance.log.system.warning(
+          `(${user.userId})${await user.getUsername()} Tried to confirm a two factor code, but they lacked a temporary secret?`,
+        );
 
         return false;
-      }),
+      }
+
+      const totp = new OTPAuth.TOTP({
+        issuer: opt.ctx.instance.sys.configuration.webUrl[0],
+        label: `${opt.ctx.instance.sys.configuration.displayName} (Workspace)`,
+        algorithm: "SHA1",
+        digits: 6,
+        secret: secretString,
+      });
+
+      if (totp.validate({ token: opt.input.twoFactorCode }) !== null) {
+        temporaryTwoFactorSecrets.delete(user.userId);
+        await opt.ctx.instance.sys.authorization.setTwoFactorAuthenticationSecret(user.userId, secretString);
+        opt.ctx.instance.log.system.success(`(${user.userId})${await user.getUsername()} Setup two-factor authentication on their account!`);
+
+        return true;
+      }
+
+      return false;
+    }),
     enableTwoFactor: procedure
       .output(
         z
@@ -333,9 +308,7 @@ export const workspacesRouter = t.router({
 
         const user = await opt.ctx.user();
 
-        if (
-          await opt.ctx.instance.sys.authorization.hasTwoFactorAuthenticationSecret(user.userId)
-        ) {
+        if (await opt.ctx.instance.sys.authorization.hasTwoFactorAuthenticationSecret(user.userId)) {
           opt.ctx.instance.log.system.warning(
             `User (${user.userId})${await user.getUsername()} has attempted to re-setup their two factor from the signup method... this is suspicious...`,
           );
@@ -390,9 +363,7 @@ export const workspacesRouter = t.router({
             message: "Failed to find the user",
           };
 
-        if (
-          await opt.ctx.instance.sys.authorization.hasTwoFactorAuthenticationSecret(user.userId)
-        ) {
+        if (await opt.ctx.instance.sys.authorization.hasTwoFactorAuthenticationSecret(user.userId)) {
           if (opt.input.twoFactorCode === undefined)
             return {
               type: "twofactor",
@@ -426,33 +397,29 @@ export const workspacesRouter = t.router({
           sessionToken: session,
         };
       }),
-    isAuthenticated: publicProcedure
-      .output(z.object({ authenticated: z.boolean() }))
-      .query(async (opt) => {
-        const cookieString = opt.ctx.rawRequest.req.headers?.get("cookie");
+    isAuthenticated: publicProcedure.output(z.object({ authenticated: z.boolean() })).query(async (opt) => {
+      const cookieString = opt.ctx.rawRequest.req.headers?.get("cookie");
 
-        if (cookieString === null) {
-          return {
-            authenticated: false,
-          };
-        }
-
-        const parsedCookie = Bun.Cookie.parse(cookieString);
-
-        const userId = await opt.ctx.instance.sys.authorization.verifySession(
-          decodeURIComponent(parsedCookie.value),
-        );
-
-        if (userId === undefined) {
-          return {
-            authenticated: false,
-          };
-        }
-
+      if (cookieString === null) {
         return {
-          authenticated: true,
+          authenticated: false,
         };
-      }),
+      }
+
+      const parsedCookie = Bun.Cookie.parse(cookieString);
+
+      const userId = await opt.ctx.instance.sys.authorization.verifySession(decodeURIComponent(parsedCookie.value));
+
+      if (userId === undefined) {
+        return {
+          authenticated: false,
+        };
+      }
+
+      return {
+        authenticated: true,
+      };
+    }),
     logout: procedure.output(z.object({ success: z.literal(true) })).mutation(async (opt) => {
       const cookieString = opt.ctx.rawRequest.req.headers?.get("cookie");
 
@@ -464,9 +431,7 @@ export const workspacesRouter = t.router({
 
       const parsedCookie = Bun.Cookie.parse(cookieString);
 
-      await opt.ctx.instance.sys.authorization.endSessionByToken(
-        decodeURIComponent(parsedCookie.value),
-      );
+      await opt.ctx.instance.sys.authorization.endSessionByToken(decodeURIComponent(parsedCookie.value));
 
       return {
         success: true,
@@ -518,9 +483,7 @@ ${opt.ctx.instance.sys.configuration.termsOfUse.message}`;
           .query(async (opt) => {
             const db = opt.ctx.instance.sys.database.postgres();
 
-            const user = (
-              await db`SELECT username, forename, surname FROM users WHERE id = ${opt.ctx.userId};`
-            )?.[0];
+            const user = (await db`SELECT username, forename, surname FROM users WHERE id = ${opt.ctx.userId};`)?.[0];
 
             if (!user) {
               throw new TRPCError({
@@ -588,13 +551,11 @@ ${opt.ctx.instance.sys.configuration.termsOfUse.message}`;
           });
         }),
       getQuickShortcuts: procedure.query(async (opt) => {
-        const a = opt.ctx.instance.sys.settings.applicationSettings["core"].find(
-          (s) => s.id === "quick_shortcuts",
-        );
+        const a = opt.ctx.instance.sys.settings.applicationSettings["core"].find((s) => s.id === "quick_shortcuts");
 
         if (!a) throw "The core:quick_shortcuts setting is somehow missing???";
 
-        const quickShortcuts = (await a.getValue(opt.ctx.userId)) as string[];
+        const quickShortcuts = (await a.onValueChange(opt.ctx.userId)) as string[];
 
         const applications = opt.ctx.instance.sys.applications.getEnabledApplications();
 
@@ -641,13 +602,9 @@ ${opt.ctx.instance.sys.configuration.termsOfUse.message}`;
       listener: procedure
         // @ts-ignore
         .subscription(async function* (opt) {
-          for await (const [data] of on(
-            opt.ctx.instance.sys.notifications.eventEmitter,
-            WorkspacesNotificationEventEmitterEvent.SendNotification,
-            {
-              signal: opt.signal,
-            },
-          )) {
+          for await (const [data] of on(opt.ctx.instance.sys.notifications.eventEmitter, WorkspacesNotificationEventEmitterEvent.SendNotification, {
+            signal: opt.signal,
+          })) {
             const notification = data as WorkspacesNotification;
             if (notification.recipient === opt.ctx.userId) {
               notifications.push(notification);

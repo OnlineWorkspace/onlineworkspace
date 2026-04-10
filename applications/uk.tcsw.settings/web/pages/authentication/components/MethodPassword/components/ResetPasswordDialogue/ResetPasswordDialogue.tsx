@@ -1,5 +1,5 @@
 import CHECK_ICON from "@material-symbols/svg-700/outlined/check.svg";
-import UKButton from "@tcsw/uikit-solid/src/components/button/UKButton.jsx";
+import UKButton, { AffirmativeButtonState } from "@tcsw/uikit-solid/src/components/button/UKButton.jsx";
 import UKButtonGroup from "@tcsw/uikit-solid/src/components/buttonGroup/UKButtonGroup.tsx";
 import { DividerDirection } from "@tcsw/uikit-solid/src/components/divider/lib/direction.js";
 import UKDivider from "@tcsw/uikit-solid/src/components/divider/UKDivider.jsx";
@@ -19,20 +19,13 @@ const ResetPasswordDialogue: Component<{ closeDialogue: () => void }> = (props) 
         Change password
       </UKText>
       <UKDivider direction={DividerDirection.horizontal} />
-      <UKTextField
-        label="New Password"
-        color="outlined"
-        shouldMask
-        getValue={setPasswordOne}
-        setValue={passwordOne()}
-        defaultValue={passwordOne()}
-      />
+      <UKTextField label="New Password" color="outlined" shouldMask onValueChange={setPasswordOne} value={passwordOne()} defaultValue={passwordOne()} />
       <UKTextField
         label="Re-Enter New Password"
         color="outlined"
         shouldMask
-        getValue={setPasswordTwo}
-        setValue={passwordTwo()}
+        onValueChange={setPasswordTwo}
+        value={passwordTwo()}
         defaultValue={passwordTwo()}
       />
       <UKButtonGroup size={"s"}>
@@ -47,6 +40,7 @@ const ResetPasswordDialogue: Component<{ closeDialogue: () => void }> = (props) 
         <UKButton
           leadingIcon={CHECK_ICON}
           color="filled"
+          affirmative={true}
           class={styles.confirmButton}
           onClick={async () => {
             if (passwordOne() === passwordTwo())
@@ -54,7 +48,12 @@ const ResetPasswordDialogue: Component<{ closeDialogue: () => void }> = (props) 
                 password: passwordOne(),
               });
 
-            props.closeDialogue();
+            return {
+              state: AffirmativeButtonState.Success,
+              cb() {
+                props.closeDialogue();
+              },
+            };
           }}
           disabled={!(passwordOne() === passwordTwo() && passwordOne().length > 3)}
         >

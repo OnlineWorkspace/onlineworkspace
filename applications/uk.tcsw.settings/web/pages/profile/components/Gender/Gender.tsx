@@ -7,9 +7,7 @@ import trpc from "../../../../lib/trpc";
 import styles from "./Gender.module.scss";
 
 const Gender: Component = () => {
-  const [gender, { mutate: setGender, refetch: refetchGender }] = createResource(() =>
-    trpc.profile.getGender.query(),
-  );
+  const [gender, { mutate: setGender, refetch: refetchGender }] = createResource(() => trpc.profile.getGender.query());
 
   return (
     <UKStackItem
@@ -29,7 +27,7 @@ const Gender: Component = () => {
             inputColor={"outlined"}
             label={"Gender"}
             defaultValue={gender()}
-            getValue={(val) => setGender(val)}
+            onValueChange={(val) => setGender(val)}
             items={[
               {
                 type: "button",

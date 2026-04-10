@@ -23,7 +23,7 @@ export class NumberApplicationSetting extends ApplicationSetting<number> {
     return true;
   }
 
-  async getValue(userId: number): Promise<number> {
+  async onValueChange(userId: number): Promise<number> {
     const userSettings = await this.instance.sys.settings.getUserSettings(userId);
     const settingValue = userSettings[`app:${this.applicationId}:${this.id}`] as string | undefined;
 
@@ -69,7 +69,7 @@ export class GlobalNumberApplicationSetting extends GlobalApplicationSetting<num
     return true;
   }
 
-  async getValue(): Promise<number> {
+  async onValueChange(): Promise<number> {
     const settingValue = await this.instance.sys.settings.getGlobalSetting(`app:${this.applicationId}:${this.id}`);
 
     if (settingValue === undefined) return this.defaultValue;

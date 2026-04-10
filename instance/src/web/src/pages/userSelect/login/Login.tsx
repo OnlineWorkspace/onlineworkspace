@@ -1,6 +1,6 @@
 import KEY_ICON from "@material-symbols/svg-700/outlined/key.svg";
-import { useNavigate } from "@solidjs/router";
-import UKButton from "@tcsw/uikit-solid/src/components/button/UKButton.tsx";
+import { useNavigate, usePreloadRoute, useSearchParams } from "@solidjs/router";
+import UKButton, { AffirmativeButtonState } from "@tcsw/uikit-solid/src/components/button/UKButton.tsx";
 import UKCard from "@tcsw/uikit-solid/src/components/card/UKCard.tsx";
 import { DividerDirection } from "@tcsw/uikit-solid/src/components/divider/lib/direction.ts";
 import UKDivider from "@tcsw/uikit-solid/src/components/divider/UKDivider.tsx";
@@ -12,8 +12,10 @@ import styles from "./Login.module.scss";
 
 const UserSelectPage: Component = () => {
   const navigate = useNavigate();
+  const preloadRoute = usePreloadRoute();
+  const [searchParams] = useSearchParams();
 
-  const [username, setUsername] = createSignal("");
+  const [username, setUsername] = createSignal(searchParams.username?.toString() || "");
   const [password, setPassword] = createSignal("");
   const [showTwoFactor, setShowTwoFactor] = createSignal<boolean>(false);
   const [canSignup] = createResource(() => trpc.authorization.canSignup.query());
@@ -37,7 +39,7 @@ const UserSelectPage: Component = () => {
           </UKText>
           <UKTextField
             color={"outlined"}
-            getValue={async (val) => {
+            onValueChange={async (val) => {
               if (val.length === 6) {
                 const resp = await trpc.authorization.signin.mutate({
                   username: username(),
@@ -62,13 +64,21 @@ const UserSelectPage: Component = () => {
       ) : (
         <>
           <form>
-            <UKTextField color={"outlined"} label={"Username"} setValue={username()} getValue={setUsername} autocomplete="username" />
-            <UKTextField shouldMask={true} color={"outlined"} label={"Password"} autocomplete="password" setValue={password()} getValue={setPassword} />
+            <UKTextField
+              color={"outlined"}
+              label={"Username"}
+              defaultValue={searchParams.username?.toString() || ""}
+              value={username()}
+              onValueChange={setUsername}
+              autocomplete="username"
+            />
+            <UKTextField shouldMask={true} color={"outlined"} label={"Password"} autocomplete="password" value={password()} onValueChange={setPassword} />
             <div class={styles.loginButtons}>
-              <UKButton onClick={() => 0} disabled={username() === ""} color={"standard"}>
+              <UKButton onClick={() => navigate(`/forgot-password?username=${username()}`)} disabled={username() === ""} color={"standard"}>
                 Forgot password?
               </UKButton>
               <UKButton
+                affirmative={true}
                 disabled={username() === "" || password() === ""}
                 onClick={async () => {
                   const resp = await trpc.authorization.signin.mutate({
@@ -78,23 +88,28 @@ const UserSelectPage: Component = () => {
 
                   if (resp.type === "twofactor") {
                     setShowTwoFactor(true);
-                    return;
+                    return { state: AffirmativeButtonState.Unset };
                   }
 
                   if (resp.type === "success") {
                     const redirect = new URLSearchParams(window.location.search).get("redirect");
                     if (redirect) {
-                      navigate(redirect);
-                      return;
+                      preloadRoute(redirect);
+                      return { state: AffirmativeButtonState.Success, cb: () => navigate(redirect) };
                     }
 
-                    navigate("/app");
-                    return;
+                    preloadRoute("/app");
+                    return {
+                      state: AffirmativeButtonState.Success,
+                      cb: () => navigate("/app"),
+                    };
                   }
 
                   // TODO: change to a toast when support is included in UIKit
                   console.error("Failed to login");
+                  return { state: AffirmativeButtonState.Error };
                 }}
+                onSuccess={() => {}}
                 color={"filled"}
               >
                 Login
@@ -109,7 +124,7 @@ const UserSelectPage: Component = () => {
             color={"tonal"}
             disabled={true}
             onClick={() => {
-              return 0;
+              return;
             }}
           >
             Use Security Key

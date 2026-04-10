@@ -7,9 +7,7 @@ import trpc from "../../../../lib/trpc";
 import styles from "./Name.module.scss";
 
 const Name: Component<{ refetchName(): void }> = (props) => {
-  const [name, { mutate: setName, refetch: refetchName }] = createResource(() =>
-    trpc.profile.getName.query(),
-  );
+  const [name, { mutate: setName, refetch: refetchName }] = createResource(() => trpc.profile.getName.query());
 
   return (
     <UKStackItem
@@ -24,13 +22,7 @@ const Name: Component<{ refetchName(): void }> = (props) => {
       }}
       expandedComponent={
         <div class={styles.expanded}>
-          <UKTextField
-            color="outlined"
-            getValue={setName}
-            defaultValue={name()}
-            setValue={name() || "Untitled User"}
-            label="Name"
-          />
+          <UKTextField color="outlined" onValueChange={setName} defaultValue={name()} value={name() || "Untitled User"} label="Name" />
           <UKButton
             class={styles.button}
             onClick={async () => {

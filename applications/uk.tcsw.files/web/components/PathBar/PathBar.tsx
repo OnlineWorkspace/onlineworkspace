@@ -51,7 +51,7 @@ const PathBar: Component = () => {
           <UKTextField
             label={"Path"}
             defaultValue={`/${decodeURI(params.currentPath || "")}`}
-            getValue={(val) => {
+            onValueChange={(val) => {
               if (val[0] === "/") navigate(`/app/uk.tcsw.files/dir${val}`);
             }}
             onBlur={() => setShowTextField(false)}
@@ -64,11 +64,7 @@ const PathBar: Component = () => {
           <div class={styles.segmentContainer} onDblClick={() => setShowTextField(true)}>
             <For each={`/${decodeURI(params.currentPath || "")}`.split("/")}>
               {(segment, index) => {
-                if (
-                  index() === `/${decodeURI(params.currentPath || "")}`.split("/").length - 1 &&
-                  segment === ""
-                )
-                  return null;
+                if (index() === `/${decodeURI(params.currentPath || "")}`.split("/").length - 1 && segment === "") return null;
 
                 return (
                   <>
@@ -90,10 +86,7 @@ const PathBar: Component = () => {
                       size={"l"}
                     >
                       {segment !== "" ? <span>{segment}</span> : null}
-                      {index() !==
-                        `/${decodeURI(params.currentPath || "")}`.split("/").length - 1 && (
-                        <span class={styles.slash}>/</span>
-                      )}
+                      {index() !== `/${decodeURI(params.currentPath || "")}`.split("/").length - 1 && <span class={styles.slash}>/</span>}
                     </UKText>
                   </>
                 );

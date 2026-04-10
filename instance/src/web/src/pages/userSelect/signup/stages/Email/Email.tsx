@@ -26,7 +26,7 @@ const Email: Component<{
           color={"outlined"}
           label={"Email Address*"}
           defaultValue={props.emailAddress()}
-          getValue={props.setEmailAddress}
+          onValueChange={props.setEmailAddress}
           supportingText={"*required"}
           error={props.emailAddress() !== "" && !z.safeParse(z.email(), props.emailAddress()).data}
         />
@@ -40,9 +40,7 @@ const Email: Component<{
             Back
           </UKButton>
           <UKButton
-            disabled={
-              props.emailAddress() === "" || !z.safeParse(z.email(), props.emailAddress()).data
-            }
+            disabled={props.emailAddress() === "" || !z.safeParse(z.email(), props.emailAddress()).data}
             onClick={async () => {
               await trpc.authorization.checkEmailAddressOwnership.mutate({
                 emailAddress: props.emailAddress(),

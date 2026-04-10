@@ -7,9 +7,7 @@ import trpc from "../../../../lib/trpc";
 import styles from "./Bio.module.scss";
 
 const Bio: Component = () => {
-  const [bio, { mutate: setBio, refetch: refetchBio }] = createResource(() =>
-    trpc.profile.getBio.query(),
-  );
+  const [bio, { mutate: setBio, refetch: refetchBio }] = createResource(() => trpc.profile.getBio.query());
 
   return (
     <UKStackItem
@@ -24,14 +22,7 @@ const Bio: Component = () => {
       }}
       expandedComponent={
         <div class={styles.expanded}>
-          <UKTextField
-            as={"textarea"}
-            color="outlined"
-            getValue={setBio}
-            setValue={bio() || "Missing bio"}
-            defaultValue={bio()}
-            label="Bio"
-          />
+          <UKTextField as={"textarea"} color="outlined" onValueChange={setBio} value={bio() || "Missing bio"} defaultValue={bio()} label="Bio" />
           <UKButton
             class={styles.button}
             onClick={async () => {

@@ -77,17 +77,17 @@ const Branding: Component = () => {
         <UKStackItem
           labelText="Tagline"
           supportingText="This is a short phrase that describes your organization. It is displayed on the bottom of the login page."
-          expandedComponent={<UKTextField label="Tagline" color="outlined" getValue={() => 0} setValue="" />}
+          expandedComponent={<UKTextField label="Tagline" color="outlined" onValueChange={() => 0} value="" />}
         />
         <UKStackItem
           labelText="Display Name"
           supportingText="This is the name of your workspace. Is is displayed on the bottom of the login page and in the tab title."
-          expandedComponent={<UKTextField label="Display Name" color="outlined" getValue={() => 0} setValue="" />}
+          expandedComponent={<UKTextField label="Display Name" color="outlined" onValueChange={() => 0} value="" />}
         />
         <UKStackItem
           labelText="Meta Description"
           supportingText="This is a short description of your workspace. It is used for SEO purposes and may be displayed in search engine results."
-          expandedComponent={<UKTextField label="Meta Description" color="outlined" getValue={() => 0} setValue="" />}
+          expandedComponent={<UKTextField label="Meta Description" color="outlined" onValueChange={() => 0} value="" />}
         />
       </UKStack>
     </>

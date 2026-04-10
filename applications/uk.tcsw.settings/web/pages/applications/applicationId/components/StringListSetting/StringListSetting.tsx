@@ -54,8 +54,8 @@ const StringListSetting: Component<{
               containerClass={styles.textField}
               color={"outlined"}
               label={"Value"}
-              getValue={setInputValue}
-              setValue={inputValue()}
+              onValueChange={setInputValue}
+              value={inputValue()}
               defaultValue={inputValue()}
             />
             <UKButton

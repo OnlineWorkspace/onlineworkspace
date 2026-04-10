@@ -1,12 +1,12 @@
 import clsx from "clsx";
 import type { Component } from "solid-js";
 import { createSignal, onCleanup } from "solid-js";
-import styles from "./UKSwitch.module.scss";
 import UKIcon from "../icon/UKIcon";
+import styles from "./UKSwitch.module.scss";
 
 const UKSwitch: Component<{
   value: boolean;
-  getValue: (value: boolean) => void;
+  onValueChange: (value: boolean) => void;
   class?: string;
   icon?: boolean;
   disabled?: boolean;
@@ -27,7 +27,7 @@ const UKSwitch: Component<{
     const dragThreshold = 10;
 
     if (Math.abs(dragDistance) > dragThreshold) {
-      props.getValue(dragDistance > 0);
+      props.onValueChange(dragDistance > 0);
     }
   };
 
@@ -46,7 +46,7 @@ const UKSwitch: Component<{
       type="button"
       class={clsx(styles.root, props.class)}
       data-value={props.value}
-      onClick={() => props.getValue(!props.value)}
+      onClick={() => props.onValueChange(!props.value)}
       onPointerDown={handlePointerDown}
       disabled={props.disabled}
     >

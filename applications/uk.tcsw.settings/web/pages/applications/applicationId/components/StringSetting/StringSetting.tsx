@@ -47,8 +47,8 @@ const StringSetting: Component<{
           containerClass={styles.textField}
           color={"filled"}
           label={"Value"}
-          getValue={setValue}
-          setValue={value()}
+          onValueChange={setValue}
+          value={value()}
           defaultValue={props.currentValue ?? props.defaultValue}
         />
       }

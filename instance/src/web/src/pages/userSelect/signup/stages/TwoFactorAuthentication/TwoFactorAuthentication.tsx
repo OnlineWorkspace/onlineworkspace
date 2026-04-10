@@ -81,7 +81,7 @@ const TwoFactorAuthentication: Component<{
             color={"outlined"}
             label={"Two Factor Code*"}
             defaultValue={props.twoFactorTestCode()}
-            getValue={async (value) => {
+            onValueChange={async (value) => {
               props.setTwoFactorTestCode(value);
 
               if (value.length === 6) {

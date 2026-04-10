@@ -31,7 +31,7 @@ const VerifyEmail: Component<{
           color={"outlined"}
           label={"Email Verification Code*"}
           defaultValue={props.emailCode()}
-          getValue={async (value) => {
+          onValueChange={async (value) => {
             props.setEmailCode(value);
 
             props.setIsEmailCodeValid(

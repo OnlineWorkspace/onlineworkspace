@@ -1,5 +1,6 @@
 import { useNavigate } from "@solidjs/router";
 import UKButton from "@tcsw/uikit-solid/src/components/button/UKButton.jsx";
+import UKCard from "@tcsw/uikit-solid/src/components/card/UKCard.jsx";
 import UKIcon from "@tcsw/uikit-solid/src/components/icon/UKIcon.jsx";
 import UKIconButton from "@tcsw/uikit-solid/src/components/iconButton/UKIconButton.jsx";
 import UKStack from "@tcsw/uikit-solid/src/components/stack/UKStack.jsx";
@@ -7,25 +8,15 @@ import UKStackItem from "@tcsw/uikit-solid/src/components/stack/UKStackItem.jsx"
 import UKSwitch from "@tcsw/uikit-solid/src/components/switch/UKSwitch.jsx";
 import UKText from "@tcsw/uikit-solid/src/components/text/UKText.jsx";
 import UKTopAppBar from "@tcsw/uikit-solid/src/components/topAppBar/UKTopAppBar.jsx";
-import {
-  type Component,
-  createEffect,
-  createResource,
-  createSignal,
-  For,
-  Suspense,
-} from "solid-js";
+import { type Component, createEffect, createResource, createSignal, For, Suspense } from "solid-js";
 import trpc from "../../lib/trpc";
 import styles from "./Index.module.scss";
-import UKCard from "@tcsw/uikit-solid/src/components/card/UKCard.jsx";
 
 const ManageInstalledPage: Component = () => {
   const navigate = useNavigate();
   const [selectionMode, setSelectionMode] = createSignal<boolean>(false);
   const [selectedApplicationIds, setSelectedApplicationIds] = createSignal<string[]>([]);
-  const [installedApplications, { refetch: refetchInstalledApplications }] = createResource(() =>
-    trpc.manageInstalled.getApplications.query(),
-  );
+  const [installedApplications, { refetch: refetchInstalledApplications }] = createResource(() => trpc.manageInstalled.getApplications.query());
   const [enabledApplications, setEnabledApplications] = createSignal<string[]>([]);
 
   createEffect(() => {
@@ -58,12 +49,7 @@ const ManageInstalledPage: Component = () => {
                 Uninstall
               </UKButton>
             )}
-            {selectionMode() && (
-              <UKText
-                role={"label"}
-                size={"m"}
-              >{`Selected: ${selectedApplicationIds().length}`}</UKText>
-            )}
+            {selectionMode() && <UKText role={"label"} size={"m"}>{`Selected: ${selectedApplicationIds().length}`}</UKText>}
             <UKIconButton
               color={"standard"}
               alt={"select"}
@@ -115,23 +101,17 @@ const ManageInstalledPage: Component = () => {
                             icon={"store"}
                             alt={"go to store page"}
                             color={"standard"}
-                            onClick={() =>
-                              navigate(
-                                `/app/uk.tcsw.store/app/${app.repository}/${app.id}?origin=/app/uk.tcsw.store/manage-installed`,
-                              )
-                            }
+                            onClick={() => navigate(`/app/uk.tcsw.store/app/${app.repository}/${app.id}?origin=/app/uk.tcsw.store/manage-installed`)}
                           />
                           {installedApplications()?.cannotDisable.includes(app.id) ? null : (
                             <UKSwitch
                               icon={true}
                               class={styles.stackSwitch}
-                              getValue={async (val) => {
+                              onValueChange={async (val) => {
                                 if (val) {
                                   setEnabledApplications((prev) => [...prev, app.id]);
                                 } else {
-                                  setEnabledApplications((prev) =>
-                                    prev.filter((i) => i !== app.id),
-                                  );
+                                  setEnabledApplications((prev) => prev.filter((i) => i !== app.id));
                                 }
 
                                 await trpc.manageInstalled.setEnabledApplications.mutate({
@@ -143,11 +123,7 @@ const ManageInstalledPage: Component = () => {
                           )}
                         </>
                       ) : installedApplications()?.cannotDisable.includes(app.id) ? null : (
-                        <UKIcon class={styles.stackSelect}>
-                          {selectedApplicationIds().includes(app.id)
-                            ? "check"
-                            : "check_indeterminate_small"}
-                        </UKIcon>
+                        <UKIcon class={styles.stackSelect}>{selectedApplicationIds().includes(app.id) ? "check" : "check_indeterminate_small"}</UKIcon>
                       )
                     }
                     onClick={
@@ -158,9 +134,7 @@ const ManageInstalledPage: Component = () => {
                               if (!selectedApplicationIds().includes(app.id)) {
                                 setSelectedApplicationIds((prev) => [...prev, app.id]);
                               } else {
-                                setSelectedApplicationIds((prev) =>
-                                  prev.filter((i) => i !== app.id),
-                                );
+                                setSelectedApplicationIds((prev) => prev.filter((i) => i !== app.id));
                               }
                             }
                         : undefined

@@ -1,53 +1,56 @@
+import CHECK_ICON from "@material-symbols/svg-700/outlined/check.svg";
+import ERROR_ICON from "@material-symbols/svg-700/outlined/error.svg";
+import PROGRESS_ACTIVITY_ICON from "@material-symbols/svg-700/outlined/progress_activity.svg";
 import clsx from "clsx";
-import { type Component, createSignal, type ParentProps } from "solid-js";
+import { createSignal, type ParentProps } from "solid-js";
 import UKIcon from "../icon/UKIcon.tsx";
 import type { ButtonColor } from "./lib/color.ts";
 import type { ButtonShape } from "./lib/shape.ts";
 import type { ButtonSize } from "./lib/size.ts";
 import styles from "./UKButton.module.scss";
-import PROGRESS_ACTIVITY_ICON from "@material-symbols/svg-700/outlined/progress_activity.svg";
-import CHECK_ICON from "@material-symbols/svg-700/outlined/check.svg";
 
-type ButtonProps =
-  | {
-      class?: string;
-      disabled?: boolean;
-      size?: ButtonSize;
-      color?: ButtonColor;
-      shape?: ButtonShape;
-      type?: "normal" | "toggle";
-      onClick: (
+export enum AffirmativeButtonState {
+  Success,
+  Error,
+  InProgress,
+  Unset,
+}
+
+type ButtonProps<Affirmative extends true | undefined = undefined> = {
+  class?: string;
+  disabled?: boolean;
+  size?: ButtonSize;
+  color?: ButtonColor;
+  shape?: ButtonShape;
+  type?: "normal" | "toggle";
+  onClick: Affirmative extends true
+    ? (
         event: MouseEvent & {
           currentTarget: HTMLButtonElement;
           target: Element;
         },
-      ) => void;
-      affirmative?: false;
-      leadingIcon?: string;
-      trailingIcon?: string;
+      ) => Promise<{ state: AffirmativeButtonState; cb?: () => void | Promise<void> }>
+    : (
+        event: MouseEvent & {
+          currentTarget: HTMLButtonElement;
+          target: Element;
+        },
+      ) => void | Promise<void>;
+  affirmative?: Affirmative;
+  leadingIcon?: string;
+  trailingIcon?: string;
+} & (Affirmative extends true
+  ? {
+      onSuccess?: () => void;
+      onError?: () => void;
     }
-  | {
-      class?: string;
-      disabled?: boolean;
-      size?: ButtonSize;
-      color?: ButtonColor;
-      shape?: ButtonShape;
-      type?: "normal";
-      onClick: (
-        event: MouseEvent & {
-          currentTarget: HTMLButtonElement;
-          target: Element;
-        },
-      ) => Promise<any>;
-      affirmative: true;
-      trailingIcon?: string;
-    };
+  : unknown);
 
-const UKButton: Component<ParentProps<ButtonProps>> = (props) => {
+const AFFIRMATIVE_BUTTON_HOLD_TIME = 1000;
+
+const UKButton = <Affirmative extends true | undefined = undefined>(props: ParentProps<ButtonProps<Affirmative>>) => {
   const [isSelected, setIsSelected] = createSignal(false);
-  const [affirmativeState, setAffirmativeState] = createSignal<
-    "in-progress" | "affirmative" | "unset"
-  >("unset");
+  const [affirmativeState, setAffirmativeState] = createSignal<AffirmativeButtonState>(AffirmativeButtonState.Unset);
 
   if (props.color === "standard" && props.type === "toggle") {
     alert("You cannot have a standard color button be toggleable");
@@ -59,67 +62,60 @@ const UKButton: Component<ParentProps<ButtonProps>> = (props) => {
       data-selected={isSelected()}
       data-toggleable={props.type === "toggle" || false}
       data-size={props.size || "s"}
-      data-shape={
-        isSelected()
-          ? (props.shape || "round") === "round"
-            ? "square"
-            : "round"
-          : props.shape || "round"
-      }
+      data-shape={isSelected() ? ((props.shape || "round") === "round" ? "square" : "round") : props.shape || "round"}
       data-color={props.color || "filled"}
       onClick={async (e) => {
         e.stopPropagation();
         if (props.type === "toggle") {
           setIsSelected(!isSelected());
           props.onClick(e);
-        } else {
-          if (props.affirmative) {
-            if (affirmativeState() === "in-progress") {
-              return;
-            }
-
-            setAffirmativeState("in-progress");
-            try {
-              const clickResponse = await props.onClick(e);
-
-              setAffirmativeState("affirmative");
-
-              setTimeout(() => {
-                setAffirmativeState("unset");
-
-                if (clickResponse && typeof clickResponse === "function") {
-                  clickResponse();
-                }
-              }, 2000);
-            } catch (_) {
-              setAffirmativeState("unset");
-            }
+          return;
+        }
+        if (props.affirmative) {
+          if (affirmativeState() !== AffirmativeButtonState.Unset) {
             return;
           }
 
-          props.onClick(e);
+          setAffirmativeState(AffirmativeButtonState.InProgress);
+
+          try {
+            const clickResponse = await props.onClick(e);
+
+            setAffirmativeState(clickResponse?.state || AffirmativeButtonState.Success);
+
+            setTimeout(() => {
+              setAffirmativeState(AffirmativeButtonState.Unset);
+
+              clickResponse?.cb?.();
+            }, AFFIRMATIVE_BUTTON_HOLD_TIME);
+          } catch (_) {
+            setAffirmativeState(AffirmativeButtonState.Unset);
+          }
+
+          return;
         }
+
+        props.onClick(e);
       }}
-      class={clsx(
-        styles.root,
-        props.class,
-        affirmativeState() === "in-progress" && styles.inProgress,
-      )}
+      class={clsx(styles.root, props.class, affirmativeState() === AffirmativeButtonState.InProgress && styles.inProgress)}
       type="button"
     >
       {props.affirmative ? (
-        affirmativeState() === "unset" || affirmativeState() === "affirmative" ? (
-          <UKIcon
-            class={clsx(
-              styles.iconClass,
-              affirmativeState() === "unset" && styles.leadingIconNoWidth,
-            )}
-          >
-            {affirmativeState() === "affirmative" ? CHECK_ICON : ""}
-          </UKIcon>
-        ) : affirmativeState() === "in-progress" ? (
-          <UKIcon class={clsx(styles.iconClass, styles.leadingIconSpin)}>{PROGRESS_ACTIVITY_ICON}</UKIcon>
-        ) : null
+        <UKIcon
+          class={clsx(
+            styles.iconClass,
+            affirmativeState() === AffirmativeButtonState.InProgress && styles.leadingIconSpin,
+            affirmativeState() === AffirmativeButtonState.Unset && styles.leadingIconNoWidth,
+          )}
+        >
+          {affirmativeState() === AffirmativeButtonState.Success
+            ? CHECK_ICON
+            : affirmativeState() === AffirmativeButtonState.InProgress
+              ? PROGRESS_ACTIVITY_ICON
+              : affirmativeState() === AffirmativeButtonState.Error
+                ? ERROR_ICON
+                : props.leadingIcon || ""}
+        </UKIcon>
       ) : (
         props.leadingIcon && <UKIcon class={styles.iconClass}>{props.leadingIcon}</UKIcon>
       )}

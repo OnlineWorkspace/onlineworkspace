@@ -31,7 +31,7 @@ const BooleanSetting: Component<{
       supportingText={props.description}
       inlineComponent={
         <>
-          <UKSwitch class={styles.switch} getValue={setValue} value={value()} />
+          <UKSwitch class={styles.switch} onValueChange={setValue} value={value()} />
         </>
       }
     />

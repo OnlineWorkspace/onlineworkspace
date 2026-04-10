@@ -7,9 +7,7 @@ import trpc from "../../../../lib/trpc";
 import styles from "./Email.module.scss";
 
 const Email: Component = () => {
-  const [email, { mutate: setEmail, refetch: refetchEmail }] = createResource(() =>
-    trpc.profile.getEmail.query(),
-  );
+  const [email, { mutate: setEmail, refetch: refetchEmail }] = createResource(() => trpc.profile.getEmail.query());
 
   return (
     <UKStackItem
@@ -24,13 +22,7 @@ const Email: Component = () => {
       }}
       expandedComponent={
         <div class={styles.expanded}>
-          <UKTextField
-            color="outlined"
-            getValue={setEmail}
-            defaultValue={email()}
-            setValue={email() || "unknown@example.com"}
-            label="Email"
-          />
+          <UKTextField color="outlined" onValueChange={setEmail} defaultValue={email()} value={email() || "unknown@example.com"} label="Email" />
           <UKButton
             class={styles.button}
             onClick={async () => {

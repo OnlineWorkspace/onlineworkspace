@@ -10,7 +10,7 @@ export abstract class ApplicationSetting<T> {
   description!: string;
   hidden!: boolean;
 
-  abstract getValue(userId: number): Promise<T>;
+  abstract onValueChange(userId: number): Promise<T>;
   abstract setValue(userId: number, value: T): Promise<boolean>;
   abstract setHidden(hidden: boolean): this;
 }
@@ -25,7 +25,7 @@ export abstract class GlobalApplicationSetting<T> {
   description!: string;
   hidden!: boolean;
 
-  abstract getValue(): Promise<T>;
+  abstract onValueChange(): Promise<T>;
   abstract setValue(value: T): Promise<boolean>;
   abstract setHidden(hidden: boolean): this;
 }

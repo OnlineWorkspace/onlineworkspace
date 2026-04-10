@@ -145,80 +145,78 @@ const WallpaperPage: Component = () => {
               </UKButtonGroup>
             }
           />
-          <UKStackItem
-            labelText="Wallpaper Vertical Alignment"
-            inlineComponent={
-              <UKButtonGroup size={"s"} connected={true} align="end">
-                <UKButton
-                  disabled={wallpaperFit() === "fill"}
-                  leadingIcon={wallpaperAlignVertical() === "top" ? CHECK_ICON : undefined}
-                  onClick={() => {
-                    setWallpaperAlignVertical("top");
-                  }}
-                  color={wallpaperAlignVertical() === "top" ? "filled" : "tonal"}
-                >
-                  Top
-                </UKButton>
-                <UKButton
-                  disabled={wallpaperFit() === "fill"}
-                  leadingIcon={wallpaperAlignVertical() === "middle" ? CHECK_ICON : undefined}
-                  onClick={() => {
-                    setWallpaperAlignVertical("middle");
-                  }}
-                  color={wallpaperAlignVertical() === "middle" ? "filled" : "tonal"}
-                >
-                  Middle
-                </UKButton>
-                <UKButton
-                  disabled={wallpaperFit() === "fill"}
-                  leadingIcon={wallpaperAlignVertical() === "bottom" ? CHECK_ICON : undefined}
-                  onClick={() => {
-                    setWallpaperAlignVertical("bottom");
-                  }}
-                  color={wallpaperAlignVertical() === "bottom" ? "filled" : "tonal"}
-                >
-                  Bottom
-                </UKButton>
-              </UKButtonGroup>
-            }
-          />
-          <UKStackItem
-            labelText="Wallpaper Vertical Alignment"
-            inlineComponent={
-              <UKButtonGroup size={"s"} connected={true} align="end">
-                <UKButton
-                  disabled={wallpaperFit() === "fill"}
-                  leadingIcon={wallpaperAlignHorizontal() === "left" ? CHECK_ICON : undefined}
-                  onClick={() => {
-                    setWallpaperAlignHorizontal("left");
-                  }}
-                  color={wallpaperAlignHorizontal() === "left" ? "filled" : "tonal"}
-                >
-                  Left
-                </UKButton>
-                <UKButton
-                  disabled={wallpaperFit() === "fill"}
-                  leadingIcon={wallpaperAlignHorizontal() === "center" ? CHECK_ICON : undefined}
-                  onClick={() => {
-                    setWallpaperAlignHorizontal("center");
-                  }}
-                  color={wallpaperAlignHorizontal() === "center" ? "filled" : "tonal"}
-                >
-                  Center
-                </UKButton>
-                <UKButton
-                  disabled={wallpaperFit() === "fill"}
-                  leadingIcon={wallpaperAlignHorizontal() === "right" ? CHECK_ICON : undefined}
-                  onClick={() => {
-                    setWallpaperAlignHorizontal("right");
-                  }}
-                  color={wallpaperAlignHorizontal() === "right" ? "filled" : "tonal"}
-                >
-                  Right
-                </UKButton>
-              </UKButtonGroup>
-            }
-          />
+          {wallpaperFit() !== "fill" && (
+            <>
+              <UKStackItem
+                labelText="Wallpaper Vertical Alignment"
+                inlineComponent={
+                  <UKButtonGroup size={"s"} connected={true} align="end">
+                    <UKButton
+                      leadingIcon={wallpaperAlignVertical() === "top" ? CHECK_ICON : undefined}
+                      onClick={() => {
+                        setWallpaperAlignVertical("top");
+                      }}
+                      color={wallpaperAlignVertical() === "top" ? "filled" : "tonal"}
+                    >
+                      Top
+                    </UKButton>
+                    <UKButton
+                      leadingIcon={wallpaperAlignVertical() === "middle" ? CHECK_ICON : undefined}
+                      onClick={() => {
+                        setWallpaperAlignVertical("middle");
+                      }}
+                      color={wallpaperAlignVertical() === "middle" ? "filled" : "tonal"}
+                    >
+                      Middle
+                    </UKButton>
+                    <UKButton
+                      leadingIcon={wallpaperAlignVertical() === "bottom" ? CHECK_ICON : undefined}
+                      onClick={() => {
+                        setWallpaperAlignVertical("bottom");
+                      }}
+                      color={wallpaperAlignVertical() === "bottom" ? "filled" : "tonal"}
+                    >
+                      Bottom
+                    </UKButton>
+                  </UKButtonGroup>
+                }
+              />
+              <UKStackItem
+                labelText="Wallpaper Vertical Alignment"
+                inlineComponent={
+                  <UKButtonGroup size={"s"} connected={true} align="end">
+                    <UKButton
+                      leadingIcon={wallpaperAlignHorizontal() === "left" ? CHECK_ICON : undefined}
+                      onClick={() => {
+                        setWallpaperAlignHorizontal("left");
+                      }}
+                      color={wallpaperAlignHorizontal() === "left" ? "filled" : "tonal"}
+                    >
+                      Left
+                    </UKButton>
+                    <UKButton
+                      leadingIcon={wallpaperAlignHorizontal() === "center" ? CHECK_ICON : undefined}
+                      onClick={() => {
+                        setWallpaperAlignHorizontal("center");
+                      }}
+                      color={wallpaperAlignHorizontal() === "center" ? "filled" : "tonal"}
+                    >
+                      Center
+                    </UKButton>
+                    <UKButton
+                      leadingIcon={wallpaperAlignHorizontal() === "right" ? CHECK_ICON : undefined}
+                      onClick={() => {
+                        setWallpaperAlignHorizontal("right");
+                      }}
+                      color={wallpaperAlignHorizontal() === "right" ? "filled" : "tonal"}
+                    >
+                      Right
+                    </UKButton>
+                  </UKButtonGroup>
+                }
+              />
+            </>
+          )}
         </UKStack>
         <UKText role={"title"} size={"m"} class={styles.subheading}>
           Select New Wallpaper

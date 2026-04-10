@@ -37,7 +37,7 @@ const Username: Component<{
           label={"Username*"}
           supportingText={"*required"}
           defaultValue={props.username()}
-          getValue={async (val) => {
+          onValueChange={async (val) => {
             props.setUsername(val);
 
             if (await trpc.authorization.isUsernameValid.query(val)) {

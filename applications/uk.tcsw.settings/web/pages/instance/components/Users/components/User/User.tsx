@@ -18,37 +18,22 @@ const User: Component<{
   updateUsers: () => void;
 }> = (props) => {
   const appContext = useContext(AppContext)!;
-  const [showDialog, setShowDialog] = createSignal<
-    "user" | "confirmDelete" | "removeOwnAdmin" | undefined
-  >(undefined);
-  const [username, { mutate: setUsername }] = createResource(
-    () => trpc.instance.user.getUsername.query(props.userId),
-    {
-      initialValue: "",
-    },
-  );
-  const [email, { mutate: setEmail }] = createResource(
-    () => trpc.instance.user.getEmail.query(props.userId),
-    {
-      initialValue: "",
-    },
-  );
-  const [forename, { mutate: setForename }] = createResource(
-    () => trpc.instance.user.getForename.query(props.userId),
-    {
-      initialValue: "",
-    },
-  );
-  const [surname, { mutate: setSurname }] = createResource(
-    () => trpc.instance.user.getSurname.query(props.userId),
-    {
-      initialValue: "",
-    },
-  );
-  const [isAdministrator, { mutate: setIsAdministrator }] = createResource(
-    () => trpc.instance.user.getIsAdministrator.query(props.userId),
-    { initialValue: false },
-  );
+  const [showDialog, setShowDialog] = createSignal<"user" | "confirmDelete" | "removeOwnAdmin" | undefined>(undefined);
+  const [username, { mutate: setUsername }] = createResource(() => trpc.instance.user.getUsername.query(props.userId), {
+    initialValue: "",
+  });
+  const [email, { mutate: setEmail }] = createResource(() => trpc.instance.user.getEmail.query(props.userId), {
+    initialValue: "",
+  });
+  const [forename, { mutate: setForename }] = createResource(() => trpc.instance.user.getForename.query(props.userId), {
+    initialValue: "",
+  });
+  const [surname, { mutate: setSurname }] = createResource(() => trpc.instance.user.getSurname.query(props.userId), {
+    initialValue: "",
+  });
+  const [isAdministrator, { mutate: setIsAdministrator }] = createResource(() => trpc.instance.user.getIsAdministrator.query(props.userId), {
+    initialValue: false,
+  });
   const [isMe] = createResource(() => trpc.instance.user.getIsMe.query(props.userId), {
     initialValue: false,
   });
@@ -72,7 +57,7 @@ const User: Component<{
           <UKDivider direction="horizontal" />
           <UKTextField
             color="outlined"
-            getValue={(val) => {
+            onValueChange={(val) => {
               setUsername(val);
               trpc.instance.user.setUsername.mutate({
                 userId: props.userId,
@@ -81,12 +66,12 @@ const User: Component<{
             }}
             defaultValue={username()}
             label="Username"
-            setValue={username()}
+            value={username()}
           />
           <div class={styles.name}>
             <UKTextField
               color="outlined"
-              getValue={(val) => {
+              onValueChange={(val) => {
                 setForename(val);
                 trpc.instance.user.setForename.mutate({
                   userId: props.userId,
@@ -95,11 +80,11 @@ const User: Component<{
               }}
               defaultValue={forename()}
               label="Forename"
-              setValue={forename()}
+              value={forename()}
             />
             <UKTextField
               color="outlined"
-              getValue={(val) => {
+              onValueChange={(val) => {
                 setSurname(val);
                 trpc.instance.user.setSurname.mutate({
                   userId: props.userId,
@@ -108,12 +93,12 @@ const User: Component<{
               }}
               defaultValue={surname()}
               label="Surname"
-              setValue={surname()}
+              value={surname()}
             />
           </div>
           <UKTextField
             color="outlined"
-            getValue={(val) => {
+            onValueChange={(val) => {
               setEmail(val);
               trpc.instance.user.setEmail.mutate({
                 userId: props.userId,
@@ -122,7 +107,7 @@ const User: Component<{
             }}
             defaultValue={email()}
             label="Email"
-            setValue={email()}
+            value={email()}
           />
           <div class={styles.boolean}>
             <UKText role="label" size="m">
@@ -130,7 +115,7 @@ const User: Component<{
             </UKText>
             <UKSwitch
               disabled={isMe() && !appContext.shootYourselfInTheFoot()}
-              getValue={(val) => {
+              onValueChange={(val) => {
                 if (isMe() && !val) {
                   setShowDialog("removeOwnAdmin");
                   return;
@@ -181,10 +166,7 @@ const User: Component<{
           </UKButton>
         </div>
       </UKDialog>
-      <UKDialog
-        show={() => showDialog() === "confirmDelete"}
-        onClose={() => setShowDialog(undefined)}
-      >
+      <UKDialog show={() => showDialog() === "confirmDelete"} onClose={() => setShowDialog(undefined)}>
         <UKText role="title" size="l">
           Confirm Deletion
         </UKText>
@@ -212,26 +194,21 @@ const User: Component<{
         </Show>
         <Show when={isMe()}>
           <UKText role="body" size="m">
-            Sorry, you cannot delete your own user account. Please ask another administrator to
-            delete your account if you wish to do so.
+            Sorry, you cannot delete your own user account. Please ask another administrator to delete your account if you wish to do so.
           </UKText>
           <UKButton color={"filled"} onClick={() => setShowDialog(undefined)}>
             Close
           </UKButton>
         </Show>
       </UKDialog>
-      <UKDialog
-        show={() => showDialog() === "removeOwnAdmin"}
-        onClose={() => setShowDialog(undefined)}
-      >
+      <UKDialog show={() => showDialog() === "removeOwnAdmin"} onClose={() => setShowDialog(undefined)}>
         <UKText role="title" size="l">
           Remove Administrator Privileges
         </UKText>
         <UKDivider direction="horizontal" />
         <UKText role="body" size="m">
-          Are you sure you want to remove your own administrator privileges? You will not be able to
-          modify any users or settings if you do this. Please ask another administrator or use the
-          console if you need to restore your privileges.
+          Are you sure you want to remove your own administrator privileges? You will not be able to modify any users or settings if you do this. Please ask
+          another administrator or use the console if you need to restore your privileges.
         </UKText>
         <UKButtonGroup size={"s"} align={"end"}>
           <UKButton

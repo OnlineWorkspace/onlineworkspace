@@ -1,6 +1,6 @@
-import { useNavigate } from "@solidjs/router";
+import { useNavigate, usePreloadRoute } from "@solidjs/router";
 import UKAvatar from "@tcsw/uikit-solid/src/components/avatar/UKAvatar.tsx";
-import UKButton from "@tcsw/uikit-solid/src/components/button/UKButton.tsx";
+import UKButton, { AffirmativeButtonState } from "@tcsw/uikit-solid/src/components/button/UKButton.tsx";
 import UKCard from "@tcsw/uikit-solid/src/components/card/UKCard.tsx";
 import { DividerDirection } from "@tcsw/uikit-solid/src/components/divider/lib/direction.ts";
 import UKDivider from "@tcsw/uikit-solid/src/components/divider/UKDivider.tsx";
@@ -32,6 +32,7 @@ export enum UserSelectStage {
 
 const UserSelectPage: Component = () => {
   const navigate = useNavigate();
+  const preload = usePreloadRoute();
   const [stage, setStage] = createSignal<UserSelectStage>(UserSelectStage.Username);
 
   const [username, setUsername] = createSignal<string>("");
@@ -62,12 +63,7 @@ const UserSelectPage: Component = () => {
         />
       </Match>
       <Match when={stage() === UserSelectStage.Email}>
-        <Email
-          setStage={setStage}
-          emailAddress={emailAddress}
-          setEmailAddress={setEmailAddress}
-          setEmailCode={setEmailCode}
-        />
+        <Email setStage={setStage} emailAddress={emailAddress} setEmailAddress={setEmailAddress} setEmailCode={setEmailCode} />
       </Match>
       <Match when={stage() === UserSelectStage.VerifyEmail}>
         <VerifyEmail
@@ -90,8 +86,8 @@ const UserSelectPage: Component = () => {
             color={"outlined"}
             label={"Password*"}
             defaultValue={password()}
-            setValue={password()}
-            getValue={setPassword}
+            value={password()}
+            onValueChange={setPassword}
             supportingText={"*required"}
             error={password() !== confirmedPassword()}
           />
@@ -100,8 +96,8 @@ const UserSelectPage: Component = () => {
             color={"outlined"}
             label={"Confirm Password*"}
             defaultValue={confirmedPassword()}
-            setValue={confirmedPassword()}
-            getValue={setConfirmedPassword}
+            value={confirmedPassword()}
+            onValueChange={setConfirmedPassword}
             supportingText={"*required"}
             error={password() !== confirmedPassword()}
           />
@@ -136,19 +132,8 @@ const UserSelectPage: Component = () => {
             Setup Profile
           </UKText>
           <UKDivider direction={DividerDirection.horizontal} />
-          <UKAvatar
-            class={styles.avatar}
-            size={"l"}
-            username={username()}
-            avatar={"/assets/placeholder/avatar.png"}
-          />
-          <UKText
-            class={styles.displayName}
-            role={"headline"}
-            align={"center"}
-            size={"l"}
-            emphasized={true}
-          >
+          <UKAvatar class={styles.avatar} size={"l"} username={username()} avatar={"/assets/placeholder/avatar.png"} />
+          <UKText class={styles.displayName} role={"headline"} align={"center"} size={"l"} emphasized={true}>
             {displayName() || username()}
           </UKText>
           <UKText class={styles.username} role={"body"} align={"center"} size={"m"}>
@@ -157,19 +142,13 @@ const UserSelectPage: Component = () => {
           <UKText class={styles.pronouns} role={"label"} align={"center"} size={"s"}>
             {gender() === "female" ? "she/her" : gender() === "male" ? "he/him" : "they/them"}
           </UKText>
-          <UKTextField
-            color={"outlined"}
-            label={"Display Name"}
-            defaultValue={displayName()}
-            setValue={displayName()}
-            getValue={setDisplayName}
-          />
+          <UKTextField color={"outlined"} label={"Display Name"} defaultValue={displayName()} value={displayName()} onValueChange={setDisplayName} />
           <UKSearchableDropdownMenu
             inputColor={"outlined"}
             label={"Gender"}
             defaultValue={gender()}
             // @ts-ignore
-            getValue={(val) => setGender(val.toLowerCase())}
+            onValueChange={(val) => setGender(val.toLowerCase())}
             items={[
               {
                 id: "female",
@@ -188,14 +167,7 @@ const UserSelectPage: Component = () => {
               },
             ]}
           />
-          <UKTextField
-            color={"outlined"}
-            label={"Bio"}
-            as={"textarea"}
-            setValue={bio()}
-            defaultValue={bio()}
-            getValue={setBio}
-          />
+          <UKTextField color={"outlined"} label={"Bio"} as={"textarea"} value={bio()} defaultValue={bio()} onValueChange={setBio} />
           <div class={styles.stageButtons}>
             <UKButton
               onClick={() => {
@@ -236,13 +208,21 @@ const UserSelectPage: Component = () => {
             });
 
             if (resp.type === "success") {
-              return () => {
-                setStage(UserSelectStage.TwoFactorAuthentication);
+              preload("/app/uk.tcsw.dashboard");
+              return {
+                state: AffirmativeButtonState.Success,
+                cb() {
+                  setStage(UserSelectStage.TwoFactorAuthentication);
+                },
               };
             } else {
               // TODO: add an error toast here instead of a console message (When implemented in UIKit of course)
               console.error(resp);
               alert("A critical error occurred!");
+
+              return {
+                state: AffirmativeButtonState.Error,
+              };
             }
           }}
         />
@@ -269,7 +249,12 @@ const UserSelectPage: Component = () => {
             <UKButton onClick={() => navigate("/app")} color={"tonal"}>
               Skip guide
             </UKButton>
-            <UKButton onClick={() => setStage(UserSelectStage.Guide)} color={"filled"}>
+            <UKButton
+              onClick={() => {
+                setStage(UserSelectStage.Guide);
+              }}
+              color={"filled"}
+            >
               Continue
             </UKButton>
           </div>

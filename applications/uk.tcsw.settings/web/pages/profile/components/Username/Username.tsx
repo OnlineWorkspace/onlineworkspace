@@ -7,9 +7,7 @@ import trpc from "../../../../lib/trpc";
 import styles from "./Username.module.scss";
 
 const Username: Component = () => {
-  const [username, { mutate: setUsername, refetch: refetchUsername }] = createResource(() =>
-    trpc.profile.getUsername.query(),
-  );
+  const [username, { mutate: setUsername, refetch: refetchUsername }] = createResource(() => trpc.profile.getUsername.query());
 
   return (
     <UKStackItem
@@ -26,8 +24,8 @@ const Username: Component = () => {
         <div class={styles.expanded}>
           <UKTextField
             color="outlined"
-            getValue={setUsername}
-            setValue={username() || "no username"}
+            onValueChange={setUsername}
+            value={username() || "no username"}
             defaultValue={username()}
             label="Username"
             leadingIcon={{ icon: ALTERNATE_EMAIL_ICON }}

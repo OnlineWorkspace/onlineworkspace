@@ -39,21 +39,8 @@ const CreateUser: Component<{ updateUsers: () => void }> = (props) => {
           Create user
         </UKText>
         <UKDivider direction="horizontal" />
-        <UKTextField
-          color={"outlined"}
-          label={"Username"}
-          getValue={setUsername}
-          setValue={username()}
-          defaultValue={username()}
-        />
-        <UKTextField
-          color={"outlined"}
-          label={"Password"}
-          shouldMask
-          getValue={setPassword}
-          setValue={password()}
-          defaultValue={password()}
-        />
+        <UKTextField color={"outlined"} label={"Username"} onValueChange={setUsername} value={username()} defaultValue={username()} />
+        <UKTextField color={"outlined"} label={"Password"} shouldMask onValueChange={setPassword} value={password()} defaultValue={password()} />
         <UKButtonGroup size={"s"} align="end">
           <UKButton
             color="tonal"
