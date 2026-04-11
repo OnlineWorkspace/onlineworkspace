@@ -1,62 +1,15 @@
-# Workspace (To be renamed)
+![Online Workspace](./metaAssets/online_workspace_wordmark.svg)
+
+A self-hosted web platform for applications & services.
 
 ---
 
-A working environment for the Home-Lab.
-
-> [!INFO]
-> Workspace is in need of a permanent name, any suggestions would be appreciated in the discord.
-
 > [!WARNING]
-> Workspaces is not yet intended for production use. Although early adoption for testing purposes is appreciated.
+> Online Workspace is not yet intended for production use. Although early adoption for testing purposes is appreciated.
 
 ### Links
 
-- Discord -> https://discord.gg/jcJeGEAYhY
-- Source Code (GitHub) -> https://github.com/tricolorsoftware/workspaces
-
-### Showcase
-
-<details>
-  <summary><b>View Screenshots</b></summary>
-
-Login Page
-
-![login.png](metaAssets/preview_screenshots/login.png)
-
-Signup Page
-
-![signup.png](metaAssets/preview_screenshots/signup.png)
-
-App Navigation Rail
-
-![app navigation rail](metaAssets/app_navigation_rail.avif)
-
-Dashboard
-
-![dashboard.png](metaAssets/preview_screenshots/dashboard.png)
-
-Files Grid
-
-![files_grid.png](metaAssets/preview_screenshots/files_grid.png)
-
-Settings Profile Page (Mobile mode)
-
-![mobile_settings_profile.png](metaAssets/preview_screenshots/mobile_settings_profile.png)
-
-Settings Overview Page
-
-![settings_overview.png](metaAssets/preview_screenshots/settings_overview.png)
-
-Settings Customize Wallpaper Page
-
-![settings_wallpaper.png](metaAssets/preview_screenshots/settings_wallpaper.png)
-
-Store Application Page
-
-![store_application.png](metaAssets/preview_screenshots/store_application.png)
-
-</details>
+- Source Code (GitHub) -> <https://github.com/onlineworkspace/workspace>
 
 <!--
 ## Installation Guide for Production Environments (Docker)
@@ -74,9 +27,9 @@ Store Application Page
 1. Ensure all dependencies are installed before continuing
 2. Ensure that the installation environment is running a supported version of Linux
 3. `cd /`
-4. create a directory to house the Workspaces filesystem root e.g.: `sudo mkdir /tricolor/workspaces`
-5. change into the newly created directory `cd /tricolor/workspaces`
-6. clone the workspaces docker configuration from git `git clone git@github.com:tricolorsoftware/workspaces-docker.git .`
+4. create a directory to house the Workspaces filesystem root e.g.: `sudo mkdir /onlineworkspaces/workspaces`
+5. change into the newly created directory `cd /onlineworkspaces/workspaces`
+6. clone the workspaces docker configuration from git `git clone git@github.com:onlineworkspace/workspace-docker.git .`
 7. edit `docker-compose.yaml` to your desired configuration from [Insert link to relevant documentation here] before continuing.
 8. run `docker-compose up` to start the workspaces docker image and install all remaining dependencies
 9. open your browser and head to `https://[server-ip]` and follow the on-screen instructions to complete the setup.
@@ -94,15 +47,14 @@ Store Application Page
 | Bun        | https://bun.sh                   | No       |
 | PostgreSQL | https://www.postgresql.org/      | No       |
 
-
 1. Ensure all dependencies are installed before continuing
 2. Ensure that the installation environment is running a supported version of Linux
 3. `cd /`
 4. create a directory to house the Workspaces filesystem root e.g.: `sudo mkdir /var/www/workspaces`
 5. change into the newly created directory `cd /var/www/workspaces`
-6. clone the workspaces docker configuration from git `git clone git@github.com:tricolorsoftware/workspaces.git .`
+6. clone the workspaces docker configuration from git `git clone git@github.com:onlineworkspace/workspace.git .`
 7. run `bun install`
-8. create a postgresql database called `tricolor_workspaces`
+8. create a postgresql database called `onlineworkspace_workspace`
 9. change into the `instance` directory
 10. copy `meta/backend.service` to `/etc/systemd/system/workspaces-backend.service`.
 11. run `systemctl enable workspaces-backend --now` to start the backend
@@ -111,7 +63,6 @@ Store Application Page
 14. choose a webserver of your choice to serve `/var/www/workspaces/instance/web/dist` (caddy is fast & easy to use)
 15. open your browser and head to `https://[server-ip]` and login as the user `admin` with password `password` to finish setup.
 -->
-
 
 ## Installation Guide for Development Environments
 
@@ -122,11 +73,11 @@ Store Application Page
 
 ### Dependencies
 
-| Dependency | NPM Package | External Installation Guide      | Optional |
-|------------|-------------|----------------------------------|----------|
-| Bun        |             | https://bun.sh                   | No       |
-| PostgreSQL |             | https://www.postgresql.org/      | No       |
-| Caddy      |             | https://caddyserver.com/download | No       |
+| Dependency | NPM Package | External Installation Guide        | Optional |
+|------------|-------------|------------------------------------|----------|
+| Bun        |             | <https://bun.sh>                   | No       |
+| PostgreSQL |             | <https://www.postgresql.org/>      | No       |
+| Caddy      |             | <https://caddyserver.com/download> | No       |
 
 > [!IMPORTANT]
 > Please ensure all non-optional dependencies are installed before proceeding.
@@ -137,7 +88,7 @@ Store Application Page
         2. Start the PostgreSQL service -> `sudo systemctl enable --now postgresql`
         3. Switch to the postgres user -> `sudo su postgres`
         4. Open PostgreSQL with psql -> `psql`
-        5. Create a PostgreSQL database with the following query -> `CREATE DATABASE tricolor_workspaces;`
+        5. Create a PostgreSQL database with the following query -> `CREATE DATABASE onlineworkspace_workspace;`
         6. Change the PostgreSQL password with the following query -> `ALTER USER postgres WITH PASSWORD 'postgres';`
         7. Exit psql -> `exit;`
         8. Logout from the postgres user -> `exit`
@@ -145,17 +96,17 @@ Store Application Page
     - Windows
         1. Simply install postgreSQL with the setup file downloaded from the postgreSQL website
         2. Open your database viewer of choice (DBeaver Community Edition is recommended)
-        3. Create the `tricolor_workspaces` table
+        3. Create the `onlineworkspace_workspace` table
         4. Download the caddy executable from the caddy website, this can be placed anywhere but in the repo root directory is recommended for ease of use
     - MacOS
         1. Using Orbstack with an Ubuntu container, follow the Ubuntu Linux instructions above
 2. Run `bun install` inside the project root directory to install all NPM dependencies
-3. Ensure all autoinstall configuration is set before proceeding, if you want a vanilla setup this step can be skipped (see [Autoinstall Configuration](#autoinstall-configuration) section in the documentation for more details)
+3. Ensure all auto-install configuration is set before proceeding, if you want a vanilla setup this step can be skipped (see [auto-install Configuration](#auto-install-configuration) section in the documentation for more details)
 4. Run `bun run dev` to start up the web interface and backend in development mode
 5. If on Linux or MacOS, ensure that caddy is allowed to bind to ports lower than 1024 by running `sudo setcap 'cap_net_bind_service=+ep' $(which caddy)`.
 6. Run `caddy run`(Linux) or `.\caddy.exe run`(Windows) to start the caddy server with the provided configuration (this will serve the web interface on `https://localhost` by default)
 
-## Autoinstall Configuration
+## Auto-install Configuration
 
 ---
 
@@ -170,14 +121,21 @@ To automatically configure a workspaces instance on the first run, create a dire
       "password": "postgres",
       "host": "localhost",
       "port": 5432,
-      "database": "tricolor_workspaces"
+      "database": "onlineworkspace_workspace"
     }
   },
   "backendUrl": "https://localhost",
   "webUrl": ["https://localhost"],
   "signupRequirements": {
     "email": false,
-    "twoFactorAuthentication": false
+    "twoFactorAuthentication": false,
+    "passwordMinimumLength": 8,
+    "passwordContains": {
+      "minimumUppercase": 1,
+      "minimumLowercase": 1,
+      "minimumNumbers": 1,
+      "minimumSymbols": 1
+    }
   },
   "displayName": "Workspace",
   "mailserver": {
@@ -206,4 +164,5 @@ To automatically configure a workspaces instance on the first run, create a dire
 Any fields provided in the `config.json` file will override the default settings. By leaving out any fields, the default values will be used instead. This allows you to only modify the settings you want to change while leaving the rest of the default configuration intact.
 
 Instance branding assets can be added to the `autoinstall` directory and should be located and named as follows:
+
 - `autoinstall/assets/login/banner.png`
