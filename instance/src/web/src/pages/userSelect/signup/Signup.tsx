@@ -149,7 +149,7 @@ const UserSelectPage: Component = () => {
           </UKText>
           <UKDivider direction={DividerDirection.horizontal} />
           <UKText role={"body"} size={"l"} align={"center"}>
-            {"Would you like to have a guide of Workspaces?"}
+            {"Would you like to have a guide of your new workspace?"}
           </UKText>
           <UKDivider direction={DividerDirection.horizontal} />
           <div class={styles.continueSegment}>
