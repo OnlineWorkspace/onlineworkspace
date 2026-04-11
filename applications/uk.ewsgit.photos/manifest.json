@@ -5,6 +5,7 @@
     "type": "icon",
     "value": "./web/node_modules/@material-symbols/svg-700/outlined/photo_prints.svg"
   },
+  "bannerImage": "./banner.svg",
   "description": "Manage & View your photos and videos",
   "authors": [
     {

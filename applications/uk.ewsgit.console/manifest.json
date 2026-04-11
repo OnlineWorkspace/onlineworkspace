@@ -5,7 +5,8 @@
     "type": "icon",
     "value": "./web/node_modules/@material-symbols/svg-700/outlined/terminal.svg"
   },
-  "description": "The administrator instance console as an application",
+  "bannerImage": "./banner.svg",
+  "description": "The instance administrator console as an application",
   "authors": [
     {
       "name": "Ewsgit",

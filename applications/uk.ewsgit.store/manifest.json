@@ -5,6 +5,7 @@
     "type": "icon",
     "value": "./web/node_modules/@material-symbols/svg-700/outlined/store.svg"
   },
+  "bannerImage": "./banner.svg",
   "description": "Manage and install Applications",
   "authors": [
     {

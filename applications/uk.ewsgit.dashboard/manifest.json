@@ -5,7 +5,8 @@
     "type": "icon",
     "value": "./web/node_modules/@material-symbols/svg-700/outlined/dashboard.svg"
   },
-  "description": "The Homepage for workspaces",
+  "bannerImage": "./banner.svg",
+  "description": "The Homepage for an online workspace",
   "authors": [
     {
       "name": "Ewsgit",

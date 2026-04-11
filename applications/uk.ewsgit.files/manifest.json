@@ -5,6 +5,7 @@
     "type": "icon",
     "value": "./web/node_modules/@material-symbols/svg-700/outlined/folder.svg"
   },
+  "bannerImage": "./banner.svg",
   "description": "Navigate and manage files in your Workspace",
   "authors": [
     {
