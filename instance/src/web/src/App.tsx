@@ -1,7 +1,7 @@
-import { Route, Router } from "@solidjs/router";
-import { UIKitRoot } from "@tcsw/uikit-solid/src/index.tsx";
+import { UIKitRoot } from "@onlineworkspace/uikit-solid/src/index.tsx";
 // @ts-ignore
-import ApplicationsRouter from "@tcsw/workspaces-applications";
+import ApplicationsRouter from "@onlineworkspace/workspaces-applications";
+import { Route, Router } from "@solidjs/router";
 import { type Component, lazy } from "solid-js";
 import styles from "./App.module.scss";
 import AppIndex from "./pages/app/Index.tsx";

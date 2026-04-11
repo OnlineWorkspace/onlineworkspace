@@ -107,6 +107,15 @@ export const workspacesRouter = t.router({
         z.object({
           email: z.boolean(),
           twoFactorAuthentication: z.boolean(),
+          passwordMinimumLength: z.number().or(z.undefined()),
+          passwordContains: z
+            .object({
+              minimumUppercase: z.number().or(z.undefined()),
+              minimumLowercase: z.number().or(z.undefined()),
+              minimumNumbers: z.number().or(z.undefined()),
+              minimumSymbols: z.number().or(z.undefined()),
+            })
+            .or(z.undefined()),
         }),
       )
       .query(async (opt) => {

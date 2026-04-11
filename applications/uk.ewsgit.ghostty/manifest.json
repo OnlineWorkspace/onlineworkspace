@@ -1,0 +1,26 @@
+{
+  "id": "uk.ewsgit.ghostty",
+  "displayName": "Ghostty",
+  "icon": {
+    "type": "image",
+    "value": "./icon.png"
+  },
+  "bannerImage": "./banner.svg",
+  "description": "The Ghostty Terminal for Workspaces",
+  "authors": [
+    {
+      "name": "Ewsgit",
+      "link": "<https://ewsgit.uk>"
+    }
+  ],
+  "license": "MIT",
+  "source": "https://github.com/onlineworkspace/workspace/src/branch/main/packages/applications/uk.ewsgit.ghostty",
+  "modules": {
+    "web": {
+      "path": "./web"
+    },
+    "bun": {
+      "path": "./backend/index.ts"
+    }
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "id": "uk.ewsgit.store",
+  "displayName": "Store",
+  "icon": {
+    "type": "icon",
+    "value": "./web/node_modules/@material-symbols/svg-700/outlined/store.svg"
+  },
+  "description": "Manage and install Applications",
+  "authors": [
+    {
+      "name": "Ewsgit",
+      "link": "<https://ewsgit.uk>"
+    }
+  ],
+  "graphicsAcceleration": "Recommended",
+  "license": "MIT",
+  "source": "https://github.com/onlineworkspace/workspace/src/branch/main/packages/applications/uk.ewsgit.store",
+  "modules": {
+    "web": {
+      "path": "./web"
+    },
+    "bun": {
+      "path": "./backend/index.ts"
+    }
+  }
+}

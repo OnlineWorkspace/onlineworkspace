@@ -1,12 +1,12 @@
 {
-  "name": "@tcsw/workspaces-instance",
+  "name": "@onlineworkspace/workspace-instance",
   "type": "module",
   "version": "0.0.1",
   "description": "",
   "main": "src/index.ts",
   "repository": {
     "type": "git",
-    "url": "https://github.com/tricoloruk/workspaces"
+    "url": "https://github.com/onlineworkspace/workspace"
   },
   "private": true,
   "dependencies": {

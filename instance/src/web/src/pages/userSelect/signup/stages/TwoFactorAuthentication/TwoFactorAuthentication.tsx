@@ -1,18 +1,11 @@
-import UKButton from "@tcsw/uikit-solid/src/components/button/UKButton.jsx";
-import UKCard from "@tcsw/uikit-solid/src/components/card/UKCard.jsx";
-import UKDivider from "@tcsw/uikit-solid/src/components/divider/UKDivider.jsx";
-import UKText from "@tcsw/uikit-solid/src/components/text/UKText.jsx";
-import UKTextField from "@tcsw/uikit-solid/src/components/textField/UKTextField.jsx";
+import UKButton from "@onlineworkspace/uikit-solid/src/components/button/UKButton.jsx";
+import UKCard from "@onlineworkspace/uikit-solid/src/components/card/UKCard.jsx";
+import UKDivider from "@onlineworkspace/uikit-solid/src/components/divider/UKDivider.jsx";
+import UKText from "@onlineworkspace/uikit-solid/src/components/text/UKText.jsx";
+import UKTextField from "@onlineworkspace/uikit-solid/src/components/textField/UKTextField.jsx";
 import clsx from "clsx";
 import QRCode from "qrcode";
-import {
-  type Accessor,
-  type Component,
-  createEffect,
-  createResource,
-  createSignal,
-  type Resource,
-} from "solid-js";
+import { type Accessor, type Component, createEffect, createResource, createSignal, type Resource } from "solid-js";
 import trpc from "../../../../../lib/trpc";
 import { UserSelectStage } from "../../Signup";
 import modalStyles from "../../Signup.module.scss";
@@ -33,13 +26,9 @@ const TwoFactorAuthentication: Component<{
 
     if (!twoFactorSecretValue) return;
 
-    QRCode.toCanvas(
-      canvasElement,
-      twoFactorSecretValue?.twoFactorSecretURI || "https://http.cat/404",
-      (error) => {
-        if (error) console.error(error);
-      },
-    );
+    QRCode.toCanvas(canvasElement, twoFactorSecretValue?.twoFactorSecretURI || "https://http.cat/404", (error) => {
+      if (error) console.error(error);
+    });
   });
 
   return (

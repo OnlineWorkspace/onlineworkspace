@@ -10,10 +10,7 @@ export default class FilesystemSystem extends System {
   readonly CACHE_PATH = path.join(this.FS_ROOT, "cache");
   readonly AUTOINSTALL_PATH = path.join(process.cwd(), "autoinstall");
 
-  _internalAssets: Map<
-    string,
-    { userId: number; path: string; validUntil: number; public?: boolean }
-  >;
+  _internalAssets: Map<string, { userId: number; path: string; validUntil: number; public?: boolean }>;
   _internalAssetPaths: Map<string, string>;
 
   constructor(instance: Instance) {
@@ -33,23 +30,14 @@ export default class FilesystemSystem extends System {
 
     if (!fs.existsSync(path.join(this.FS_ROOT, "assets/login/banner.png"))) {
       if (!fs.existsSync(path.join(this.AUTOINSTALL_PATH, "assets/login/banner.png"))) {
-        fs.cpSync(
-          path.join(this.SRC_ROOT, "assets/placeholder/banner.png"),
-          path.join(this.FS_ROOT, "assets/login/banner.png"),
-        );
+        fs.cpSync(path.join(this.SRC_ROOT, "assets/placeholder/banner.png"), path.join(this.FS_ROOT, "assets/login/banner.png"));
       } else {
-        fs.cpSync(
-          path.join(this.AUTOINSTALL_PATH, "assets/login/banner.png"),
-          path.join(this.FS_ROOT, "assets/login/banner.png"),
-        );
+        fs.cpSync(path.join(this.AUTOINSTALL_PATH, "assets/login/banner.png"), path.join(this.FS_ROOT, "assets/login/banner.png"));
       }
     }
 
     if (!fs.existsSync(path.join(this.FS_ROOT, "assets/login/background.png"))) {
-      fs.cpSync(
-        path.join(this.SRC_ROOT, "assets/wallpapers/stars_wallpaper.png"),
-        path.join(this.FS_ROOT, "assets/login/background.png"),
-      );
+      fs.cpSync(path.join(this.SRC_ROOT, "assets/wallpapers/pexels-steve-29708303.jpg"), path.join(this.FS_ROOT, "assets/login/background.png"));
     }
 
     this._internalAssets = new Map();
@@ -57,15 +45,9 @@ export default class FilesystemSystem extends System {
   }
 
   getApplicationSrc(applicationId: string) {
-    console.log(
-      this.instance.sys.applications.availableApplications.find(
-        (a) => a.manifest?.id === applicationId,
-      )?.path,
-    );
+    console.log(this.instance.sys.applications.availableApplications.find((a) => a.manifest?.id === applicationId)?.path);
 
-    return this.instance.sys.applications.availableApplications.find(
-      (a) => a.manifest?.id === applicationId,
-    )?.path;
+    return this.instance.sys.applications.availableApplications.find((a) => a.manifest?.id === applicationId)?.path;
   }
 
   // Create a directory if it does not already exist
@@ -128,13 +110,7 @@ export default class FilesystemSystem extends System {
 
   // returns an endpoint where the asset located at the provided path can be loaded from on the client
   // defaults to 3hrs validity
-  serveFile(
-    userId: number,
-    fsPath: string,
-    isPublic: boolean = false,
-    dontCachePath = false,
-    validMs: number = 21600000,
-  ): string {
+  serveFile(userId: number, fsPath: string, isPublic: boolean = false, dontCachePath = false, validMs: number = 21600000): string {
     if (!dontCachePath) {
       const existingAsset = this._internalAssetPaths.get(fsPath);
 
@@ -160,10 +136,7 @@ export default class FilesystemSystem extends System {
     return `/api/asset/raw/${assetId}`;
   }
 
-  async getUserPermissions(
-    userId: number,
-    fsPath: string,
-  ): Promise<{ read: boolean; write: boolean }> {
+  async getUserPermissions(userId: number, fsPath: string): Promise<{ read: boolean; write: boolean }> {
     const user = (await this.instance.sys.users.getUserById(userId))!;
 
     if (await user.isAdministrator())

@@ -1,0 +1,25 @@
+{
+  "id": "uk.ewsgit.console",
+  "displayName": "Console",
+  "icon": {
+    "type": "icon",
+    "value": "./web/node_modules/@material-symbols/svg-700/outlined/terminal.svg"
+  },
+  "description": "The administrator instance console as an application",
+  "authors": [
+    {
+      "name": "Ewsgit",
+      "link": "<https://ewsgit.uk>"
+    }
+  ],
+  "license": "MIT",
+  "source": "https://github.com/onlineworkspace/workspace/src/branch/main/packages/applications/uk.ewsgit.console",
+  "modules": {
+    "web": {
+      "path": "./web"
+    },
+    "bun": {
+      "path": "./backend/index.ts"
+    }
+  }
+}

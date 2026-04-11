@@ -1,27 +1,27 @@
-import UKCard from "@tcsw/uikit-solid/src/components/card/UKCard.jsx";
-import UKText from "@tcsw/uikit-solid/src/components/text/UKText.jsx";
-import { Suspense, type Component } from "solid-js";
-import styles from "./Layout.module.scss";
+import UKCard from "@onlineworkspace/uikit-solid/src/components/card/UKCard.jsx";
+import UKIndeterminateSpinner from "@onlineworkspace/uikit-solid/src/components/indeterminateSpinner/UKIndeterminateSpinner.jsx";
+import UKText from "@onlineworkspace/uikit-solid/src/components/text/UKText.jsx";
 import type { RouteSectionProps } from "@solidjs/router";
-import UKIndeterminateSpinner from "@tcsw/uikit-solid/src/components/indeterminateSpinner/UKIndeterminateSpinner.jsx";
+import { type Component, Suspense } from "solid-js";
 import backend from "../../lib/backend";
+import styles from "./Layout.module.scss";
 
 const UserSelectLayout: Component<RouteSectionProps<unknown>> = (props) => {
-    return (
-        <div class={styles.root}>
-            <img class={styles.background} src={backend("/api/instance/login/background")} />
-            <img class={styles.banner} src={backend("/api/instance/login/banner")} />
-            <Suspense fallback={<UKIndeterminateSpinner />}>{props.children}</Suspense>
-            <UKCard color={"outlined"} class={styles.copyrightContainer}>
-                <UKText role={"title"} size={"m"} emphasized={true}>
-                    Workspace Alpha
-                </UKText>
-                <UKText href="https://tcsw.uk" role={"body"} size={"s"} emphasized={true}>
-                    © Copyright Tricolor Software 2026
-                </UKText>
-            </UKCard>
-        </div>
-    );
+  return (
+    <div class={styles.root}>
+      <img class={styles.background} src={backend("/api/instance/login/background")} />
+      <img class={styles.banner} src={backend("/api/instance/login/banner")} />
+      <Suspense fallback={<UKIndeterminateSpinner />}>{props.children}</Suspense>
+      <UKCard color={"outlined"} class={styles.copyrightContainer}>
+        <UKText role={"title"} size={"m"} emphasized={true}>
+          Online Workspace Alpha
+        </UKText>
+        <UKText href="https://ewsgit.uk" role={"body"} size={"s"} emphasized={true}>
+          © Copyright Ewsgit 2026
+        </UKText>
+      </UKCard>
+    </div>
+  );
 };
 
 export default UserSelectLayout;

@@ -1,11 +1,11 @@
 import APPS_ICON from "@material-symbols/svg-700/outlined/apps.svg";
+import { DividerDirection } from "@onlineworkspace/uikit-solid/src/components/divider/lib/direction.js";
+import UKDivider from "@onlineworkspace/uikit-solid/src/components/divider/UKDivider.jsx";
+import UKIconButton from "@onlineworkspace/uikit-solid/src/components/iconButton/UKIconButton.jsx";
+import UKList from "@onlineworkspace/uikit-solid/src/components/list/UKList.jsx";
+import UKListItem from "@onlineworkspace/uikit-solid/src/components/list/UKListItem.jsx";
+import UKText from "@onlineworkspace/uikit-solid/src/components/text/UKText.jsx";
 import { useNavigate } from "@solidjs/router";
-import { DividerDirection } from "@tcsw/uikit-solid/src/components/divider/lib/direction.js";
-import UKDivider from "@tcsw/uikit-solid/src/components/divider/UKDivider.jsx";
-import UKIconButton from "@tcsw/uikit-solid/src/components/iconButton/UKIconButton.jsx";
-import UKList from "@tcsw/uikit-solid/src/components/list/UKList.jsx";
-import UKListItem from "@tcsw/uikit-solid/src/components/list/UKListItem.jsx";
-import UKText from "@tcsw/uikit-solid/src/components/text/UKText.jsx";
 import { type Component, createResource, For } from "solid-js";
 import trpc from "../../../../../../lib/trpc";
 import styles from "./NavigationRailApplications.module.scss";

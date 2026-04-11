@@ -1,9 +1,9 @@
-import UKButton from "@tcsw/uikit-solid/src/components/button/UKButton.jsx";
-import UKCard from "@tcsw/uikit-solid/src/components/card/UKCard.jsx";
-import { DividerDirection } from "@tcsw/uikit-solid/src/components/divider/lib/direction.js";
-import UKDivider from "@tcsw/uikit-solid/src/components/divider/UKDivider.jsx";
-import UKIcon from "@tcsw/uikit-solid/src/components/icon/UKIcon.jsx";
-import UKText from "@tcsw/uikit-solid/src/components/text/UKText.jsx";
+import UKButton from "@onlineworkspace/uikit-solid/src/components/button/UKButton.jsx";
+import UKCard from "@onlineworkspace/uikit-solid/src/components/card/UKCard.jsx";
+import { DividerDirection } from "@onlineworkspace/uikit-solid/src/components/divider/lib/direction.js";
+import UKDivider from "@onlineworkspace/uikit-solid/src/components/divider/UKDivider.jsx";
+import UKIcon from "@onlineworkspace/uikit-solid/src/components/icon/UKIcon.jsx";
+import UKText from "@onlineworkspace/uikit-solid/src/components/text/UKText.jsx";
 import { type Component, For } from "solid-js";
 import type { WorkspacesNotification } from "../../../../../../../../../systems/notifications";
 import styles from "./Notification.module.scss";

@@ -6,8 +6,7 @@ import type { WorkspacesApplication } from "./applications/application.js";
 import type { WorkspacesApplicationServiceStatus } from "./applications/serviceStatus.js";
 import { WorkspacesNotificationPriority } from "./notifications.js";
 
-const APPLICATIONS_CONFIG_FILE_PATH = (subsystem: System) =>
-  path.join(subsystem.instance.sys.filesystem.FS_ROOT, "applications.json");
+const APPLICATIONS_CONFIG_FILE_PATH = (subsystem: System) => path.join(subsystem.instance.sys.filesystem.FS_ROOT, "applications.json");
 
 interface AvailableWorkspacesApplication {
   path: string;
@@ -28,9 +27,7 @@ export default class ApplicationsSystem extends System {
   }
 
   getEnabledApplications(): AvailableWorkspacesApplication[] {
-    return this.enabledApplications
-      .map((a) => this.availableApplications.find((aa) => aa.manifest?.id === a))
-      .filter((a) => a !== undefined);
+    return this.enabledApplications.map((a) => this.availableApplications.find((aa) => aa.manifest?.id === a)).filter((a) => a !== undefined);
   }
 
   async updateWebRouter() {
@@ -51,30 +48,22 @@ export default class ApplicationsSystem extends System {
       applicationsInfill = `<Route path="*" component={() => <div style={{ "text-align": "center" }}>How peculiar. You have no applications installed, please ask an administrator to install some via the command-line interface.</div>}/>`;
     }
 
-    const applicationsWebRouterTemplate = `import { Route } from "@solidjs/router";import { type Component, lazy, Suspense } from "solid-js";import UKIndeterminateSpinner from "@tcsw/uikit-solid/src/components/indeterminateSpinner/UKIndeterminateSpinner.tsx";${applicationImportsInfill};const ApplicationsRouter: Component = () => {return (<>${applicationsInfill}</>);};export default ApplicationsRouter`;
+    const applicationsWebRouterTemplate = `import { Route } from "@solidjs/router";import { type Component, lazy, Suspense } from "solid-js";import UKIndeterminateSpinner from "@onlineworkspace/uikit-solid/src/components/indeterminateSpinner/UKIndeterminateSpinner.tsx";${applicationImportsInfill};const ApplicationsRouter: Component = () => {return (<>${applicationsInfill}</>);};export default ApplicationsRouter`;
 
-    await fs.writeFile(
-      path.join(this.instance.sys.filesystem.FS_ROOT, "Applications.tsx"),
-      applicationsWebRouterTemplate,
-    );
+    await fs.writeFile(path.join(this.instance.sys.filesystem.FS_ROOT, "Applications.tsx"), applicationsWebRouterTemplate);
 
     return true;
   }
 
   async startup(): Promise<boolean> {
     try {
-      if (!fsExistsSync(APPLICATIONS_CONFIG_FILE_PATH(this)))
-        await fs.writeFile(APPLICATIONS_CONFIG_FILE_PATH(this), JSON.stringify([]));
+      if (!fsExistsSync(APPLICATIONS_CONFIG_FILE_PATH(this))) await fs.writeFile(APPLICATIONS_CONFIG_FILE_PATH(this), JSON.stringify([]));
 
-      this.availableApplications = JSON.parse(
-        (await fs.readFile(APPLICATIONS_CONFIG_FILE_PATH(this))).toString(),
-      );
+      this.availableApplications = JSON.parse((await fs.readFile(APPLICATIONS_CONFIG_FILE_PATH(this))).toString());
 
       for (const defaultApplication of this.instance.sys.configuration.defaultApplications) {
         if (!this.availableApplications.find((aa) => aa.path.endsWith(defaultApplication.id))) {
-          this.log.info(
-            `The instance is missing default application '${defaultApplication.id}', installing it now...`,
-          );
+          this.log.info(`The instance is missing default application '${defaultApplication.id}', installing it now...`);
           await this.installApplication(defaultApplication.uri);
           await this.enableApplication(defaultApplication.id);
         }
@@ -89,9 +78,7 @@ export default class ApplicationsSystem extends System {
       }
 
       for (const app of this.availableApplications) {
-        this.log.info(
-          `application '${app.manifest?.id}' is ${app.enabled ? "enabled" : "disabled"}`,
-        );
+        this.log.info(`application '${app.manifest?.id}' is ${app.enabled ? "enabled" : "disabled"}`);
       }
 
       await this.updateWebRouter();
@@ -101,7 +88,7 @@ export default class ApplicationsSystem extends System {
           path.join(this.instance.sys.filesystem.FS_ROOT, "package.json"),
           `{
     "name": "workspaces-fs",
-    "author": "Tricolor Software",
+    "author": "Ewsgit",
     "dependencies": {
         "@solidjs/router": "^0.15.3",
         "solid-js": "^1.9.8",
@@ -166,17 +153,10 @@ export default class ApplicationsSystem extends System {
   // ssh - clones as a git repository to /fs/applicatons & adds to /fs/applications.json
   // https - downloads as a zip file and extracts to /fs/applications & adds to /fs/applications.json
   async installApplication(applicationURI: string): Promise<boolean> {
-    let applicationPath: string = path.join(
-      this.instance.sys.filesystem.FS_ROOT,
-      "application-failed-to-install",
-    );
+    let applicationPath: string = path.join(this.instance.sys.filesystem.FS_ROOT, "application-failed-to-install");
 
     if (applicationURI.startsWith("local:")) {
-      applicationPath = path.join(
-        this.instance.sys.filesystem.SRC_ROOT,
-        "../../applications/",
-        applicationURI.slice("local:".length),
-      );
+      applicationPath = path.join(this.instance.sys.filesystem.SRC_ROOT, "../../applications/", applicationURI.slice("local:".length));
     }
 
     if (applicationURI.startsWith("file:")) {
@@ -194,9 +174,7 @@ export default class ApplicationsSystem extends System {
     }
 
     if (this.availableApplications.find((a) => a.path === applicationPath)) {
-      this.log.warning(
-        `Cannot install application at path -> '${applicationPath}' as it is already installed!`,
-      );
+      this.log.warning(`Cannot install application at path -> '${applicationPath}' as it is already installed!`);
       return false;
     }
 
@@ -206,9 +184,7 @@ export default class ApplicationsSystem extends System {
 
     await this.saveApplicationsConfig();
 
-    for (const administrator of (await this.instance.sys.users.getAllUsers()).filter((u) =>
-      u.isAdministrator(),
-    )) {
+    for (const administrator of (await this.instance.sys.users.getAllUsers()).filter((u) => u.isAdministrator())) {
       this.instance.sys.notifications.send(
         administrator.userId,
         "instance.system.application.install",
@@ -243,15 +219,11 @@ export default class ApplicationsSystem extends System {
       return false;
     }
 
-    this.availableApplications = this.availableApplications.filter(
-      (a) => a.manifest?.id !== applicationId,
-    );
+    this.availableApplications = this.availableApplications.filter((a) => a.manifest?.id !== applicationId);
 
     await this.saveApplicationsConfig();
 
-    for (const administrator of (await this.instance.sys.users.getAllUsers()).filter((u) =>
-      u.isAdministrator(),
-    )) {
+    for (const administrator of (await this.instance.sys.users.getAllUsers()).filter((u) => u.isAdministrator())) {
       this.instance.sys.notifications.send(
         administrator.userId,
         "instance.system.application.uninstall",
@@ -281,13 +253,9 @@ export default class ApplicationsSystem extends System {
   async loadApplication(applicationPath: string): Promise<boolean> {
     const APPLICATION_MANIFEST_PATH = path.join(applicationPath, "manifest.json");
 
-    const applicationManifest = JSON.parse(
-      (await fs.readFile(APPLICATION_MANIFEST_PATH)).toString(),
-    );
+    const applicationManifest = JSON.parse((await fs.readFile(APPLICATION_MANIFEST_PATH)).toString());
 
-    const alreadyRegisteredApplication = this.availableApplications.find(
-      (a) => a.path === applicationPath,
-    );
+    const alreadyRegisteredApplication = this.availableApplications.find((a) => a.path === applicationPath);
 
     if (alreadyRegisteredApplication) {
       alreadyRegisteredApplication.manifest = applicationManifest;
@@ -372,9 +340,7 @@ export default class ApplicationsSystem extends System {
       }
     }
 
-    for (const administrator of (await this.instance.sys.users.getAllUsers()).filter((u) =>
-      u.isAdministrator(),
-    )) {
+    for (const administrator of (await this.instance.sys.users.getAllUsers()).filter((u) => u.isAdministrator())) {
       this.instance.sys.notifications.send(
         administrator.userId,
         "instance.system.application.enable",
@@ -434,9 +400,7 @@ export default class ApplicationsSystem extends System {
 
     const self = this;
 
-    for (const administrator of (await this.instance.sys.users.getAllUsers()).filter((u) =>
-      u.isAdministrator(),
-    ))
+    for (const administrator of (await this.instance.sys.users.getAllUsers()).filter((u) => u.isAdministrator()))
       this.instance.sys.notifications.send(
         administrator.userId,
         "instance.system.application.disable",

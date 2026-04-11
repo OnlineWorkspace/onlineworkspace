@@ -1,5 +1,5 @@
+import UKText from "@onlineworkspace/uikit-solid/src/components/text/UKText.jsx";
 import type { RouteSectionProps } from "@solidjs/router";
-import UKText from "@tcsw/uikit-solid/src/components/text/UKText.jsx";
 import type { Component } from "solid-js";
 
 const NotFoundPage: Component<RouteSectionProps<unknown>> = () => {

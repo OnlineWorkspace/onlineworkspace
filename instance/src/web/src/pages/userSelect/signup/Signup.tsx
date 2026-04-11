@@ -1,18 +1,20 @@
+import UKAvatar from "@onlineworkspace/uikit-solid/src/components/avatar/UKAvatar.tsx";
+import UKButton, { AffirmativeButtonState } from "@onlineworkspace/uikit-solid/src/components/button/UKButton.tsx";
+import UKCard from "@onlineworkspace/uikit-solid/src/components/card/UKCard.tsx";
+import { DividerDirection } from "@onlineworkspace/uikit-solid/src/components/divider/lib/direction.ts";
+import UKDivider from "@onlineworkspace/uikit-solid/src/components/divider/UKDivider.tsx";
+import UKIndeterminateSpinner from "@onlineworkspace/uikit-solid/src/components/indeterminateSpinner/UKIndeterminateSpinner.tsx";
+import UKSearchableDropdownMenu from "@onlineworkspace/uikit-solid/src/components/searchableDropdownMenu/UKSearchableDropdownMenu.tsx";
+import UKText from "@onlineworkspace/uikit-solid/src/components/text/UKText.tsx";
+import UKTextField from "@onlineworkspace/uikit-solid/src/components/textField/UKTextField.tsx";
 import { useNavigate, usePreloadRoute } from "@solidjs/router";
-import UKAvatar from "@tcsw/uikit-solid/src/components/avatar/UKAvatar.tsx";
-import UKButton, { AffirmativeButtonState } from "@tcsw/uikit-solid/src/components/button/UKButton.tsx";
-import UKCard from "@tcsw/uikit-solid/src/components/card/UKCard.tsx";
-import { DividerDirection } from "@tcsw/uikit-solid/src/components/divider/lib/direction.ts";
-import UKDivider from "@tcsw/uikit-solid/src/components/divider/UKDivider.tsx";
-import UKIndeterminateSpinner from "@tcsw/uikit-solid/src/components/indeterminateSpinner/UKIndeterminateSpinner.tsx";
-import UKSearchableDropdownMenu from "@tcsw/uikit-solid/src/components/searchableDropdownMenu/UKSearchableDropdownMenu.tsx";
-import UKText from "@tcsw/uikit-solid/src/components/text/UKText.tsx";
-import UKTextField from "@tcsw/uikit-solid/src/components/textField/UKTextField.tsx";
 import clsx from "clsx";
 import { type Component, createResource, createSignal, Match, Switch } from "solid-js";
 import trpc from "../../../lib/trpc";
 import styles from "./Signup.module.scss";
 import Email from "./stages/Email/Email";
+import Password from "./stages/Password/Password";
+import Profile from "./stages/Profile/Profile";
 import TermsOfUse from "./stages/TermsOfUse/TermsOfUse";
 import TwoFactorAuthentication from "./stages/TwoFactorAuthentication/TwoFactorAuthentication";
 import Username from "./stages/Username/Username";
@@ -76,121 +78,26 @@ const UserSelectPage: Component = () => {
         />
       </Match>
       <Match when={stage() === UserSelectStage.Password}>
-        <UKCard color={"filled"} class={styles.modal}>
-          <UKText role={"title"} size={"l"} emphasized={true}>
-            Set Password
-          </UKText>
-          <UKDivider direction={DividerDirection.horizontal} />
-          <UKTextField
-            shouldMask={true}
-            color={"outlined"}
-            label={"Password*"}
-            defaultValue={password()}
-            value={password()}
-            onValueChange={setPassword}
-            supportingText={"*required"}
-            error={password() !== confirmedPassword()}
-          />
-          <UKTextField
-            shouldMask={true}
-            color={"outlined"}
-            label={"Confirm Password*"}
-            defaultValue={confirmedPassword()}
-            value={confirmedPassword()}
-            onValueChange={setConfirmedPassword}
-            supportingText={"*required"}
-            error={password() !== confirmedPassword()}
-          />
-          <div class={styles.stageButtons}>
-            <UKButton
-              onClick={() => {
-                if (requirements()?.email) {
-                  setStage(UserSelectStage.VerifyEmail);
-                } else {
-                  setStage(UserSelectStage.Username);
-                }
-              }}
-              color={"tonal"}
-            >
-              Back
-            </UKButton>
-            <UKButton
-              disabled={password() !== confirmedPassword() || password() === ""}
-              onClick={() => {
-                setStage(UserSelectStage.Profile);
-              }}
-              color={"filled"}
-            >
-              Continue
-            </UKButton>
-          </div>
-        </UKCard>
+        <Password
+          password={password}
+          setPassword={setPassword}
+          confirmedPassword={confirmedPassword}
+          setConfirmedPassword={setConfirmedPassword}
+          requirements={requirements}
+          setStage={setStage}
+        />
       </Match>
       <Match when={stage() === UserSelectStage.Profile}>
-        <UKCard color={"filled"} class={clsx(styles.modal, styles.profileStage)}>
-          <UKText role={"title"} size={"l"} emphasized={true}>
-            Setup Profile
-          </UKText>
-          <UKDivider direction={DividerDirection.horizontal} />
-          <UKAvatar class={styles.avatar} size={"l"} username={username()} avatar={"/assets/placeholder/avatar.png"} />
-          <UKText class={styles.displayName} role={"headline"} align={"center"} size={"l"} emphasized={true}>
-            {displayName() || username()}
-          </UKText>
-          <UKText class={styles.username} role={"body"} align={"center"} size={"m"}>
-            {`@${username()}`}
-          </UKText>
-          <UKText class={styles.pronouns} role={"label"} align={"center"} size={"s"}>
-            {gender() === "female" ? "she/her" : gender() === "male" ? "he/him" : "they/them"}
-          </UKText>
-          <UKTextField color={"outlined"} label={"Display Name"} defaultValue={displayName()} value={displayName()} onValueChange={setDisplayName} />
-          <UKSearchableDropdownMenu
-            inputColor={"outlined"}
-            label={"Gender"}
-            defaultValue={gender()}
-            // @ts-ignore
-            onValueChange={(val) => setGender(val.toLowerCase())}
-            items={[
-              {
-                id: "female",
-                type: "button",
-                label: "Female",
-              },
-              {
-                id: "male",
-                type: "button",
-                label: "Male",
-              },
-              {
-                id: "other",
-                type: "button",
-                label: "Other",
-              },
-            ]}
-          />
-          <UKTextField color={"outlined"} label={"Bio"} as={"textarea"} value={bio()} defaultValue={bio()} onValueChange={setBio} />
-          <div class={styles.stageButtons}>
-            <UKButton
-              onClick={() => {
-                setStage(UserSelectStage.TwoFactorAuthentication);
-              }}
-              color={"tonal"}
-            >
-              Back
-            </UKButton>
-            <UKButton
-              onClick={() => {
-                if (displayName() === "") {
-                  setDisplayName(username());
-                }
-
-                setStage(UserSelectStage.TermsOfUse);
-              }}
-              color={"filled"}
-            >
-              Continue
-            </UKButton>
-          </div>
-        </UKCard>
+        <Profile
+          username={username}
+          displayName={displayName}
+          setDisplayName={setDisplayName}
+          gender={gender}
+          setGender={setGender}
+          bio={bio}
+          setBio={setBio}
+          setStage={setStage}
+        />
       </Match>
       <Match when={stage() === UserSelectStage.TermsOfUse}>
         <TermsOfUse
@@ -208,7 +115,7 @@ const UserSelectPage: Component = () => {
             });
 
             if (resp.type === "success") {
-              preload("/app/uk.tcsw.dashboard");
+              preload("/app/uk.ewsgit.dashboard");
               return {
                 state: AffirmativeButtonState.Success,
                 cb() {

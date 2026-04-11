@@ -1,7 +1,7 @@
+import UKNavigationRail from "@onlineworkspace/uikit-solid/src/components/navigationRail/UKNavigationRail.jsx";
+import UKText from "@onlineworkspace/uikit-solid/src/components/text/UKText.jsx";
+import useIsMobile from "@onlineworkspace/uikit-solid/src/core/useIsMobile.js";
 import { useLocation, useNavigate } from "@solidjs/router";
-import UKNavigationRail from "@tcsw/uikit-solid/src/components/navigationRail/UKNavigationRail.jsx";
-import UKText from "@tcsw/uikit-solid/src/components/text/UKText.jsx";
-import useIsMobile from "@tcsw/uikit-solid/src/core/useIsMobile.js";
 import { type Component, createResource, createSignal, type ParentProps, Show } from "solid-js";
 import trpc from "../../lib/trpc";
 import NavigationRailApplications from "./components/NavigationRail/components/navigationRailApplications/NavigationRailApplications";

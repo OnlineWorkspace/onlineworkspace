@@ -1,8 +1,8 @@
-import UKButton from "@tcsw/uikit-solid/src/components/button/UKButton.jsx";
-import UKCard from "@tcsw/uikit-solid/src/components/card/UKCard.jsx";
-import UKDivider from "@tcsw/uikit-solid/src/components/divider/UKDivider.jsx";
-import UKText from "@tcsw/uikit-solid/src/components/text/UKText.jsx";
-import UKTextField from "@tcsw/uikit-solid/src/components/textField/UKTextField.jsx";
+import UKButton from "@onlineworkspace/uikit-solid/src/components/button/UKButton.jsx";
+import UKCard from "@onlineworkspace/uikit-solid/src/components/card/UKCard.jsx";
+import UKDivider from "@onlineworkspace/uikit-solid/src/components/divider/UKDivider.jsx";
+import UKText from "@onlineworkspace/uikit-solid/src/components/text/UKText.jsx";
+import UKTextField from "@onlineworkspace/uikit-solid/src/components/textField/UKTextField.jsx";
 import { type Accessor, type Component, createSignal } from "solid-js";
 import trpc from "../../../../../lib/trpc";
 import { UserSelectStage } from "../../Signup";

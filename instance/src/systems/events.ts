@@ -1,4 +1,4 @@
-import { Instance } from "../index.js";
+import type { Instance } from "../index.js";
 import System from "../system.js";
 
 export enum WorkspacesEvent {
@@ -69,8 +69,6 @@ export default class EventSystem extends System {
       clearInterval(dailyTimer);
       clearInterval(weeklyTimer);
     });
-
-    return this;
   }
 
   on(eventType: WorkspacesEvent, cb: () => void) {
@@ -84,7 +82,7 @@ export default class EventSystem extends System {
   }
 
   invoke(eventType: WorkspacesEvent) {
-    let events = this.__internal_eventListeners[eventType];
+    const events = this.__internal_eventListeners[eventType];
 
     if (!events) {
       return this;

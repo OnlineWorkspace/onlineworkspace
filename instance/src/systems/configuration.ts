@@ -1,6 +1,6 @@
+import { promises as fs, existsSync as fsExistsSync, readFileSync as fsReadFileSync } from "node:fs";
 import * as os from "node:os";
-import { promises as fs, existsSync as fsExistsSync, readFileSync as fsReadFileSync } from "fs";
-import path from "path";
+import path from "node:path";
 import type { Instance } from "../index.js";
 import System from "../system.js";
 
@@ -11,12 +11,10 @@ export enum WorkspacesFeatureFlags {
 }
 
 export const FEATURE_FLAG_DESCRIPTIONS = {
-  [WorkspacesFeatureFlags.SlashCommands]:
-    "Enable the ability to use slash commands in the instance's console",
+  [WorkspacesFeatureFlags.SlashCommands]: "Enable the ability to use slash commands in the instance's console",
   [WorkspacesFeatureFlags.ShootYourselfInTheFoot]:
     "Allow administrators to alter settings / configuration options which may cause the instance to malfunction. (Only enable this if you are sure you know what you are doing!)",
-  [WorkspacesFeatureFlags.AllowUserSignups]:
-    "Allow new users to create accounts from the instance user login page",
+  [WorkspacesFeatureFlags.AllowUserSignups]: "Allow new users to create accounts from the instance user login page",
 };
 
 export default class ConfigurationSystem extends System {
@@ -38,6 +36,13 @@ export default class ConfigurationSystem extends System {
   signupRequirements: {
     email: boolean;
     twoFactorAuthentication: boolean;
+    passwordMinimumLength?: number;
+    passwordContains?: {
+      minimumUppercase?: number;
+      minimumLowercase?: number;
+      minimumNumbers?: number;
+      minimumSymbols?: number;
+    };
   };
   displayName: string;
   mailServer: {
@@ -63,19 +68,32 @@ export default class ConfigurationSystem extends System {
         password: "postgres",
         host: "localhost",
         port: 5432,
-        database: "tricolor_workspaces",
+        database: "onlineworkspace_workspace",
       },
     };
 
-    if (process.env.POSTGRES_DATABASE_HOST)
-      this.databases.postgres.host = process.env.POSTGRES_DATABASE_HOST;
+    if (process.env.POSTGRES_DATABASE_HOST) this.databases.postgres.host = process.env.POSTGRES_DATABASE_HOST;
 
     this.backendUrl = "https://localhost";
     // localhost and the current machine's local ip
-    this.webUrl = ["https://localhost", `https://${os.networkInterfaces().eth0?.[0].address}`];
+    this.webUrl = [
+      "https://localhost",
+      // @ts-ignore
+      Object.values(os.networkInterfaces())
+        .flat()
+        .filter((networkInterface) => networkInterface!.internal === false && networkInterface!.family === "IPv4")
+        .map((networkInterface) => `https://${networkInterface!.address}`),
+    ];
     this.signupRequirements = {
       email: false,
       twoFactorAuthentication: false,
+      passwordMinimumLength: 5,
+      passwordContains: {
+        minimumLowercase: 1,
+        minimumNumbers: 1,
+        minimumSymbols: 1,
+        minimumUppercase: 1,
+      },
     };
     this.displayName = "Workspace";
     this.mailServer = {
@@ -109,49 +127,31 @@ export default class ConfigurationSystem extends System {
       lastUpdated: Date.now(),
     };
 
-    this.defaultQuickShortcuts = [
-      "uk.tcsw.dashboard",
-      "uk.tcsw.store",
-      "uk.tcsw.settings",
-      "uk.tcsw.photos",
-      "uk.tcsw.files",
-    ];
+    this.defaultQuickShortcuts = ["uk.ewsgit.dashboard", "uk.ewsgit.store", "uk.ewsgit.settings", "uk.ewsgit.photos", "uk.ewsgit.files"];
 
     this.defaultApplications = [
-      { id: "uk.tcsw.dashboard", uri: "local:uk.tcsw.dashboard" },
-      { id: "uk.tcsw.store", uri: "local:uk.tcsw.store" },
-      { id: "uk.tcsw.settings", uri: "local:uk.tcsw.settings" },
-      { id: "uk.tcsw.photos", uri: "local:uk.tcsw.photos" },
-      { id: "uk.tcsw.files", uri: "local:uk.tcsw.files" },
+      { id: "uk.ewsgit.dashboard", uri: "local:uk.ewsgit.dashboard" },
+      { id: "uk.ewsgit.store", uri: "local:uk.ewsgit.store" },
+      { id: "uk.ewsgit.settings", uri: "local:uk.ewsgit.settings" },
+      { id: "uk.ewsgit.photos", uri: "local:uk.ewsgit.photos" },
+      { id: "uk.ewsgit.files", uri: "local:uk.ewsgit.files" },
     ];
 
-    if (
-      fsExistsSync(path.join(this.instance.sys.filesystem.AUTOINSTALL_PATH, "configuration.json"))
-    ) {
-      this.log.info(
-        "Auto-install configuration detected. Loading configuration from auto-install.",
-      );
+    if (fsExistsSync(path.join(this.instance.sys.filesystem.AUTOINSTALL_PATH, "configuration.json"))) {
+      this.log.info("Auto-install configuration detected. Loading configuration from auto-install.");
 
-      const autoInstallConfig = JSON.parse(
-        fsReadFileSync(
-          path.join(this.instance.sys.filesystem.AUTOINSTALL_PATH, "configuration.json"),
-        ).toString(),
-      );
+      const autoInstallConfig = JSON.parse(fsReadFileSync(path.join(this.instance.sys.filesystem.AUTOINSTALL_PATH, "configuration.json")).toString());
 
-      if (autoInstallConfig.enabledFeatures)
-        this.enabledFeatures = autoInstallConfig.enabledFeatures;
+      if (autoInstallConfig.enabledFeatures) this.enabledFeatures = autoInstallConfig.enabledFeatures;
       if (autoInstallConfig.databases) this.databases = autoInstallConfig.databases;
       if (autoInstallConfig.backendUrl) this.backendUrl = autoInstallConfig.backendUrl;
       if (autoInstallConfig.webUrl) this.webUrl = autoInstallConfig.webUrl;
-      if (autoInstallConfig.signupRequirements)
-        this.signupRequirements = autoInstallConfig.signupRequirements;
+      if (autoInstallConfig.signupRequirements) this.signupRequirements = autoInstallConfig.signupRequirements;
       if (autoInstallConfig.displayName) this.displayName = autoInstallConfig.displayName;
       if (autoInstallConfig.mailserver) this.mailServer = autoInstallConfig.mailserver;
       if (autoInstallConfig.termsOfUse) this.termsOfUse = autoInstallConfig.termsOfUse;
-      if (autoInstallConfig.defaultQuickShortcuts)
-        this.defaultQuickShortcuts = autoInstallConfig.defaultQuickShortcuts;
-      if (autoInstallConfig.defaultApplications)
-        this.defaultApplications = autoInstallConfig.defaultApplications;
+      if (autoInstallConfig.defaultQuickShortcuts) this.defaultQuickShortcuts = autoInstallConfig.defaultQuickShortcuts;
+      if (autoInstallConfig.defaultApplications) this.defaultApplications = autoInstallConfig.defaultApplications;
     }
   }
 
@@ -176,10 +176,7 @@ export default class ConfigurationSystem extends System {
   }
 
   async saveConfiguration(): Promise<boolean> {
-    const CONFIGURATION_FILE_PATH = path.join(
-      this.instance.sys.filesystem.FS_ROOT,
-      "configuration.json",
-    );
+    const CONFIGURATION_FILE_PATH = path.join(this.instance.sys.filesystem.FS_ROOT, "configuration.json");
 
     await fs.writeFile(
       CONFIGURATION_FILE_PATH,
@@ -204,12 +201,9 @@ export default class ConfigurationSystem extends System {
   }
 
   async startup(): Promise<boolean> {
-    const CONFIGURATION_FILE_PATH = path.join(
-      this.instance.sys.filesystem.FS_ROOT,
-      "configuration.json",
-    );
+    const CONFIGURATION_FILE_PATH = path.join(this.instance.sys.filesystem.FS_ROOT, "configuration.json");
 
-    if (!(await fs.exists(CONFIGURATION_FILE_PATH))) {
+    if (!fsExistsSync(CONFIGURATION_FILE_PATH)) {
       await this.saveConfiguration();
     }
 
@@ -219,15 +213,12 @@ export default class ConfigurationSystem extends System {
     if (configurationFile.databases) this.databases = configurationFile.databases;
     if (configurationFile.backendUrl) this.backendUrl = configurationFile.backendUrl;
     if (configurationFile.webUrl) this.webUrl = configurationFile.webUrl;
-    if (configurationFile.signupRequirements)
-      this.signupRequirements = configurationFile.signupRequirements;
+    if (configurationFile.signupRequirements) this.signupRequirements = configurationFile.signupRequirements;
     if (configurationFile.displayName) this.displayName = configurationFile.displayName;
     if (configurationFile.mailserver) this.mailServer = configurationFile.mailserver;
     if (configurationFile.termsOfUse) this.termsOfUse = configurationFile.termsOfUse;
-    if (configurationFile.defaultQuickShortcuts)
-      this.defaultQuickShortcuts = configurationFile.defaultQuickShortcuts;
-    if (configurationFile.defaultApplications)
-      this.defaultApplications = configurationFile.defaultApplications;
+    if (configurationFile.defaultQuickShortcuts) this.defaultQuickShortcuts = configurationFile.defaultQuickShortcuts;
+    if (configurationFile.defaultApplications) this.defaultApplications = configurationFile.defaultApplications;
 
     for (const feature of Object.keys(WorkspacesFeatureFlags)) {
       this.log.info(

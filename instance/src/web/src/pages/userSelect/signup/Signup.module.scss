@@ -1,75 +1,41 @@
 .modal {
-    gap: 1rem;
+  gap: 1rem;
+  display: flex;
+  flex-direction: column;
+  width: max-content;
+  min-width: min(20rem, calc(100% - 2rem));
+
+  > .stageButtons {
     display: flex;
-    flex-direction: column;
-    width: max-content;
-    min-width: min(20rem, calc(100% - 2rem));
-
-    > .stageButtons {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        justify-content: space-between;
-        gap: 0.5rem;
-        width: 100%;
-    }
-}
-
-.profileStage {
-    &.modal {
-        > .avatar {
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        > .displayName {
-            font-variation-settings:
-                "wght" 900,
-                "wdth" 151,
-                "opsz" 8,
-                "GRAD" 60,
-                "XTRA" 475,
-                "XOPQ" 175,
-                "YOPQ" 100,
-                "YTLC" 570,
-                "YTAS" 850 !important;
-            text-align: center;
-            word-wrap: normal;
-        }
-
-        > .username {
-            margin-top: -0.75rem;
-            color: rgb(var(--uk-sys-color-secondary));
-        }
-
-        > .pronouns {
-            margin-top: -0.75rem;
-            color: rgb(var(--uk-sys-color-secondary), 0.75);
-        }
-    }
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    width: 100%;
+  }
 }
 
 .guidePromptStage {
-    &.modal {
-        > .continueSegment {
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            justify-content: space-between;
-            gap: 0.5rem;
-        }
+  &.modal {
+    > .continueSegment {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
     }
+  }
 }
 
 .guideStage {
-    &.modal {
-        > .continueSegment {
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            gap: 0.5rem;
-        }
+  &.modal {
+    > .continueSegment {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      gap: 0.5rem;
     }
+  }
 }

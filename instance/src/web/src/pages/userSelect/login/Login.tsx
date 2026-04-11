@@ -1,11 +1,11 @@
 import KEY_ICON from "@material-symbols/svg-700/outlined/key.svg";
+import UKButton, { AffirmativeButtonState } from "@onlineworkspace/uikit-solid/src/components/button/UKButton.tsx";
+import UKCard from "@onlineworkspace/uikit-solid/src/components/card/UKCard.tsx";
+import { DividerDirection } from "@onlineworkspace/uikit-solid/src/components/divider/lib/direction.ts";
+import UKDivider from "@onlineworkspace/uikit-solid/src/components/divider/UKDivider.tsx";
+import UKText from "@onlineworkspace/uikit-solid/src/components/text/UKText.tsx";
+import UKTextField from "@onlineworkspace/uikit-solid/src/components/textField/UKTextField.tsx";
 import { useNavigate, usePreloadRoute, useSearchParams } from "@solidjs/router";
-import UKButton, { AffirmativeButtonState } from "@tcsw/uikit-solid/src/components/button/UKButton.tsx";
-import UKCard from "@tcsw/uikit-solid/src/components/card/UKCard.tsx";
-import { DividerDirection } from "@tcsw/uikit-solid/src/components/divider/lib/direction.ts";
-import UKDivider from "@tcsw/uikit-solid/src/components/divider/UKDivider.tsx";
-import UKText from "@tcsw/uikit-solid/src/components/text/UKText.tsx";
-import UKTextField from "@tcsw/uikit-solid/src/components/textField/UKTextField.tsx";
 import { type Component, createEffect, createResource, createSignal } from "solid-js";
 import trpc from "../../../lib/trpc";
 import styles from "./Login.module.scss";

@@ -5,9 +5,11 @@
 }
 
 .root {
-  transition: var(--uk-sys-motion-easing-standard-normal) var(--uk-sys-motion-duration-150),
-  outline-width linear 0s,
-  outline-offset linear 0s;
+  transition:
+    var(--uk-sys-motion-easing-standard-normal)
+      var(--uk-sys-motion-duration-150),
+    outline-width linear 0s,
+    outline-offset linear 0s;
   display: flex;
   flex-direction: row;
   position: relative;
@@ -63,7 +65,9 @@
       }
 
       & input {
-        padding-top: calc(var(--uk-sys-typescale-body-small-line-height) + 0.5rem);
+        padding-top: calc(
+          var(--uk-sys-typescale-body-small-line-height) + 0.5rem
+        );
         padding-bottom: 0.5rem;
       }
     }
@@ -94,7 +98,8 @@
         top: 1px;
         left: 1rem;
         z-index: -1;
-        transition: var(--uk-sys-motion-easing-standard-decelerate) var(--uk-sys-motion-duration-100);
+        transition: var(--uk-sys-motion-easing-standard-decelerate)
+          var(--uk-sys-motion-duration-100);
       }
     }
 
@@ -153,6 +158,15 @@
       }
     }
   }
+
+  &:focus-within,
+  &:hover,
+  &:active,
+  &[data-force-focus="true"] {
+    .visibilityIcon {
+      opacity: 1;
+    }
+  }
 }
 
 .inputContainer {
@@ -163,7 +177,8 @@
   position: absolute;
   user-select: none;
   pointer-events: none;
-  transition: var(--uk-sys-motion-easing-standard-decelerate) var(--uk-sys-motion-duration-100);
+  transition: var(--uk-sys-motion-easing-standard-decelerate)
+    var(--uk-sys-motion-duration-100);
   padding-left: 1rem;
   padding-right: 1rem;
 
@@ -277,8 +292,16 @@ textarea.input {
 
 .trailingIcon {
   color: rgb(var(--uk-sys-color-on-surface-variant));
-  padding-right: 0.75rem;
-  width: 2.25rem;
+  margin-right: 0.75rem;
+  margin-top: auto;
+  margin-bottom: auto;
+  margin-left: 0.5rem;
 
   --icon-size: 1.5rem;
+}
+
+.visibilityIcon {
+  opacity: 0;
+  transition: opacity var(--uk-sys-motion-duration-150)
+    var(--uk-sys-motion-easing-standard-decelerate);
 }

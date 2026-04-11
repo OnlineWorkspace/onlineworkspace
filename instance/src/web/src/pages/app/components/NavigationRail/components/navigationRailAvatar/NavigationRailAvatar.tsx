@@ -1,9 +1,9 @@
 import LOGOUT_ICON from "@material-symbols/svg-700/outlined/logout.svg";
+import UKAvatar from "@onlineworkspace/uikit-solid/src/components/avatar/UKAvatar.jsx";
+import UKIconButton from "@onlineworkspace/uikit-solid/src/components/iconButton/UKIconButton.tsx";
+import UKText from "@onlineworkspace/uikit-solid/src/components/text/UKText.jsx";
+import useIsMobile from "@onlineworkspace/uikit-solid/src/core/useIsMobile.ts";
 import { useNavigate } from "@solidjs/router";
-import UKAvatar from "@tcsw/uikit-solid/src/components/avatar/UKAvatar.jsx";
-import UKIconButton from "@tcsw/uikit-solid/src/components/iconButton/UKIconButton.tsx";
-import UKText from "@tcsw/uikit-solid/src/components/text/UKText.jsx";
-import useIsMobile from "@tcsw/uikit-solid/src/core/useIsMobile.ts";
 import { type Component, createResource, Show } from "solid-js";
 import backend from "../../../../../../lib/backend";
 import trpc from "../../../../../../lib/trpc";
@@ -18,7 +18,7 @@ const NavigationRailAvatar: Component<{ expanded: boolean }> = (props) => {
     <div class={styles.root} data-expanded={props.expanded}>
       <UKAvatar
         onClick={() => {
-          navigate("/app/uk.tcsw.settings/profile");
+          navigate("/app/uk.ewsgit.settings/profile");
         }}
         class={styles.avatar}
         avatar={backend("/api/user/me/avatar/s")}

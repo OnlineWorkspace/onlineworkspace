@@ -1,0 +1,25 @@
+{
+  "id": "uk.ewsgit.files",
+  "displayName": "Files",
+  "icon": {
+    "type": "icon",
+    "value": "./web/node_modules/@material-symbols/svg-700/outlined/folder.svg"
+  },
+  "description": "Navigate and manage files in your Workspace",
+  "authors": [
+    {
+      "name": "Ewsgit",
+      "link": "<https://ewsgit.uk>"
+    }
+  ],
+  "license": "MIT",
+  "source": "https://github.com/onlineworkspace/workspace/src/branch/main/packages/applications/uk.ewsgit.files",
+  "modules": {
+    "web": {
+      "path": "./web"
+    },
+    "bun": {
+      "path": "./backend/index.ts"
+    }
+  }
+}

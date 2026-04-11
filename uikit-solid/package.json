@@ -1,10 +1,10 @@
 {
-  "name": "@tcsw/uikit-solid",
+  "name": "@onlineworkspace/uikit-solid",
   "version": "1.0.0",
   "description": "The Workspace UI framework for solid.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/tricolorsoftware/workspaces"
+    "url": "https://github.com/onlineworkspace/workspace"
   },
   "dependencies": {
     "@material-symbols/svg-700": "^0.42.3",

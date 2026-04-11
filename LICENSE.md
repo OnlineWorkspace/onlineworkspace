@@ -1,4 +1,4 @@
-# Copyright © 2026 Tricolor Software
+# Copyright © 2026 Ewsgit
 
 Licensed under the MIT License
 

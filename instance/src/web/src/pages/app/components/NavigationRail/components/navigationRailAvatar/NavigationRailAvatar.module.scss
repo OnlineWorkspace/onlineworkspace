@@ -87,8 +87,11 @@
       visibility: visible;
       pointer-events: all;
       opacity: 1;
-      transition: opacity var(--uk-sys-motion-duration-1000)
-        var(--uk-sys-motion-easing-emphasized-decelerate);
+      transition:
+        opacity var(--uk-sys-motion-duration-1000)
+          var(--uk-sys-motion-easing-emphasized-decelerate),
+        border-radius var(--uk-sys-motion-duration-250)
+          var(--uk-sys-motion-easing-emphasized-decelerate);
     }
 
     .nameContainer {

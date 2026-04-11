@@ -1,8 +1,8 @@
+import utils from "node:util";
+import * as OTPAuth from "otpauth";
 import type { Instance } from "../index.js";
 import System from "../system.js";
 import { WorkspacesNotificationPriority } from "./notifications.js";
-import utils from "node:util";
-import * as OTPAuth from "otpauth";
 
 export enum AuthorizedDeviceType {
   Desktop,
@@ -16,51 +16,30 @@ export const SESSION_VALID_TERM_MS = 7 * 24 * 60 * 60 * 1000;
 export default class AuthorizationSystem extends System {
   constructor(instance: Instance) {
     super("authorization", instance);
-
-    return this;
   }
 
   // Creates a new session for a user
   // @returns {string} the new session's sessionToken
-  async createSession(
-    userId: number,
-    password: string,
-    deviceId: AuthorizedDeviceType,
-    otpCode?: string,
-    ipAddress?: string,
-  ): Promise<string | undefined> {
+  async createSession(userId: number, password: string, deviceId: AuthorizedDeviceType, otpCode?: string, ipAddress?: string): Promise<string | undefined> {
     try {
       const db = this.instance.sys.database.postgres();
 
-      if (
-        !(await Bun.password.verify(
-          password,
-          (
-            await db`SELECT hashed_password FROM public.users WHERE id = ${userId}`
-          )?.[0]?.hashed_password,
-        ))
-      ) {
+      if (!(await Bun.password.verify(password, (await db`SELECT hashed_password FROM public.users WHERE id = ${userId}`)?.[0]?.hashed_password))) {
         return undefined;
       }
 
-      if (
-        await this.instance.sys.authorization.hasTwoFactorAuthenticationSecret(
-          userId,
-        )
-      ) {
+      if (await this.instance.sys.authorization.hasTwoFactorAuthenticationSecret(userId)) {
         if (!otpCode) {
           console.log("no otp code provided when creating session?");
           return undefined;
         }
 
-        let totp = new OTPAuth.TOTP({
+        const totp = new OTPAuth.TOTP({
           issuer: this.instance.sys.configuration.webUrl[0],
           label: `${this.instance.sys.configuration.displayName} (Workspace)`,
           algorithm: "SHA1",
           digits: 6,
-          secret: (
-            await db`SELECT two_factor_secret FROM public.users WHERE id = ${userId}`
-          )?.[0]?.two_factor_secret,
+          secret: (await db`SELECT two_factor_secret FROM public.users WHERE id = ${userId}`)?.[0]?.two_factor_secret,
         });
 
         if (totp.validate({ token: otpCode }) === null) {
@@ -76,9 +55,7 @@ export default class AuthorizationSystem extends System {
 
       if (await user?.isAdministrator()) {
         if (password === "password") {
-          this.log.warning(
-            `User (${userId})${await user?.getUsername()} has the default password! Please tell them to change it!`,
-          );
+          this.log.warning(`User (${userId})${await user?.getUsername()} has the default password! Please tell them to change it!`);
 
           setTimeout(() => {
             this.instance.sys.notifications.send(
@@ -104,8 +81,7 @@ export default class AuthorizationSystem extends System {
                   return {
                     action: {
                       type: "navigate",
-                      value:
-                        "/app/uk.tcsw.settings/authentication/reset-password",
+                      value: "/app/uk.ewsgit.settings/authentication/reset-password",
                     },
                   };
                 },
@@ -117,10 +93,7 @@ export default class AuthorizationSystem extends System {
 
       return `workspaces_session:${userId}:${sessionToken}`;
     } catch (err) {
-      this.log.warning(
-        `Failed to create session. -> ${userId} @ ${AuthorizedDeviceType[deviceId]}`,
-        utils.inspect(err),
-      );
+      this.log.warning(`Failed to create session. -> ${userId} @ ${AuthorizedDeviceType[deviceId]}`, utils.inspect(err));
 
       return undefined;
     }
@@ -134,9 +107,7 @@ export default class AuthorizationSystem extends System {
 
     const sessionsDb = this.instance.sys.database.postgres();
 
-    const session = (
-      await sessionsDb`SELECT session_id, valid_until FROM public.sessions WHERE user_id = ${userId} AND session_token = ${token}`
-    )?.[0];
+    const session = (await sessionsDb`SELECT session_id, valid_until FROM public.sessions WHERE user_id = ${userId} AND session_token = ${token}`)?.[0];
 
     if (Number(session?.valid_until) < Date.now()) {
       await sessionsDb`DELETE FROM public.sessions WHERE user_id = ${userId} AND session_token = ${token}`;
@@ -164,10 +135,7 @@ export default class AuthorizationSystem extends System {
   // Removes a user's session and invalidates it's token
   // @returns {true} the session is removed, and it's token is invalidated
   // @returns {undefined} the sessionToken is invalid
-  async endSessionById(
-    userId: number,
-    sessionId: number,
-  ): Promise<boolean | undefined> {
+  async endSessionById(userId: number, sessionId: number): Promise<boolean | undefined> {
     const sessionsDb = this.instance.sys.database.postgres();
 
     await sessionsDb`DELETE FROM public.sessions WHERE user_id = ${userId} AND session_id = ${sessionId}`;
@@ -202,11 +170,11 @@ export default class AuthorizationSystem extends System {
       return false;
     }
 
-    let [{ exists }] = await db`
-            SELECT (hashed_password IS NOT NULL) as exists
-            FROM public.users
-            WHERE id = ${userId}
-        `;
+    const [{ exists }] = await db`
+      SELECT (hashed_password IS NOT NULL) as exists
+      FROM public.users
+      WHERE id = ${userId}
+    `;
 
     return !!exists;
   }
@@ -223,7 +191,7 @@ export default class AuthorizationSystem extends System {
 
     try {
       await db`UPDATE public.users SET two_factor_secret = ${secret} WHERE id = ${userId}`;
-    } catch (err) {
+    } catch (_) {
       return false;
     }
 
@@ -240,11 +208,11 @@ export default class AuthorizationSystem extends System {
       return false;
     }
 
-    let [{ exists }] = await db`
-            SELECT (two_factor_secret IS NOT NULL) as exists
-            FROM public.users
-            WHERE id = ${userId}
-        `;
+    const [{ exists }] = await db`
+      SELECT (two_factor_secret IS NOT NULL) as exists
+      FROM public.users
+      WHERE id = ${userId}
+    `;
 
     return !!exists;
   }
@@ -259,8 +227,7 @@ export default class AuthorizationSystem extends System {
       return false;
     }
 
-    const userPasskeys =
-      await db`SELECT passkeys FROM public.users WHERE id = ${userId}`;
+    const userPasskeys = await db`SELECT passkeys FROM public.users WHERE id = ${userId}`;
 
     return userPasskeys?.[0]?.passkeys?.length > 0;
   }
@@ -280,15 +247,15 @@ export default class AuthorizationSystem extends System {
     // ip_address - the ip address of the session (string)
     // login_method - the authentication method used to log in (string)
     await db`CREATE TABLE IF NOT EXISTS Sessions (
-            session_id SERIAL PRIMARY KEY,
-            user_id INTEGER,
-            session_token TEXT,
-            device_type INTEGER,
-            valid_until BIGINT,
-            ip_address TEXT DEFAULT 'Anonymous',
-            login_method TEXT,
-            FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE
-        )`;
+      session_id SERIAL PRIMARY KEY,
+      user_id INTEGER,
+      session_token TEXT,
+      device_type INTEGER,
+      valid_until BIGINT,
+      ip_address TEXT DEFAULT 'Anonymous',
+      login_method TEXT,
+      FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE
+    )`;
 
     return true;
   }

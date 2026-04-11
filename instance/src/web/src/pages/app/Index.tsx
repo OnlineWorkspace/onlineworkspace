@@ -5,7 +5,7 @@ const AppIndex: Component = () => {
   const navigate = useNavigate();
 
   // this should be a trpc request to allow the user to change it
-  navigate("/app/uk.tcsw.dashboard");
+  navigate("/app/uk.ewsgit.dashboard");
 
   return null;
 };

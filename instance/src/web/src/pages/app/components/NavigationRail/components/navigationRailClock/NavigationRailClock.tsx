@@ -1,4 +1,4 @@
-import UKText from "@tcsw/uikit-solid/src/components/text/UKText.tsx";
+import UKText from "@onlineworkspace/uikit-solid/src/components/text/UKText.tsx";
 import clsx from "clsx";
 import { type Component, createSignal, onCleanup } from "solid-js";
 import styles from "./NavigationRailClock.module.scss";

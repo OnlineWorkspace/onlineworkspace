@@ -25,8 +25,8 @@ export default defineConfig({
   resolve: {
     alias: {
       "@solidjs/router": "/node_modules/@solidjs/router",
-      "@tcsw/uikit-solid": "/node_modules/@tcsw/uikit-solid",
-      "@tcsw/workspaces-applications": "/../../../fs/Applications.tsx",
+      "@onlineworkspace/uikit-solid": "/node_modules/@onlineworkspace/uikit-solid",
+      "@onlineworkspace/workspaces-applications": "/../../../fs/Applications.tsx",
     },
   },
 });

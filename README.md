@@ -152,11 +152,11 @@ To automatically configure a workspaces instance on the first run, create a dire
     "lastUpdated": 1774139372136
   },
   "defaultQuickShortcuts": [
-    "uk.tcsw.dashboard",
-    "uk.tcsw.store",
-    "uk.tcsw.settings",
-    "uk.tcsw.photos",
-    "uk.tcsw.files"
+    "uk.ewsgit.dashboard",
+    "uk.ewsgit.store",
+    "uk.ewsgit.settings",
+    "uk.ewsgit.photos",
+    "uk.ewsgit.files"
   ]
 }
 ```
