@@ -1,25 +1,25 @@
 .root {
-    position: relative;
-    z-index: 10;
+  position: relative;
+  z-index: 10;
 }
 
 .input {
-    position: relative;
-    z-index: 100;
+  position: relative;
+  z-index: 100;
 }
 
 .menu {
-    position: absolute;
-    z-index: 100;
-    width: 100%;
+  position: absolute;
+  z-index: 100;
+  width: 100%;
 }
 
 .outside {
-    z-index: 10;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: transparent;
-    position: fixed;
+  z-index: 10;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: transparent;
+  position: fixed;
 }

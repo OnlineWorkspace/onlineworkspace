@@ -1,7 +1,7 @@
 import VISIBILITY_ICON from "@material-symbols/svg-700/outlined/visibility.svg";
 import VISIBILITY_OFF_ICON from "@material-symbols/svg-700/outlined/visibility_off.svg";
 import clsx from "clsx";
-import { type Component, createEffect, createSignal } from "solid-js";
+import { type Accessor, type Component, createEffect, createSignal } from "solid-js";
 import type { DOMElement } from "solid-js/jsx-runtime";
 import UKIcon from "../icon/UKIcon";
 import styles from "./UKTextField.module.scss";
@@ -22,7 +22,7 @@ const UKTextField: Component<
     defaultValue?: string;
     value?: string;
     maximumCharacterCount?: number;
-    forceFocussed?: boolean;
+    forceVisualFocus?: boolean;
     as?: "textarea" | "input";
     error?: boolean;
     class?: string;
@@ -73,12 +73,7 @@ const UKTextField: Component<
     autocomplete: props.autocomplete,
   };
 
-  let didMount = false;
   createEffect(() => {
-    if (!didMount) {
-      didMount = true;
-      return;
-    }
     if (props.value === undefined) return;
 
     if (textAreaRef) {
@@ -95,7 +90,7 @@ const UKTextField: Component<
 
       props.onValueChange(inputRef.value);
     }
-  }, [props.value]);
+  });
 
   createEffect(() => {
     if ("shouldMask" in props) {
@@ -111,7 +106,13 @@ const UKTextField: Component<
 
   return (
     <div class={clsx(styles.container, props.containerClass)}>
-      <div class={styles.root} data-error={props.error} data-color={props.color} data-populated={characterLength() > 0} data-force-focus={props.forceFocussed}>
+      <div
+        class={styles.root}
+        data-error={props.error}
+        data-color={props.color}
+        data-populated={characterLength() > 0}
+        data-force-focus={props.forceVisualFocus}
+      >
         {props.leadingIcon && (
           <UKIcon onClick={props.leadingIcon.onClick} class={styles.leadingIcon}>
             {props.leadingIcon.icon}

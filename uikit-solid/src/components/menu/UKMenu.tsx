@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { type Component, createSignal, For } from "solid-js";
+import { type Accessor, type Component, createSignal, For } from "solid-js";
 import { Portal } from "solid-js/web";
 import UKDivider from "../divider/UKDivider.tsx";
 import UKIcon from "../icon/UKIcon.tsx";
@@ -38,13 +38,11 @@ type MenuItem =
 const UKMenu: Component<{
   items: (MenuItem | undefined)[];
   class?: string;
-  showMenu?: { x: number; y: number } | false;
+  showMenu: Accessor<{ x: number; y: number } | false>;
+  closeMenu(): void;
   vibrant?: boolean;
 }> = (props) => {
   const [ref, setRef] = createSignal<Element | undefined>();
-  const [showMenu, setShowMenu] = createSignal<{ x: number; y: number } | false>(
-    props.showMenu || false,
-  );
 
   return (
     <>
@@ -55,21 +53,24 @@ const UKMenu: Component<{
                     items={(props.items[selected() as number] as { children: MenuItem[] }).children || []}
                 />
             )}*/}
-      {showMenu() !== false && (
-        <Portal mount={ref()?.closest("[data-uikit-root]") || document.body}>
+      <div style={{ position: "fixed", "pointer-events": "none", visibility: "hidden", display: "none" }} ref={setRef}></div>
+      {props.showMenu() !== false && (
+        <Portal mount={ref()?.closest('[data-uikit-root="true"]') || document.body}>
+          {/** biome-ignore lint/a11y/useKeyWithClickEvents: <explanation> */}
+          {/** biome-ignore lint/a11y/noStaticElementInteractions: <explanation> */}
           <div
             class={styles.background}
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              setShowMenu(false);
+              props.closeMenu();
               const element = document.elementFromPoint(e.clientX, e.clientY);
               if (!element) return;
               if ("click" in element) if (typeof element.click === "function") element.click();
             }}
             onContextMenu={(e) => {
               e.preventDefault();
-              setShowMenu(false);
+              props.closeMenu();
               // let element = document.elementFromPoint(e.clientX, e.clientY);
               // if (!element) return;
               //
@@ -87,37 +88,36 @@ const UKMenu: Component<{
               e.stopPropagation();
             }}
           ></div>
+          {/** biome-ignore lint/a11y/useKeyWithClickEvents: <explanation> */}
+          {/** biome-ignore lint/a11y/noStaticElementInteractions: <explanation> */}
           <div
             data-vibrant={props.vibrant}
             onContextMenu={(e) => e.preventDefault()}
-            onClick={() => setShowMenu(false)}
+            onClick={() => props.closeMenu()}
             class={clsx(styles.root, props.class)}
             style={{
-              top: (showMenu() as { y: number }).y + "px",
-              left: (showMenu() as { x: number }).x + "px",
+              top: `${(props.showMenu() as { y: number }).y}px`,
+              left: `${(props.showMenu() as { x: number }).x}px`,
             }}
           >
             <For each={props.items}>
-              {(item, index) => {
+              {(item) => {
                 if (item === undefined) return null;
 
                 return (
                   <>
-                    {item.type === "divider" && (
-                      <UKDivider class={styles.divider} direction={"horizontal"} />
-                    )}
+                    {item.type === "divider" && <UKDivider class={styles.divider} direction={"horizontal"} />}
                     {item.type === "spacer" && <div class={styles.spacer} />}
                     {item.type === "button" && (
                       <button
+                        type="button"
                         disabled={item.disabled}
                         class={clsx(styles.button, item.selected && styles.selected)}
                         onClick={() => {
                           item.onClick();
                         }}
                       >
-                        {item.leadingIcon && (
-                          <UKIcon class={styles.icon}>{item.leadingIcon}</UKIcon>
-                        )}
+                        {item.leadingIcon && <UKIcon class={styles.icon}>{item.leadingIcon}</UKIcon>}
                         <div class={styles.text}>
                           <UKText class={styles.label} role={"label"} size={"m"}>
                             {item.label}
@@ -130,6 +130,7 @@ const UKMenu: Component<{
                     )}
                     {item.type === "category" && (
                       <button
+                        type="button"
                         disabled={item.disabled}
                         class={clsx(styles.button, item.selected && styles.selected)}
                         // onMouseEnter={() => {
@@ -142,9 +143,7 @@ const UKMenu: Component<{
                           item.onClick?.();
                         }}
                       >
-                        {item.leadingIcon && (
-                          <UKIcon class={styles.icon}>{item.leadingIcon}</UKIcon>
-                        )}
+                        {item.leadingIcon && <UKIcon class={styles.icon}>{item.leadingIcon}</UKIcon>}
                         <div class={styles.text}>
                           <UKText class={styles.label} role={"label"} size={"m"}>
                             {item.label}

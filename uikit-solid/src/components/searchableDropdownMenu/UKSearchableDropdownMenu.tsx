@@ -61,16 +61,16 @@ const UKSearchableDropdownMenu: Component<{
       const cr = element.getBoundingClientRect();
 
       setShowMenu({
-        x: cr.left - element.offsetLeft,
-        y: cr.top - element.offsetTop,
+        x: cr.left,
+        y: cr.bottom,
       });
     });
 
-    element.addEventListener("focusout", (e) => {
-      e.preventDefault();
+    // element.addEventListener("focusout", (e) => {
+    //   e.preventDefault();
 
-      setShowMenu(false);
-    });
+    //   setShowMenu(false);
+    // });
   });
 
   return (
@@ -88,7 +88,6 @@ const UKSearchableDropdownMenu: Component<{
         label={props.label}
         defaultValue={query()}
         onValueChange={setQuery}
-        forceFocussed={showMenu() !== false}
         value={query()}
         onEscape={() => setShowMenu(false)}
         leadingIcon={props.inputLeadingIcon ? { icon: props.inputLeadingIcon } : undefined}
@@ -112,7 +111,10 @@ const UKSearchableDropdownMenu: Component<{
         //     })}
         // />
         <UKMenu
-          showMenu={showMenu()}
+          showMenu={showMenu}
+          closeMenu={() => {
+            setShowMenu(false);
+          }}
           items={queriedItems().map((i) => {
             if (i.type === "button") {
               return {
@@ -129,22 +131,6 @@ const UKSearchableDropdownMenu: Component<{
               type: "divider",
             };
           })}
-        />
-      )}
-      {showMenu() && (
-        <div
-          onClick={(e) => {
-            if (e.target === e.currentTarget) {
-              setShowMenu(false);
-
-              const a = document.elementFromPoint(e.clientX, e.clientY);
-              // @ts-ignore
-              a?.focus?.();
-              // @ts-ignore
-              a?.click?.();
-            }
-          }}
-          class={styles.outside}
         />
       )}
     </div>

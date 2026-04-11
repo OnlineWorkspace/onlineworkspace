@@ -1,220 +1,227 @@
 .background {
-    position: fixed;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  user-select: none;
+  background: transparent;
+  z-index: 20;
+}
+
+.root {
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  transform-origin: top left;
+  animation: animateIn 100ms ease-in-out forwards;
+  z-index: 21;
+
+  @keyframes animateIn {
+    from {
+      transform: scaleY(90%) scaleX(90%);
+    }
+    to {
+      transform: scaleY(100%) scaleX(100%);
+    }
+  }
+}
+
+.button {
+  position: relative;
+  padding-left: 12px;
+  padding-right: 12px;
+  border-radius: 0.25rem;
+  border: none;
+  height: 2.75rem;
+  margin-bottom: 0.125rem;
+  background: transparent;
+  color: rgb(var(--uk-sys-color-on-surface));
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: start;
+  gap: 8px;
+
+  .icon {
+    --icon-size: 20px;
+  }
+
+  &::after {
+    content: "";
+    position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    user-select: none;
-    background: transparent;
-}
+    background-color: transparent;
+    border-radius: 4px;
+  }
 
-.root {
-    position: fixed;
-    display: flex;
-    flex-direction: column;
-    transform-origin: top left;
-    animation: animateIn 100ms ease-in-out forwards;
-
-    @keyframes animateIn {
-        from {
-            transform: scaleY(90%) scaleX(90%);
-        }
-        to {
-            transform: scaleY(100%) scaleX(100%);
-        }
+  &:hover {
+    &::after {
+      background-color: rgb(
+        var(--uk-sys-color-on-surface),
+        var(--uk-sys-state-hover-state-layer-opacity)
+      );
     }
-}
+  }
 
-.button {
-    position: relative;
-    padding-left: 12px;
-    padding-right: 12px;
-    border-radius: 0.25rem;
-    border: none;
-    height: 2.75rem;
-    margin-bottom: 0.125rem;
-    background: transparent;
-    color: rgb(var(--uk-sys-color-on-surface));
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: start;
-    gap: 8px;
+  &::before {
+    content: "";
+    position: absolute;
+    left: -0.125rem;
+    top: 0;
+    width: calc(100% + 0.25rem);
+    height: calc(100% + 0.25rem);
+    background: rgb(var(--uk-sys-color-surface-container-low));
+    z-index: -1;
+  }
 
-    .icon {
-        --icon-size: 20px;
+  // is next element a spacer
+  &:has(+ .spacer) {
+    &::before {
+      top: 0;
+      border-bottom-left-radius: 0.5rem;
+      border-bottom-right-radius: 0.5rem;
+      height: calc(100% + 0.125rem);
     }
+
+    border-bottom-left-radius: 0.375rem;
+    border-bottom-right-radius: 0.375rem;
+    margin-bottom: 0.25rem;
 
     &::after {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: transparent;
-        border-radius: 4px;
+      border-bottom-left-radius: 0.375rem;
+      border-bottom-right-radius: 0.375rem;
     }
+  }
 
-    &:hover {
-        &::after {
-            background-color: rgb(var(--uk-sys-color-on-surface), var(--uk-sys-state-hover-state-layer-opacity));
-        }
-    }
-
+  // is previous element a spacer
+  .spacer + & {
     &::before {
-        content: "";
-        position: absolute;
-        left: -0.125rem;
-        top: 0;
-        width: calc(100% + 0.25rem);
-        height: calc(100% + 0.25rem);
-        background: rgb(var(--uk-sys-color-surface-container-low));
-        z-index: -1;
+      border-top-left-radius: 0.5rem;
+      border-top-right-radius: 0.5rem;
+      top: -0.125rem;
+      height: calc(100% + 0.25rem);
     }
 
-    // is next element a spacer
-    &:has(+.spacer) {
-        &::before {
-            top: 0;
-            border-bottom-left-radius: 0.5rem;
-            border-bottom-right-radius: 0.5rem;
-            height: calc(100% + 0.125rem);
-        }
+    border-top-left-radius: 0.375rem;
+    border-top-right-radius: 0.375rem;
+    margin-top: 0.125rem;
 
-        border-bottom-left-radius: 0.375rem;
-        border-bottom-right-radius: 0.375rem;
-        margin-bottom: 0.25rem;
+    &::after {
+      border-top-left-radius: 0.375rem;
+      border-top-right-radius: 0.375rem;
+    }
+  }
 
-        &::after {
-            border-bottom-left-radius: 0.375rem;
-            border-bottom-right-radius: 0.375rem;
-        }
+  &:last-of-type {
+    &::before {
+      border-bottom-left-radius: 1rem;
+      border-bottom-right-radius: 1rem;
+      height: calc(100% + 0.125rem);
     }
 
-    // is previous element a spacer
-    .spacer + & {
-        &::before {
-            border-top-left-radius: 0.5rem;
-            border-top-right-radius: 0.5rem;
-            top: -0.125rem;
-            height: calc(100% + 0.25rem);
-        }
+    border-bottom-left-radius: 0.875rem;
+    border-bottom-right-radius: 0.875rem;
+    margin-bottom: 0.25rem;
 
-        border-top-left-radius: 0.375rem;
-        border-top-right-radius: 0.375rem;
-        margin-top: 0.125rem;
+    &::after {
+      border-bottom-left-radius: 0.875rem;
+      border-bottom-right-radius: 0.875rem;
+    }
+  }
 
-        &::after {
-            border-top-left-radius: 0.375rem;
-            border-top-right-radius: 0.375rem;
-        }
+  &:first-of-type {
+    &::before {
+      border-top-left-radius: 1rem;
+      border-top-right-radius: 1rem;
+      top: -0.125rem;
+      height: calc(100% + 0.25rem);
     }
 
-    &:last-of-type {
-        &::before {
-            border-bottom-left-radius: 1rem;
-            border-bottom-right-radius: 1rem;
-            height: calc(100% + 0.125rem);
-        }
+    border-top-left-radius: 0.875rem;
+    border-top-right-radius: 0.875rem;
+    margin-top: 0.125rem;
 
-        border-bottom-left-radius: 0.875rem;
-        border-bottom-right-radius: 0.875rem;
-        margin-bottom: 0.25rem;
+    &::after {
+      border-top-left-radius: 0.875rem;
+      border-top-right-radius: 0.875rem;
+    }
+  }
 
-        &::after {
-            border-bottom-left-radius: 0.875rem;
-            border-bottom-right-radius: 0.875rem;
-        }
+  .selected {
+    background-color: rgb(var(--uk-sys-color-tertiary));
+    color: rgb(var(--uk-sys-color-on-tertiary));
+    border-radius: 0.75rem !important;
+  }
+
+  .text {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    .label {
     }
 
-    &:first-of-type {
-        &::before {
-            border-top-left-radius: 1rem;
-            border-top-right-radius: 1rem;
-            top: -0.125rem;
-            height: calc(100% + 0.25rem);
-        }
-
-        border-top-left-radius: 0.875rem;
-        border-top-right-radius: 0.875rem;
-        margin-top: 0.125rem;
-
-        &::after {
-            border-top-left-radius: 0.875rem;
-            border-top-right-radius: 0.875rem;
-        }
+    .supportingText {
+      color: rgb(var(--uk-sys-color-on-surface-variant));
     }
-
-    .selected {
-        background-color: rgb(var(--uk-sys-color-tertiary));
-        color: rgb(var(--uk-sys-color-on-tertiary));
-        border-radius: 0.75rem !important;
-    }
-
-    .text {
-        width: 100%;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-
-        .label {
-
-        }
-
-        .supportingText {
-            color: rgb(var(--uk-sys-color-on-surface-variant));
-        }
-    }
+  }
 }
 
 .divider {
-    position: relative;
-    margin-bottom: 2px;
-    background-color: rgb(var(--uk-sys-color-on-surface));
+  position: relative;
+  margin-bottom: 2px;
+  background-color: rgb(var(--uk-sys-color-on-surface));
 
-    &::before {
-        content: "";
-        position: absolute;
-        left: -4px;
-        top: 0;
-        width: calc(100% + 8px);
-        height: 100%;
-        background: rgb(var(--uk-sys-color-surface));
-        z-index: -1;
-        outline: 0.5px solid pink;
-    }
+  &::before {
+    content: "";
+    position: absolute;
+    left: -4px;
+    top: 0;
+    width: calc(100% + 8px);
+    height: 100%;
+    background: rgb(var(--uk-sys-color-surface));
+    z-index: -1;
+    outline: 0.5px solid pink;
+  }
 }
 
 .root[data-vibrant="true"] {
-    .button {
-        color: rgb(var(--uk-sys-color-on-tertiary-container));
+  .button {
+    color: rgb(var(--uk-sys-color-on-tertiary-container));
 
-        &::after {
-            background-color: transparent;
-        }
-
-        &:hover {
-            &::after {
-                background-color: rgb(var(--uk-sys-color-on-tertiary-container), var(--uk-sys-state-hover-state-layer-opacity));
-            }
-        }
-
-        .selected {
-            background-color: rgb(var(--uk-sys-color-tertiary));
-            color: rgb(var(--uk-sys-color-on-tertiary));
-        }
-
-        &::before {
-            background: rgb(var(--uk-sys-color-tertiary-container));
-        }
+    &::after {
+      background-color: transparent;
     }
 
-    .divider {
-        background-color: rgb(var(--uk-sys-color-on-tertiary-container));
-
-        &::before {
-            background: rgb(var(--uk-sys-color-tertiary-container));
-        }
+    &:hover {
+      &::after {
+        background-color: rgb(
+          var(--uk-sys-color-on-tertiary-container),
+          var(--uk-sys-state-hover-state-layer-opacity)
+        );
+      }
     }
+
+    .selected {
+      background-color: rgb(var(--uk-sys-color-tertiary));
+      color: rgb(var(--uk-sys-color-on-tertiary));
+    }
+
+    &::before {
+      background: rgb(var(--uk-sys-color-tertiary-container));
+    }
+  }
+
+  .divider {
+    background-color: rgb(var(--uk-sys-color-on-tertiary-container));
+
+    &::before {
+      background: rgb(var(--uk-sys-color-tertiary-container));
+    }
+  }
 }
