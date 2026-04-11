@@ -1,13 +1,13 @@
-import CHECK_ICON from "@material-symbols/svg-700/outlined/check.svg"
-import PASSKEY_ICON from "@material-symbols/svg-700/outlined/passkey.svg"
+import CHECK_ICON from "@material-symbols/svg-700/outlined/check.svg";
+import PASSKEY_ICON from "@material-symbols/svg-700/outlined/passkey.svg";
 import UKButton from "@onlineworkspace/uikit-solid/src/components/button/UKButton.jsx";
 import UKIcon from "@onlineworkspace/uikit-solid/src/components/icon/UKIcon.jsx";
-import UKStackItem from "@onlineworkspace/uikit-solid/src/components/;stack/UKStackItem.jsx";
-import UKText from "@onlineworkspace/uikit-solid/src/components/text/UKTe;xt.jsx";
+import UKStackItem from "@onlineworkspace/uikit-solid/src/components/stack/UKStackItem.jsx";
+import UKText from "@onlineworkspace/uikit-solid/src/components/text/UKText.jsx";
 import { type Component, createResource, Suspense } from "solid-js";
 import trpc from "../../../../lib/trpc";
 
-import styles from "./MethodPasskey.module.scss";;
+import styles from "./MethodPasskey.module.scss";
 
 const MethodPasskey: Component = () => {
   const [hasPasskey, { refetch: refetchHasPasskey }] = createResource(() => trpc.authentication.hasPasskey.query());
@@ -32,8 +32,8 @@ const MethodPasskey: Component = () => {
               disabled={true}
               class={styles.button}
               onClick={async () => {
-                refetchHasPasskey();
-                return 0;
+                await refetchHasPasskey();
+                return;
               }}
             >
               Enable experimental passkey support

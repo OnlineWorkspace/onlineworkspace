@@ -1,5 +1,6 @@
 /// <reference path="./global.d.ts" />
 
+import { existsSync as fsExistsSync } from "node:fs";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { AuthorizedDeviceType, SESSION_VALID_TERM_MS } from "@onlineworkspace/workspace-instance/src/systems/authorization.js";
@@ -498,7 +499,7 @@ const router = t.router({
             name: wallpaperName,
             previewSrc:
               opt.ctx.instance.sys.configuration.backendUrl +
-              (await instance.sys.image.serveImage(opt.ctx.userId, wallpaperPath, { resize: { dimensions: { height: 140, width: 250 } } })),
+              (await instance.sys.image.serveImage(opt.ctx.userId, wallpaperPath, { resize: { dimensions: { height: 140, width: 250 }, position: "centre" } })),
           });
         }
 
@@ -510,11 +511,11 @@ const router = t.router({
         const resizedWallpapersPath = path.join(wallpapersRootPath, "resized");
         const requiredResizedWallpaperPath = path.join(resizedWallpapersPath, `${504}x${280}.webp`);
 
-        if (!(await fs.exists(rawWallpaperPath))) {
+        if (!fsExistsSync(rawWallpaperPath)) {
           return undefined;
         }
 
-        if (!(await fs.exists(requiredResizedWallpaperPath))) {
+        if (!fsExistsSync(requiredResizedWallpaperPath)) {
           const options = JSON.parse((await fs.readFile(path.join(wallpapersRootPath, "config.json"))).toString());
 
           await instance.sys.image.resizeImage(
@@ -543,6 +544,7 @@ const router = t.router({
 
         const wallpaperUUID = Bun.randomUUIDv7();
 
+        // @ts-ignore
         const bytes = await opt.input.bytes();
 
         await sharp(bytes)
@@ -572,7 +574,7 @@ const router = t.router({
         .query(async (opt) => {
           const wallpaperPath = path.join((await opt.ctx.user()).getPath(), "assets/wallpapers");
 
-          if (await fs.exists(path.join(wallpaperPath, "config.json"))) {
+          if (fsExistsSync(path.join(wallpaperPath, "config.json"))) {
             const options = JSON.parse((await fs.readFile(path.join(wallpaperPath, "config.json"))).toString());
 
             options.position = options.position.split(" ");
@@ -665,7 +667,7 @@ const router = t.router({
           }),
         )
         .query(async (opt) => {
-          const a = instance.sys.settings.applicationSettings["core"].find((s) => s.id === "quick_shortcuts");
+          const a = instance.sys.settings.applicationSettings.core.find((s) => s.id === "quick_shortcuts");
 
           if (!a) throw "The core:quick_shortcuts setting is somehow missing???";
 
@@ -720,7 +722,7 @@ const router = t.router({
           icon: { type: "icon" | "image"; value: string };
         }[] = [];
 
-        const quickShortcutsSetting = instance.sys.settings.applicationSettings["core"]?.find((s) => s.id === "quick_shortcuts");
+        const quickShortcutsSetting = instance.sys.settings.applicationSettings.core?.find((s) => s.id === "quick_shortcuts");
 
         if (!quickShortcutsSetting) return [];
         const userShortcuts = (await quickShortcutsSetting.onValueChange(opt.ctx.userId)) || [];
