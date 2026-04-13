@@ -22,7 +22,7 @@ import styles from "./Index.module.scss";
 const ProfilePage: Component = () => {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
-  const [name, { refetch: refetchName }] = createResource(() => trpc.profile.getName.query());
+  const [name, { refetch: refetchName, mutate: mutateName }] = createResource(() => trpc.profile.getName.query());
   const [role] = createResource(() => trpc.profile.getRole.query());
   const [avatar, { refetch: refetchAvatar }] = createResource(() => trpc.profile.getProfilePicture.query());
 
@@ -58,7 +58,7 @@ const ProfilePage: Component = () => {
           <UKStack>
             <ProfilePicture refetchAvatar={refetchAvatar} />
             <Username />
-            <Name refetchName={refetchName} />
+            <Name name={name} mutateName={mutateName} refetchName={refetchName} />
             <Gender />
             <Bio />
           </UKStack>

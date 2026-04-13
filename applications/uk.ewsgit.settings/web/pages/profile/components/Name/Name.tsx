@@ -2,12 +2,20 @@ import ASSIGNMENT_IND_ICON from "@material-symbols/svg-700/outlined/assignment_i
 import UKButton from "@onlineworkspace/uikit-solid/src/components/button/UKButton.jsx";
 import UKStackItem from "@onlineworkspace/uikit-solid/src/components/stack/UKStackItem.jsx";
 import UKTextField from "@onlineworkspace/uikit-solid/src/components/textField/UKTextField.jsx";
-import { type Component, createResource } from "solid-js";
+import { type Component, createSignal, onCleanup, onMount, type Resource } from "solid-js";
 import trpc from "../../../../lib/trpc";
 import styles from "./Name.module.scss";
 
-const Name: Component<{ refetchName(): void }> = (props) => {
-  const [name, { mutate: setName, refetch: refetchName }] = createResource(() => trpc.profile.getName.query());
+const Name: Component<{ name: Resource<string>; mutateName(name: string): void; refetchName(): void }> = (props) => {
+  const [definitiveName, setDefinitiveName] = createSignal<string>("");
+
+  onMount(() => {
+    setDefinitiveName(props.name() || "Untitled User");
+  });
+
+  onCleanup(() => {
+    props.mutateName(definitiveName());
+  });
 
   return (
     <UKStackItem
@@ -16,20 +24,19 @@ const Name: Component<{ refetchName(): void }> = (props) => {
         value: ASSIGNMENT_IND_ICON,
       }}
       labelText="Name"
-      supportingText={name()}
+      supportingText={props.name()}
       onCollapse={() => {
-        refetchName();
+        props.mutateName(definitiveName());
       }}
       expandedComponent={
         <div class={styles.expanded}>
-          <UKTextField color="outlined" onValueChange={setName} defaultValue={name()} value={name() || "Untitled User"} label="Name" />
+          <UKTextField color="outlined" onValueChange={props.mutateName} defaultValue={props.name()} value={props.name() || "Untitled User"} label="Name" />
           <UKButton
             class={styles.button}
             onClick={async () => {
-              await trpc.profile.setName.mutate(name() || "");
+              await trpc.profile.setName.mutate(props.name() || "Untitled User");
 
-              refetchName();
-              props.refetchName();
+              setDefinitiveName(props.name() || "Untitled User");
             }}
           >
             Save

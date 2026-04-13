@@ -1,4 +1,4 @@
-import UKButton from "@onlineworkspace/uikit-solid/src/components/button/UKButton.tsx";
+import UKButton, { AffirmativeButtonState } from "@onlineworkspace/uikit-solid/src/components/button/UKButton.tsx";
 import UKIndeterminateSpinner from "@onlineworkspace/uikit-solid/src/components/indeterminateSpinner/UKIndeterminateSpinner.jsx";
 import { createFileUploader } from "@solid-primitives/upload";
 import Cropper from "cropperjs";
@@ -80,8 +80,11 @@ const CropImage: Component<{ refetchAvatar(): void; close(): void }> = (props) =
                     });
                 });
 
-                return () => {
-                  window.location.reload();
+                return {
+                  state: AffirmativeButtonState.Success,
+                  cb: () => {
+                    window.location.reload();
+                  },
                 };
               }}
             >

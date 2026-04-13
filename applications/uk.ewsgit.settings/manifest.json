@@ -5,7 +5,7 @@
     "type": "icon",
     "value": "./web/node_modules/@material-symbols/svg-700/outlined/settings.svg"
   },
-  "bannerImage": "./banner.svg",
+  "bannerImage": "./settings_banner.svg",
   "description": "The Workspaces Settings Manager",
   "authors": [
     {

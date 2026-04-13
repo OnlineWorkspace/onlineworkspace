@@ -33,7 +33,7 @@ const CustomizationPage: Component = () => {
         <UKStack>
           <UKStackItem
             labelText={"Color Theme"}
-            supportingText={"To be implemented..."}
+            supportingText={"Choose and customize your color theme"}
             onClick={() => {
               navigate("/app/uk.ewsgit.settings/customization/color-theme");
             }}

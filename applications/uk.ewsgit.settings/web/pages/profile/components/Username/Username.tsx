@@ -2,12 +2,22 @@ import ALTERNATE_EMAIL_ICON from "@material-symbols/svg-700/outlined/alternate_e
 import UKButton from "@onlineworkspace/uikit-solid/src/components/button/UKButton.jsx";
 import UKStackItem from "@onlineworkspace/uikit-solid/src/components/stack/UKStackItem.jsx";
 import UKTextField from "@onlineworkspace/uikit-solid/src/components/textField/UKTextField.jsx";
-import { type Component, createResource } from "solid-js";
+import { type Component, createResource, createSignal, onCleanup, onMount } from "solid-js";
 import trpc from "../../../../lib/trpc";
 import styles from "./Username.module.scss";
 
 const Username: Component = () => {
-  const [username, { mutate: setUsername, refetch: refetchUsername }] = createResource(() => trpc.profile.getUsername.query());
+  const [definitiveUsername, setDefinitiveUsername] = createSignal<string>("");
+  const [username, setUsername] = createSignal<string>("");
+
+  onMount(async () => {
+    setDefinitiveUsername(await trpc.profile.getUsername.query());
+    setUsername(definitiveUsername());
+  });
+
+  onCleanup(() => {
+    setUsername(definitiveUsername());
+  });
 
   return (
     <UKStackItem
@@ -18,7 +28,7 @@ const Username: Component = () => {
       labelText="Username"
       supportingText={username()}
       onCollapse={() => {
-        refetchUsername();
+        setUsername(definitiveUsername());
       }}
       expandedComponent={
         <div class={styles.expanded}>
@@ -35,7 +45,7 @@ const Username: Component = () => {
             onClick={async () => {
               await trpc.profile.setUsername.mutate(username() || "");
 
-              refetchUsername();
+              setDefinitiveUsername(username());
             }}
           >
             Save

@@ -1,53 +1,98 @@
 import CHEVRON_LEFT from "@material-symbols/svg-700/outlined/chevron_left.svg";
 import UKButton from "@onlineworkspace/uikit-solid/src/components/button/UKButton.jsx";
 import UKCard from "@onlineworkspace/uikit-solid/src/components/card/UKCard.jsx";
-import UKDivider from "@onlineworkspace/uikit-solid/src/components/divider/UKDivider.jsx";
 import UKText from "@onlineworkspace/uikit-solid/src/components/text/UKText.jsx";
 import { useNavigate } from "@solidjs/router";
-import { closestCenter, createSortable, DragDropProvider, DragDropSensors, DragOverlay, SortableProvider } from "@thisbeyond/solid-dnd";
+import { closestCenter, createSortable, DragDropProvider, DragDropSensors, SortableProvider } from "@thisbeyond/solid-dnd";
 import { type Component, createSignal, For, Show, Suspense } from "solid-js";
 import Widgets from "../../widgets/widgets";
 import styles from "./index.module.scss";
 
-const Sortable: Component<{ id: string }> = (props) => {
-  const sortable = createSortable(props.id);
-  const Widget = Widgets[props.id as keyof typeof Widgets];
+interface WidgetInstance {
+  id: string;
+  type: string;
+}
+
+const generateInstanceId = () => `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+
+const DraggableWidget: Component<{ instance: WidgetInstance }> = (props) => {
+  const sortable = createSortable(props.instance.id);
+  const WidgetComponent = Widgets[props.instance.type as keyof typeof Widgets];
 
   return (
     <Show
-      when={Widget}
+      when={WidgetComponent}
       fallback={
         <UKText role="body" size="l">
-          Invalid '{props.id}'
+          Invalid '{props.instance.type}'
         </UKText>
       }
     >
-      {/*@ts-ignore*/}
-      <Widget use:sortable classList={{ [styles.dragging]: sortable.isActiveDraggable }} />
+      <div
+        /* @ts-ignore */
+        use:sortable
+        classList={{
+          [styles.dragging]: sortable.isActiveDraggable,
+        }}
+      >
+        {/*@ts-ignore*/}
+        <WidgetComponent />
+      </div>
     </Show>
   );
 };
 
 const EditWidgets: Component = () => {
   const navigate = useNavigate();
-  const [items, setItems] = createSignal<string[]>(["weather", "user.profile", "user.avatar"]);
-  const [activeItem, setActiveItem] = createSignal<string | null>(null);
+  const [items, setItems] = createSignal<WidgetInstance[]>([
+    { id: generateInstanceId(), type: "weather" },
+    { id: generateInstanceId(), type: "user.profile" },
+    { id: generateInstanceId(), type: "user.avatar" },
+  ]);
 
-  // @ts-ignore
-  const onDragStart = ({ draggable }) => setActiveItem(draggable.id);
+  const [activeDraggableId, setActiveDraggableId] = createSignal<string | null>(null);
 
-  // @ts-ignore
-  const onDragEnd = ({ draggable, droppable }) => {
-    if (draggable && droppable && draggable.id !== droppable.id) {
-      const currentItems = [...items()];
-      const fromIndex = currentItems.indexOf(draggable.id);
-      const toIndex = currentItems.indexOf(droppable.id);
+  const allWidgetTypes = Object.keys(Widgets);
+  const allInstanceIds = () => items().map((w) => w.id);
+  const allDraggableIds = () => [...allInstanceIds(), ...allWidgetTypes];
 
-      const updatedItems = currentItems.slice();
-      updatedItems.splice(toIndex, 0, ...updatedItems.splice(fromIndex, 1));
-      setItems(updatedItems);
+  const onDragStart = ({ draggable }) => {
+    setActiveDraggableId(draggable.id);
+  };
+
+  const onDragEnd = ({ draggable, droppable }: { draggable: { id: string }; droppable: { id: string } | null }) => {
+    setActiveDraggableId(null);
+
+    if (!draggable || !droppable || draggable.id === droppable.id) {
+      return;
     }
-    setActiveItem(null);
+
+    const currentItems = [...items()];
+    const fromIndex = currentItems.findIndex((w) => w.id === draggable.id);
+    const toIndex = currentItems.findIndex((w) => w.id === droppable.id);
+
+    if (fromIndex === -1 && allWidgetTypes.includes(draggable.id)) {
+      const newWidget: WidgetInstance = {
+        id: generateInstanceId(),
+        type: draggable.id,
+      };
+
+      if (toIndex !== -1) {
+        currentItems.splice(toIndex, 0, newWidget);
+      } else {
+        currentItems.push(newWidget);
+      }
+      setItems(currentItems);
+      return;
+    }
+
+    if (toIndex === -1 || fromIndex === toIndex) {
+      return;
+    }
+
+    const updatedItems = currentItems.slice();
+    updatedItems.splice(toIndex, 0, ...updatedItems.splice(fromIndex, 1));
+    setItems(updatedItems);
   };
 
   return (
@@ -60,53 +105,51 @@ const EditWidgets: Component = () => {
           Confirm Changes
         </UKButton>
 
-        <div class={styles.widgets}>
-          <SortableProvider ids={items()}>
+        <SortableProvider ids={allDraggableIds()}>
+          <div class={styles.widgets} classList={{ [styles.draggingActive]: activeDraggableId() !== null }}>
             <Suspense>
               <For each={items()}>
-                {(widgetId) => {
-                  return <Sortable id={widgetId} />;
+                {(widget) => {
+                  return <DraggableWidget instance={widget} />;
                 }}
               </For>
             </Suspense>
-          </SortableProvider>
-        </div>
-
-        <DragOverlay>
-          <Suspense>
-            <Show when={activeItem()}>
-              {(id) => {
-                const Widget = Widgets[id() as keyof typeof Widgets];
-                return (
-                  <div class={styles.overlayItem}>
-                    <Widget />
-                  </div>
-                );
-              }}
-            </Show>
-          </Suspense>
-        </DragOverlay>
-
-        <UKCard class={styles.drawer} color="outlined">
-          <UKText role="title" size="s">
-            Widgets
-          </UKText>
-          <div class={styles.widgetGrid}>
-            {Object.keys(Widgets).map((widgetId) => {
-              // @ts-ignore
-              const Widget = Widgets[widgetId];
-
-              if (!Widget)
-                return (
-                  <UKText role={"body"} size="l" align={"center"} emphasized>
-                    Invalid WidgetId '{widgetId}'
-                  </UKText>
-                );
-
-              return <Widget />;
-            })}
           </div>
-        </UKCard>
+
+          <UKCard class={styles.drawer} color="outlined">
+            <UKText role="title" size="s">
+              Widgets
+            </UKText>
+            <div class={styles.widgetGrid}>
+              <For each={allWidgetTypes}>
+                {(widgetType) => {
+                  const WidgetComponent = Widgets[widgetType as keyof typeof Widgets];
+                  const sortable = createSortable(widgetType);
+
+                  if (!WidgetComponent)
+                    return (
+                      <UKText role={"body"} size="l" align={"center"} emphasized>
+                        Invalid WidgetId '{widgetType}'
+                      </UKText>
+                    );
+
+                  return (
+                    <div
+                      /* @ts-ignore */
+                      use:sortable
+                      classList={{
+                        [styles.dragging]: sortable.isActiveDraggable,
+                      }}
+                    >
+                      {/*@ts-ignore*/}
+                      <WidgetComponent />
+                    </div>
+                  );
+                }}
+              </For>
+            </div>
+          </UKCard>
+        </SortableProvider>
       </DragDropProvider>
     </div>
   );

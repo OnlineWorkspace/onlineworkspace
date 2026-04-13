@@ -694,6 +694,18 @@ const router = t.router({
 
         return newBuf;
       }),
+      setColorTheme: procedure.input(z.any()).mutation(async (opt) => {
+        const db = instance.sys.database.postgres();
+
+        if (opt.input === undefined) {
+          await db`UPDATE public.users SET color_theme = NULL WHERE id = ${opt.ctx.userId}`;
+          return true;
+        }
+
+        await db`UPDATE public.users SET color_theme = ${opt.input} WHERE id = ${opt.ctx.userId}`;
+
+        return true;
+      }),
     },
     quickShortcuts: {
       getSettingData: procedure

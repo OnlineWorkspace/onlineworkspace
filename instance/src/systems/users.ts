@@ -477,12 +477,13 @@ export default class UsersSystem extends System {
       two_factor_secret - the user's secret string used to verify 2fa opt codes (string)
       settings - a settings object
       groups - a list of the group ids which this user is a member of
+      color_scheme - the user's color scheme
     */
     await db`CREATE TABLE IF NOT EXISTS users (
       id SERIAL PRIMARY KEY,
       username TEXT,
       forename TEXT,
-      surname TEXT,
+      surname TEXT DEFAULT '',
       gender TEXT DEFAULT 'other',
       bio TEXT,
       storage_quota BIGINT DEFAULT 10,
@@ -493,7 +494,8 @@ export default class UsersSystem extends System {
       hashed_password TEXT,
       two_factor_secret TEXT,
       settings JSONB DEFAULT '{}'::JSONB,
-      groups TEXT[]
+      groups TEXT[],
+      color_scheme JSONB
     )`;
 
     if (!(await this.getAllUsers()).find((u) => u.isAdministrator())) {

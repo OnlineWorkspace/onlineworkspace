@@ -5,100 +5,6 @@ import { baselineTheme } from "./themes/baseline.ts";
 export interface UKDesignTokens {
   raw: {
     ref: {
-      palette: {
-        error0(): string;
-        error10(): string;
-        error20(): string;
-        error30(): string;
-        error40(): string;
-        error50(): string;
-        error60(): string;
-        error70(): string;
-        error80(): string;
-        error90(): string;
-        error95(): string;
-        error99(): string;
-        error100(): string;
-        tertiary0(): string;
-        tertiary10(): string;
-        tertiary20(): string;
-        tertiary30(): string;
-        tertiary40(): string;
-        tertiary50(): string;
-        tertiary60(): string;
-        tertiary70(): string;
-        tertiary80(): string;
-        tertiary90(): string;
-        tertiary95(): string;
-        tertiary99(): string;
-        tertiary100(): string;
-        secondary0(): string;
-        secondary10(): string;
-        secondary20(): string;
-        secondary30(): string;
-        secondary40(): string;
-        secondary50(): string;
-        secondary60(): string;
-        secondary70(): string;
-        secondary80(): string;
-        secondary90(): string;
-        secondary95(): string;
-        secondary99(): string;
-        secondary100(): string;
-        primary0(): string;
-        primary10(): string;
-        primary20(): string;
-        primary30(): string;
-        primary40(): string;
-        primary50(): string;
-        primary60(): string;
-        primary70(): string;
-        primary80(): string;
-        primary90(): string;
-        primary95(): string;
-        primary99(): string;
-        primary100(): string;
-        "neutral-variant0"(): string;
-        "neutral-variant10"(): string;
-        "neutral-variant20"(): string;
-        "neutral-variant30"(): string;
-        "neutral-variant40"(): string;
-        "neutral-variant50"(): string;
-        "neutral-variant60"(): string;
-        "neutral-variant70"(): string;
-        "neutral-variant80"(): string;
-        "neutral-variant90"(): string;
-        "neutral-variant95"(): string;
-        "neutral-variant98"(): string;
-        "neutral-variant99"(): string;
-        "neutral-variant100"(): string;
-        neutral0(): string;
-        neutral4(): string;
-        neutral6(): string;
-        neutral10(): string;
-        neutral12(): string;
-        neutral17(): string;
-        neutral20(): string;
-        neutral22(): string;
-        neutral24(): string;
-        neutral30(): string;
-        neutral40(): string;
-        neutral50(): string;
-        neutral60(): string;
-        neutral70(): string;
-        neutral80(): string;
-        neutral87(): string;
-        neutral90(): string;
-        neutral92(): string;
-        neutral94(): string;
-        neutral95(): string;
-        neutral96(): string;
-        neutral98(): string;
-        neutral99(): string;
-        neutral100(): string;
-        black(): string;
-        white(): string;
-      };
       typeface: {
         plain(): string;
         brand(): string;
@@ -572,6 +478,8 @@ export interface UKDesignTokens {
           surface(): string;
           "surface-container"(): string;
           "surface-container-low"(): string;
+          "surface-container-lowest"(): string;
+          "surface-container-high"(): string;
           "surface-container-highest"(): string;
           "on-secondary-container"(): string;
           "on-secondary"(): string;
@@ -607,6 +515,8 @@ export interface UKDesignTokens {
           surface(): string;
           "surface-container"(): string;
           "surface-container-low"(): string;
+          "surface-container-lowest"(): string;
+          "surface-container-high"(): string;
           "surface-container-highest"(): string;
           "on-secondary-container"(): string;
           "on-secondary"(): string;
@@ -622,100 +532,6 @@ export interface UKDesignTokens {
     };
   };
   ref: {
-    palette: {
-      error0: string;
-      error10: string;
-      error20: string;
-      error30: string;
-      error40: string;
-      error50: string;
-      error60: string;
-      error70: string;
-      error80: string;
-      error90: string;
-      error95: string;
-      error99: string;
-      error100: string;
-      tertiary0: string;
-      tertiary10: string;
-      tertiary20: string;
-      tertiary30: string;
-      tertiary40: string;
-      tertiary50: string;
-      tertiary60: string;
-      tertiary70: string;
-      tertiary80: string;
-      tertiary90: string;
-      tertiary95: string;
-      tertiary99: string;
-      tertiary100: string;
-      secondary0: string;
-      secondary10: string;
-      secondary20: string;
-      secondary30: string;
-      secondary40: string;
-      secondary50: string;
-      secondary60: string;
-      secondary70: string;
-      secondary80: string;
-      secondary90: string;
-      secondary95: string;
-      secondary99: string;
-      secondary100: string;
-      primary0: string;
-      primary10: string;
-      primary20: string;
-      primary30: string;
-      primary40: string;
-      primary50: string;
-      primary60: string;
-      primary70: string;
-      primary80: string;
-      primary90: string;
-      primary95: string;
-      primary99: string;
-      primary100: string;
-      "neutral-variant0": string;
-      "neutral-variant10": string;
-      "neutral-variant20": string;
-      "neutral-variant30": string;
-      "neutral-variant40": string;
-      "neutral-variant50": string;
-      "neutral-variant60": string;
-      "neutral-variant70": string;
-      "neutral-variant80": string;
-      "neutral-variant90": string;
-      "neutral-variant95": string;
-      "neutral-variant98": string;
-      "neutral-variant99": string;
-      "neutral-variant100": string;
-      neutral0: string;
-      neutral4: string;
-      neutral6: string;
-      neutral10: string;
-      neutral12: string;
-      neutral17: string;
-      neutral20: string;
-      neutral22: string;
-      neutral24: string;
-      neutral30: string;
-      neutral40: string;
-      neutral50: string;
-      neutral60: string;
-      neutral70: string;
-      neutral80: string;
-      neutral87: string;
-      neutral90: string;
-      neutral92: string;
-      neutral94: string;
-      neutral95: string;
-      neutral96: string;
-      neutral98: string;
-      neutral99: string;
-      neutral100: string;
-      black: string;
-      white: string;
-    };
     typeface: {
       plain: string;
       brand: string;
@@ -1640,174 +1456,82 @@ const tokens: UKDesignTokens = {
         "path-standard-path": () => "1",
       },
       color: {
-        darkMode: {
-          "surface-tint": () => tokens.raw.sys.color.darkMode.primary(),
-          "surface-tint-color": () => tokens.raw.sys.color.darkMode.primary(),
-          "on-error-container": () => tokens.raw.ref.palette.error80(),
-          "on-error": () => tokens.raw.ref.palette.error20(),
-          "error-container": () => tokens.raw.ref.palette.error30(),
-          "on-tertiary-container": () => tokens.raw.ref.palette.tertiary90(),
-          "on-tertiary": () => tokens.raw.ref.palette.tertiary20(),
-          "tertiary-container": () => tokens.raw.ref.palette.tertiary30(),
-          tertiary: () => tokens.raw.ref.palette.tertiary80(),
-          shadow: () => tokens.raw.ref.palette.neutral0(),
-          error: () => tokens.raw.ref.palette.error80(),
-          outline: () => tokens.raw.ref.palette["neutral-variant60"](),
-          "outline-variant": () => tokens.raw.ref.palette["neutral-variant30"](),
-          "on-background": () => tokens.raw.ref.palette.neutral90(),
-          background: () => tokens.raw.ref.palette.neutral10(),
-          "inverse-on-surface": () => tokens.raw.ref.palette.neutral20(),
-          "inverse-surface": () => tokens.raw.ref.palette.neutral90(),
-          "on-surface-variant": () => tokens.raw.ref.palette["neutral-variant80"](),
-          "on-surface": () => tokens.raw.ref.palette.neutral90(),
-          "surface-variant": () => tokens.raw.ref.palette["neutral-variant30"](),
-          surface: () => tokens.raw.ref.palette.neutral10(),
-          "surface-container": () => tokens.raw.ref.palette.neutral12(),
-          "surface-container-low": () => tokens.raw.ref.palette.neutral10(),
-          "surface-container-highest": () => tokens.raw.ref.palette.neutral22(),
-          "on-secondary-container": () => tokens.raw.ref.palette.secondary90(),
-          "on-secondary": () => tokens.raw.ref.palette.secondary20(),
-          "secondary-container": () => tokens.raw.ref.palette.secondary30(),
-          secondary: () => tokens.raw.ref.palette.secondary80(),
-          "inverse-primary": () => tokens.raw.ref.palette.primary40(),
-          "on-primary-container": () => tokens.raw.ref.palette.primary90(),
-          "on-primary": () => tokens.raw.ref.palette.primary20(),
-          "primary-container": () => tokens.raw.ref.palette.primary30(),
-          primary: () => tokens.raw.ref.palette.primary80(),
-        }, // THIS IS AN INVALID LIGHT THEME
+        // @ts-ignore
         lightMode: {
-          "surface-tint": () => tokens.raw.sys.color.darkMode.primary(),
-          "surface-tint-color": () => tokens.raw.sys.color.darkMode.primary(),
-          "on-error-container": () => tokens.raw.ref.palette.error80(),
-          "on-error": () => tokens.raw.ref.palette.error20(),
-          "error-container": () => tokens.raw.ref.palette.error30(),
-          "on-tertiary-container": () => tokens.raw.ref.palette.tertiary90(),
-          "on-tertiary": () => tokens.raw.ref.palette.tertiary20(),
-          "tertiary-container": () => tokens.raw.ref.palette.tertiary30(),
-          tertiary: () => tokens.raw.ref.palette.tertiary80(),
-          shadow: () => tokens.raw.ref.palette.neutral0(),
-          error: () => tokens.raw.ref.palette.error80(),
-          outline: () => tokens.raw.ref.palette["neutral-variant60"](),
-          "outline-variant": () => tokens.raw.ref.palette["neutral-variant30"](),
-          "on-background": () => tokens.raw.ref.palette.neutral90(),
-          background: () => tokens.raw.ref.palette.neutral10(),
-          "inverse-on-surface": () => tokens.raw.ref.palette.neutral20(),
-          "inverse-surface": () => tokens.raw.ref.palette.neutral90(),
-          "on-surface-variant": () => tokens.raw.ref.palette["neutral-variant80"](),
-          "on-surface": () => tokens.raw.ref.palette.neutral90(),
-          "surface-variant": () => tokens.raw.ref.palette["neutral-variant30"](),
-          surface: () => tokens.raw.ref.palette.neutral10(),
-          "surface-container": () => tokens.raw.ref.palette.neutral12(),
-          "surface-container-low": () => tokens.raw.ref.palette.neutral95(),
-          "surface-container-highest": () => tokens.raw.ref.palette.neutral22(),
-          "on-secondary-container": () => tokens.raw.ref.palette.secondary90(),
-          "on-secondary": () => tokens.raw.ref.palette.secondary20(),
-          "secondary-container": () => tokens.raw.ref.palette.secondary30(),
-          secondary: () => tokens.raw.ref.palette.secondary80(),
-          "inverse-primary": () => tokens.raw.ref.palette.primary40(),
-          "on-primary-container": () => tokens.raw.ref.palette.primary90(),
-          "on-primary": () => tokens.raw.ref.palette.primary20(),
-          "primary-container": () => tokens.raw.ref.palette.primary30(),
-          primary: () => tokens.raw.ref.palette.primary80(),
+          "surface-tint": () => "103, 80, 164",
+          "surface-tint-color": () => "103, 80, 164",
+          "on-error-container": () => "#410e0bff",
+          "on-error": () => "#ffffffff",
+          "error-container": () => "#f9dedcff",
+          "on-tertiary-container": () => "#31111dff",
+          "on-tertiary": () => "#ffffffff",
+          "tertiary-container": () => "#ffd8e4ff",
+          tertiary: () => "#7d5260ff",
+          shadow: () => "#000000",
+          error: () => "#b3261eff",
+          outline: () => "#79747E",
+          "outline-variant": () => "#CAC4D0",
+          "on-background": () => "#1D1B20",
+          background: () => "#FFFBFF",
+          "inverse-on-surface": () => "#F5EFF7",
+          "inverse-surface": () => "#322F35",
+          "on-surface-variant": () => "#49454F",
+          "on-surface": () => "#1D1B20",
+          "surface-variant": () => "#E7E0EC",
+          surface: () => "#FFFBFF",
+          "surface-container": () => "#F3EDF7",
+          "surface-container-low": () => "#F5EFF7",
+          "surface-container-highest": () => "#E6E0E9",
+          "on-secondary-container": () => "#1d192bff",
+          "on-secondary": () => "#ffffffff",
+          "secondary-container": () => "#e8def8ff",
+          secondary: () => "#625b71ff",
+          "inverse-primary": () => "#d0bcffff",
+          "on-primary-container": () => "#21005dff",
+          "on-primary": () => "#ffffffff",
+          "primary-container": () => "#eaddffff",
+          primary: () => "#6750a4ff",
+        },
+        // @ts-ignore
+        darkMode: {
+          "surface-tint": () => "208, 188, 255",
+          "surface-tint-color": () => "208, 188, 255",
+          "on-error-container": () => "#f2b8b5ff",
+          "on-error": () => "#601410ff",
+          "error-container": () => "#8c1d18ff",
+          "on-tertiary-container": () => "#ffd8e4ff",
+          "on-tertiary": () => "#492532ff",
+          "tertiary-container": () => "#633b48ff",
+          tertiary: () => "#efb8c8ff",
+          shadow: () => "#000000",
+          error: () => "#f2b8b5ff",
+          outline: () => "#938F99",
+          "outline-variant": () => "#49454F",
+          "on-background": () => "#E6E0E9",
+          background: () => "#141218",
+          "inverse-on-surface": () => "#322F35",
+          "inverse-surface": () => "#E6E0E9",
+          "on-surface-variant": () => "#CAC4D0",
+          "on-surface": () => "#E6E0E9",
+          "surface-variant": () => "#49454F",
+          surface: () => "#1D1B20",
+          "surface-container": () => "#211F26",
+          "surface-container-low": () => "#1D1B20",
+          "surface-container-highest": () => "#36343B",
+          "on-secondary-container": () => "#e8def8ff",
+          "on-secondary": () => "#332d41ff",
+          "secondary-container": () => "#4a4458ff",
+          secondary: () => "#ccc2dcff",
+          "inverse-primary": () => "#6750a4ff",
+          "on-primary-container": () => "#eaddffff",
+          "on-primary": () => "#381e72ff",
+          "primary-container": () => "#4f378bff",
+          primary: () => "#d0bcffff",
         },
       },
     },
   },
   ref: {
-    palette: {
-      error0: "var(--uk-ref-palette-error00)",
-      error10: "var(--uk-ref-palette-error10)",
-      error20: "var(--uk-ref-palette-error20)",
-      error30: "var(--uk-ref-palette-error30)",
-      error40: "var(--uk-ref-palette-error40)",
-      error50: "var(--uk-ref-palette-error50)",
-      error60: "var(--uk-ref-palette-error60)",
-      error70: "var(--uk-ref-palette-error70)",
-      error80: "var(--uk-ref-palette-error80)",
-      error90: "var(--uk-ref-palette-error90)",
-      error95: "var(--uk-ref-palette-error95)",
-      error99: "var(--uk-ref-palette-error99)",
-      error100: "var(--uk-ref-palette-error100)",
-      tertiary0: "var(--uk-ref-palette-tertiary0)",
-      tertiary10: "var(--uk-ref-palette-tertiary10)",
-      tertiary20: "var(--uk-ref-palette-tertiary20)",
-      tertiary30: "var(--uk-ref-palette-tertiary30)",
-      tertiary40: "var(--uk-ref-palette-tertiary40)",
-      tertiary50: "var(--uk-ref-palette-tertiary50)",
-      tertiary60: "var(--uk-ref-palette-tertiary60)",
-      tertiary70: "var(--uk-ref-palette-tertiary70)",
-      tertiary80: "var(--uk-ref-palette-tertiary80)",
-      tertiary90: "var(--uk-ref-palette-tertiary90)",
-      tertiary95: "var(--uk-ref-palette-tertiary95)",
-      tertiary99: "var(--uk-ref-palette-tertiary99)",
-      tertiary100: "var(--uk-ref-palette-tertiary100)",
-      secondary0: "var(--uk-ref-palette-secondary0)",
-      secondary10: "var(--uk-ref-palette-secondary10)",
-      secondary20: "var(--uk-ref-palette-secondary20)",
-      secondary30: "var(--uk-ref-palette-secondary30)",
-      secondary40: "var(--uk-ref-palette-secondary40)",
-      secondary50: "var(--uk-ref-palette-secondary50)",
-      secondary60: "var(--uk-ref-palette-secondary60)",
-      secondary70: "var(--uk-ref-palette-secondary70)",
-      secondary80: "var(--uk-ref-palette-secondary80)",
-      secondary90: "var(--uk-ref-palette-secondary90)",
-      secondary95: "var(--uk-ref-palette-secondary95)",
-      secondary99: "var(--uk-ref-palette-secondary99)",
-      secondary100: "var(--uk-ref-palette-secondary100)",
-      primary0: "var(--uk-ref-palette-primary0)",
-      primary10: "var(--uk-ref-palette-primary10)",
-      primary20: "var(--uk-ref-palette-primary20)",
-      primary30: "var(--uk-ref-palette-primary30)",
-      primary40: "var(--uk-ref-palette-primary40)",
-      primary50: "var(--uk-ref-palette-primary50)",
-      primary60: "var(--uk-ref-palette-primary60)",
-      primary70: "var(--uk-ref-palette-primary70)",
-      primary80: "var(--uk-ref-palette-primary80)",
-      primary90: "var(--uk-ref-palette-primary90)",
-      primary95: "var(--uk-ref-palette-primary95)",
-      primary99: "var(--uk-ref-palette-primary99)",
-      primary100: "var(--uk-ref-palette-primary100)",
-      "neutral-variant0": "var(--uk-ref-palette-neutral-variant0)",
-      "neutral-variant10": "var(--uk-ref-palette-neutral-variant10)",
-      "neutral-variant20": "var(--uk-ref-palette-neutral-variant20)",
-      "neutral-variant30": "var(--uk-ref-palette-neutral-variant30)",
-      "neutral-variant40": "var(--uk-ref-palette-neutral-variant40)",
-      "neutral-variant50": "var(--uk-ref-palette-neutral-variant50)",
-      "neutral-variant60": "var(--uk-ref-palette-neutral-variant60)",
-      "neutral-variant70": "var(--uk-ref-palette-neutral-variant70)",
-      "neutral-variant80": "var(--uk-ref-palette-neutral-variant80)",
-      "neutral-variant90": "var(--uk-ref-palette-neutral-variant90)",
-      "neutral-variant95": "var(--uk-ref-palette-neutral-variant95)",
-      "neutral-variant98": "var(--uk-ref-palette-neutral-variant98)",
-      "neutral-variant99": "var(--uk-ref-palette-neutral-variant99)",
-      "neutral-variant100": "var(--uk-ref-palette-neutral-variant100)",
-      neutral0: "var(--uk-ref-palette-neutral0)",
-      neutral4: "var(--uk-ref-palette-neutral4)",
-      neutral6: "var(--uk-ref-palette-neutral6)",
-      neutral10: "var(--uk-ref-palette-neutral10)",
-      neutral12: "var(--uk-ref-palette-neutral12)",
-      neutral17: "var(--uk-ref-palette-neutral17)",
-      neutral20: "var(--uk-ref-palette-neutral20)",
-      neutral22: "var(--uk-ref-palette-neutral22)",
-      neutral24: "var(--uk-ref-palette-neutral24)",
-      neutral30: "var(--uk-ref-palette-neutral30)",
-      neutral40: "var(--uk-ref-palette-neutral40)",
-      neutral50: "var(--uk-ref-palette-neutral50)",
-      neutral60: "var(--uk-ref-palette-neutral60)",
-      neutral70: "var(--uk-ref-palette-neutral70)",
-      neutral80: "var(--uk-ref-palette-neutral80)",
-      neutral87: "var(--uk-ref-palette-neutral87)",
-      neutral90: "var(--uk-ref-palette-neutral90)",
-      neutral92: "var(--uk-ref-palette-neutral92)",
-      neutral94: "var(--uk-ref-palette-neutral94)",
-      neutral95: "var(--uk-ref-palette-neutral95)",
-      neutral96: "var(--uk-ref-palette-neutral96)",
-      neutral98: "var(--uk-ref-palette-neutral98)",
-      neutral99: "var(--uk-ref-palette-neutral99)",
-      neutral100: "var(--uk-ref-palette-neutral100)",
-      black: "var(--uk-ref-palette-black)",
-      white: "var(--uk-ref-palette-white)",
-    },
     typeface: {
       plain: "var(--uk-ref-typeface-plain)",
       brand: "var(--uk-ref-typeface-brand)",
@@ -2300,23 +2024,28 @@ function hexToRgb(hex: string) {
 
 function applyTheme(theme: UKDesignTheme, element: HTMLDivElement, mode: "light" | "dark") {
   for (const key of Object.keys(theme.sys.color.lightMode)) {
-    const val = theme.sys.color.lightMode[key as keyof typeof theme.sys.color.lightMode]();
+    let val = theme.sys.color.lightMode[key as keyof typeof theme.sys.color.lightMode];
 
-    uk.raw.sys.color.lightMode[key as keyof typeof theme.sys.color.lightMode] = () => hexToRgb(val);
+    if (val.startsWith("#")) {
+      val = hexToRgb(val);
+    }
+    uk.raw.sys.color.lightMode[key as keyof typeof theme.sys.color.lightMode] = () => val;
   }
 
   for (const key of Object.keys(theme.sys.color.darkMode)) {
-    const val = theme.sys.color.darkMode[key as keyof typeof theme.sys.color.darkMode]();
+    let val = theme.sys.color.darkMode[key as keyof typeof theme.sys.color.darkMode];
 
-    uk.raw.sys.color.darkMode[key as keyof typeof theme.sys.color.darkMode] = () => hexToRgb(val);
+    if (val.startsWith("#")) {
+      val = hexToRgb(val);
+    }
+    uk.raw.sys.color.darkMode[key as keyof typeof theme.sys.color.darkMode] = () => val;
   }
 
-  tokens.raw.ref.palette = { ...tokens.raw.ref.palette, ...theme.ref.palette };
   tokens.raw.ref.typeface = { ...tokens.raw.ref.typeface, ...theme.ref.typeface };
 
   const cssVars: [string, string][] = [];
 
-  const randomClassName = "uk" + Math.floor(Math.random() * 100000000);
+  const randomClassName = `uk${Math.floor(Math.random() * 100000000)}`;
 
   function applyProperty(key: string, value: () => string) {
     cssVars.push([key.slice(4, -1), value()]);
@@ -2435,8 +2164,6 @@ function applyTheme(theme: UKDesignTheme, element: HTMLDivElement, mode: "light"
   // applyProperty(uk.ref.palette.neutral100, uk.raw.ref.palette.neutral100);
   // applyProperty(uk.ref.palette.black, uk.raw.ref.palette.black);
   // applyProperty(uk.ref.palette.white, uk.raw.ref.palette.white);
-
-  recurseLevel(uk.ref.palette, uk.raw.ref.palette);
 
   // applyProperty(uk.ref.typeface.plain, uk.raw.ref.typeface.plain);
   // applyProperty(uk.ref.typeface.brand, uk.raw.ref.typeface.brand);
@@ -2850,72 +2577,74 @@ function applyTheme(theme: UKDesignTheme, element: HTMLDivElement, mode: "light"
   recurseLevel(uk.sys.motion, uk.raw.sys.motion);
 
   if (mode === "light") {
-    applyProperty(uk.sys.color["surface-tint"], uk.raw.sys.color.lightMode["surface-tint"]);
-    applyProperty(uk.sys.color["surface-tint-color"], uk.raw.sys.color.lightMode["surface-tint-color"]);
-    applyProperty(uk.sys.color["on-error-container"], uk.raw.sys.color.lightMode["on-error-container"]);
-    applyProperty(uk.sys.color["on-error"], uk.raw.sys.color.lightMode["on-error"]);
-    applyProperty(uk.sys.color["error-container"], uk.raw.sys.color.lightMode["error-container"]);
-    applyProperty(uk.sys.color["on-tertiary-container"], uk.raw.sys.color.lightMode["on-tertiary-container"]);
-    applyProperty(uk.sys.color["on-tertiary"], uk.raw.sys.color.lightMode["on-tertiary"]);
-    applyProperty(uk.sys.color["tertiary-container"], uk.raw.sys.color.lightMode["tertiary-container"]);
-    applyProperty(uk.sys.color["tertiary"], uk.raw.sys.color.lightMode["tertiary"]);
-    applyProperty(uk.sys.color["shadow"], uk.raw.sys.color.lightMode["shadow"]);
-    applyProperty(uk.sys.color["error"], uk.raw.sys.color.lightMode["error"]);
-    applyProperty(uk.sys.color["outline"], uk.raw.sys.color.lightMode["outline"]);
-    applyProperty(uk.sys.color["outline-variant"], uk.raw.sys.color.lightMode["outline-variant"]);
-    applyProperty(uk.sys.color["on-background"], uk.raw.sys.color.lightMode["on-background"]);
-    applyProperty(uk.sys.color["background"], uk.raw.sys.color.lightMode["background"]);
-    applyProperty(uk.sys.color["inverse-on-surface"], uk.raw.sys.color.lightMode["inverse-on-surface"]);
-    applyProperty(uk.sys.color["inverse-surface"], uk.raw.sys.color.lightMode["inverse-surface"]);
-    applyProperty(uk.sys.color["on-surface-variant"], uk.raw.sys.color.lightMode["on-surface-variant"]);
-    applyProperty(uk.sys.color["on-surface"], uk.raw.sys.color.lightMode["on-surface"]);
-    applyProperty(uk.sys.color["surface-variant"], uk.raw.sys.color.lightMode["surface-variant"]);
-    applyProperty(uk.sys.color["surface"], uk.raw.sys.color.lightMode["surface"]);
-    applyProperty(uk.sys.color["surface-container"], uk.raw.sys.color.lightMode["surface-container"]);
-    applyProperty(uk.sys.color["surface-container-low"], uk.raw.sys.color.lightMode["surface-container-low"]);
-    applyProperty(uk.sys.color["surface-container-highest"], uk.raw.sys.color.lightMode["surface-container-highest"]);
-    applyProperty(uk.sys.color["on-secondary-container"], uk.raw.sys.color.lightMode["on-secondary-container"]);
-    applyProperty(uk.sys.color["on-secondary"], uk.raw.sys.color.lightMode["on-secondary"]);
-    applyProperty(uk.sys.color["secondary-container"], uk.raw.sys.color.lightMode["secondary-container"]);
-    applyProperty(uk.sys.color["secondary"], uk.raw.sys.color.lightMode["secondary"]);
-    applyProperty(uk.sys.color["inverse-primary"], uk.raw.sys.color.lightMode["inverse-primary"]);
-    applyProperty(uk.sys.color["on-primary-container"], uk.raw.sys.color.lightMode["on-primary-container"]);
-    applyProperty(uk.sys.color["on-primary"], uk.raw.sys.color.lightMode["on-primary"]);
-    applyProperty(uk.sys.color["primary-container"], uk.raw.sys.color.lightMode["primary-container"]);
-    applyProperty(uk.sys.color["primary"], uk.raw.sys.color.lightMode["primary"]);
+    recurseLevel(uk.sys.color, uk.raw.sys.color.lightMode);
+    // applyProperty(uk.sys.color["surface-tint"], uk.raw.sys.color.lightMode["surface-tint"]);
+    // applyProperty(uk.sys.color["surface-tint-color"], uk.raw.sys.color.lightMode["surface-tint-color"]);
+    // applyProperty(uk.sys.color["on-error-container"], uk.raw.sys.color.lightMode["on-error-container"]);
+    // applyProperty(uk.sys.color["on-error"], uk.raw.sys.color.lightMode["on-error"]);
+    // applyProperty(uk.sys.color["error-container"], uk.raw.sys.color.lightMode["error-container"]);
+    // applyProperty(uk.sys.color["on-tertiary-container"], uk.raw.sys.color.lightMode["on-tertiary-container"]);
+    // applyProperty(uk.sys.color["on-tertiary"], uk.raw.sys.color.lightMode["on-tertiary"]);
+    // applyProperty(uk.sys.color["tertiary-container"], uk.raw.sys.color.lightMode["tertiary-container"]);
+    // applyProperty(uk.sys.color["tertiary"], uk.raw.sys.color.lightMode["tertiary"]);
+    // applyProperty(uk.sys.color["shadow"], uk.raw.sys.color.lightMode["shadow"]);
+    // applyProperty(uk.sys.color["error"], uk.raw.sys.color.lightMode["error"]);
+    // applyProperty(uk.sys.color["outline"], uk.raw.sys.color.lightMode["outline"]);
+    // applyProperty(uk.sys.color["outline-variant"], uk.raw.sys.color.lightMode["outline-variant"]);
+    // applyProperty(uk.sys.color["on-background"], uk.raw.sys.color.lightMode["on-background"]);
+    // applyProperty(uk.sys.color["background"], uk.raw.sys.color.lightMode["background"]);
+    // applyProperty(uk.sys.color["inverse-on-surface"], uk.raw.sys.color.lightMode["inverse-on-surface"]);
+    // applyProperty(uk.sys.color["inverse-surface"], uk.raw.sys.color.lightMode["inverse-surface"]);
+    // applyProperty(uk.sys.color["on-surface-variant"], uk.raw.sys.color.lightMode["on-surface-variant"]);
+    // applyProperty(uk.sys.color["on-surface"], uk.raw.sys.color.lightMode["on-surface"]);
+    // applyProperty(uk.sys.color["surface-variant"], uk.raw.sys.color.lightMode["surface-variant"]);
+    // applyProperty(uk.sys.color["surface"], uk.raw.sys.color.lightMode["surface"]);
+    // applyProperty(uk.sys.color["surface-container"], uk.raw.sys.color.lightMode["surface-container"]);
+    // applyProperty(uk.sys.color["surface-container-low"], uk.raw.sys.color.lightMode["surface-container-low"]);
+    // applyProperty(uk.sys.color["surface-container-highest"], uk.raw.sys.color.lightMode["surface-container-highest"]);
+    // applyProperty(uk.sys.color["on-secondary-container"], uk.raw.sys.color.lightMode["on-secondary-container"]);
+    // applyProperty(uk.sys.color["on-secondary"], uk.raw.sys.color.lightMode["on-secondary"]);
+    // applyProperty(uk.sys.color["secondary-container"], uk.raw.sys.color.lightMode["secondary-container"]);
+    // applyProperty(uk.sys.color["secondary"], uk.raw.sys.color.lightMode["secondary"]);
+    // applyProperty(uk.sys.color["inverse-primary"], uk.raw.sys.color.lightMode["inverse-primary"]);
+    // applyProperty(uk.sys.color["on-primary-container"], uk.raw.sys.color.lightMode["on-primary-container"]);
+    // applyProperty(uk.sys.color["on-primary"], uk.raw.sys.color.lightMode["on-primary"]);
+    // applyProperty(uk.sys.color["primary-container"], uk.raw.sys.color.lightMode["primary-container"]);
+    // applyProperty(uk.sys.color["primary"], uk.raw.sys.color.lightMode["primary"]);
   }
 
   if (mode === "dark") {
-    applyProperty(uk.sys.color["on-error"], uk.raw.sys.color.darkMode["on-error"]);
-    applyProperty(uk.sys.color["error-container"], uk.raw.sys.color.darkMode["error-container"]);
-    applyProperty(uk.sys.color["on-tertiary-container"], uk.raw.sys.color.darkMode["on-tertiary-container"]);
-    applyProperty(uk.sys.color["on-tertiary"], uk.raw.sys.color.darkMode["on-tertiary"]);
-    applyProperty(uk.sys.color["tertiary-container"], uk.raw.sys.color.darkMode["tertiary-container"]);
-    applyProperty(uk.sys.color["tertiary"], uk.raw.sys.color.darkMode["tertiary"]);
-    applyProperty(uk.sys.color["shadow"], uk.raw.sys.color.darkMode["shadow"]);
-    applyProperty(uk.sys.color["error"], uk.raw.sys.color.darkMode["error"]);
-    applyProperty(uk.sys.color["outline"], uk.raw.sys.color.darkMode["outline"]);
-    applyProperty(uk.sys.color["outline-variant"], uk.raw.sys.color.darkMode["outline-variant"]);
-    applyProperty(uk.sys.color["on-background"], uk.raw.sys.color.darkMode["on-background"]);
-    applyProperty(uk.sys.color["background"], uk.raw.sys.color.darkMode["background"]);
-    applyProperty(uk.sys.color["inverse-on-surface"], uk.raw.sys.color.darkMode["inverse-on-surface"]);
-    applyProperty(uk.sys.color["inverse-surface"], uk.raw.sys.color.darkMode["inverse-surface"]);
-    applyProperty(uk.sys.color["on-surface-variant"], uk.raw.sys.color.darkMode["on-surface-variant"]);
-    applyProperty(uk.sys.color["on-surface"], uk.raw.sys.color.darkMode["on-surface"]);
-    applyProperty(uk.sys.color["surface-variant"], uk.raw.sys.color.darkMode["surface-variant"]);
-    applyProperty(uk.sys.color["surface"], uk.raw.sys.color.darkMode["surface"]);
-    applyProperty(uk.sys.color["surface-container"], uk.raw.sys.color.darkMode["surface-container"]);
-    applyProperty(uk.sys.color["surface-container-low"], uk.raw.sys.color.darkMode["surface-container-low"]);
-    applyProperty(uk.sys.color["surface-container-highest"], uk.raw.sys.color.darkMode["surface-container-highest"]);
-    applyProperty(uk.sys.color["on-secondary-container"], uk.raw.sys.color.darkMode["on-secondary-container"]);
-    applyProperty(uk.sys.color["on-secondary"], uk.raw.sys.color.darkMode["on-secondary"]);
-    applyProperty(uk.sys.color["secondary-container"], uk.raw.sys.color.darkMode["secondary-container"]);
-    applyProperty(uk.sys.color["secondary"], uk.raw.sys.color.darkMode["secondary"]);
-    applyProperty(uk.sys.color["inverse-primary"], uk.raw.sys.color.darkMode["inverse-primary"]);
-    applyProperty(uk.sys.color["on-primary-container"], uk.raw.sys.color.darkMode["on-primary-container"]);
-    applyProperty(uk.sys.color["on-primary"], uk.raw.sys.color.darkMode["on-primary"]);
-    applyProperty(uk.sys.color["primary-container"], uk.raw.sys.color.darkMode["primary-container"]);
-    applyProperty(uk.sys.color["primary"], uk.raw.sys.color.darkMode["primary"]);
+    recurseLevel(uk.sys.color, uk.raw.sys.color.darkMode);
+    // applyProperty(uk.sys.color["on-error"], uk.raw.sys.color.darkMode["on-error"]);
+    // applyProperty(uk.sys.color["error-container"], uk.raw.sys.color.darkMode["error-container"]);
+    // applyProperty(uk.sys.color["on-tertiary-container"], uk.raw.sys.color.darkMode["on-tertiary-container"]);
+    // applyProperty(uk.sys.color["on-tertiary"], uk.raw.sys.color.darkMode["on-tertiary"]);
+    // applyProperty(uk.sys.color["tertiary-container"], uk.raw.sys.color.darkMode["tertiary-container"]);
+    // applyProperty(uk.sys.color["tertiary"], uk.raw.sys.color.darkMode["tertiary"]);
+    // applyProperty(uk.sys.color["shadow"], uk.raw.sys.color.darkMode["shadow"]);
+    // applyProperty(uk.sys.color["error"], uk.raw.sys.color.darkMode["error"]);
+    // applyProperty(uk.sys.color["outline"], uk.raw.sys.color.darkMode["outline"]);
+    // applyProperty(uk.sys.color["outline-variant"], uk.raw.sys.color.darkMode["outline-variant"]);
+    // applyProperty(uk.sys.color["on-background"], uk.raw.sys.color.darkMode["on-background"]);
+    // applyProperty(uk.sys.color["background"], uk.raw.sys.color.darkMode["background"]);
+    // applyProperty(uk.sys.color["inverse-on-surface"], uk.raw.sys.color.darkMode["inverse-on-surface"]);
+    // applyProperty(uk.sys.color["inverse-surface"], uk.raw.sys.color.darkMode["inverse-surface"]);
+    // applyProperty(uk.sys.color["on-surface-variant"], uk.raw.sys.color.darkMode["on-surface-variant"]);
+    // applyProperty(uk.sys.color["on-surface"], uk.raw.sys.color.darkMode["on-surface"]);
+    // applyProperty(uk.sys.color["surface-variant"], uk.raw.sys.color.darkMode["surface-variant"]);
+    // applyProperty(uk.sys.color["surface"], uk.raw.sys.color.darkMode["surface"]);
+    // applyProperty(uk.sys.color["surface-container"], uk.raw.sys.color.darkMode["surface-container"]);
+    // applyProperty(uk.sys.color["surface-container-low"], uk.raw.sys.color.darkMode["surface-container-low"]);
+    // applyProperty(uk.sys.color["surface-container-highest"], uk.raw.sys.color.darkMode["surface-container-highest"]);
+    // applyProperty(uk.sys.color["on-secondary-container"], uk.raw.sys.color.darkMode["on-secondary-container"]);
+    // applyProperty(uk.sys.color["on-secondary"], uk.raw.sys.color.darkMode["on-secondary"]);
+    // applyProperty(uk.sys.color["secondary-container"], uk.raw.sys.color.darkMode["secondary-container"]);
+    // applyProperty(uk.sys.color["secondary"], uk.raw.sys.color.darkMode["secondary"]);
+    // applyProperty(uk.sys.color["inverse-primary"], uk.raw.sys.color.darkMode["inverse-primary"]);
+    // applyProperty(uk.sys.color["on-primary-container"], uk.raw.sys.color.darkMode["on-primary-container"]);
+    // applyProperty(uk.sys.color["on-primary"], uk.raw.sys.color.darkMode["on-primary"]);
+    // applyProperty(uk.sys.color["primary-container"], uk.raw.sys.color.darkMode["primary-container"]);
+    // applyProperty(uk.sys.color["primary"], uk.raw.sys.color.darkMode["primary"]);
   }
 
   element.querySelector("[data-uikit-styles]")!.innerHTML = `.${randomClassName} {

@@ -98,7 +98,7 @@ export const adminProcedure = procedure.use(async (opt) => {
 
 const temporaryTwoFactorSecrets: Map<number, string> = new Map();
 const emailSignupVerificationCodes: Map<string, string> = new Map();
-let notifications: WorkspacesNotification[] = [];
+const notifications: WorkspacesNotification[] = [];
 
 export const workspacesRouter = t.router({
   authorization: {
@@ -697,35 +697,45 @@ ${opt.ctx.instance.sys.configuration.termsOfUse.message}`;
               .optional(),
           }),
         )
-        .mutation(async (opt) => {
-          const notification = notifications.find((n) => n.uuid === opt.input.uuid);
+        .mutation(async (_) => {
+          // const notification = notifications.find((n) => n.uuid === opt.input.uuid);
 
-          if (notification) {
-            let output:
-              | {
-                  type: "navigate";
-                  value: string;
-                }
-              | {
-                  type: "reload";
-                };
+          // if (notification) {
+          //   let output:
+          //     | {
+          //         type: "navigate";
+          //         value: string;
+          //       }
+          //     | {
+          //         type: "reload";
+          //       };
 
-            if (opt.input.responseType === "button") {
-              output = notification.optionsCallbacks?.onButton(opt.input.value);
-            }
+          //   if (opt.input.responseType === "button") {
+          //     output = notification.optionsCallbacks?.onButton(opt.input.value);
+          //   }
 
-            notifications = notifications.filter((n) => n.uuid !== notification.uuid);
+          //   notifications = notifications.filter((n) => n.uuid !== notification.uuid);
 
-            if (output !== undefined) {
-              return { ok: true, action: output.action };
-            } else {
-              return { ok: true };
-            }
-          }
+          //   if (output !== undefined) {
+          //     return { ok: true, action: output.action };
+          //   } else {
+          //     return { ok: true };
+          //   }
+          // }
 
           return { ok: false };
         }),
     },
+  },
+  theme: {
+    get: procedure.output(z.any().or(z.literal(false))).query(async (opt) => {
+      const db = opt.ctx.instance.sys.database.postgres();
+
+      // biome-ignore lint/suspicious/noExplicitAny: unrequired
+      const themeValues = (await db`SELECT color_theme FROM public.users WHERE id = ${opt.ctx.userId}`) as any;
+
+      return themeValues?.[0]?.color_theme || false;
+    }),
   },
 });
 
