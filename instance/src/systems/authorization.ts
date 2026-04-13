@@ -374,11 +374,18 @@ export default class AuthorizationSystem extends System {
       const sessionToken = crypto.getRandomValues(new Uint32Array(16)).join("");
 
       await db`INSERT INTO public.sessions (user_id, session_token, device_type, valid_until, ip_address, login_method) VALUES (${userId}, ${sessionToken}, ${deviceId}, ${Date.now() + SESSION_VALID_TERM_MS}, ${ipAddress || "Anonymous"}, 'passkey')`;
+      await db`UPDATE public.passkeys SET last_used_timestamp = NOW(), counter = ${passkey.counter + 1} WHERE passkey_id = ${passkey.passkey_id}`;
 
       return `workspaces_session:${userId}:${sessionToken}`;
     }
 
     return undefined;
+  }
+
+  removePasskey(userId: number, passkeyId: string) {
+    const db = this.instance.sys.database.postgres();
+
+    return db`DELETE FROM public.passkeys WHERE user_id = ${userId} AND passkey_id = ${passkeyId}`;
   }
 
   async startup() {
@@ -415,6 +422,8 @@ export default class AuthorizationSystem extends System {
     // device_type - the type of device the passkey is used on (CredentialDeviceType)
     // backed_up - whether the passkey has been backed up or not (boolean)
     // transports - the transports supported by the passkey (string array stored as a CSV string -> AuthenticatorTransportFuture[])
+    // creation_timestamp - the timestamp of when the passkey was created (Date)
+    // last_used_timestamp - the timestamp of when the passkey was last used (Date)
     await db`CREATE TABLE IF NOT EXISTS Passkeys (
       passkey_id TEXT PRIMARY KEY,
       public_key BYTEA,
@@ -425,6 +434,7 @@ export default class AuthorizationSystem extends System {
       backed_up BOOLEAN DEFAULT FALSE,
       transports VARCHAR(255),
       creation_timetamp TIMESTAMPTZ DEFAULT NOW(),
+      last_used_timestamp TIMESTAMPTZ DEFAULT NOW(),
       FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE
     )`;
 

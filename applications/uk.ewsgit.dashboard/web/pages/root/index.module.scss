@@ -75,3 +75,19 @@
     backdrop-filter: blur(2rem);
   }
 }
+
+@media (prefers-color-scheme: light) {
+  *[data-show-background="true"] {
+    .welcomeMessage {
+      background: #fff6;
+    }
+
+    .widgets {
+      background: #fff6;
+    }
+
+    .searchBar {
+      background: #fff6;
+    }
+  }
+}

@@ -68,14 +68,18 @@ const ApplicationPage: Component = () => {
           {application()?.isInstalled ? "Uninstall" : "Install"}
         </UKButton>
       </div>
+      {!application()?.isUserAdministrator && (
+        <UKCard color="elevated" class={styles.permissionWarning}>
+          <UKText role="body" size="l">
+            Info: You are not an administrator and lack the permission to install or uninstall applications.
+          </UKText>
+        </UKCard>
+      )}
       <UKCard color="filled" class={styles.description}>
         <UKText role="body" size="m">
           {application()?.description}
         </UKText>
       </UKCard>
-      {!application()?.isUserAdministrator && (
-        <UKCard color="elevated">Info: You are not an administrator and lack the permission to install or uninstall applications.</UKCard>
-      )}
       {/*TODO: implement this*/}
       {/*<UKCarousel>*/}
       {/*  <UKCard>*/}

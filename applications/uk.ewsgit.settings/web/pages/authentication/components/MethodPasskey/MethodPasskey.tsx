@@ -7,11 +7,13 @@ import UKText from "@onlineworkspace/uikit-solid/src/components/text/UKText.jsx"
 import { startRegistration } from "@simplewebauthn/browser";
 import { type Component, createResource, createSignal, onMount, Suspense } from "solid-js";
 import trpc from "../../../../lib/trpc";
+import Passkeys from "./components/Passkeys/Passkeys";
 import styles from "./MethodPasskey.module.scss";
 
 const MethodPasskey: Component = () => {
   const [supportsPasskeys, setSupportsPasskeys] = createSignal<boolean>(false);
   const [hasPasskey, { refetch: refetchHasPasskey }] = createResource(() => trpc.authentication.hasPasskey.query());
+  const [refetchCounter, setRefetchCounter] = createSignal(0);
 
   onMount(async () => {
     if (window.PublicKeyCredential && PublicKeyCredential.getClientCapabilities) {
@@ -39,6 +41,9 @@ const MethodPasskey: Component = () => {
               Use a passkey to login to your Workspace account. This is more secure {"&"} convenient than a password and can be used with biometric
               authentication on supported devices.
             </UKText>
+            <Suspense>
+              <Passkeys refetch={refetchCounter()} />
+            </Suspense>
             <UKButton
               disabled={!supportsPasskeys()}
               affirmative={true}
@@ -54,6 +59,7 @@ const MethodPasskey: Component = () => {
                   return {
                     state: AffirmativeButtonState.Success,
                     cb: async () => {
+                      setRefetchCounter((c) => c + 1);
                       await refetchHasPasskey();
                     },
                   };

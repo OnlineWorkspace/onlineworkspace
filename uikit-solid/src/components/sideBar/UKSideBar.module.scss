@@ -6,12 +6,12 @@
   height: 100%;
 
   &[data-sidebar-mode-mobile-mode="true"] {
-    grid-template-columns: 1fr;
-    grid-template-rows: auto 1fr;
+    display: flex;
+    flex-direction: column;
 
     .component {
       height: max-content;
-      width: 100%;
+      max-width: 100%;
     }
   }
 }
@@ -19,11 +19,13 @@
 .component {
   display: flex;
   flex-direction: column;
-  width: 22.5rem;
+  width: 100%;
+  max-width: 22.5rem;
   height: 100%;
   padding-left: 0.75rem;
   padding-right: 0.75rem;
   padding-top: 1rem;
+  padding-bottom: 1rem;
   background-color: rgb(var(--uk-sys-color-surface-container-low));
 
   .button {

@@ -162,6 +162,39 @@ const router = t.router({
     registerPasskey: procedure.input(z.any()).mutation(async (opt) => {
       return opt.ctx.instance.sys.authorization.registerPasskey(opt.ctx.userId, opt.input);
     }),
+    getPasskeys: procedure
+      .output(
+        z
+          .object({
+            id: z.string(),
+            creationTimestamp: z.string(),
+            lastUsedTimestamp: z.string(),
+            deviceType: z.string(),
+            usedTimes: z.string(),
+          })
+          .array(),
+      )
+      .query(async (opt) => {
+        const db = instance.sys.database.postgres();
+
+        const passkeys =
+          await db`SELECT passkey_id, creation_timetamp, last_used_timestamp, device_type, counter FROM public.passkeys WHERE user_id = ${opt.ctx.userId}`;
+
+        return passkeys.map((passkey: { passkey_id: string; creation_timetamp: Date; last_used_timestamp: Date; device_type: string; counter: string }) => {
+          return {
+            id: passkey.passkey_id,
+            creationTimestamp: passkey.creation_timetamp.toString() || "",
+            lastUsedTimestamp: passkey.last_used_timestamp.toString() || "",
+            deviceType: passkey.device_type,
+            usedTimes: passkey.counter,
+          };
+        });
+      }),
+    removePasskey: procedure.input(z.object({ id: z.string() })).mutation(async (opt) => {
+      await instance.sys.authorization.removePasskey(opt.ctx.userId, opt.input.id);
+
+      return { success: true };
+    }),
     getSessions: procedure
       .output(
         z

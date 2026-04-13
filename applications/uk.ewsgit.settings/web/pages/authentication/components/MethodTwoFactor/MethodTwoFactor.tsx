@@ -38,7 +38,7 @@ const MethodTwoFactor: Component = () => {
                 class={styles.button}
                 onClick={async () => {
                   setShowDialog("createCode");
-                  return 0;
+                  return;
                 }}
               >
                 {hasTwoFactor() ? "Reset" : "Setup"} OTP two factor

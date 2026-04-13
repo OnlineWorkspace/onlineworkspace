@@ -1,6 +1,6 @@
 import CHEVRON_RIGHT_ICON from "@material-symbols/svg-700/outlined/chevron_right.svg";
 import clsx from "clsx";
-import { type Component, createSignal, type JSXElement, Match, Suspense, Switch } from "solid-js";
+import { type Component, createSignal, type JSXElement, Match, Show, Suspense, Switch } from "solid-js";
 import UKIcon from "../icon/UKIcon";
 import UKIconButton from "../iconButton/UKIconButton.tsx";
 import UKText from "../text/UKText";
@@ -70,23 +70,9 @@ const UKStackItem: Component<{
                 : props.onClick
             }
           >
-            {props.leading?.type === "iconButton" && (
-              <UKIconButton
-                alt={props.leading.alt}
-                onClick={props.leading.onClick}
-                icon={props.leading.value}
-              />
-            )}
-            {props.leading?.type === "icon" && (
-              <UKIcon class={styles.leadingIcon}>{props.leading.value}</UKIcon>
-            )}
-            {props.leading?.type === "image" && (
-              <img
-                class={styles.leadingImage}
-                src={props.leading.value}
-                alt={props.leading.alt || ""}
-              />
-            )}
+            {props.leading?.type === "iconButton" && <UKIconButton alt={props.leading.alt} onClick={props.leading.onClick} icon={props.leading.value} />}
+            {props.leading?.type === "icon" && <UKIcon class={styles.leadingIcon}>{props.leading.value}</UKIcon>}
+            {props.leading?.type === "image" && <img class={styles.leadingImage} src={props.leading.value} alt={props.leading.alt || ""} />}
             {(props.labelText || props.supportingText) && (
               <div class={styles.body}>
                 <Suspense
@@ -121,12 +107,7 @@ const UKStackItem: Component<{
               {props.inlineComponent
                 ? props.inlineComponent
                 : !!props.expandedComponent && (
-                    <UKIcon
-                      class={clsx(
-                        expanded() ? styles.indicatorExpanded : styles.indicatorCollapsed,
-                        styles.toggleIndicator,
-                      )}
-                    >
+                    <UKIcon class={clsx(expanded() ? styles.indicatorExpanded : styles.indicatorCollapsed, styles.toggleIndicator)}>
                       {CHEVRON_RIGHT_ICON}
                     </UKIcon>
                   )}
@@ -135,16 +116,8 @@ const UKStackItem: Component<{
         </Match>
         <Match when={!props.onClick}>
           <div class={styles.collapsedArea} data-clickable={false}>
-            {props.leading?.type === "icon" && (
-              <UKIcon class={styles.leadingIcon}>{props.leading.value}</UKIcon>
-            )}
-            {props.leading?.type === "image" && (
-              <img
-                class={styles.leadingImage}
-                src={props.leading.value}
-                alt={props.leading.alt || ""}
-              />
-            )}
+            {props.leading?.type === "icon" && <UKIcon class={styles.leadingIcon}>{props.leading.value}</UKIcon>}
+            {props.leading?.type === "image" && <img class={styles.leadingImage} src={props.leading.value} alt={props.leading.alt || ""} />}
             {(props.labelText || props.supportingText) && (
               <div class={styles.body}>
                 <Suspense
@@ -179,7 +152,7 @@ const UKStackItem: Component<{
           </div>
         </Match>
       </Switch>
-      {expanded() && props.expandedComponent}
+      <Show when={expanded()}>{props.expandedComponent}</Show>
     </div>
   );
 };

@@ -1,105 +1,119 @@
 .root {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    width: 100%;
-    align-items: center;
-    gap: 1rem;
-    position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  align-items: center;
+  gap: 1rem;
+  position: relative;
+  overflow-y: auto;
 }
 
 .backButton {
-    position: absolute;
-    top: 1rem;
-    left: 1rem;
-    z-index: 1;
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  z-index: 1;
 }
 
 .header {
-    height: 24rem;
-    width: 100%;
-    margin-bottom: 2rem;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
+  height: 24rem;
+  min-height: 12rem;
+  width: 100%;
+  margin-bottom: 2rem;
+  overflow: hidden;
+  display: flex;
+  flex-shrink: 1;
+  align-items: center;
+  justify-content: center;
+  position: relative;
 
-    &::after {
-        content: "";
-        position: absolute;
-        width: 100%;
-        height: 7.5rem;
-        bottom: 0;
-        left: 0;
-        background: linear-gradient(to top, rgb(var(--uk-sys-color-background)), transparent);
-    }
+  &::after {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 7.5rem;
+    bottom: 0;
+    left: 0;
+    background: linear-gradient(
+      to top,
+      rgb(var(--uk-sys-color-background)),
+      transparent
+    );
+  }
 }
 
 .headerImage {
-    min-width: 100%;
-    height: 100%;
-    object-fit: cover;
+  min-width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .headerContent {
-    position: relative;
-    --header-content-height: calc(var(--uk-sys-typescale-display-medium-line-height) + 1rem);
+  position: relative;
+  --header-content-height: calc(
+    var(--uk-sys-typescale-display-medium-line-height) + 1rem
+  );
 
-    display: flex;
-    align-items: center;
-    justify-content: start;
-    gap: 1rem;
-    margin-top: calc(calc(var(--header-content-height) + 1rem) * -1);
-    width: calc(100% - 2rem);
-    max-width: 768px;
+  display: flex;
+  align-items: center;
+  justify-content: start;
+  gap: 1rem;
+  margin-top: calc(calc(var(--header-content-height) + 1rem) * -1);
+  width: calc(100% - 2rem);
+  max-width: 768px;
 
-    .iconImage {
-        height: var(--header-content-height);
-        width: var(--header-content-height);
-    }
+  .iconImage {
+    height: var(--header-content-height);
+    width: var(--header-content-height);
+  }
 
-    .iconIcon {
-        --icon-size: var(--header-content-height);
+  .iconIcon {
+    --icon-size: var(--header-content-height);
 
-        height: var(--header-content-height);
-        width: var(--header-content-height);
-    }
+    height: var(--header-content-height);
+    width: var(--header-content-height);
+  }
 
-    .headerContentButton {
-        margin-left: auto;
-    }
+  .headerContentButton {
+    margin-left: auto;
+  }
+}
+
+.permissionWarning {
+  width: calc(100% - 2rem);
+  max-width: 768px;
 }
 
 .description {
-    width: calc(100% - 2rem);
-    max-width: 768px;
+  width: calc(100% - 2rem);
+  max-width: 768px;
 }
 
 .author {
-    width: calc(100% - 2rem);
-    max-width: 768px;
+  width: calc(100% - 2rem);
+  max-width: 768px;
 }
 
 .repository {
-    width: calc(100% - 2rem);
-    max-width: 768px;
-    margin-bottom: 1rem;
+  width: calc(100% - 2rem);
+  max-width: 768px;
+  margin-bottom: 1rem;
 }
 
 .divider {
-    max-width: calc(768px - 2rem);
+  max-width: calc(768px - 2rem);
 }
 
 .requirements {
-    width: calc(100% - 2rem);
-    max-width: 768px;
-    padding: 0;
+  width: calc(100% - 2rem);
+  max-width: 768px;
+  padding: 0;
 }
 
 .requirementsExpanded {
-    padding: 1rem;
-    display: grid;
-    grid-template-columns: auto 1fr;
-    gap: 0.5rem;
+  padding: 1rem;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.5rem;
 }
