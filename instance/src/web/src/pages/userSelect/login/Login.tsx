@@ -5,8 +5,9 @@ import { DividerDirection } from "@onlineworkspace/uikit-solid/src/components/di
 import UKDivider from "@onlineworkspace/uikit-solid/src/components/divider/UKDivider.tsx";
 import UKText from "@onlineworkspace/uikit-solid/src/components/text/UKText.tsx";
 import UKTextField from "@onlineworkspace/uikit-solid/src/components/textField/UKTextField.tsx";
+import { startAuthentication } from "@simplewebauthn/browser";
 import { useNavigate, usePreloadRoute, useSearchParams } from "@solidjs/router";
-import { type Component, createEffect, createResource, createSignal } from "solid-js";
+import { type Component, createEffect, createResource, createSignal, onMount } from "solid-js";
 import trpc from "../../../lib/trpc";
 import styles from "./Login.module.scss";
 
@@ -26,6 +27,28 @@ const UserSelectPage: Component = () => {
     }
   });
 
+  createEffect(async () => {
+    const authenticationOptions = await trpc.authorization.passkeyRequestSignin.query({ username: username() });
+
+    if (authenticationOptions === undefined) return;
+
+    const authenticationResponse = await startAuthentication({
+      optionsJSON: authenticationOptions,
+      useBrowserAutofill: true,
+    });
+
+    const response = await trpc.authorization.passkeyCompleteSignin.mutate({ username: username(), passkeyResponse: authenticationResponse });
+
+    if (response.type === "success") {
+      const redirect = new URLSearchParams(window.location.search).get("redirect");
+      if (redirect) {
+        navigate(redirect);
+      }
+
+      navigate("/app");
+    }
+  });
+
   return (
     <UKCard color={"filled"} class={styles.modal}>
       <UKText role={"title"} size={"l"} emphasized={true}>
@@ -41,7 +64,7 @@ const UserSelectPage: Component = () => {
             color={"outlined"}
             onValueChange={async (val) => {
               if (val.length === 6) {
-                const resp = await trpc.authorization.signin.mutate({
+                const resp = await trpc.authorization.passwordSignin.mutate({
                   username: username(),
                   password: password(),
                   twoFactorCode: val,
@@ -70,9 +93,16 @@ const UserSelectPage: Component = () => {
               defaultValue={searchParams.username?.toString() || ""}
               value={username()}
               onValueChange={setUsername}
-              autocomplete="username"
+              autocomplete="username webauthn"
             />
-            <UKTextField shouldMask={true} color={"outlined"} label={"Password"} autocomplete="password" value={password()} onValueChange={setPassword} />
+            <UKTextField
+              shouldMask={true}
+              color={"outlined"}
+              label={"Password"}
+              autocomplete="password webauthn"
+              value={password()}
+              onValueChange={setPassword}
+            />
             <div class={styles.loginButtons}>
               <UKButton onClick={() => navigate(`/forgot-password?username=${username()}`)} disabled={username() === ""} color={"standard"}>
                 Forgot password?
@@ -81,7 +111,7 @@ const UserSelectPage: Component = () => {
                 affirmative={true}
                 disabled={username() === "" || password() === ""}
                 onClick={async () => {
-                  const resp = await trpc.authorization.signin.mutate({
+                  const resp = await trpc.authorization.passwordSignin.mutate({
                     username: username(),
                     password: password(),
                   });
@@ -116,19 +146,6 @@ const UserSelectPage: Component = () => {
               </UKButton>
             </div>
           </form>
-          <UKDivider direction={DividerDirection.horizontal} />
-          {/* TODO: implement security key as a login method */}
-          <UKButton
-            class={styles.alternateLoginMethod}
-            leadingIcon={KEY_ICON}
-            color={"tonal"}
-            disabled={true}
-            onClick={() => {
-              return;
-            }}
-          >
-            Use Security Key
-          </UKButton>
           {canSignup() ? (
             <>
               <UKDivider direction={DividerDirection.horizontal} />

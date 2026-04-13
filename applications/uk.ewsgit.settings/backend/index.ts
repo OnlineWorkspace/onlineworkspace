@@ -156,6 +156,12 @@ const router = t.router({
     hasPasskey: procedure.output(z.boolean()).query(async (opt) => {
       return await instance.sys.authorization.hasPasskey(opt.ctx.userId);
     }),
+    requestNewPasskey: procedure.mutation(async (opt) => {
+      return opt.ctx.instance.sys.authorization.requestNewPasskey(opt.ctx.userId);
+    }),
+    registerPasskey: procedure.input(z.any()).mutation(async (opt) => {
+      return opt.ctx.instance.sys.authorization.registerPasskey(opt.ctx.userId, opt.input);
+    }),
     getSessions: procedure
       .output(
         z
@@ -165,6 +171,7 @@ const router = t.router({
             firstLoginTimestamp: z.number(),
             ipAddress: z.string(),
             isCurrent: z.boolean(),
+            loginMethod: z.string(),
           })
           .array(),
       )
@@ -182,6 +189,7 @@ const router = t.router({
             valid_until: number;
             ip_address: string;
             session_token: string;
+            login_method: string;
           }[];
 
         const cookieString = opt.ctx.rawRequest.req.headers?.get("cookie");
@@ -204,6 +212,7 @@ const router = t.router({
             firstLoginTimestamp: s.valid_until - SESSION_VALID_TERM_MS,
             ipAddress: s.ip_address,
             isCurrent: s.session_token === token,
+            loginMethod: s.login_method || "Unknown",
           };
         });
       }),

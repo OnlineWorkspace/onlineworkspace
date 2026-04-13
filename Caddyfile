@@ -3,6 +3,9 @@
 }
 
 localhost {
-	reverse_proxy /api/* http://localhost:3563
+	reverse_proxy /api/* http://localhost:3563 {
+	  header_up X-Real-IP {remote}
+    header_up X-Forwarded-For {remote}
+	}
 	reverse_proxy http://localhost:5173
 }

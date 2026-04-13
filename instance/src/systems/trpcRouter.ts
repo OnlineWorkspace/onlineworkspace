@@ -107,15 +107,15 @@ export const workspacesRouter = t.router({
         z.object({
           email: z.boolean(),
           twoFactorAuthentication: z.boolean(),
-          passwordMinimumLength: z.number().or(z.undefined()),
+          passwordMinimumLength: z.number().optional(),
           passwordContains: z
             .object({
-              minimumUppercase: z.number().or(z.undefined()),
-              minimumLowercase: z.number().or(z.undefined()),
-              minimumNumbers: z.number().or(z.undefined()),
-              minimumSymbols: z.number().or(z.undefined()),
+              minimumUppercase: z.number().optional(),
+              minimumLowercase: z.number().optional(),
+              minimumNumbers: z.number().optional(),
+              minimumSymbols: z.number().optional(),
             })
-            .or(z.undefined()),
+            .optional(),
         }),
       )
       .query(async (opt) => {
@@ -242,12 +242,12 @@ export const workspacesRouter = t.router({
         // TODO: get default quota size from the instance config
         await user.setQuota(20);
 
-        const session = await opt.ctx.instance.sys.authorization.createSession(
+        const session = await opt.ctx.instance.sys.authorization.createPasswordSession(
           user.userId,
           opt.input.password,
           AuthorizedDeviceType.UnknownBrowser,
           undefined,
-          opt.ctx.rawRequest.server.requestIP(opt.ctx.rawRequest.req)?.address,
+          opt.ctx.rawRequest.req.headers.get("X-Real-IP")?.split(":")?.[0] || "missing-caddy-ip",
         );
 
         if (session === undefined) {
@@ -347,7 +347,7 @@ export const workspacesRouter = t.router({
           twoFactorSecret: secretString,
         };
       }),
-    signin: publicProcedure
+    passwordSignin: publicProcedure
       .input(
         z.object({
           username: z.string(),
@@ -379,12 +379,70 @@ export const workspacesRouter = t.router({
             };
         }
 
-        const session = await opt.ctx.instance.sys.authorization.createSession(
+        const session = await opt.ctx.instance.sys.authorization.createPasswordSession(
           user.userId,
           opt.input.password,
           AuthorizedDeviceType.UnknownBrowser,
           opt.input.twoFactorCode,
-          opt.ctx.rawRequest.server.requestIP(opt.ctx.rawRequest.req)?.address,
+          opt.ctx.rawRequest.req.headers.get("X-Real-IP")?.split(":")?.[0] || "missing-caddy-ip",
+        );
+
+        if (session === undefined) {
+          return {
+            type: "error",
+            message: "Failed to create a session?",
+          };
+        }
+
+        opt.ctx.rawRequest.resHeaders.set(
+          "set-cookie",
+          Bun.Cookie.from("Authorization", session, {
+            secure: false,
+          }).serialize(),
+        );
+
+        return {
+          type: "success",
+          sessionToken: session,
+        };
+      }),
+    passkeyRequestSignin: publicProcedure
+      .input(
+        z.object({
+          username: z.string(),
+        }),
+      )
+      .query(async (opt) => {
+        const user = await opt.ctx.instance.sys.users.getUserByUsername(opt.input.username.toLowerCase());
+
+        if (user === undefined) {
+          return undefined;
+        }
+
+        return opt.ctx.instance.sys.authorization.requestPasskeySession(user.userId);
+      }),
+    passkeyCompleteSignin: publicProcedure
+      .input(
+        z.object({
+          username: z.string(),
+          passkeyResponse: z.any(),
+        }),
+      )
+      .mutation(async (opt) => {
+        const user = await opt.ctx.instance.sys.users.getUserByUsername(opt.input.username.toLowerCase());
+
+        if (user === undefined) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Failed to find the user",
+          });
+        }
+
+        const session = await opt.ctx.instance.sys.authorization.createPasskeySession(
+          user.userId,
+          AuthorizedDeviceType.UnknownBrowser,
+          opt.input.passkeyResponse,
+          opt.ctx.rawRequest.req.headers.get("X-Real-IP")?.split(":")?.[0] || "missing-caddy-ip",
         );
 
         if (session === undefined) {

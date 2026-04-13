@@ -21,28 +21,31 @@ const Session: Component<{
   firstLoginTimestamp: number;
   ipAddress: string;
   isCurrent: boolean;
+  loginMethod: string;
   refetch: () => void;
 }> = (props) => {
   return (
     <UKStackItem
       leading={{ type: "icon", value: ICON_FOR_DEVICE_TYPE[props.deviceType] }}
       inlineComponent={
-        <div class={styles.inlineComponent}>
-          <UKIconButton
-            icon={DELETE_ICON}
-            alt={"Delete session"}
-            color={"tonal"}
-            onClick={async () => {
-              await trpc.authentication.deleteSession.mutate({
-                sessionId: props.sessionId,
-              });
-              props.refetch();
-            }}
-          />
-        </div>
+        !props.isCurrent ? (
+          <div class={styles.inlineComponent}>
+            <UKIconButton
+              icon={DELETE_ICON}
+              alt={"Delete session"}
+              color={"tonal"}
+              onClick={async () => {
+                await trpc.authentication.deleteSession.mutate({
+                  sessionId: props.sessionId,
+                });
+                props.refetch();
+              }}
+            />
+          </div>
+        ) : null
       }
       labelText={`session #${props.sessionId}${props.isCurrent ? " (Current session)" : ""}`}
-      supportingText={`Session Created on ${new Date(props.firstLoginTimestamp).toLocaleDateString("en-GB", { hour: "2-digit", minute: "2-digit", day: "numeric", month: "numeric", year: "numeric" })} from ${props.ipAddress}`}
+      supportingText={`Session Created on '${new Date(props.firstLoginTimestamp).toLocaleDateString("en-GB", { hour: "2-digit", minute: "2-digit", day: "numeric", month: "numeric", year: "numeric" })}' from IP '${props.ipAddress}' using ${props.loginMethod}`}
     />
   );
 };

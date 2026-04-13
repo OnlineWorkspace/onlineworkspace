@@ -2,7 +2,6 @@ import CHEVRON_LEFT from "@material-symbols/svg-700/outlined/chevron_left.svg";
 import UKButton from "@onlineworkspace/uikit-solid/src/components/button/UKButton.jsx";
 import UKCard from "@onlineworkspace/uikit-solid/src/components/card/UKCard.jsx";
 import UKDivider from "@onlineworkspace/uikit-solid/src/components/divider/UKDivider.jsx";
-import UKIconButton from "@onlineworkspace/uikit-solid/src/components/iconButton/UKIconButton.jsx";
 import UKText from "@onlineworkspace/uikit-solid/src/components/text/UKText.jsx";
 import { useNavigate } from "@solidjs/router";
 import { closestCenter, createSortable, DragDropProvider, DragDropSensors, DragOverlay, SortableProvider } from "@thisbeyond/solid-dnd";
@@ -34,8 +33,10 @@ const EditWidgets: Component = () => {
   const [items, setItems] = createSignal<string[]>(["weather", "user.profile", "user.avatar"]);
   const [activeItem, setActiveItem] = createSignal<string | null>(null);
 
+  // @ts-ignore
   const onDragStart = ({ draggable }) => setActiveItem(draggable.id);
 
+  // @ts-ignore
   const onDragEnd = ({ draggable, droppable }) => {
     if (draggable && droppable && draggable.id !== droppable.id) {
       const currentItems = [...items()];
@@ -51,6 +52,7 @@ const EditWidgets: Component = () => {
 
   return (
     <div class={styles.page}>
+      {/* @ts-ignore */}
       <DragDropProvider onDragStart={onDragStart} onDragEnd={onDragEnd} collisionDetector={closestCenter}>
         <DragDropSensors />
 
@@ -86,19 +88,23 @@ const EditWidgets: Component = () => {
         </DragOverlay>
 
         <UKCard class={styles.drawer} color="outlined">
-          <UKText role="title" size="l">
+          <UKText role="title" size="s">
             Widgets
           </UKText>
-          <UKDivider direction="horizontal" />
-          <div>
-            {Object.keys(Widgets).map((widgetId) => (
-              <div>
-                <UKText role="body" size="m">
-                  {/* TODO: display the widgets but using sample placeholder data */}
-                  {widgetId}
-                </UKText>
-              </div>
-            ))}
+          <div class={styles.widgetGrid}>
+            {Object.keys(Widgets).map((widgetId) => {
+              // @ts-ignore
+              const Widget = Widgets[widgetId];
+
+              if (!Widget)
+                return (
+                  <UKText role={"body"} size="l" align={"center"} emphasized>
+                    Invalid WidgetId '{widgetId}'
+                  </UKText>
+                );
+
+              return <Widget />;
+            })}
           </div>
         </UKCard>
       </DragDropProvider>

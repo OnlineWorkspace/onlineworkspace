@@ -16,15 +16,14 @@
 }
 
 .widgets {
-  height: max-content;
-  width: max-content;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(16rem, 23rem));
-  grid-auto-rows: 7rem;
   padding: 1rem;
   gap: 1rem;
   margin-top: auto;
   margin-bottom: auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 23rem));
+  grid-auto-rows: 7rem;
+  flex-shrink: 0;
 }
 
 *[data-show-background="true"] {
@@ -45,6 +44,7 @@
   gap: 0.5rem;
   display: flex;
   flex-direction: column;
+  overflow-y: auto;
 
   @keyframes slideIn {
     from {
@@ -55,5 +55,13 @@
       transform: translateY(0);
       opacity: 1;
     }
+  }
+
+  .widgetGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(16rem, 23rem));
+    grid-auto-rows: 7rem;
+    padding-top: 0.25rem;
+    gap: 1rem;
   }
 }

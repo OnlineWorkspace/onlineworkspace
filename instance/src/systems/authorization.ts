@@ -1,4 +1,13 @@
 import utils from "node:util";
+import {
+  type AuthenticatorTransportFuture,
+  generateAuthenticationOptions,
+  generateRegistrationOptions,
+  type PublicKeyCredentialCreationOptionsJSON,
+  type PublicKeyCredentialRequestOptionsJSON,
+  verifyAuthenticationResponse,
+  verifyRegistrationResponse,
+} from "@simplewebauthn/server";
 import * as OTPAuth from "otpauth";
 import type { Instance } from "../index.js";
 import System from "../system.js";
@@ -14,13 +23,25 @@ export enum AuthorizedDeviceType {
 export const SESSION_VALID_TERM_MS = 7 * 24 * 60 * 60 * 1000;
 
 export default class AuthorizationSystem extends System {
+  private temporaryPasskeyCreationChallenges: Map<number, PublicKeyCredentialCreationOptionsJSON>;
+  private temporaryPasskeyAuthenticationChallenges: Map<number, PublicKeyCredentialRequestOptionsJSON>;
+
   constructor(instance: Instance) {
     super("authorization", instance);
+
+    this.temporaryPasskeyCreationChallenges = new Map();
+    this.temporaryPasskeyAuthenticationChallenges = new Map();
   }
 
   // Creates a new session for a user
   // @returns {string} the new session's sessionToken
-  async createSession(userId: number, password: string, deviceId: AuthorizedDeviceType, otpCode?: string, ipAddress?: string): Promise<string | undefined> {
+  async createPasswordSession(
+    userId: number,
+    password: string,
+    deviceId: AuthorizedDeviceType,
+    otpCode?: string,
+    ipAddress?: string,
+  ): Promise<string | undefined> {
     try {
       const db = this.instance.sys.database.postgres();
 
@@ -49,7 +70,7 @@ export default class AuthorizationSystem extends System {
 
       const sessionToken = crypto.getRandomValues(new Uint32Array(16)).join("");
 
-      await db`INSERT INTO public.sessions (user_id, session_token, device_type, valid_until, ip_address) VALUES (${userId}, ${sessionToken}, ${deviceId}, ${Date.now() + SESSION_VALID_TERM_MS}, ${ipAddress || "Anonymous"})`;
+      await db`INSERT INTO public.sessions (user_id, session_token, device_type, valid_until, ip_address, login_method) VALUES (${userId}, ${sessionToken}, ${deviceId}, ${Date.now() + SESSION_VALID_TERM_MS}, ${ipAddress || "Anonymous"}, 'password authentication')`;
 
       const user = await this.instance.sys.users.getUserById(userId);
 
@@ -99,9 +120,11 @@ export default class AuthorizationSystem extends System {
     }
   }
 
-  // Verifies that a sessionToken exists and is vaild
-  // @returns {number} the userId of the session
-  // @returns {undefined} the session is invalid
+  /**
+    Verifies that a sessionToken exists and is valid
+    @returns {number} the userId of the session
+    @returns {undefined} the session is invalid
+  */
   async verifySession(sessionToken: string): Promise<number | undefined> {
     const [_, userId, token] = sessionToken.split(":");
 
@@ -227,13 +250,139 @@ export default class AuthorizationSystem extends System {
       return false;
     }
 
-    const userPasskeys = await db`SELECT passkeys FROM public.users WHERE id = ${userId}`;
+    const userPasskeys = await db`SELECT COUNT(*) FROM public.passkeys WHERE user_id = ${userId}`;
 
-    return userPasskeys?.[0]?.passkeys?.length > 0;
+    return Number(userPasskeys[0].count) > 0;
+  }
+
+  async requestNewPasskey(userId: number) {
+    const db = this.instance.sys.database.postgres();
+
+    const userPasskeys = await db`SELECT * FROM public.passkeys WHERE user_id = ${userId}`;
+
+    const passkeyCreationOptions: PublicKeyCredentialCreationOptionsJSON = await generateRegistrationOptions({
+      rpName: this.instance.sys.configuration.displayName,
+      rpID: this.instance.sys.configuration.webUrl[0].replace("https://", ""),
+      userName: (await (await this.instance.sys.users.getUserById(userId))?.getUsername()) || `${userId}`,
+      excludeCredentials: userPasskeys.map((passkey: { passkey_id: string; transports: string }) => {
+        return {
+          id: passkey.passkey_id,
+          transports: passkey.transports.split(",") as AuthenticatorTransportFuture[],
+        };
+      }),
+      authenticatorSelection: {
+        residentKey: "preferred",
+        userVerification: "preferred",
+        authenticatorAttachment: "platform",
+      },
+    });
+
+    this.temporaryPasskeyCreationChallenges.set(userId, passkeyCreationOptions);
+
+    return passkeyCreationOptions;
+  }
+
+  // biome-ignore lint/suspicious/noExplicitAny: the input is a webauthn response which is very complex and would require a lot of work to type, so we'll just use any here as it is handled by a library and we don't need to worry about the types
+  async registerPasskey(userId: number, input: any) {
+    const db = this.instance.sys.database.postgres();
+    const expectedChallenge = this.temporaryPasskeyCreationChallenges.get(userId);
+    if (!expectedChallenge) {
+      return false;
+    }
+
+    const verification = await verifyRegistrationResponse({
+      response: input,
+      expectedChallenge: expectedChallenge.challenge,
+      expectedOrigin: this.instance.sys.configuration.webUrl[0],
+      expectedRPID: this.instance.sys.configuration.webUrl[0].replace("https://", ""),
+    });
+
+    const registrationInfo = verification.registrationInfo!;
+    const credential = registrationInfo?.credential;
+
+    await db`INSERT INTO public.passkeys (
+      passkey_id,
+      public_key,
+      user_id,
+      webauthn_user_id,
+      counter,
+      device_type,
+      backed_up,
+      transports
+    ) VALUES (
+      ${credential.id},
+      ${credential.publicKey},
+      ${userId},
+      ${expectedChallenge.user.id},
+      ${credential.counter},
+      ${registrationInfo.credentialDeviceType},
+      ${registrationInfo.credentialBackedUp},
+      ${credential.transports}
+    )`;
+
+    this.temporaryPasskeyCreationChallenges.delete(userId);
+
+    return verification.verified;
+  }
+
+  async requestPasskeySession(userId: number) {
+    const db = this.instance.sys.database.postgres();
+    const userPasskeys = await db`SELECT * FROM public.passkeys WHERE user_id = ${userId}`;
+
+    const passkeyOptions: PublicKeyCredentialRequestOptionsJSON = await generateAuthenticationOptions({
+      rpID: this.instance.sys.configuration.webUrl[0].replace("https://", ""),
+      allowCredentials: userPasskeys.map((passkey: { passkey_id: string; transports: string }) => {
+        return {
+          id: passkey.passkey_id,
+          transports: passkey.transports.split(",") as AuthenticatorTransportFuture[],
+        };
+      }),
+    });
+
+    this.temporaryPasskeyAuthenticationChallenges.set(userId, passkeyOptions);
+
+    return passkeyOptions;
+  }
+
+  // biome-ignore lint/suspicious/noExplicitAny: the input is a webauthn response which is very complex and would require a lot of work to type, so we'll just use any here as it is handled by a library and we don't need to worry about the types
+  async createPasskeySession(userId: number, deviceId: AuthorizedDeviceType, input: any, ipAddress?: string) {
+    const db = this.instance.sys.database.postgres();
+    const expectedChallenge = this.temporaryPasskeyAuthenticationChallenges.get(userId);
+    if (!expectedChallenge) {
+      return undefined;
+    }
+
+    const passkey = (await db`SELECT * FROM public.passkeys WHERE user_id = ${userId} AND passkey_id = ${input.id}`)?.[0];
+    if (!passkey) {
+      return undefined;
+    }
+
+    const verification = await verifyAuthenticationResponse({
+      response: input,
+      expectedChallenge: expectedChallenge.challenge,
+      expectedOrigin: this.instance.sys.configuration.webUrl[0],
+      expectedRPID: this.instance.sys.configuration.webUrl[0].replace("https://", ""),
+      credential: {
+        id: passkey.id,
+        publicKey: passkey.public_key,
+        counter: passkey.counter,
+        transports: passkey.transports.split(",") as AuthenticatorTransportFuture[],
+      },
+    });
+
+    if (verification.verified) {
+      const sessionToken = crypto.getRandomValues(new Uint32Array(16)).join("");
+
+      await db`INSERT INTO public.sessions (user_id, session_token, device_type, valid_until, ip_address, login_method) VALUES (${userId}, ${sessionToken}, ${deviceId}, ${Date.now() + SESSION_VALID_TERM_MS}, ${ipAddress || "Anonymous"}, 'passkey')`;
+
+      return `workspaces_session:${userId}:${sessionToken}`;
+    }
+
+    return undefined;
   }
 
   async startup() {
-    // loop through all users, check for any session tokens which are expired and remove them from the user's valud sessions pool
+    // loop through all users, check for any session tokens which are expired and remove them from the user's valid sessions pool
 
     const db = this.instance.sys.database.postgres();
 
@@ -254,6 +403,28 @@ export default class AuthorizationSystem extends System {
       valid_until BIGINT,
       ip_address TEXT DEFAULT 'Anonymous',
       login_method TEXT,
+      FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE
+    )`;
+
+    // init the passkeys database
+    // passkey_id - the id of the passkey (Base64URLString)
+    // public_key - the passkey's public key (Uint8Array)
+    // user_id - the id of the user who owns the passkey (number)
+    // webauthn_user_id - the webauthn user id associated with the passkey (string)
+    // counter - the passkey's counter for preventing replay attacks (number)
+    // device_type - the type of device the passkey is used on (CredentialDeviceType)
+    // backed_up - whether the passkey has been backed up or not (boolean)
+    // transports - the transports supported by the passkey (string array stored as a CSV string -> AuthenticatorTransportFuture[])
+    await db`CREATE TABLE IF NOT EXISTS Passkeys (
+      passkey_id TEXT PRIMARY KEY,
+      public_key BYTEA,
+      user_id INTEGER,
+      webauthn_user_id TEXT,
+      counter BIGINT,
+      device_type VARCHAR(32),
+      backed_up BOOLEAN DEFAULT FALSE,
+      transports VARCHAR(255),
+      creation_timetamp TIMESTAMPTZ DEFAULT NOW(),
       FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE
     )`;
 

@@ -1,4 +1,4 @@
-import { promises as fs } from "node:fs";
+import { promises as fs, existsSync as fsExistsSync } from "node:fs";
 import path from "node:path";
 import { sql } from "bun";
 import sharp from "sharp";
@@ -27,10 +27,10 @@ export class WorkspacesUser {
   }
 
   /**
-        Sets the user's username to username
-        @return `false` - failed to change the username
-        @return `true` - successfully changed the username
-    */
+    Sets the user's username to username
+    @return `false` - failed to change the username
+    @return `true` - successfully changed the username
+  */
   async setUsername(username: string): Promise<boolean> {
     const db = this.instance.sys.database.postgres();
 
@@ -39,17 +39,17 @@ export class WorkspacesUser {
 
       await db`UPDATE public.users SET username = ${username} WHERE id = ${this.userId}`;
       return true;
-    } catch (err) {
+    } catch (_) {
       this.instance.sys.users.log.error(`Failed to set username for ${this.userId}`);
       return false;
     }
   }
 
   /**
-        Get the user's username
-        @return `string` - the users username
-        @return `undefined` - could not get the user's username
-    */
+    Get the user's username
+    @return `string` - the users username
+    @return `undefined` - could not get the user's username
+  */
   async getUsername(): Promise<string | undefined> {
     const db = this.instance.sys.database.postgres();
 
@@ -57,10 +57,10 @@ export class WorkspacesUser {
   }
 
   /**
-        Sets the user's forename to forename
-        @return `false` - failed to change the forename
-        @return `true` - successfully changed the forename
-    */
+    Sets the user's forename to forename
+    @return `false` - failed to change the forename
+    @return `true` - successfully changed the forename
+  */
   async setForename(forename: string): Promise<boolean> {
     const db = this.instance.sys.database.postgres();
 
@@ -68,17 +68,17 @@ export class WorkspacesUser {
       await db`UPDATE public.users SET forename = ${forename} WHERE id = ${this.userId}`;
 
       return true;
-    } catch (err) {
+    } catch (_) {
       this.instance.sys.users.log.error(`Failed to set forename for ${this.userId}`);
       return false;
     }
   }
 
   /**
-        Get the user's forename
-        @return `string` - the users forename
-        @return `undefined` - could not get the user's forename
-    */
+    Get the user's forename
+    @return `string` - the users forename
+    @return `undefined` - could not get the user's forename
+  */
   async getForename(): Promise<string | undefined> {
     const db = this.instance.sys.database.postgres();
 
@@ -86,10 +86,10 @@ export class WorkspacesUser {
   }
 
   /**
-        Sets the user's surname to surname
-        @return `false` - failed to change the surname
-        @return `true` - successfully changed the surname
-    */
+    Sets the user's surname to surname
+    @return `false` - failed to change the surname
+    @return `true` - successfully changed the surname
+  */
   async setSurname(surname: string): Promise<boolean> {
     const db = this.instance.sys.database.postgres();
 
@@ -104,10 +104,10 @@ export class WorkspacesUser {
   }
 
   /**
-        Get the user's surname
-        @return `string` - the users surname
-        @return `undefined` - could not get the user's surname
-    */
+    Get the user's surname
+    @return `string` - the users surname
+    @return `undefined` - could not get the user's surname
+  */
   async getSurname(): Promise<string | undefined> {
     const db = this.instance.sys.database.postgres();
 
@@ -115,10 +115,10 @@ export class WorkspacesUser {
   }
 
   /**
-        Sets the user's forename and surname to the provided forename and surname
-        @return `false` - failed to change the surname
-        @return `true` - successfully changed the surname
-    */
+    Sets the user's forename and surname to the provided forename and surname
+    @return `false` - failed to change the surname
+    @return `true` - successfully changed the surname
+  */
   async setFullName(forename: string, surname: string): Promise<boolean> {
     const forenameRes = await this.setForename(forename);
     const surnameRes = await this.setSurname(surname);
@@ -127,8 +127,8 @@ export class WorkspacesUser {
   }
 
   /**
-        Gets the user's forename and surname
-    */
+    Gets the user's forename and surname
+  */
   async getFullName(): Promise<{ forename?: string; surname?: string }> {
     const forenameRes = await this.getForename();
     const surnameRes = await this.getSurname();
@@ -137,27 +137,27 @@ export class WorkspacesUser {
   }
 
   /**
-        Sets the user's quota to the provided quota
-        @returns `false` - failed to set the quota
-        @returns `true` - successfully set the quota
-    */
+    Sets the user's quota to the provided quota
+    @returns `false` - failed to set the quota
+    @returns `true` - successfully set the quota
+  */
   async setQuota(quota: number): Promise<boolean> {
     const db = this.instance.sys.database.postgres();
 
     try {
       await db`UPDATE public.users SET storage_quota = ${quota} WHERE id = ${this.userId}`;
       return true;
-    } catch (err) {
+    } catch (_) {
       this.instance.sys.users.log.error(`Failed to set storage quota for ${this.userId}`);
       return false;
     }
   }
 
   /**
-        Get the user's quota
-        @returns `number` - the users quota
-        @returns `undefined` - could not get the user's quota
-    */
+    Get the user's quota
+    @returns `number` - the users quota
+    @returns `undefined` - could not get the user's quota
+  */
   async getQuota(): Promise<number | undefined> {
     const db = this.instance.sys.database.postgres();
 
@@ -165,27 +165,27 @@ export class WorkspacesUser {
   }
 
   /**
-        Sets the user's bio to bio
-        @returns `false` - failed to change the bio
-        @returns `true` - successfully changed the bio
-    */
+    Sets the user's bio to bio
+    @returns `false` - failed to change the bio
+    @returns `true` - successfully changed the bio
+  */
   async setBio(bio: string): Promise<boolean> {
     const db = this.instance.sys.database.postgres();
 
     try {
       await db`UPDATE public.users SET bio = ${bio} WHERE id = ${this.userId}`;
       return true;
-    } catch (err) {
+    } catch (_) {
       this.instance.sys.users.log.error(`Failed to set bio for ${this.userId}`);
       return false;
     }
   }
 
   /**
-        Get the user's bio
-        @returns `string` - the users bio
-        @returns `undefined` - could not get the user's bio
-    */
+    Get the user's bio
+    @returns `string` - the users bio
+    @returns `undefined` - could not get the user's bio
+  */
   async getBio(): Promise<string | undefined> {
     const db = this.instance.sys.database.postgres();
 
@@ -193,16 +193,16 @@ export class WorkspacesUser {
   }
 
   /**
-        Sets the user's email to email
-        @returns `false` - failed to change the email
-        @returns `true` - successfully changed the email
-    */
+    Sets the user's email to email
+    @returns `false` - failed to change the email
+    @returns `true` - successfully changed the email
+  */
   async setEmail(email: string): Promise<boolean> {
     const db = this.instance.sys.database.postgres();
     try {
       await db`UPDATE public.users SET email = ${email} WHERE id = ${this.userId}`;
       return true;
-    } catch (err) {
+    } catch (_) {
       this.instance.sys.users.log.error(`Failed to set email for ${this.userId}`);
       return false;
     }
@@ -220,27 +220,27 @@ export class WorkspacesUser {
   }
 
   /**
-        Sets the user's gender to gender
-        @returns `false` - failed to change the gender
-        @returns `true` - successfully changed the gender
-    */
+    Sets the user's gender to gender
+    @returns `false` - failed to change the gender
+    @returns `true` - successfully changed the gender
+  */
   async setGender(gender: "female" | "male" | "other"): Promise<boolean> {
     const db = this.instance.sys.database.postgres();
 
     try {
       await db`UPDATE public.users SET gender = ${gender} WHERE id = ${this.userId}`;
       return true;
-    } catch (err) {
+    } catch (_) {
       this.instance.sys.users.log.error(`Failed to set gender for ${this.userId}`);
       return false;
     }
   }
 
   /**
-        Get the user's gender
-        @returns `"female" | "male" | "other"` - the users gender
-        @returns `undefined` - could not get the user's gender
-    */
+    Get the user's gender
+    @returns `"female" | "male" | "other"` - the users gender
+    @returns `undefined` - could not get the user's gender
+  */
   async getGender(): Promise<string | undefined> {
     const db = this.instance.sys.database.postgres();
 
@@ -248,10 +248,10 @@ export class WorkspacesUser {
   }
 
   /**
-        Join a specified group for the user.
-        @returns `true` - if successfully joined the group
-        @returns `false` - if already a member or an error occurred.
-    */
+    Join a specified group for the user.
+    @returns `true` - if successfully joined the group
+    @returns `false` - if already a member or an error occurred.
+  */
   async joinGroup(groupId: string): Promise<boolean> {
     const db = this.instance.sys.database.postgres();
 
@@ -276,10 +276,10 @@ export class WorkspacesUser {
   }
 
   /**
-        Leave a specified group for the user.
-        @returns `true` - if successfully left the group
-        @returns `false` - if not a member or an error occurred.
-    */
+    Leave a specified group for the user.
+    @returns `true` - if successfully left the group
+    @returns `false` - if not a member or an error occurred.
+  */
   async leaveGroup(groupId: string): Promise<boolean> {
     const db = this.instance.sys.database.postgres();
 
@@ -304,9 +304,9 @@ export class WorkspacesUser {
   }
 
   /**
-        Returns an array of groups the user belongs to.
-        @returns `string[]` - An array of group IDs the user is a member of, or an empty array if none.
-    */
+    Returns an array of groups the user belongs to.
+    @returns `string[]` - An array of group IDs the user is a member of, or an empty array if none.
+  */
   async getGroups(): Promise<string[]> {
     const db = this.instance.sys.database.postgres();
 
@@ -314,9 +314,9 @@ export class WorkspacesUser {
   }
 
   /**
-        Get if the user is an administrator
-        @returns `boolean` - if the user an administrator
-    */
+    Get if the user is an administrator
+    @returns `boolean` - if the user an administrator
+  */
   async isAdministrator(): Promise<boolean> {
     const db = this.instance.sys.database.postgres();
 
@@ -324,10 +324,10 @@ export class WorkspacesUser {
   }
 
   /**
-        Sets if user is an administrator
-        @returns `false` - failed to change the administrator status
-        @returns `true` - successfully changed the administrator status
-    */
+    Sets if user is an administrator
+    @returns `false` - failed to change the administrator status
+    @returns `true` - successfully changed the administrator status
+  */
   async setIsAdministrator(administrator: boolean): Promise<boolean> {
     const db = this.instance.sys.database.postgres();
 
@@ -341,10 +341,10 @@ export class WorkspacesUser {
   }
 
   /**
-        sets the user's original quality avatar to avatarFile
-        @returns `true` - copied the avatarFile successfully
-        @returns `false` - failed to copy the avatarFile
-    */
+    sets the user's original quality avatar to avatarFile
+    @returns `true` - copied the avatarFile successfully
+    @returns `false` - failed to copy the avatarFile
+  */
   async setAvatar(avatarFile: string): Promise<boolean> {
     try {
       await fs.cp(avatarFile, path.join(this.getPath(), "assets/avatar/avatar.webp"));
@@ -356,10 +356,10 @@ export class WorkspacesUser {
   }
 
   /**
-        generates the required avatar sizes from the user's avatarFile, if override is not set to true, only missing avatar sizes will be generated
-        @returns `true` - generated required avatar files successfully
-        @returns `false` - failed to generate all required avatar files
-    */
+    generates the required avatar sizes from the user's avatarFile, if override is not set to true, only missing avatar sizes will be generated
+    @returns `true` - generated required avatar files successfully
+    @returns `false` - failed to generate all required avatar files
+  */
   async generateAvatars(override?: boolean): Promise<boolean> {
     const AVATAR_SIZES: { width: number; height: number; name: string }[] = [
       { width: 16, height: 16, name: "xs" },
@@ -388,11 +388,10 @@ export class WorkspacesUser {
   }
 
   /**
-        Check that all required directories and assets are valid for this user.
-        If they are missing or invalid, directories will be created and assets will be generated / copied
-
-        @returns `true` - if successful
-    */
+    Check that all required directories and assets are valid for this user.
+    If they are missing or invalid, directories will be created and assets will be generated / copied
+    @returns `true` - if successful
+  */
   async verify(): Promise<boolean> {
     const username = await this.getUsername();
     const USER_DIRECTORIES = [
@@ -417,7 +416,7 @@ export class WorkspacesUser {
       await this.instance.sys.filesystem.createDirectoryIfNotExists(path.join(this.instance.sys.filesystem.FS_ROOT, `users/${this.userId}`, dir));
     }
 
-    if (!(await fs.exists(path.join(this.getPath(), "assets/avatar/avatar.webp")))) {
+    if (!fsExistsSync(path.join(this.getPath(), "assets/avatar/avatar.webp"))) {
       await this.setAvatar(path.join(this.instance.sys.filesystem.SRC_ROOT, "assets/placeholder/avatar.png"));
     }
 
@@ -433,8 +432,8 @@ export class WorkspacesUser {
   }
 
   /**
-        Deletes a user from the filesystem and all database entries
-     */
+    Deletes a user from the filesystem and all database entries
+  */
   async delete() {
     await fs.rm(path.join(this.instance.sys.filesystem.FS_ROOT, `users/${this.userId}`), {
       recursive: true,
@@ -461,42 +460,41 @@ export default class UsersSystem extends System {
     const db = this.instance.sys.database.postgres();
 
     /**
-            init the users database
+      init the users database
 
-            id - permanent unique user id number (number)
-            username - the user's changeable username (string)
-            forename - the user's chosen forename (string)
-            surname - the user's chosen surname (string)
-            gender - the user's chosen gender ("female" | "male" | "other")
-            bio - the user's chosen bio (string)
-            storage_quota - the user's storage quota in MB (number)
-            email - the user's chosen contact email (string)
-            is_administrator - is the user an administrator (boolean)
-            is_email_verified - is the user's chosen contact email verified to be theirs (boolean)
-            socials - the user's chosen social media links in the format '[name]:-:[url]' as such, the string ':-:' must not be in either [name] or [url] (string[])
-            hashed_password - the user's password after it has been hashed by bun (string)
-            two_factor_secret - the user's secret string used to verify 2fa opt codes (string)
-            settings - a settings object
-            groups - a list of the group ids which this user is a member of
-        */
+      id - permanent unique user id number (number)
+      username - the user's changeable username (string)
+      forename - the user's chosen forename (string)
+      surname - the user's chosen surname (string)
+      gender - the user's chosen gender ("female" | "male" | "other")
+      bio - the user's chosen bio (string)
+      storage_quota - the user's storage quota in MB (number)
+      email - the user's chosen contact email (string)
+      is_administrator - is the user an administrator (boolean)
+      is_email_verified - is the user's chosen contact email verified to be theirs (boolean)
+      socials - the user's chosen social media links in the format '[name]:-:[url]' as such, the string ':-:' must not be in either [name] or [url] (string[])
+      hashed_password - the user's password after it has been hashed by bun (string)
+      two_factor_secret - the user's secret string used to verify 2fa opt codes (string)
+      settings - a settings object
+      groups - a list of the group ids which this user is a member of
+    */
     await db`CREATE TABLE IF NOT EXISTS users (
-               id SERIAL PRIMARY KEY,
-               username TEXT,
-               forename TEXT,
-               surname TEXT,
-               gender TEXT DEFAULT 'other',
-               bio TEXT,
-               storage_quota BIGINT DEFAULT 10,
-               email TEXT,
-               is_administrator BOOL DEFAULT FALSE,
-               is_email_verified BOOL DEFAULT FALSE,
-               socials TEXT[] DEFAULT '{}',
-               hashed_password TEXT,
-               two_factor_secret TEXT,
-               settings JSONB DEFAULT '{}'::JSONB,
-               groups TEXT[],
-               passkeys JSONB DEFAULT '[]'::JSONB
-             )`;
+      id SERIAL PRIMARY KEY,
+      username TEXT,
+      forename TEXT,
+      surname TEXT,
+      gender TEXT DEFAULT 'other',
+      bio TEXT,
+      storage_quota BIGINT DEFAULT 10,
+      email TEXT,
+      is_administrator BOOL DEFAULT FALSE,
+      is_email_verified BOOL DEFAULT FALSE,
+      socials TEXT[] DEFAULT '{}',
+      hashed_password TEXT,
+      two_factor_secret TEXT,
+      settings JSONB DEFAULT '{}'::JSONB,
+      groups TEXT[]
+    )`;
 
     if (!(await this.getAllUsers()).find((u) => u.isAdministrator())) {
       this.log.warning("No administrator account exists, creating default administrator account with username 'admin' and password 'password'");
@@ -510,6 +508,7 @@ export default class UsersSystem extends System {
         if (!adminUser) {
           this.log.error("Admin user didn't exist and couldn't be created!");
         } else {
+          // Name: Admin Istrator
           await adminUser.setFullName("Admin", "Istrator");
           await adminUser.setIsAdministrator(true);
 
@@ -531,10 +530,10 @@ export default class UsersSystem extends System {
   }
 
   /**
-        Create a new Workspaces User
-        @returns number - the userId of the created user
-        @returns undefined - the user already exists
-    */
+    Create a new Workspaces User
+    @returns number - the userId of the created user
+    @returns undefined - the user already exists
+  */
   async createUser(username: string, password?: string): Promise<number | undefined> {
     const db = this.instance.sys.database.postgres();
 
@@ -565,10 +564,10 @@ export default class UsersSystem extends System {
   }
 
   /**
-        Does a user with the userId exist
-        @returns true - they exist
-        @returns false - they do not exist
-    */
+    Does a user with the userId exist
+    @returns true - they exist
+    @returns false - they do not exist
+  */
   async doesUserExist(userId: number): Promise<boolean> {
     const db = this.instance.sys.database.postgres();
 
@@ -576,9 +575,9 @@ export default class UsersSystem extends System {
   }
 
   /**
-        Gets an array of all users registered on this instance
-        @returns `WorkspacesUser[]` - an array of all users
-    */
+    Gets an array of all users registered on this instance
+    @returns `WorkspacesUser[]` - an array of all users
+  */
   async getAllUsers(): Promise<WorkspacesUser[]> {
     const db = this.instance.sys.database.postgres();
 
@@ -592,10 +591,10 @@ export default class UsersSystem extends System {
   }
 
   /**
-        Gets a user by their userId
-        @returns `WorkspacesUser` - the user
-        @returns `undefined` - no such user exists
-    */
+    Gets a user by their userId
+    @returns `WorkspacesUser` - the user
+    @returns `undefined` - no such user exists
+  */
   async getUserById(userId: number): Promise<WorkspacesUser | undefined> {
     if ((await this.doesUserExist(userId)) === undefined) return undefined;
 
@@ -603,10 +602,10 @@ export default class UsersSystem extends System {
   }
 
   /**
-        Gets a user by their username
-        @returns `WorkspacesUser` - the user
-        @returns `undefined` - no such user exists
-    */
+    Gets a user by their username
+    @returns `WorkspacesUser` - the user
+    @returns `undefined` - no such user exists
+  */
   async getUserByUsername(username: string): Promise<WorkspacesUser | undefined> {
     const db = this.instance.sys.database.postgres();
 

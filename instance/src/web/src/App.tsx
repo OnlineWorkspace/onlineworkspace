@@ -4,6 +4,7 @@ import ApplicationsRouter from "@onlineworkspace/workspaces-applications";
 import { Route, Router } from "@solidjs/router";
 import { type Component, lazy } from "solid-js";
 import styles from "./App.module.scss";
+import MissingApp from "./MissingApp.tsx";
 import AppIndex from "./pages/app/Index.tsx";
 
 const App: Component = () => {
@@ -20,6 +21,7 @@ const App: Component = () => {
             <Route path={"app"}>
               <Route path={"/"} component={AppIndex} />
               <ApplicationsRouter />
+              <Route path={":applicationId"} component={MissingApp} />
             </Route>
             <Route path={"*"} component={lazy(() => import("./pages/notFound/Index.tsx"))} />
           </Route>

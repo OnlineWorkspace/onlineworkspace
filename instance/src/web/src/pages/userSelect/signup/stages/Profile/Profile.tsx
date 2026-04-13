@@ -70,15 +70,7 @@ const Profile: Component<{
         ]}
       />
       <UKTextField color={"outlined"} label={"Bio"} as={"textarea"} value={props.bio()} defaultValue={props.bio()} onValueChange={props.setBio} />
-      <div class={modalStyles.stageButtons}>
-        <UKButton
-          onClick={() => {
-            props.setStage(UserSelectStage.TwoFactorAuthentication);
-          }}
-          color={"tonal"}
-        >
-          Back
-        </UKButton>
+      <div class={styles.buttonContainer}>
         <UKButton
           onClick={() => {
             if (props.displayName() === "") {

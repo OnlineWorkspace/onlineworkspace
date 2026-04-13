@@ -27,3 +27,9 @@
   margin-top: -0.75rem;
   color: rgb(var(--uk-sys-color-secondary), 0.75);
 }
+
+.buttonContainer {
+  display: flex;
+  align-items: center;
+  justify-content: endcop;
+}

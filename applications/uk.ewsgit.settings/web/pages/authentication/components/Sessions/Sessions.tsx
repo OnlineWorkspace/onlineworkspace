@@ -1,4 +1,4 @@
-import UKButton from "@onlineworkspace/uikit-solid/src/components/button/UKButton.jsx";
+import UKButton, { AffirmativeButtonState } from "@onlineworkspace/uikit-solid/src/components/button/UKButton.jsx";
 import UKButtonGroup from "@onlineworkspace/uikit-solid/src/components/buttonGroup/UKButtonGroup.jsx";
 import UKIndeterminateSpinner from "@onlineworkspace/uikit-solid/src/components/indeterminateSpinner/UKIndeterminateSpinner.jsx";
 import UKStack from "@onlineworkspace/uikit-solid/src/components/stack/UKStack.jsx";
@@ -24,21 +24,29 @@ const Sessions: Component = () => {
       <UKButtonGroup size="s" class={styles.buttonGroup}>
         <UKButton
           affirmative
+          disabled={sessions()?.length === 0}
           color="tonal"
           onClick={async () => {
-            const sessionsArray = sessions();
-            if (!sessionsArray || sessionsArray.length === 0) return;
+            const sessionsArray = sessions()!;
 
             const weekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
             const sessionsToDelete = sessionsArray
               .filter((session) => session.firstLoginTimestamp < weekAgo && !session.isCurrent)
               .map((session) => session.sessionId);
 
-            if (sessionsToDelete.length === 0) return;
+            if (sessionsToDelete.length === 0)
+              return {
+                state: AffirmativeButtonState.Success,
+              };
 
             await Promise.all(sessionsToDelete.map((sessionId) => trpc.authentication.deleteSession.mutate({ sessionId })));
 
-            refetchSessions();
+            return {
+              state: AffirmativeButtonState.Success,
+              cb: () => {
+                refetchSessions();
+              },
+            };
           }}
         >
           Remove sessions older than a week
