@@ -1,7 +1,7 @@
+import path from "node:path";
 import { SQL } from "bun";
 import type { Instance } from "../index.js";
 import System from "../system.js";
-import path from "path";
 
 export default class DatabaseSystem extends System {
   databaseConnections: { [connectionId: string]: SQL };
@@ -10,20 +10,14 @@ export default class DatabaseSystem extends System {
     super("database", instance);
 
     this.databaseConnections = {};
-
-    return this;
   }
 
   private sqlite(connectionId: string) {
-    if (this.databaseConnections[connectionId])
-      return this.databaseConnections[connectionId];
+    if (this.databaseConnections[connectionId]) return this.databaseConnections[connectionId];
 
-    let conPath =
-      "sqlite://" +
-      path.join(this.instance.sys.filesystem.FS_ROOT, connectionId) +
-      ".sqlite";
+    const conPath = `sqlite://${path.join(this.instance.sys.filesystem.FS_ROOT, connectionId)}.sqlite`;
 
-    let con = new SQL({
+    const con = new SQL({
       adapter: "sqlite",
       readwrite: true,
       create: true,
@@ -36,13 +30,12 @@ export default class DatabaseSystem extends System {
   }
 
   postgres() {
-    if (this.databaseConnections["postgres"])
-      return this.databaseConnections["postgres"];
+    if (this.databaseConnections.postgres) return this.databaseConnections.postgres;
 
     const connectionString = `postgres://${this.instance.sys.configuration.databases.postgres.user}:${this.instance.sys.configuration.databases.postgres.password}@${this.instance.sys.configuration.databases.postgres.host}:${this.instance.sys.configuration.databases.postgres.port}/${this.instance.sys.configuration.databases.postgres.database}`;
-    let con = new SQL(connectionString);
+    const con = new SQL(connectionString);
 
-    this.databaseConnections[`postgres`] = con;
+    this.databaseConnections.postgres = con;
 
     return con;
   }
