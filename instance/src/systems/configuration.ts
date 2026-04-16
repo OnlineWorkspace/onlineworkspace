@@ -1,4 +1,4 @@
-import { promises as fs, existsSync as fsExistsSync, readFileSync as fsReadFileSync } from "node:fs";
+import { existsSync as fsExistsSync, promises as fs, readFileSync as fsReadFileSync } from "node:fs";
 import * as os from "node:os";
 import path from "node:path";
 import type { Instance } from "../index.js";
@@ -57,6 +57,7 @@ export default class ConfigurationSystem extends System {
   termsOfUse: { message: string; lastUpdated: number };
   defaultQuickShortcuts: string[];
   defaultApplications: { id: string; uri: string }[];
+  caddyfile: string | undefined;
 
   constructor(instance: Instance) {
     super("configuration", instance);
@@ -81,7 +82,7 @@ export default class ConfigurationSystem extends System {
       // @ts-ignore
       Object.values(os.networkInterfaces())
         .flat()
-        .filter((networkInterface) => networkInterface!.internal === false && networkInterface!.family === "IPv4")
+        .filter((networkInterface) => !networkInterface!.internal && networkInterface!.family === "IPv4")
         .map((networkInterface) => `https://${networkInterface!.address}`),
     ];
     this.signupRequirements = {
@@ -137,21 +138,19 @@ export default class ConfigurationSystem extends System {
       { id: "uk.ewsgit.files", uri: "local:uk.ewsgit.files" },
     ];
 
+    this.caddyfile = "../Caddyfile";
+
     if (fsExistsSync(path.join(this.instance.sys.filesystem.AUTOINSTALL_PATH, "configuration.json"))) {
       this.log.info("Auto-install configuration detected. Loading configuration from auto-install.");
 
       const autoInstallConfig = JSON.parse(fsReadFileSync(path.join(this.instance.sys.filesystem.AUTOINSTALL_PATH, "configuration.json")).toString());
 
-      if (autoInstallConfig.enabledFeatures) this.enabledFeatures = autoInstallConfig.enabledFeatures;
-      if (autoInstallConfig.databases) this.databases = autoInstallConfig.databases;
-      if (autoInstallConfig.backendUrl) this.backendUrl = autoInstallConfig.backendUrl;
-      if (autoInstallConfig.webUrl) this.webUrl = autoInstallConfig.webUrl;
-      if (autoInstallConfig.signupRequirements) this.signupRequirements = autoInstallConfig.signupRequirements;
-      if (autoInstallConfig.displayName) this.displayName = autoInstallConfig.displayName;
-      if (autoInstallConfig.mailserver) this.mailServer = autoInstallConfig.mailserver;
-      if (autoInstallConfig.termsOfUse) this.termsOfUse = autoInstallConfig.termsOfUse;
-      if (autoInstallConfig.defaultQuickShortcuts) this.defaultQuickShortcuts = autoInstallConfig.defaultQuickShortcuts;
-      if (autoInstallConfig.defaultApplications) this.defaultApplications = autoInstallConfig.defaultApplications;
+      for (const key of Object.keys(autoInstallConfig)) {
+        if (key in this) {
+          // @ts-ignore
+          this[key] = autoInstallConfig[key];
+        }
+      }
     }
   }
 
@@ -178,24 +177,17 @@ export default class ConfigurationSystem extends System {
   async saveConfiguration(): Promise<boolean> {
     const CONFIGURATION_FILE_PATH = path.join(this.instance.sys.filesystem.FS_ROOT, "configuration.json");
 
-    await fs.writeFile(
-      CONFIGURATION_FILE_PATH,
-      JSON.stringify(
-        {
-          enabledFeatures: this.enabledFeatures,
-          databases: this.databases,
-          backendUrl: this.backendUrl,
-          webUrl: this.webUrl,
-          signupRequirements: this.signupRequirements,
-          displayName: this.displayName,
-          mailserver: this.mailServer,
-          termsOfUse: this.termsOfUse,
-          defaultQuickShortcuts: this.defaultQuickShortcuts,
-        },
-        null,
-        2,
-      ),
-    );
+    const allowedProperties = (Object.keys(this) as (keyof ConfigurationSystem)[]).filter((property) => {
+      return typeof this[property] !== "function" && property !== "instance";
+    });
+
+    const configurationFileContents: Record<string, unknown> = {};
+
+    for (const propertyKey of allowedProperties) {
+      configurationFileContents[propertyKey] = this[propertyKey];
+    }
+
+    await fs.writeFile(CONFIGURATION_FILE_PATH, JSON.stringify(configurationFileContents, null, 2));
 
     return true;
   }
@@ -209,22 +201,19 @@ export default class ConfigurationSystem extends System {
 
     const configurationFile = JSON.parse((await fs.readFile(CONFIGURATION_FILE_PATH)).toString());
 
-    if (configurationFile.enabledFeatures) this.enabledFeatures = configurationFile.enabledFeatures;
-    if (configurationFile.databases) this.databases = configurationFile.databases;
-    if (configurationFile.backendUrl) this.backendUrl = configurationFile.backendUrl;
-    if (configurationFile.webUrl) this.webUrl = configurationFile.webUrl;
-    if (configurationFile.signupRequirements) this.signupRequirements = configurationFile.signupRequirements;
-    if (configurationFile.displayName) this.displayName = configurationFile.displayName;
-    if (configurationFile.mailserver) this.mailServer = configurationFile.mailserver;
-    if (configurationFile.termsOfUse) this.termsOfUse = configurationFile.termsOfUse;
-    if (configurationFile.defaultQuickShortcuts) this.defaultQuickShortcuts = configurationFile.defaultQuickShortcuts;
-    if (configurationFile.defaultApplications) this.defaultApplications = configurationFile.defaultApplications;
+    const allowedProperties = (Object.keys(this) as (keyof ConfigurationSystem)[]).filter((property) => {
+      return typeof this[property] !== "function" && property !== "instance" && property !== "id" && property !== "log";
+    });
 
-    for (const feature of Object.keys(WorkspacesFeatureFlags)) {
-      this.log.info(
-        // @ts-ignore
-        `Feature ${feature} -> ${this.enabledFeatures.includes(WorkspacesFeatureFlags[feature])}`,
-      );
+    for (const propertyKey of allowedProperties) {
+      if (propertyKey in configurationFile) {
+        // @ts-expect-error We can ignore this as the properties which are read-only are already removed from the allowedProperties by this stage.
+        this[propertyKey] = configurationFile[propertyKey];
+      }
+    }
+
+    for (const feature of Object.keys(WorkspacesFeatureFlags) as (keyof typeof WorkspacesFeatureFlags)[]) {
+      this.log.info(`Feature ${feature} -> ${this.enabledFeatures.includes(WorkspacesFeatureFlags[feature])}`);
     }
 
     return true;

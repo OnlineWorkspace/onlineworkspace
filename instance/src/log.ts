@@ -27,7 +27,7 @@ class Logger {
     this.log = log;
 
     // biome-ignore lint/suspicious/noExplicitAny: data could be of any type
-    global.console.log = (...data: any[]): void => {
+    global.global.console.log = (...data: any[]): void => {
       if (process.stdout.cursorTo) {
         process.stdout.cursorTo(0, this._internal_getWindowSize()[1], () => {
           process.stdout.clearLine(1, () => {
@@ -92,6 +92,7 @@ class Logger {
     return this.logMessage(LogType.RAW, ...message);
   }
 
+  // biome-ignore lint/suspicious/noExplicitAny: the message can be of any type
   _internal_promptMessage(...message: any[]) {
     return this.logMessage(LogType.PROMPT, ...message);
   }
@@ -168,7 +169,7 @@ class Logger {
     return this.logMessage(LogType.DEBUG, ...message);
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // biome-ignore lint/suspicious/noExplicitAny: the message can be of any type
   private logMessage(type: LogType, ...message: any[]): this {
     this.logHistory.push({ type: type, level: this.level, message: message });
 
@@ -210,38 +211,23 @@ class Logger {
   }
 
   _internal_writePrompt() {
-    if (
-      !this.log.instance?.sys.configuration?.hasFeature(WorkspacesFeatureFlags.SlashCommands) ||
-      !process.stdout.cursorTo
-    )
-      return this;
+    if (!this.log.instance?.sys.configuration?.hasFeature(WorkspacesFeatureFlags.SlashCommands) || !process.stdout.cursorTo) return this;
 
     process.stdout.cursorTo(0, this._internal_getWindowSize()[1], () => {
-      process.stdout.write(
-        `Workspaces Alpha ${this.log.instance.sys.configuration?.isDevMode ? `[${this.emphasis("Dev Mode")}] ` : ""}`,
-        () => {
-          // move the cursor to the metaLen+6th column of the 2nd from the bottom row
-          process.stdout.cursorTo(
-            this.log.META_LENGTH + 6,
-            this._internal_getWindowSize()[1],
-            () => {
-              // write the prompt indicator to the stdout
-              process.stdout.write(
-                `> ${this.log.instance.sys.consoleCommands?.rlInterface?.line || ""}`,
-              );
-            },
-          );
-        },
-      );
+      process.stdout.write(`Workspaces Alpha ${this.log.instance.sys.configuration?.isDevMode ? `[${this.emphasis("Dev Mode")}] ` : ""}`, () => {
+        // move the cursor to the metaLen+6th column of the 2nd from the bottom row
+        process.stdout.cursorTo(this.log.META_LENGTH + 6, this._internal_getWindowSize()[1], () => {
+          // write the prompt indicator to the stdout
+          process.stdout.write(`> ${this.log.instance.sys.consoleCommands?.rlInterface?.line || ""}`);
+        });
+      });
     });
   }
 
   private writeMessage(logType: LogType, typeString: string, ...message: any[]) {
     if (logType === LogType.RAW) {
       process.stdout.write(
-        chalk.bold(
-          `${typeString}${chalk.yellow(this.level.toUpperCase().slice(0, this.log.META_LENGTH).padEnd(this.log.META_LENGTH))}  `,
-        ) + message.join(" "),
+        chalk.bold(`${typeString}${chalk.yellow(this.level.toUpperCase().slice(0, this.log.META_LENGTH).padEnd(this.log.META_LENGTH))}  `) + message.join(" "),
       );
 
       return this;
@@ -251,9 +237,8 @@ class Logger {
       process.stdout.cursorTo(0, this._internal_getWindowSize()[1], () => {
         process.stdout.clearLine(1, () => {
           process.stdout.write(
-            chalk.bold(
-              `${typeString}${chalk.yellow(this.level.toUpperCase().slice(0, this.log.META_LENGTH).padEnd(this.log.META_LENGTH))}  `,
-            ) + message.join(" "),
+            chalk.bold(`${typeString}${chalk.yellow(this.level.toUpperCase().slice(0, this.log.META_LENGTH).padEnd(this.log.META_LENGTH))}  `) +
+              message.join(" "),
           );
         });
       });
@@ -261,13 +246,7 @@ class Logger {
       return this;
     }
 
-    console.log(
-      typeString,
-      chalk.bold(
-        `${chalk.yellow(this.level.toUpperCase().slice(0, this.log.META_LENGTH).padEnd(this.log.META_LENGTH))} `,
-      ),
-      ...message,
-    );
+    console.log(typeString, chalk.bold(`${chalk.yellow(this.level.toUpperCase().slice(0, this.log.META_LENGTH).padEnd(this.log.META_LENGTH))} `), ...message);
 
     return this;
   }

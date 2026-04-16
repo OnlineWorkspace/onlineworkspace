@@ -62,13 +62,13 @@ class Instance {
   }
 
   async startup() {
-    this.log.system.info(`--------------------------------------------------------------------------`);
+    this.log.system.info(`=================================================================`);
     this.log.system.info(`   ${chalk.hex("FF002E")("/XXX/")}${chalk.hex("70FF00")("/XXX/")}${chalk.hex("0066FF")("/XXX/")}`);
     this.log.system.info(
-      `  ${chalk.hex("FF002E")("/XXX/")}${chalk.hex("70FF00")("/XXX/")}${chalk.hex("0066FF")("/XXX/")}  Workspaces © 2026 Tricolor Software -> https://ewsgit.uk`,
+      `  ${chalk.hex("FF002E")("/XXX/")}${chalk.hex("70FF00")("/XXX/")}${chalk.hex("0066FF")("/XXX/")}  Workspaces © 2026 Ewsgit -> https://ewsgit.uk`,
     );
     this.log.system.info(` ${chalk.hex("FF002E")("/XXX/")}${chalk.hex("70FF00")("/XXX/")}${chalk.hex("0066FF")("/XXX/")}`);
-    this.log.system.info(`--------------------------------------------------------------------------`);
+    this.log.system.info(`=================================================================`);
     this.log.system.info(`Starting up...`);
 
     if (this.status !== InstanceStatus.Offline) {
@@ -310,6 +310,7 @@ class Instance {
     this.log.system.success(`Listening for http requests on port ${this.webServer.port}`);
 
     this.log.system.info("Startup complete");
+    this.status = InstanceStatus.Online
 
     return this;
   }
@@ -320,11 +321,13 @@ class Instance {
   }
 
   async shutdown() {
+    this.status = InstanceStatus.Stopping
     this.sys.consoleCommands.currentCommandInterface.active = true;
     this.sys.consoleCommands.currentCommandInterface.cb = () => 0;
     this.log.system.info("Shutting down...");
 
     this.sys.event.invoke(WorkspacesEvent.BeforeShutdown);
+    this.status = InstanceStatus.Offline
 
     if (process.stdout.cursorTo) {
       process.stdout.cursorTo(0, 0);
