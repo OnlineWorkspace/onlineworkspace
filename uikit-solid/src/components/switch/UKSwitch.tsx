@@ -16,14 +16,23 @@ const UKSwitch: Component<{
 
   const removeMouseUpListener = () => {
     window.removeEventListener("mouseup", handleWindowMouseUp);
+    window.removeEventListener("touchend", handleWindowMouseUp);
   };
 
-  const handleWindowMouseUp = (e: MouseEvent) => {
+  const handleWindowMouseUp = (e: MouseEvent | TouchEvent) => {
     if (!isDragging()) return;
     setIsDragging(false);
     removeMouseUpListener();
 
-    const dragDistance = e.clientX - dragStart();
+    let posX: number = 0;
+
+    if ("touches" in e) {
+      posX = e.touches[0].clientX;
+    } else {
+      posX = e.clientX;
+    }
+
+    const dragDistance = posX - dragStart();
     const dragThreshold = 10;
 
     if (Math.abs(dragDistance) > dragThreshold) {
@@ -31,12 +40,22 @@ const UKSwitch: Component<{
     }
   };
 
-  const handlePointerDown = (e: PointerEvent) => {
+  const handlePointerDown = (e: PointerEvent | TouchEvent) => {
     if (props.disabled) return;
     setIsDragging(true);
-    setDragStart(e.clientX);
+
+    let posX: number = 0;
+
+    if ("touches" in e) {
+      posX = e.touches[0].clientX;
+    } else {
+      posX = e.clientX;
+    }
+
+    setDragStart(posX);
 
     window.addEventListener("mouseup", handleWindowMouseUp);
+    window.addEventListener("touchend", handleWindowMouseUp);
   };
 
   onCleanup(removeMouseUpListener);
@@ -48,6 +67,7 @@ const UKSwitch: Component<{
       data-value={props.value}
       onClick={() => props.onValueChange(!props.value)}
       onPointerDown={handlePointerDown}
+      onTouchStart={handlePointerDown}
       disabled={props.disabled}
     >
       <div data-icon={!!props.icon} class={styles.handle}>

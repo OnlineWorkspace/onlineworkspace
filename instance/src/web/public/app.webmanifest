@@ -5,7 +5,8 @@
     {
       "src": "assets/onlineworkspace/online_workspace_logo.svg",
       "type": "image/svg",
-      "sizes": "512x512"
+      "sizes": "512x512",
+      "purpose": "maskable"
     }
   ],
   "display": "standalone"
