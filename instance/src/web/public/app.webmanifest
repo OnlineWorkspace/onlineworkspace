@@ -1,0 +1,12 @@
+{
+  "name": "Online Workspaces",
+  "short_name": "Workspaces",
+  "icons": [
+    {
+      "src": "assets/onlineworkspace/online_workspace_logo.svg",
+      "type": "image/svg",
+      "sizes": "512x512"
+    }
+  ],
+  "display": "standalone"
+}

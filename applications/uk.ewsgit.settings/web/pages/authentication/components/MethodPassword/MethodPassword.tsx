@@ -30,7 +30,7 @@ const MethodPassword: Component = () => {
         expandedComponent={
           <div class={styles.expanded}>
             <UKText role="body" size="m">
-              Use a password to login to your Workspace account.
+              Use a password to login to your Online Workspace account.
             </UKText>
             <UKButton
               class={styles.button}

@@ -276,6 +276,7 @@
         "@onlineworkspace/workspace-instance": "workspace:*",
         "@onlineworkspace/workspace-instance-web": "workspace:*",
         "@simplewebauthn/browser": "^13.3.0",
+        "@solid-primitives/media": "^2.3.5",
         "@solid-primitives/upload": "^0.1.3",
         "@solidjs/router": "^0.15.3",
         "@thisbeyond/solid-dnd": "^0.7.5",

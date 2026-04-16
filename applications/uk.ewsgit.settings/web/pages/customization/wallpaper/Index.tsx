@@ -228,16 +228,10 @@ const WallpaperPage: Component = () => {
             onClick={() => {
               selectWallpaperUpload(async (files) => {
                 for (const file of files) {
-                  const name = await trpc.customization.wallpaper.upload.mutate(file.file);
-                  await refetchWallpapers();
-
-                  if (files.length === 1) {
-                    await trpc.customization.wallpaper.setWallpaperToCustomWallpaper.mutate({
-                      name: name,
-                    });
-                    await refetchCurrentWallpaper();
-                  }
+                  await trpc.customization.wallpaper.upload.mutate(file.file);
+                  // TODO: add a notification to show the file has uploaded successfully
                 }
+                await refetchWallpapers();
               });
             }}
           >
@@ -248,7 +242,8 @@ const WallpaperPage: Component = () => {
             color={"tonal"}
             leadingIcon={FOLDER_ICON}
             onClick={() => {
-              return 0;
+              alert("Not implemented");
+              return;
             }}
           >
             Choose from Files
@@ -272,6 +267,7 @@ const WallpaperPage: Component = () => {
                           await trpc.customization.wallpaper.setWallpaperToCustomWallpaper.mutate({
                             name: wallpaper.name,
                           });
+
                           refetchCurrentWallpaper();
                         }}
                       >
@@ -288,7 +284,7 @@ const WallpaperPage: Component = () => {
                           }}
                           alt={"delete"}
                         />
-                        <img src={wallpaper.previewSrc} loading={"lazy"} alt={"wallpaper preview"} />
+                        <img src={wallpaper.previewSrc} draggable={false} loading={"lazy"} alt={"wallpaper preview"} />
                       </button>
                     );
                   }}
@@ -316,7 +312,7 @@ const WallpaperPage: Component = () => {
                     refetchCurrentWallpaper();
                   }}
                 >
-                  <img src={wallpaper.previewSrc} loading={"lazy"} alt={"wallpaper preview"} />
+                  <img src={wallpaper.previewSrc} draggable={false} loading={"lazy"} alt={"wallpaper preview"} />
                 </button>
               );
             }}

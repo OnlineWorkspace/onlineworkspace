@@ -38,7 +38,7 @@ const MethodPasskey: Component = () => {
         <Suspense>
           <div class={styles.expanded}>
             <UKText role="body" size="m">
-              Use a passkey to login to your Workspace account. This is more secure {"&"} convenient than a password and can be used with biometric
+              Use a passkey to login to your Online Workspace account. This is more secure {"&"} convenient than a password and can be used with biometric
               authentication on supported devices.
             </UKText>
             <Suspense>

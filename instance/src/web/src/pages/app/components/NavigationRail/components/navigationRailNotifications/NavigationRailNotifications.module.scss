@@ -1,117 +1,117 @@
 .root {
-    position: relative;
-    display: flex;
-    padding-bottom: 1rem;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
+  position: relative;
+  display: flex;
+  padding-bottom: 1rem;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
 
-    &[data-expanded="true"] {
-        > .notifications,
-        > .flyoutNotifications {
-            left: 22.5rem;
-        }
+  &[data-expanded="true"] {
+    > .notifications,
+    > .flyoutNotifications {
+      left: 22.5rem;
     }
+  }
 
-    &[data-expanded="false"] {
-        > .notifications,
-        > .flyoutNotifications {
-            left: 6rem;
-        }
+  &[data-expanded="false"] {
+    > .notifications,
+    > .flyoutNotifications {
+      left: 6rem;
     }
+  }
 
-    *[data-navigation-rail-mobile-mode="true"] > div > & {
-        justify-content: unset;
-        width: unset;
-        padding-bottom: unset;
+  *[data-navigation-rail-mobile-mode="true"] > div > & {
+    justify-content: unset;
+    width: unset;
+    padding-bottom: unset;
 
-        > .notifications,
-        > .flyoutNotifications {
-            position: fixed;
-            left: 1rem;
-            bottom: 5.5rem;
-            height: unset;
-            width: calc(100vw - 2rem);
+    > .notifications,
+    > .flyoutNotifications {
+      position: fixed;
+      left: 1rem;
+      bottom: 5.5rem;
+      height: unset;
+      width: calc(100vw - 2rem);
 
-            animation: fadeInBottom var(--uk-sys-motion-duration-250) var(--uk-sys-motion-easing-emphasized-decelerate);
-            transition: bottom var(--uk-sys-motion-duration-250) var(--uk-sys-motion-easing-emphasized-decelerate);
+      animation: fadeInBottom var(--uk-sys-motion-duration-250) var(--uk-sys-motion-easing-emphasized-decelerate);
+      transition: bottom var(--uk-sys-motion-duration-250) var(--uk-sys-motion-easing-emphasized-decelerate);
 
-            @keyframes fadeInBottom {
-                from {
-                    opacity: 0;
-                    transform: translateY(1rem);
-                }
-                to {
-                    opacity: 1;
-                    transform: translateY(0);
-                }
-            }
+      @keyframes fadeInBottom {
+        from {
+          opacity: 0;
+          transform: translateY(1rem);
         }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
     }
+  }
 }
 
 .notifications {
-    position: absolute;
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    bottom: 1rem;
-    padding: 1rem;
-    z-index: 10;
-    height: calc(100vh - 2rem);
-    width: calc(20rem + 2rem);
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  bottom: 1rem;
+  padding: 1rem;
+  z-index: 10;
+  height: calc(100vh - 2rem);
+  width: calc(20rem + 2rem);
 
-    background-color: rgb(var(--uk-sys-color-surface-container));
-    border: 1px solid rgb(var(--uk-sys-color-outline-variant));
-    border-radius: calc(var(--uk-sys-shape-corner-medium) + 1rem);
+  background-color: rgb(var(--uk-sys-color-surface-container));
+  border: 1px solid rgb(var(--uk-sys-color-outline-variant));
+  border-radius: calc(var(--uk-sys-shape-corner-medium) + 1rem);
 
-    transition: left var(--uk-sys-motion-duration-250) var(--uk-sys-motion-easing-emphasized-decelerate);
+  transition: left var(--uk-sys-motion-duration-250) var(--uk-sys-motion-easing-emphasized-decelerate);
 
-    animation: fadeInLeft var(--uk-sys-motion-duration-250) var(--uk-sys-motion-easing-emphasized-decelerate);
+  animation: fadeInLeft var(--uk-sys-motion-duration-250) var(--uk-sys-motion-easing-emphasized-decelerate);
 
-    @keyframes fadeInLeft {
-        from {
-            opacity: 0;
-            transform: translateX(-1rem);
-        }
-        to {
-            opacity: 1;
-            transform: translateX(0);
-        }
+  @keyframes fadeInLeft {
+    from {
+      opacity: 0;
+      transform: translateX(-1rem);
     }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
 }
 
 .flyoutNotifications {
-    position: absolute;
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    bottom: 1rem;
-    z-index: 10;
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  bottom: 1rem;
+  z-index: 10;
 
-    transition: left var(--uk-sys-motion-duration-250) var(--uk-sys-motion-easing-emphasized-decelerate);
+  transition: left var(--uk-sys-motion-duration-250) var(--uk-sys-motion-easing-emphasized-decelerate);
 
-    > * {
-        animation: fadeIn var(--uk-sys-motion-duration-250) var(--uk-sys-motion-easing-emphasized-decelerate);
+  > * {
+    animation: fadeIn var(--uk-sys-motion-duration-250) var(--uk-sys-motion-easing-emphasized-decelerate);
 
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateX(-1rem);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateX(-1rem);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
     }
+  }
 }
 
 .noNotificationsMessage {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    margin: auto;
-    align-items: center;
-    justify-content: center;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin: auto;
+  align-items: center;
+  justify-content: center;
 }

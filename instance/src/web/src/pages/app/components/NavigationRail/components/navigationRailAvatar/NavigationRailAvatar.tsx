@@ -18,9 +18,9 @@ const NavigationRailAvatar: Component<{ expanded: boolean }> = (props) => {
     <div class={styles.root} data-expanded={props.expanded}>
       <UKAvatar
         onClick={() => {
-          navigate("/app/uk.ewsgit.settings/profile");
+          navigate("/app/uk.ewsgit.settings/");
         }}
-        class={styles.avatar}
+        containerClass={styles.avatarContainer}
         avatar={backend("/api/user/me/avatar/s")}
         size="s"
         username="me"

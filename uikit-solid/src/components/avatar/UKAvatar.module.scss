@@ -4,14 +4,20 @@
   background-color: transparent;
   border: none;
   border-radius: 100rem;
-}
-
-.image {
+  display: block;
   width: var(--size);
   height: var(--size);
-  border-radius: 100rem;
-  user-select: none;
-  -webkit-user-drag: none;
+
+  outline-style: solid;
+  outline-offset: 2px;
+  outline-width: 0;
+  outline-color: transparent;
+
+  &:focus-visible {
+    outline-width: var(--uk-sys-state-focus-indicator-thickness);
+    outline-offset: var(--uk-sys-state-focus-indicator-outer-offset);
+    outline-color: rgb(var(--uk-sys-color-secondary));
+  }
 
   &[data-size="xs"] {
     --size: 1rem;
@@ -32,4 +38,12 @@
   &[data-size="xl"] {
     --size: 16rem;
   }
+}
+
+.image {
+  width: var(--size);
+  height: var(--size);
+  border-radius: 100rem;
+  user-select: none;
+  -webkit-user-drag: none;
 }

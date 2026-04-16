@@ -18,6 +18,7 @@ const ThemePreview: Component<{
     <div class={styles.root}>
       <Suspense>
         <img
+          draggable={false}
           onLoad={(e) => {
             e.currentTarget.style.opacity = "1";
             e.currentTarget.style.filter = "blur(0)";

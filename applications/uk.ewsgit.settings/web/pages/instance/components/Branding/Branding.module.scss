@@ -1,3 +1,14 @@
 .uploadButton {
   margin-left: auto;
 }
+
+.expandedContent {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1rem;
+
+  .saveButton {
+    margin-left: auto;
+  }
+}

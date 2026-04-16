@@ -1,0 +1,30 @@
+import UKStackItem from "@onlineworkspace/uikit-solid/src/components/stack/UKStackItem.jsx";
+import type { Component } from "solid-js";
+import UKTextField from "@onlineworkspace/uikit-solid/src/components/textField/UKTextField.jsx";
+import brandingStyles from "../../Branding.module.scss";
+import UKButton, { AffirmativeButtonState } from "@onlineworkspace/uikit-solid/src/components/button/UKButton.jsx";
+
+const DisplayName: Component = () => {
+  return (
+    <UKStackItem
+      labelText="Display Name"
+      supportingText="This is the name of your workspace. Is is displayed on the bottom of the login page and in the tab title."
+      expandedComponent={
+        <div class={brandingStyles.expandedContent}>
+          <UKTextField label="Display Name" color="outlined" onValueChange={() => 0} value="" />
+          <UKButton
+            class={brandingStyles.saveButton}
+            affirmative
+            onClick={async () => {
+              return { state: AffirmativeButtonState.Success };
+            }}
+          >
+            Save
+          </UKButton>
+        </div>
+      }
+    />
+  );
+};
+
+export default DisplayName;

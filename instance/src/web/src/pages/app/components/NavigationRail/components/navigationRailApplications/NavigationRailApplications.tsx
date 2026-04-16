@@ -6,9 +6,11 @@ import UKList from "@onlineworkspace/uikit-solid/src/components/list/UKList.jsx"
 import UKListItem from "@onlineworkspace/uikit-solid/src/components/list/UKListItem.jsx";
 import UKText from "@onlineworkspace/uikit-solid/src/components/text/UKText.jsx";
 import { useNavigate } from "@solidjs/router";
-import { type Component, createResource, For } from "solid-js";
+import { type Component, createResource, For, Show } from "solid-js";
 import trpc from "../../../../../../lib/trpc";
 import styles from "./NavigationRailApplications.module.scss";
+import UKCard from "@onlineworkspace/uikit-solid/src/components/card/UKCard.jsx";
+import UKIcon from "@onlineworkspace/uikit-solid/src/components/icon/UKIcon.jsx";
 
 const NavigationRailApplications: Component<{
   expanded: boolean;
@@ -36,27 +38,33 @@ const NavigationRailApplications: Component<{
           </UKText>
           <UKDivider direction={DividerDirection.horizontal} />
           <div class={styles.appsGrid}>
-            <UKList>
-              <For each={applications()}>
-                {(app) => {
-                  return (
-                    <UKListItem
-                      labelText={app.label}
-                      onClick={() => {
-                        if (app.location.type === "local") {
-                          navigate(app.location.value);
-                          props.toggle("applications");
-                        } else if (app.location.type === "remote") {
-                          window.location.href = app.location.value;
-                        }
-                      }}
-                      supportingText={`(${app.id})`}
-                      leading={app.icon}
-                    />
-                  );
-                }}
-              </For>
-            </UKList>
+            <For each={applications()}>
+              {(app) => {
+                return (
+                  <UKCard
+                    class={styles.application}
+                    onClick={() => {
+                      if (app.location.type === "local") {
+                        navigate(app.location.value);
+                        props.toggle("applications");
+                      } else if (app.location.type === "remote") {
+                        window.location.href = app.location.value;
+                      }
+                    }}
+                  >
+                    <Show when={app.icon.type === "icon"}>
+                      <UKIcon>{app.icon.value}</UKIcon>
+                    </Show>
+                    <Show when={app.icon.type === "image"}>
+                      <img class={styles.applicationImageIcon} alt="" src={app.icon.value} />
+                    </Show>
+                    <UKText role={"label"} size="m">
+                      {app.label}
+                    </UKText>
+                  </UKCard>
+                );
+              }}
+            </For>
           </div>
         </div>
       )}

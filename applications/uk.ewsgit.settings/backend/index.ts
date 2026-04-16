@@ -594,7 +594,7 @@ const router = t.router({
           .toFile(path.join(wallpapersPath, `${wallpaperUUID}.webp`));
 
         log.info(
-          `converted '${wallpaperUUID}' to PNG -> '${path.relative(instance.sys.filesystem.FS_ROOT, path.join(wallpapersPath, `${wallpaperUUID}.webp`))}'`,
+          `converted '${wallpaperUUID}' to WEBP -> '${path.relative(instance.sys.filesystem.FS_ROOT, path.join(wallpapersPath, `${wallpaperUUID}.webp`))}'`,
         );
 
         return `${wallpaperUUID}.webp`;
@@ -653,33 +653,33 @@ const router = t.router({
           return true;
         }),
       setWallpaperToCustomWallpaper: procedure.input(z.object({ name: z.string() })).mutation(async (opt) => {
-        const wallpaperPath = path.join((await opt.ctx.user()).getPath(), "assets/wallpapers");
-        const resizedWallpapersPath = path.join(wallpaperPath, "resized");
+        const wallpapersPath = path.join((await opt.ctx.user()).getPath(), "assets/wallpapers");
+        const resizedWallpapersPath = path.join(wallpapersPath, "resized");
 
         for (const resizedWallpaper of await fs.readdir(resizedWallpapersPath)) {
           await fs.rm(path.join(resizedWallpapersPath, resizedWallpaper));
         }
 
-        await fs.copyFile(path.join(wallpaperPath, opt.input.name.replace(".preview", "")), path.join(wallpaperPath, "current.webp"));
+        await fs.copyFile(path.join(wallpapersPath, opt.input.name.replace(".preview", "")), path.join(wallpapersPath, "current.webp"));
 
         return true;
       }),
       setWallpaperToDefaultWallpaper: procedure.input(z.object({ name: z.string() })).mutation(async (opt) => {
-        const wallpaperPath = path.join((await opt.ctx.user()).getPath(), "assets/wallpapers");
+        const wallpapersPath = path.join((await opt.ctx.user()).getPath(), "assets/wallpapers");
         const officialWallpaperPath = path.join(instance.sys.filesystem.SRC_ROOT, "assets/wallpapers");
-        const resizedWallpapersPath = path.join(wallpaperPath, "resized");
+        const resizedWallpapersPath = path.join(wallpapersPath, "resized");
 
         for (const resizedWallpaper of await fs.readdir(resizedWallpapersPath)) {
           await fs.rm(path.join(resizedWallpapersPath, resizedWallpaper));
         }
 
-        await fs.copyFile(path.join(officialWallpaperPath, opt.input.name), path.join(wallpaperPath, "current.webp"));
+        await fs.copyFile(path.join(officialWallpaperPath, opt.input.name), path.join(wallpapersPath, "current.webp"));
 
         return true;
       }),
     },
     colorTheme: {
-      wallpaperPixeldata: procedure.output(z.number().array()).query(async (opt) => {
+      getWallpaperPixelData: procedure.output(z.number().array()).query(async (opt) => {
         const wallpaperPath = path.join((await opt.ctx.user()).getPath(), "assets/wallpapers/resized", `${504}x${280}.webp`);
 
         const buf = (await sharp(wallpaperPath).raw().toBuffer({ resolveWithObject: true })).data;

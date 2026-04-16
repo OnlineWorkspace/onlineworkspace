@@ -10,12 +10,10 @@
   position: relative;
 
   transition:
-    background-color var(--uk-sys-motion-duration-250)
-      var(--uk-sys-motion-easing-emphasized-decelerate),
-    color var(--uk-sys-motion-duration-250)
-      var(--uk-sys-motion-easing-emphasized-decelerate);
+    background-color var(--uk-sys-motion-duration-250) var(--uk-sys-motion-easing-emphasized-decelerate),
+    color var(--uk-sys-motion-duration-250) var(--uk-sys-motion-easing-emphasized-decelerate);
 
-  .avatar {
+  .avatarContainer {
     outline-style: solid;
     outline-offset: 2px;
     outline-width: 0;
@@ -23,11 +21,9 @@
     margin-bottom: 0;
 
     transition:
-      outline-color var(--uk-sys-motion-duration-100)
-        var(--uk-sys-motion-easing-standard-decelerate),
+      outline-color var(--uk-sys-motion-duration-100) var(--uk-sys-motion-easing-standard-decelerate),
       outline-width var(--uk-sys-motion-duration-50) linear,
-      margin-bottom var(--uk-sys-motion-duration-500)
-        var(--uk-sys-motion-easing-emphasized-decelerate);
+      margin-bottom var(--uk-sys-motion-duration-500) var(--uk-sys-motion-easing-emphasized-decelerate);
 
     &:hover {
       outline-width: var(--uk-sys-state-focus-indicator-thickness);
@@ -56,8 +52,7 @@
       visibility: visible;
       pointer-events: all;
       opacity: 1;
-      transition: opacity var(--uk-sys-motion-duration-1000)
-        var(--uk-sys-motion-easing-emphasized-decelerate);
+      transition: opacity var(--uk-sys-motion-duration-1000) var(--uk-sys-motion-easing-emphasized-decelerate);
     }
   }
 
@@ -76,7 +71,7 @@
     color: rgb(var(--uk-sys-color-secondary));
     background-color: rgb(var(--uk-sys-color-secondary-container));
 
-    .avatar {
+    .avatarContainer {
       margin-bottom: 3rem;
       outline-width: var(--uk-sys-state-focus-indicator-thickness);
       outline-offset: var(--uk-sys-state-focus-indicator-outer-offset);
@@ -88,10 +83,8 @@
       pointer-events: all;
       opacity: 1;
       transition:
-        opacity var(--uk-sys-motion-duration-1000)
-          var(--uk-sys-motion-easing-emphasized-decelerate),
-        border-radius var(--uk-sys-motion-duration-250)
-          var(--uk-sys-motion-easing-emphasized-decelerate);
+        opacity var(--uk-sys-motion-duration-1000) var(--uk-sys-motion-easing-emphasized-decelerate),
+        border-radius var(--uk-sys-motion-duration-250) var(--uk-sys-motion-easing-emphasized-decelerate);
     }
 
     .nameContainer {
@@ -101,19 +94,15 @@
   }
 
   *[data-navigation-rail-mobile-mode="true"] > div > & {
-    margin-top: unset;
+    margin-top: auto;
+    margin-bottom: auto;
+    margin-right: 1rem;
     padding: unset;
     aspect-ratio: 1 / 1;
     background: transparent;
 
-    .avatar {
-      margin: auto;
-    }
-
-    &[data-expanded="false"] {
-      background: transparent;
-
-      .avatar {
+    &:hover {
+      .avatarContainer {
         margin-bottom: auto;
       }
     }
