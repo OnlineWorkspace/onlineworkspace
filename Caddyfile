@@ -2,6 +2,7 @@
 	admin off
 }
 
+## Begin OnlineWorkspace -----
 localhost {
 	reverse_proxy /api/* http://localhost:3563 {
 	  header_up X-Real-IP {remote}
@@ -9,3 +10,4 @@ localhost {
 	}
 	reverse_proxy http://localhost:5173
 }
+## End OnlineWorkspace -----
