@@ -33,6 +33,7 @@ export default class DatabaseSystem extends System {
     if (this.databaseConnections.postgres) return this.databaseConnections.postgres;
 
     const connectionString = `postgres://${this.instance.sys.configuration.databases.postgres.user}:${this.instance.sys.configuration.databases.postgres.password}@${this.instance.sys.configuration.databases.postgres.host}:${this.instance.sys.configuration.databases.postgres.port}/${this.instance.sys.configuration.databases.postgres.database}`;
+    this.log.info(`Connecting to database @ '${this.instance.sys.configuration.databases.postgres.host}' named '${this.instance.sys.configuration.databases.postgres.database}'`)
     const con = new SQL(connectionString);
 
     this.databaseConnections.postgres = con;

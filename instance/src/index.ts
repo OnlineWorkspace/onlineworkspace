@@ -46,9 +46,9 @@ class Instance {
     this.sys.event = new EventSystem(this);
     this.sys.filesystem = new FilesystemSystem(this);
     this.sys.configuration = new ConfigurationSystem(this);
+    this.sys.database = new DatabaseSystem(this);
     this.sys.notifications = new NotificationsSystem(this);
     this.sys.consoleCommands = new ConsoleCommandsSystem(this);
-    this.sys.database = new DatabaseSystem(this);
     this.sys.users = new UsersSystem(this);
     this.sys.authorization = new AuthorizationSystem(this);
     this.sys.applications = new ApplicationsSystem(this);
@@ -62,13 +62,13 @@ class Instance {
   }
 
   async startup() {
-    this.log.system.info(`=================================================================`);
+    this.log.system.info(`=======================================================================`);
     this.log.system.info(`   ${chalk.hex("FF002E")("/XXX/")}${chalk.hex("70FF00")("/XXX/")}${chalk.hex("0066FF")("/XXX/")}`);
     this.log.system.info(
-      `  ${chalk.hex("FF002E")("/XXX/")}${chalk.hex("70FF00")("/XXX/")}${chalk.hex("0066FF")("/XXX/")}  Workspaces © 2026 Ewsgit -> https://ewsgit.uk`,
+      `  ${chalk.hex("FF002E")("/XXX/")}${chalk.hex("70FF00")("/XXX/")}${chalk.hex("0066FF")("/XXX/")}  Online Workspace © 2026 Ewsgit -> https://ewsgit.uk`,
     );
     this.log.system.info(` ${chalk.hex("FF002E")("/XXX/")}${chalk.hex("70FF00")("/XXX/")}${chalk.hex("0066FF")("/XXX/")}`);
-    this.log.system.info(`=================================================================`);
+    this.log.system.info(`=======================================================================`);
     this.log.system.info(`Starting up...`);
 
     if (this.status !== InstanceStatus.Offline) {

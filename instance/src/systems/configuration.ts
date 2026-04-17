@@ -178,12 +178,13 @@ export default class ConfigurationSystem extends System {
     const CONFIGURATION_FILE_PATH = path.join(this.instance.sys.filesystem.FS_ROOT, "configuration.json");
 
     const allowedProperties = (Object.keys(this) as (keyof ConfigurationSystem)[]).filter((property) => {
-      return typeof this[property] !== "function" && property !== "instance";
+      return typeof this[property] !== "function" && property !== "instance" && property !== "id" && property !== "log";
     });
 
     const configurationFileContents: Record<string, unknown> = {};
 
     for (const propertyKey of allowedProperties) {
+      console.log(propertyKey)
       configurationFileContents[propertyKey] = this[propertyKey];
     }
 

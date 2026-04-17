@@ -3,6 +3,7 @@ import fs from "fs";
 import path from "path";
 import type { Instance } from "../index.js";
 import System from "../system.js";
+import {WorkspacesEvent} from "./events.js";
 
 export default class FilesystemSystem extends System {
   readonly SRC_ROOT = path.resolve("./instance/src/");
@@ -191,6 +192,7 @@ export default class FilesystemSystem extends System {
   }
 
   async startup(): Promise<boolean> {
+    this.instance.sys.event.on(WorkspacesEvent.BeforeStartupComplete, async () => {
     const db = this.instance.sys.database.postgres();
 
     await db`CREATE TABLE IF NOT EXISTS filesystem_permission_overrides (
@@ -202,6 +204,7 @@ export default class FilesystemSystem extends System {
                 write_permission_users TEXT[],
                 owner TEXT[]
         )`;
+    })
 
     return true;
   }
