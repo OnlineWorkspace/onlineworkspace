@@ -16,16 +16,7 @@ export default class ImageSystem extends System {
         resize?: {
           dimensions: { width: number; height: number };
           changeFormatTo?: "avif" | "jpeg" | "png";
-          position?:
-            | "top"
-            | "right top"
-            | "right"
-            | "right bottom"
-            | "bottom"
-            | "left bottom"
-            | "left"
-            | "left top"
-            | "centre";
+          position?: "top" | "right top" | "right" | "right bottom" | "bottom" | "left bottom" | "left" | "left top" | "centre";
           fit?: "cover" | "contain" | "fill";
           background?: string;
         };
@@ -39,8 +30,6 @@ export default class ImageSystem extends System {
 
     this._internalImages = new Map();
     this._internalImagePaths = new Map();
-
-    return this;
   }
 
   // returns an endpoint where the image located at the provided path can be loaded from on the client
@@ -71,16 +60,7 @@ export default class ImageSystem extends System {
                   height: number;
                 });
             changeFormatTo?: "avif" | "jpeg" | "png";
-            position?:
-              | "top"
-              | "right top"
-              | "right"
-              | "right bottom"
-              | "bottom"
-              | "left bottom"
-              | "left"
-              | "left top"
-              | "centre";
+            position?: "top" | "right top" | "right" | "right bottom" | "bottom" | "left bottom" | "left" | "left top" | "centre";
             fit?: "cover" | "contain" | "fill";
             background?: string;
           };
@@ -156,9 +136,7 @@ export default class ImageSystem extends System {
 
     this._internalImagePaths.set(path, imageId);
 
-    this.log.info(
-      `Serving image at '${nodePath.relative(this.instance.sys.filesystem.FS_ROOT, path)}' as '${imageId}'`,
-    );
+    this.log.info(`Serving image at '${nodePath.relative(this.instance.sys.filesystem.FS_ROOT, path)}' as '${imageId}'`);
 
     return `/api/asset/image/${imageId}/${requestResolution}`;
   }
@@ -174,16 +152,7 @@ export default class ImageSystem extends System {
         }),
     options?: {
       changeFormatTo?: "avif" | "jpeg" | "png" | "webp";
-      position?:
-        | "top"
-        | "right top"
-        | "right"
-        | "right bottom"
-        | "bottom"
-        | "left bottom"
-        | "left"
-        | "left top"
-        | "centre";
+      position?: "top" | "right top" | "right" | "right bottom" | "bottom" | "left bottom" | "left" | "left top" | "centre";
       fit?: "cover" | "contain" | "fill";
       background?: string;
     },

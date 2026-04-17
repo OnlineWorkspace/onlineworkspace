@@ -28,7 +28,7 @@ const Profile: Component<{
         Setup Profile
       </UKText>
       <UKDivider direction={DividerDirection.horizontal} />
-      <UKAvatar class={styles.avatar} size={"l"} username={props.username()} avatar={"/assets/placeholder/avatar.png"} />
+      <UKAvatar containerClass={styles.avatar} size={"l"} username={props.username()} avatar={"/assets/placeholder/avatar.png"} />
       <UKText class={styles.displayName} role={"headline"} align={"center"} size={"l"} emphasized={true}>
         {props.displayName() || props.username()}
       </UKText>

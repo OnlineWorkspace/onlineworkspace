@@ -57,9 +57,11 @@ const User: Component<{
           <UKDivider direction="horizontal" />
           <UKTextField
             color="outlined"
-            onValueChange={(val) => {
+            onValueChange={async (val) => {
+              if (val === username()) return;
+
               setUsername(val);
-              trpc.instance.user.setUsername.mutate({
+              await trpc.instance.user.setUsername.mutate({
                 userId: props.userId,
                 username: val,
               });
@@ -71,9 +73,11 @@ const User: Component<{
           <div class={styles.name}>
             <UKTextField
               color="outlined"
-              onValueChange={(val) => {
+              onValueChange={async (val) => {
+                if (val === forename()) return;
+
                 setForename(val);
-                trpc.instance.user.setForename.mutate({
+                await trpc.instance.user.setForename.mutate({
                   userId: props.userId,
                   forename: val,
                 });
@@ -84,9 +88,11 @@ const User: Component<{
             />
             <UKTextField
               color="outlined"
-              onValueChange={(val) => {
+              onValueChange={async (val) => {
+                if (val === surname()) return;
+
                 setSurname(val);
-                trpc.instance.user.setSurname.mutate({
+                await trpc.instance.user.setSurname.mutate({
                   userId: props.userId,
                   surname: val,
                 });
@@ -98,9 +104,11 @@ const User: Component<{
           </div>
           <UKTextField
             color="outlined"
-            onValueChange={(val) => {
+            onValueChange={async (val) => {
+              if (val === email()) return;
+
               setEmail(val);
-              trpc.instance.user.setEmail.mutate({
+              await trpc.instance.user.setEmail.mutate({
                 userId: props.userId,
                 email: val,
               });
@@ -115,13 +123,13 @@ const User: Component<{
             </UKText>
             <UKSwitch
               disabled={isMe() && !appContext.shootYourselfInTheFoot()}
-              onValueChange={(val) => {
+              onValueChange={async (val) => {
                 if (isMe() && !val) {
                   setShowDialog("removeOwnAdmin");
                   return;
                 }
                 setIsAdministrator(val);
-                trpc.instance.user.setIsAdministrator.mutate({
+                await trpc.instance.user.setIsAdministrator.mutate({
                   administrator: val,
                   userId: props.userId,
                 });
@@ -138,9 +146,9 @@ const User: Component<{
             </UKButton>
             <UKButton
               color={"standard"}
-              onClick={() => {
+              onClick={async () => {
                 // send a boop notification
-                trpc.instance.user.boop.mutate({ userId: props.userId });
+                await trpc.instance.user.boop.mutate({ userId: props.userId });
               }}
             >
               Boop

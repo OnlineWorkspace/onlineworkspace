@@ -94,6 +94,8 @@ export class WorkspacesUser {
     const db = this.instance.sys.database.postgres();
 
     try {
+      this.instance.log.system.info(`Set Surname to '${surname}' for ${this.userId}`);
+
       await db`UPDATE public.users SET surname = ${surname} WHERE id = ${this.userId}`;
 
       return true;
@@ -372,7 +374,7 @@ export class WorkspacesUser {
 
     try {
       for (const size of AVATAR_SIZES) {
-        if (override || !(await fs.exists(path.join(this.getPath(), `assets/avatar/${size.name}.webp`)))) {
+        if (override || !fsExistsSync(path.join(this.getPath(), `assets/avatar/${size.name}.webp`))) {
           this.instance.sys.users.log.info(`Generating avatar for user '${this.userId}' @ ${size.name}`);
           await sharp(path.join(this.getPath(), "assets/avatar/avatar.webp"))
             .resize(size.width, size.height)
@@ -539,7 +541,10 @@ export default class UsersSystem extends System {
   async createUser(username: string, password?: string): Promise<number | undefined> {
     const db = this.instance.sys.database.postgres();
 
-    if ((await db`SELECT username FROM public.users WHERE username = ${username}`).count !== 0) return undefined;
+    if ((await db`SELECT username FROM public.users WHERE username = ${username}`).count !== 0) {
+      this.log.warning(`Failed to create user ${username} as they already exist`);
+      return undefined;
+    }
 
     const user = {
       username,

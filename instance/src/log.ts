@@ -273,3 +273,7 @@ export default class Log {
     return new Logger(prefix, this);
   }
 }
+
+/*
+ * Prompt a message
+ */
