@@ -18,9 +18,11 @@ export default class FilesystemSystem extends System {
     super("filesystem", instance);
 
     fs.mkdirSync(this.FS_ROOT, { recursive: true });
+
     if (fs.existsSync(this.CACHE_PATH)) {
       fs.rmSync(this.CACHE_PATH, { recursive: true });
     }
+
     fs.mkdirSync(this.CACHE_PATH, { recursive: true });
 
     if (!fs.existsSync(path.join(this.FS_ROOT, "assets/login"))) {

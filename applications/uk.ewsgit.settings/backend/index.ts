@@ -653,27 +653,29 @@ const router = t.router({
           return true;
         }),
       setWallpaperToCustomWallpaper: procedure.input(z.object({ name: z.string() })).mutation(async (opt) => {
-        const wallpapersPath = path.join((await opt.ctx.user()).getPath(), "assets/wallpapers");
-        const resizedWallpapersPath = path.join(wallpapersPath, "resized");
+        const userWallpapersPath = path.join((await opt.ctx.user()).getPath(), "assets/wallpapers");
+        const resizedWallpapersPath = path.join(userWallpapersPath, "resized");
 
         for (const resizedWallpaper of await fs.readdir(resizedWallpapersPath)) {
           await fs.rm(path.join(resizedWallpapersPath, resizedWallpaper));
         }
 
-        await fs.copyFile(path.join(wallpapersPath, opt.input.name.replace(".preview", "")), path.join(wallpapersPath, "current.webp"));
+        await fs.rm(path.join(userWallpapersPath, "current.webp"));
+        await fs.copyFile(path.join(userWallpapersPath, opt.input.name.replace(".preview", "")), path.join(userWallpapersPath, "current.webp"));
 
         return true;
       }),
       setWallpaperToDefaultWallpaper: procedure.input(z.object({ name: z.string() })).mutation(async (opt) => {
-        const wallpapersPath = path.join((await opt.ctx.user()).getPath(), "assets/wallpapers");
+        const userWallpapersPath = path.join((await opt.ctx.user()).getPath(), "assets/wallpapers");
         const officialWallpaperPath = path.join(instance.sys.filesystem.SRC_ROOT, "assets/wallpapers");
-        const resizedWallpapersPath = path.join(wallpapersPath, "resized");
+        const resizedWallpapersPath = path.join(userWallpapersPath, "resized");
 
         for (const resizedWallpaper of await fs.readdir(resizedWallpapersPath)) {
           await fs.rm(path.join(resizedWallpapersPath, resizedWallpaper));
         }
 
-        await fs.copyFile(path.join(officialWallpaperPath, opt.input.name), path.join(wallpapersPath, "current.webp"));
+        await fs.rm(path.join(userWallpapersPath, "current.webp"));
+        await fs.copyFile(path.join(officialWallpaperPath, opt.input.name), path.join(userWallpapersPath, "current.webp"));
 
         return true;
       }),
@@ -698,11 +700,11 @@ const router = t.router({
         const db = instance.sys.database.postgres();
 
         if (opt.input === undefined) {
-          await db`UPDATE public.users SET color_theme = NULL WHERE id = ${opt.ctx.userId}`;
+          await db`UPDATE public.users SET color_scheme = NULL WHERE id = ${opt.ctx.userId}`;
           return true;
         }
 
-        await db`UPDATE public.users SET color_theme = ${opt.input} WHERE id = ${opt.ctx.userId}`;
+        await db`UPDATE public.users SET color_scheme = ${opt.input} WHERE id = ${opt.ctx.userId}`;
 
         return true;
       }),

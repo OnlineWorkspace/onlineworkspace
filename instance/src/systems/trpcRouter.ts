@@ -732,9 +732,9 @@ ${opt.ctx.instance.sys.configuration.termsOfUse.message}`;
       const db = opt.ctx.instance.sys.database.postgres();
 
       // biome-ignore lint/suspicious/noExplicitAny: unrequired
-      const themeValues = (await db`SELECT color_theme FROM public.users WHERE id = ${opt.ctx.userId}`) as any;
+      const themeValues = (await db`SELECT color_scheme FROM public.users WHERE id = ${opt.ctx.userId}`) as any;
 
-      return themeValues?.[0]?.color_theme || false;
+      return themeValues?.[0]?.color_scheme || false;
     }),
   },
 });

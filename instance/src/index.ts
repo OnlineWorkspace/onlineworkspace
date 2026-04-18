@@ -23,6 +23,7 @@ import TRPCSystem from "./systems/trpc.js";
 import { createTRPCContext as createWorkspacesTRPCContext, workspacesRouter } from "./systems/trpcRouter.js";
 import UsersSystem from "./systems/users.js";
 import WebFrontendSystem from "./systems/webFrontend.js";
+import {cache} from "sharp";
 
 export enum InstanceStatus {
   Online,
@@ -235,12 +236,18 @@ class Instance {
                 this.sys.image.log.info(`Served Image -> '${(req.params as { imageId: string }).imageId} @ ${resolutionParam}'`);
                 return new Response(file(sourceImage.path));
               } else {
-                const outputPath = path.join(this.sys.filesystem.CACHE_PATH, sourceImage.path, resolutionParam);
+                const cachedFilePath = path.join(this.sys.filesystem.CACHE_PATH, sourceImage.path.replaceAll(":", ""))
+                const outputPath = path.join(cachedFilePath, resolutionParam);
+                const hashPath = path.join(`${outputPath}.hash`)
 
-                // FIXME!: IF THE IMAGE AT THE SOURCE PATH IS REPLACED WITH ANOTHER, IT WILL CONTINUE TO SEND THE OLD IMAGE
                 if (fsExistsSync(outputPath)) {
-                  this.sys.image.log.info(`Served Image -> '${(req.params as { imageId: string }).imageId} @ ${resolutionParam}'`);
-                  return new Response(file(outputPath));
+                  const fileHash = Bun.hash.rapidhash(await fs.readFile(sourceImage.path)).toString()
+                  const cacheFileHash = (await fs.readFile(hashPath)).toString()
+
+                  if (fileHash === cacheFileHash) {
+                    this.sys.image.log.info(`Served Image -> '${(req.params as { imageId: string }).imageId} @ ${resolutionParam}'`);
+                    return new Response(file(outputPath));
+                  }
                 }
 
                 if (!fsExistsSync(path.join(outputPath, ".."))) {
@@ -249,7 +256,9 @@ class Instance {
                   });
                 }
 
+                const fileHash = Bun.hash.rapidhash(await fs.readFile(sourceImage.path)).toString()
                 await this.sys.image.resizeImage(sourceImage.path, outputPath, sourceImage.resize!.dimensions, sourceImage.resize!);
+                await fs.writeFile(hashPath, fileHash)
 
                 this.sys.image.log.info(`Served Image -> '${(req.params as { imageId: string }).imageId} @ ${resolutionParam}'`);
                 return new Response(file(outputPath));
