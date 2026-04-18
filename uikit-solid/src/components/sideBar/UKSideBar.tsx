@@ -1,12 +1,12 @@
-import { createSignal, Index, Show, type Component, type ParentProps } from "solid-js";
-import styles from "./UKSideBar.module.scss";
-import UKIcon from "../icon/UKIcon.tsx";
+import MENU_ICON from "@material-symbols/svg-700/outlined/menu.svg";
+import MENU_OPEN_ICON from "@material-symbols/svg-700/outlined/menu_open.svg";
+import clsx from "clsx";
+import { type Component, createSignal, Index, type ParentProps, Show } from "solid-js";
 import useIsMobile from "../../core/useIsMobile.ts";
 import UKDivider from "../divider/UKDivider.tsx";
+import UKIcon from "../icon/UKIcon.tsx";
 import UKIconButton from "../iconButton/UKIconButton.tsx";
-import clsx from "clsx";
-import MENU_ICON from "@material-symbols/svg-700/outlined/menu.svg"
-import MENU_OPEN_ICON from "@material-symbols/svg-700/outlined/menu_open.svg";
+import styles from "./UKSideBar.module.scss";
 
 interface ButtonItem {
   type: "button";
@@ -32,16 +32,22 @@ interface MarginItem {
   type: "margin";
 }
 
+interface ComponentItem {
+  type: "component";
+  component: Component;
+}
+
 const UKSideBar: Component<
   ParentProps<{
-    items: (ButtonItem | LabelItem | DividerItem | MarginItem | undefined)[];
+    items: (ButtonItem | LabelItem | DividerItem | MarginItem | ComponentItem | undefined)[];
+    containerClassName?: string;
   }>
 > = (props) => {
   const isMobile = useIsMobile();
   const [isMobileToggled, setIsMobileToggled] = createSignal<boolean>(false);
 
   return (
-    <div class={styles.root} data-sidebar-mode-mobile-mode={isMobile()}>
+    <div class={clsx(styles.root, props.containerClassName)} data-sidebar-mode-mobile-mode={isMobile()}>
       <div class={styles.component}>
         {isMobile() && (
           <UKIconButton
@@ -76,6 +82,8 @@ const UKSideBar: Component<
                   return <div class={styles.margin} />;
                 case "divider":
                   return <UKDivider class={styles.divider} width="middle-inset" direction="horizontal" />;
+                case "component":
+                  return <>{(item() as ComponentItem).component}</>;
                 default:
                   return <div>AHH</div>;
               }

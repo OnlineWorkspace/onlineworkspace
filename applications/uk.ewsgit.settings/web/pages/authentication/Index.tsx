@@ -1,5 +1,5 @@
 import CHEVRON_LEFT_ICON from "@material-symbols/svg-700/outlined/chevron_left.svg";
-import UKIndeterminateSpinner from "@onlineworkspace/uikit-solid/src/components/indeterminateSpinner/UKIndeterminateSpinner.jsx";
+import UKCircularProgressIndicator from "@onlineworkspace/uikit-solid/src/components/circularProgressIndicator/UKCircularProgressIndicator.jsx";
 import UKStack from "@onlineworkspace/uikit-solid/src/components/stack/UKStack.jsx";
 import UKStackLabel from "@onlineworkspace/uikit-solid/src/components/stack/UKStackLabel.tsx";
 import UKTopAppBar from "@onlineworkspace/uikit-solid/src/components/topAppBar/UKTopAppBar.jsx";
@@ -30,7 +30,7 @@ const AuthenticationPage: Component = () => {
       <div class={styles.root}>
         <UKStackLabel>Login methods</UKStackLabel>
         <UKStack>
-          <Suspense fallback={<UKIndeterminateSpinner class={styles.spinner} />}>
+          <Suspense fallback={<UKCircularProgressIndicator class={styles.spinner} />}>
             <MethodPassword />
             <MethodTwoFactor />
             <MethodPasskey />

@@ -1,5 +1,5 @@
 import UKButton, { AffirmativeButtonState } from "@onlineworkspace/uikit-solid/src/components/button/UKButton.tsx";
-import UKIndeterminateSpinner from "@onlineworkspace/uikit-solid/src/components/indeterminateSpinner/UKIndeterminateSpinner.jsx";
+import UKCircularProgressIndicator from "@onlineworkspace/uikit-solid/src/components/circularProgressIndicator/UKCircularProgressIndicator.jsx";
 import { createFileUploader } from "@solid-primitives/upload";
 import Cropper from "cropperjs";
 import type { Component } from "solid-js";
@@ -42,7 +42,7 @@ const CropImage: Component<{ refetchAvatar(): void; close(): void }> = (props) =
     <div class={styles.root}>
       {files().length === 0 ? (
         <div class={styles.spinnerContainer}>
-          <UKIndeterminateSpinner />
+          <UKCircularProgressIndicator />
         </div>
       ) : (
         <>

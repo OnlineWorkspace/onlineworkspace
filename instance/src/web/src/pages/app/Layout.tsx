@@ -1,4 +1,4 @@
-import UKIndeterminateSpinner from "@onlineworkspace/uikit-solid/src/components/indeterminateSpinner/UKIndeterminateSpinner.jsx";
+import UKCircularProgressIndicator from "@onlineworkspace/uikit-solid/src/components/circularProgressIndicator/UKCircularProgressIndicator.jsx";
 import { baselineTheme } from "@onlineworkspace/uikit-solid/src/core/design/themes/baseline.js";
 import { applyTheme } from "@onlineworkspace/uikit-solid/src/core/design/tokens.js";
 import { Ref } from "@solid-primitives/refs";
@@ -49,13 +49,13 @@ const AppLayout: Component<RouteSectionProps<unknown>> = (props) => {
       {window.localStorage.getItem("onlineworkspace_workspace_no_app_navigation_rail") !== "true" ? (
         <Ref ref={setRef}>
           <AppNavigation>
-            <Suspense fallback={<UKIndeterminateSpinner />}>{props.children}</Suspense>
+            <Suspense fallback={<UKCircularProgressIndicator />}>{props.children}</Suspense>
           </AppNavigation>
         </Ref>
       ) : (
         <Ref ref={setRef}>
           <div class={styles.page}>
-            <Suspense fallback={<UKIndeterminateSpinner />}>{props.children}</Suspense>
+            <Suspense fallback={<UKCircularProgressIndicator />}>{props.children}</Suspense>
           </div>
         </Ref>
       )}

@@ -1,5 +1,5 @@
+import * as nodePath from "node:path";
 import { randomUUIDv7 } from "bun";
-import * as nodePath from "path";
 import sharp from "sharp";
 import type { Instance } from "../index.js";
 import System from "../system.js";

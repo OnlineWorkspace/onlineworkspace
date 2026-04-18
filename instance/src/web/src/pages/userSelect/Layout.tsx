@@ -1,5 +1,5 @@
 import UKCard from "@onlineworkspace/uikit-solid/src/components/card/UKCard.jsx";
-import UKIndeterminateSpinner from "@onlineworkspace/uikit-solid/src/components/indeterminateSpinner/UKIndeterminateSpinner.jsx";
+import UKCircularProgressIndicator from "@onlineworkspace/uikit-solid/src/components/circularProgressIndicator/UKCircularProgressIndicator.jsx";
 import UKText from "@onlineworkspace/uikit-solid/src/components/text/UKText.jsx";
 import type { RouteSectionProps } from "@solidjs/router";
 import { type Component, Suspense } from "solid-js";
@@ -11,7 +11,7 @@ const UserSelectLayout: Component<RouteSectionProps<unknown>> = (props) => {
     <div class={styles.root}>
       <img class={styles.background} alt="" src={backend("/api/instance/login/background")} />
       <img alt="" class={styles.banner} src={backend("/api/instance/login/banner")} />
-      <Suspense fallback={<UKIndeterminateSpinner />}>{props.children}</Suspense>
+      <Suspense fallback={<UKCircularProgressIndicator />}>{props.children}</Suspense>
       <UKCard color={"outlined"} class={styles.copyrightContainer}>
         <UKText role={"title"} size={"m"} emphasized={true}>
           Online Workspace Alpha

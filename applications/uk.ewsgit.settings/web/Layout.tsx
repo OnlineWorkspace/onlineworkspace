@@ -5,7 +5,7 @@ import PERSON_ICON from "@material-symbols/svg-700/outlined/person.svg";
 import SETTINGS_APPLICATIONS_ICON from "@material-symbols/svg-700/outlined/settings_applications.svg";
 import STORAGE_ICON from "@material-symbols/svg-700/outlined/storage.svg";
 import WALLPAPER_ICON from "@material-symbols/svg-700/outlined/wallpaper.svg";
-import UKIndeterminateSpinner from "@onlineworkspace/uikit-solid/src/components/indeterminateSpinner/UKIndeterminateSpinner.jsx";
+import UKCircularProgressIndicator from "@onlineworkspace/uikit-solid/src/components/circularProgressIndicator/UKCircularProgressIndicator.jsx";
 import UKSideBar from "@onlineworkspace/uikit-solid/src/components/sideBar/UKSideBar.tsx";
 import { useLocation, useNavigate, useSearchParams } from "@solidjs/router";
 import { type Component, createEffect, createSignal, type ParentProps, Suspense } from "solid-js";
@@ -36,7 +36,7 @@ const Layout: Component<ParentProps> = (props) => {
     >
       {searchParams.sidebar_hidden === "true" ? (
         <div class={styles.sidebarHiddenPage}>
-          <Suspense fallback={<UKIndeterminateSpinner class={styles.spinner} />}>{props.children}</Suspense>
+          <Suspense fallback={<UKCircularProgressIndicator class={styles.spinner} />}>{props.children}</Suspense>
         </div>
       ) : (
         <UKSideBar
@@ -112,7 +112,7 @@ const Layout: Component<ParentProps> = (props) => {
               : undefined,
           ]}
         >
-          <Suspense fallback={<UKIndeterminateSpinner class={styles.spinner} />}>{props.children}</Suspense>
+          <Suspense fallback={<UKCircularProgressIndicator class={styles.spinner} />}>{props.children}</Suspense>
         </UKSideBar>
       )}
     </AppContext.Provider>

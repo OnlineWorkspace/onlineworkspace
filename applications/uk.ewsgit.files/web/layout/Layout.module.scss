@@ -1,0 +1,22 @@
+.root {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  grid-template-rows: auto 1fr auto;
+  width: 100%;
+  height: 100%;
+}
+
+.sidebar {
+  grid-row-start: 1;
+  grid-row-end: 4;
+}
+
+.actionbar {
+  grid-column-start: 2;
+  grid-column-end: 4;
+}
+
+.statusbar {
+  grid-column-start: 2;
+  grid-column-end: 4;
+}

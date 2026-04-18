@@ -1,0 +1,31 @@
+// track
+.root {
+  --track-height: var(--thickness, 0.25rem);
+
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  border-radius: 100rem;
+  height: var(--track-height);
+}
+
+.activeIndicator {
+  border-radius: 100rem;
+  background-color: rgb(var(--uk-sys-color-primary));
+}
+
+.remainingIndicator {
+  border-radius: 100rem;
+  display: flex;
+  align-items: center;
+  background-color: rgb(var(--uk-sys-color-secondary-container));
+}
+
+.stopIndicator {
+  height: 0.25rem;
+  width: 0.25rem;
+  border-radius: 100rem;
+  background-color: rgb(var(--uk-sys-color-primary));
+  margin-left: auto;
+  margin-right: calc(calc(var(--thickness) - 0.5rem) / 2);
+}

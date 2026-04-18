@@ -1,7 +1,7 @@
 import INDETERMINATE_QUESTION_BOX_ICON from "@material-symbols/svg-700/outlined/indeterminate_question_box.svg";
 import UKButton from "@onlineworkspace/uikit-solid/src/components/button/UKButton.jsx";
 import UKIcon from "@onlineworkspace/uikit-solid/src/components/icon/UKIcon.jsx";
-import UKIndeterminateSpinner from "@onlineworkspace/uikit-solid/src/components/indeterminateSpinner/UKIndeterminateSpinner.jsx";
+import UKCircularProgressIndicator from "@onlineworkspace/uikit-solid/src/components/circularProgressIndicator/UKCircularProgressIndicator.jsx";
 import UKText from "@onlineworkspace/uikit-solid/src/components/text/UKText.jsx";
 import UKTopAppBar from "@onlineworkspace/uikit-solid/src/components/topAppBar/UKTopAppBar.jsx";
 import { type Component, createResource, createSignal, For, Suspense } from "solid-js";
@@ -31,7 +31,7 @@ const Page: Component = () => {
         value={searchQuery}
         placeholder={"Search Applications"}
       />
-      <Suspense fallback={<UKIndeterminateSpinner class={styles.spinner} />}>
+      <Suspense fallback={<UKCircularProgressIndicator class={styles.spinner} />}>
         {(results() || [])?.length > 0 ? (
           <div class={styles.resultGrid}>
             <For each={results()}>

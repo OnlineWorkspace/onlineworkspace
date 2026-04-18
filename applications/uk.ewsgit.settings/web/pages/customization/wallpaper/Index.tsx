@@ -5,10 +5,10 @@ import FOLDER_ICON from "@material-symbols/svg-700/outlined/folder.svg";
 import UPLOAD_ICON from "@material-symbols/svg-700/outlined/upload.svg";
 import UKButton from "@onlineworkspace/uikit-solid/src/components/button/UKButton.tsx";
 import UKButtonGroup from "@onlineworkspace/uikit-solid/src/components/buttonGroup/UKButtonGroup.jsx";
+import UKCircularProgressIndicator from "@onlineworkspace/uikit-solid/src/components/circularProgressIndicator/UKCircularProgressIndicator.tsx";
 import { DividerDirection } from "@onlineworkspace/uikit-solid/src/components/divider/lib/direction.js";
 import UKDivider from "@onlineworkspace/uikit-solid/src/components/divider/UKDivider.jsx";
 import UKIconButton from "@onlineworkspace/uikit-solid/src/components/iconButton/UKIconButton.tsx";
-import UKIndeterminateSpinner from "@onlineworkspace/uikit-solid/src/components/indeterminateSpinner/UKIndeterminateSpinner.tsx";
 import UKStack from "@onlineworkspace/uikit-solid/src/components/stack/UKStack.jsx";
 import UKStackItem from "@onlineworkspace/uikit-solid/src/components/stack/UKStackItem.jsx";
 import UKStackLabel from "@onlineworkspace/uikit-solid/src/components/stack/UKStackLabel.jsx";
@@ -256,7 +256,7 @@ const WallpaperPage: Component = () => {
               Previous Wallpapers
             </UKText>
             <div class={styles.wallpaperHistory}>
-              <Suspense fallback={<UKIndeterminateSpinner />}>
+              <Suspense fallback={<UKCircularProgressIndicator />}>
                 <For each={previousWallpapers() || []}>
                   {(wallpaper) => {
                     return (

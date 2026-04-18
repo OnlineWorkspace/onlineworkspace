@@ -1,6 +1,6 @@
 import UKButton, { AffirmativeButtonState } from "@onlineworkspace/uikit-solid/src/components/button/UKButton.jsx";
 import UKButtonGroup from "@onlineworkspace/uikit-solid/src/components/buttonGroup/UKButtonGroup.jsx";
-import UKIndeterminateSpinner from "@onlineworkspace/uikit-solid/src/components/indeterminateSpinner/UKIndeterminateSpinner.jsx";
+import UKCircularProgressIndicator from "@onlineworkspace/uikit-solid/src/components/circularProgressIndicator/UKCircularProgressIndicator.jsx";
 import UKStack from "@onlineworkspace/uikit-solid/src/components/stack/UKStack.jsx";
 import { type Component, createResource, For, Suspense } from "solid-js";
 import trpc from "../../../../lib/trpc";
@@ -13,7 +13,7 @@ const Sessions: Component = () => {
   return (
     <>
       <UKStack>
-        <Suspense fallback={<UKIndeterminateSpinner class={styles.spinner} />}>
+        <Suspense fallback={<UKCircularProgressIndicator class={styles.spinner} />}>
           <For each={sessions()}>
             {(s) => {
               return <Session {...s} refetch={refetchSessions} />;

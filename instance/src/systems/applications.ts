@@ -38,7 +38,7 @@ export default class ApplicationsSystem extends System {
       if (this.enabledApplications.find((a) => a === app.manifest?.id)) {
         if (app.manifest?.modules.web) {
           applicationImportsInfill += `const App${ind}Router = lazy(() => import("${path.relative(path.join(this.instance.sys.filesystem.FS_ROOT), path.join(app.path, app.manifest.modules.web.path, "/App.tsx")).replaceAll("\\", "/")}"));`;
-          applicationsInfill += `<Suspense fallback={<UKIndeterminateSpinner/>}><Route path="${app.manifest.id}/*"><App${ind}Router/></Route></Suspense>`;
+          applicationsInfill += `<Suspense fallback={<UKCircularProgressIndicator/>}><Route path="${app.manifest.id}/*"><App${ind}Router/></Route></Suspense>`;
           ind++;
         }
       }
@@ -48,7 +48,7 @@ export default class ApplicationsSystem extends System {
       applicationsInfill = `<Route path="*" component={() => <div style={{ "text-align": "center" }}>How peculiar. You have no applications installed, please ask an administrator to install some via the command-line interface.</div>}/>`;
     }
 
-    const applicationsWebRouterTemplate = `import { Route } from "@solidjs/router";import { type Component, lazy, Suspense } from "solid-js";import UKIndeterminateSpinner from "@onlineworkspace/uikit-solid/src/components/indeterminateSpinner/UKIndeterminateSpinner.tsx";${applicationImportsInfill};const ApplicationsRouter: Component = () => {return (<>${applicationsInfill}</>);};export default ApplicationsRouter`;
+    const applicationsWebRouterTemplate = `import { Route } from "@solidjs/router";import { type Component, lazy, Suspense } from "solid-js";import UKCircularProgressIndicator from "@onlineworkspace/uikit-solid/src/components/circularProgressIndicator/UKCircularProgressIndicator.tsx";${applicationImportsInfill};const ApplicationsRouter: Component = () => {return (<>${applicationsInfill}</>);};export default ApplicationsRouter`;
 
     await fs.writeFile(path.join(this.instance.sys.filesystem.FS_ROOT, "Applications.tsx"), applicationsWebRouterTemplate);
 

@@ -1,7 +1,7 @@
 import APPS_ICON from "@material-symbols/svg-700/outlined/apps.svg";
 import REWARDED_ADS_ICON from "@material-symbols/svg-700/outlined/rewarded_ads.svg";
 import SEARCH_ICON from "@material-symbols/svg-700/outlined/search.svg";
-import UKIndeterminateSpinner from "@onlineworkspace/uikit-solid/src/components/indeterminateSpinner/UKIndeterminateSpinner.tsx";
+import UKCircularProgressIndicator from "@onlineworkspace/uikit-solid/src/components/circularProgressIndicator/UKCircularProgressIndicator.tsx";
 import UKSideBar from "@onlineworkspace/uikit-solid/src/components/sideBar/UKSideBar.tsx";
 import { useLocation, useNavigate } from "@solidjs/router";
 import { type Component, type ParentProps, Suspense } from "solid-js";
@@ -47,7 +47,7 @@ const Layout: Component<ParentProps> = (props) => {
         },
       ]}
     >
-      <Suspense fallback={<UKIndeterminateSpinner class={styles.spinner} />}>{props.children}</Suspense>
+      <Suspense fallback={<UKCircularProgressIndicator class={styles.spinner} />}>{props.children}</Suspense>
     </UKSideBar>
   );
 };

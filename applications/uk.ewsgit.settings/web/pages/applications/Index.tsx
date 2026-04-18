@@ -1,5 +1,5 @@
 import CHEVRON_LEFT_ICON from "@material-symbols/svg-700/outlined/chevron_left.svg";
-import UKIndeterminateSpinner from "@onlineworkspace/uikit-solid/src/components/indeterminateSpinner/UKIndeterminateSpinner.jsx";
+import UKCircularProgressIndicator from "@onlineworkspace/uikit-solid/src/components/circularProgressIndicator/UKCircularProgressIndicator.jsx";
 import UKStack from "@onlineworkspace/uikit-solid/src/components/stack/UKStack.tsx";
 import UKStackItem from "@onlineworkspace/uikit-solid/src/components/stack/UKStackItem.tsx";
 import UKStackLabel from "@onlineworkspace/uikit-solid/src/components/stack/UKStackLabel.tsx";
@@ -28,7 +28,7 @@ const ApplicationsPage: Component = () => {
       />
       <div class={styles.page}>
         <UKStackLabel>Applications</UKStackLabel>
-        <Suspense fallback={<UKIndeterminateSpinner />}>
+        <Suspense fallback={<UKCircularProgressIndicator />}>
           <UKStack>
             <For each={applications()}>
               {(app) => {

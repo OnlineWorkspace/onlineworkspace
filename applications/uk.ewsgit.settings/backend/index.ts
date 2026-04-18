@@ -655,13 +655,16 @@ const router = t.router({
       setWallpaperToCustomWallpaper: procedure.input(z.object({ name: z.string() })).mutation(async (opt) => {
         const userWallpapersPath = path.join((await opt.ctx.user()).getPath(), "assets/wallpapers");
         const resizedWallpapersPath = path.join(userWallpapersPath, "resized");
+        const currentWallpaperPath = path.join(userWallpapersPath, "current.webp");
 
         for (const resizedWallpaper of await fs.readdir(resizedWallpapersPath)) {
           await fs.rm(path.join(resizedWallpapersPath, resizedWallpaper));
         }
 
-        await fs.rm(path.join(userWallpapersPath, "current.webp"));
-        await fs.copyFile(path.join(userWallpapersPath, opt.input.name.replace(".preview", "")), path.join(userWallpapersPath, "current.webp"));
+        if (fsExistsSync(currentWallpaperPath)) {
+          await fs.rm(currentWallpaperPath);
+        }
+        await fs.copyFile(path.join(userWallpapersPath, opt.input.name.replace(".preview", "")), currentWallpaperPath);
 
         return true;
       }),
@@ -669,13 +672,16 @@ const router = t.router({
         const userWallpapersPath = path.join((await opt.ctx.user()).getPath(), "assets/wallpapers");
         const officialWallpaperPath = path.join(instance.sys.filesystem.SRC_ROOT, "assets/wallpapers");
         const resizedWallpapersPath = path.join(userWallpapersPath, "resized");
+        const currentWallpaperPath = path.join(userWallpapersPath, "current.webp");
 
         for (const resizedWallpaper of await fs.readdir(resizedWallpapersPath)) {
           await fs.rm(path.join(resizedWallpapersPath, resizedWallpaper));
         }
 
-        await fs.rm(path.join(userWallpapersPath, "current.webp"));
-        await fs.copyFile(path.join(officialWallpaperPath, opt.input.name), path.join(userWallpapersPath, "current.webp"));
+        if (fsExistsSync(currentWallpaperPath)) {
+          await fs.rm(currentWallpaperPath);
+        }
+        await fs.copyFile(path.join(officialWallpaperPath, opt.input.name), currentWallpaperPath);
 
         return true;
       }),

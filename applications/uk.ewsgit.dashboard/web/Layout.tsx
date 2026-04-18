@@ -1,4 +1,4 @@
-import UKIndeterminateSpinner from "@onlineworkspace/uikit-solid/src/components/indeterminateSpinner/UKIndeterminateSpinner.jsx";
+import UKCircularProgressIndicator from "@onlineworkspace/uikit-solid/src/components/circularProgressIndicator/UKCircularProgressIndicator.jsx";
 import clsx from "clsx";
 import { type Component, createResource, type ParentProps, Suspense } from "solid-js";
 import PLACEHOLDER_WALLPAPER from "./assets/placeholder_wallpaper.png";
@@ -17,7 +17,7 @@ const DashboardLayout: Component<ParentProps> = (props) => {
 
   return (
     <div class={styles.root} data-show-background={contentBackground()}>
-      <Suspense fallback={<UKIndeterminateSpinner class={styles.wallpaperSpinner} />}>
+      <Suspense fallback={<UKCircularProgressIndicator class={styles.wallpaperSpinner} />}>
         <img
           onLoad={(e) => {
             e.currentTarget.style.opacity = "1";

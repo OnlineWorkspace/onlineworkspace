@@ -1,9 +1,9 @@
 import UKAvatar from "@onlineworkspace/uikit-solid/src/components/avatar/UKAvatar.tsx";
 import UKButton, { AffirmativeButtonState } from "@onlineworkspace/uikit-solid/src/components/button/UKButton.tsx";
+import UKCircularProgressIndicator from "@onlineworkspace/uikit-solid/src/components/circularProgressIndicator/UKCircularProgressIndicator.tsx";
 import UKCard from "@onlineworkspace/uikit-solid/src/components/card/UKCard.tsx";
 import { DividerDirection } from "@onlineworkspace/uikit-solid/src/components/divider/lib/direction.ts";
 import UKDivider from "@onlineworkspace/uikit-solid/src/components/divider/UKDivider.tsx";
-import UKIndeterminateSpinner from "@onlineworkspace/uikit-solid/src/components/indeterminateSpinner/UKIndeterminateSpinner.tsx";
 import UKSearchableDropdownMenu from "@onlineworkspace/uikit-solid/src/components/searchableDropdownMenu/UKSearchableDropdownMenu.tsx";
 import UKText from "@onlineworkspace/uikit-solid/src/components/text/UKText.tsx";
 import UKTextField from "@onlineworkspace/uikit-solid/src/components/textField/UKTextField.tsx";
@@ -53,7 +53,7 @@ const UserSelectPage: Component = () => {
   const [isEmailCodeValid, setIsEmailCodeValid] = createSignal<boolean>(false);
 
   return (
-    <Switch fallback={<UKIndeterminateSpinner />}>
+    <Switch fallback={<UKCircularProgressIndicator />}>
       <Match when={stage() === UserSelectStage.Username}>
         <Username
           setStage={setStage}
