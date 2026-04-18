@@ -12,6 +12,7 @@
 .activeIndicator {
   border-radius: 100rem;
   background-color: rgb(var(--uk-sys-color-primary));
+  transition: width var(--uk-sys-motion-duration-250) var(--uk-sys-motion-easing-standard-decelerate);
 }
 
 .remainingIndicator {
@@ -19,9 +20,15 @@
   display: flex;
   align-items: center;
   background-color: rgb(var(--uk-sys-color-secondary-container));
+  position: relative;
+  transition: width var(--uk-sys-motion-duration-250) var(--uk-sys-motion-easing-standard-decelerate);
 }
 
 .stopIndicator {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
   height: 0.25rem;
   width: 0.25rem;
   border-radius: 100rem;

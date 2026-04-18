@@ -1,3 +1,16 @@
 .root {
   background-color: rgb(var(--uk-sys-color-surface-container-low));
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
+  align-items: center;
+  padding: 0.5rem;
+}
+
+.progressBar {
+  max-width: 12rem;
+}
+
+.margin {
+  margin-right: auto;
 }

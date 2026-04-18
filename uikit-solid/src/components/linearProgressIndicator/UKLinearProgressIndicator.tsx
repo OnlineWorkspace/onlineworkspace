@@ -1,7 +1,8 @@
+import clsx from "clsx";
 import { type Component, createEffect, createSignal } from "solid-js";
 import styles from "./UKLinearProgressIndicator.module.scss";
 
-const UKLinearProgressIndicator: Component<{ start: number; stop: number; value: number; thickness?: number }> = (props) => {
+const UKLinearProgressIndicator: Component<{ start: number; stop: number; value: number; thickness?: number; class?: string }> = (props) => {
   const [percentageCompletion, setPercentageCompletion] = createSignal<number>(45);
 
   createEffect(() => {
@@ -16,7 +17,7 @@ const UKLinearProgressIndicator: Component<{ start: number; stop: number; value:
   });
 
   return (
-    <div class={styles.root} style={{ ...(props.thickness ? { "--thickness": `${props.thickness}px` } : {}) }}>
+    <div class={clsx(styles.root, props.class)} style={{ ...(props.thickness ? { "--thickness": `${props.thickness}px` } : {}) }}>
       <div class={styles.activeIndicator} style={{ width: `${percentageCompletion()}%` }}></div>
       <div
         class={styles.remainingIndicator}

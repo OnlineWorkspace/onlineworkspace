@@ -33,6 +33,7 @@ const App: Component = () => {
 
     setUserPreferences("showWelcome", userServerPreferences.showWelcome);
     setUserPreferences("homePath", userServerPreferences.homePath);
+    setUserPreferences("pinnedDirectories", userServerPreferences.pinnedDirectories);
 
     setHasLoaded(true);
   });

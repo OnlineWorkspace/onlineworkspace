@@ -362,6 +362,7 @@ const router = t.router({
       return {
         showWelcome: false,
         homePath: `/Users/${opt.ctx.userId}/fs/`,
+        pinnedDirectories: ["/home", "/Photos", "/Documents"],
       };
     }),
   },
