@@ -1,23 +1,34 @@
 import { Route } from "@solidjs/router";
 import { type Accessor, type Component, createSignal, lazy, onMount } from "solid-js";
-import { createStore, type Store } from "solid-js/store";
+import { createStore, type SetStoreFunction, type Store } from "solid-js/store";
 import { AppContext } from "./appContext.ts";
 import trpc from "./lib/trpc.ts";
 import View from "./pages/dir/View.tsx";
+import type { ViewItem } from "./pages/dir/viewItem.ts";
 import Redirect from "./Redirect.tsx";
 
 const Layout = lazy(() => import("./layout/Layout.tsx"));
 const WelcomePage = lazy(() => import("./pages/welcome/Index.tsx"));
 
+interface UserPreferences {
+  showWelcome: boolean;
+  homePath: string;
+  pinnedDirectories: string[];
+  viewType: "grid" | "details" | "gallery";
+}
+
+interface ViewState {
+  viewItems: ViewItem[];
+  selectedItems: string[];
+}
+
 interface AppContextType {
   isAdministrator: Accessor<boolean>;
   shootYourselfInTheFoot: Accessor<boolean>;
-  userPreferences: Store<{
-    showWelcome: boolean;
-    homePath: string;
-    pinnedDirectories: string[];
-  }>;
-  viewItems: Accessor<{ icon: { type: "icon" | "image"; value: string }; path: string }[]>;
+  userPreferences: Store<UserPreferences>;
+  setUserPreferences: SetStoreFunction<UserPreferences>;
+  viewState: Store<ViewState>;
+  setViewState: SetStoreFunction<ViewState>;
   deletedItemCount: number;
 }
 
@@ -29,6 +40,11 @@ const App: Component = () => {
     showWelcome: true,
     homePath: "/Users/1/fs/",
     pinnedDirectories: ["/home"],
+    viewType: "details",
+  });
+  const [viewState, setViewState] = createStore<AppContextType["viewState"]>({
+    viewItems: [],
+    selectedItems: [],
   });
 
   onMount(async () => {
@@ -50,7 +66,9 @@ const App: Component = () => {
               isAdministrator: () => false,
               shootYourselfInTheFoot: () => false,
               userPreferences: userPreferences,
-              viewItems: () => [],
+              setUserPreferences: setUserPreferences,
+              viewState: viewState,
+              setViewState: setViewState,
               deletedItemCount: 24,
             }}
           >

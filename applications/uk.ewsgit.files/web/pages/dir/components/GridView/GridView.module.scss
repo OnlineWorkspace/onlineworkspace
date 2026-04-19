@@ -1,0 +1,9 @@
+.root {
+  --grid-size: 12rem;
+
+  display: grid;
+  grid-template-columns: repeat(auto-fill, var(--grid-size));
+  grid-auto-rows: var(--grid-size);
+  gap: 0.5rem;
+  padding: 1rem;
+}

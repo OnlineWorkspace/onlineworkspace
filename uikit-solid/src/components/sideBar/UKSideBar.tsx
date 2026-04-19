@@ -62,7 +62,7 @@ const UKSideBar: Component<
         )}
         <Show when={!isMobile() || isMobileToggled()}>
           <Index each={props.items.filter((i) => i !== undefined)}>
-            {(item) => {
+            {(item, index) => {
               switch (item().type) {
                 case "button":
                   return (
@@ -78,7 +78,7 @@ const UKSideBar: Component<
                     </button>
                   );
                 case "label":
-                  return <div class={styles.label}>{(item() as LabelItem).label}</div>;
+                  return <div class={clsx(styles.label, index === 0 && styles.isLabelFirstItem)}>{(item() as LabelItem).label}</div>;
                 case "margin":
                   return <div class={styles.margin} />;
                 case "divider":
