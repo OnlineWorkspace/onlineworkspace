@@ -1,18 +1,25 @@
+import DELETE_ICON from "@material-symbols/svg-700/outlined/delete.svg";
+import FOLDER_ICON from "@material-symbols/svg-700/outlined/folder.svg";
 import HOUSE_ICON from "@material-symbols/svg-700/outlined/house.svg";
 import PERSON_ICON from "@material-symbols/svg-700/outlined/person.svg";
 import UKSideBar from "@onlineworkspace/uikit-solid/src/components/sideBar/UKSideBar.tsx";
-import { type Component, useContext } from "solid-js";
+import UKText from "@onlineworkspace/uikit-solid/src/components/text/UKText.tsx";
+import { useNavigate } from "@solidjs/router";
+import browserPath from "path-browserify";
+import { type Component, type ParentProps, useContext } from "solid-js";
 import { AppContext } from "../appContext.ts";
 import ActionBar from "./components/ActionBar/ActionBar";
 import Quota from "./components/Quota/Quota.tsx";
 import StatusBar from "./components/StatusBar/StatusBar.tsx";
 import styles from "./Layout.module.scss";
 
-const Layout: Component = () => {
+const Layout: Component<ParentProps> = (props) => {
+  const navigate = useNavigate();
   const appContext = useContext(AppContext);
 
   return (
     <UKSideBar
+      className={styles.sidebar}
       items={[
         {
           type: "label",
@@ -23,7 +30,7 @@ const Layout: Component = () => {
           icon: { type: "icon", value: HOUSE_ICON },
           label: "Home",
           onClick() {
-            console.log("Navigate Home");
+            navigate(`/app/uk.ewsgit.files/dir?path=${appContext?.userPreferences.homePath}`);
           },
         },
         {
@@ -42,9 +49,11 @@ const Layout: Component = () => {
         ...((appContext?.userPreferences.pinnedDirectories || []).map((dir) => {
           return {
             type: "button",
-            icon: { type: "icon", value: HOUSE_ICON },
-            label: dir,
-            onClick() {},
+            icon: { type: "icon", value: FOLDER_ICON },
+            label: browserPath.basename(dir),
+            onClick() {
+              navigate(`/app/uk.ewsgit.files/dir?path=${dir}`);
+            },
           };
         }) as {
           type: "button";
@@ -53,6 +62,15 @@ const Layout: Component = () => {
           onClick(): void;
         }[]),
         { type: "margin" },
+        {
+          type: "button",
+          icon: { type: "icon", value: DELETE_ICON },
+          label: "Bin",
+          badgeLabel: appContext?.deletedItemCount || undefined,
+          onClick() {
+            navigate("/app/uk.ewsgit.files/bin  ");
+          },
+        },
         {
           type: "divider",
         },
@@ -70,8 +88,12 @@ const Layout: Component = () => {
         <div class={styles.actionbar}>
           <ActionBar />
         </div>
-        <div>View</div>
-        <div>Preview</div>
+        {props.children}
+        <div class={styles.previewPane}>
+          <UKText role={"title"} size={"m"}>
+            Preview
+          </UKText>
+        </div>
         <div class={styles.statusbar}>
           <StatusBar />
         </div>

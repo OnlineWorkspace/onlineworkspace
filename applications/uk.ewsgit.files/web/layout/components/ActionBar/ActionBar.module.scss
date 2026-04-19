@@ -1,3 +1,33 @@
 .root {
   background-color: rgb(var(--uk-sys-color-surface-container-low));
+  border-bottom: 1px solid rgb(var(--uk-sys-color-outline-variant));
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.5rem;
+}
+
+.actionButtons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.pathSelector {
+  display: flex;
+  position: relative;
+  flex-grow: 1;
+
+}
+
+.pathSegments {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+.pathInput {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  opacity: 0.5;
 }

@@ -23,30 +23,32 @@ const AppNavigation: Component<ParentProps> = (props) => {
     <UKNavigationRail
       class={styles.rail}
       expanded={!isMobile() ? expanded() : false}
-      items={quickShortcuts().map((sc) => {
-        return {
-          icon: sc.icon || {
-            type: "icon",
-            value: "indeterminate_question_box",
-          },
-          label: sc.label,
-          active: location.pathname.startsWith(sc.location.value),
-          onClick() {
-            if (sc.location.type === "local") {
-              navigate(sc.location.value);
-            } else if (sc.location.type === "remote") {
-              window.location.href = sc.location.value;
-            }
-          },
-          onMiddleClick() {
-            if (sc.location.type === "local") {
-              window.open(sc.location.value, "_blank");
-            } else if (sc.location.type === "remote") {
-              window.open(sc.location.value, "_blank");
-            }
-          },
-        };
-      })}
+      items={quickShortcuts()
+        .map((sc) => {
+          return {
+            icon: sc.icon || {
+              type: "icon",
+              value: "indeterminate_question_box",
+            },
+            label: sc.label,
+            active: location.pathname.startsWith(sc.location.value),
+            onClick() {
+              if (sc.location.type === "local") {
+                navigate(sc.location.value);
+              } else if (sc.location.type === "remote") {
+                window.location.href = sc.location.value;
+              }
+            },
+            onMiddleClick() {
+              if (sc.location.type === "local") {
+                window.open(sc.location.value, "_blank");
+              } else if (sc.location.type === "remote") {
+                window.open(sc.location.value, "_blank");
+              }
+            },
+          };
+        })
+        .slice(0, isMobile() ? 3 : undefined)}
       setExpanded={!isMobile() ? (expandedState) => setExpanded(expandedState) : undefined}
       anchorPoints={{
         topMost: (

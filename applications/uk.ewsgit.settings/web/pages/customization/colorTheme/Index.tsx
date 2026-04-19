@@ -4,7 +4,7 @@ import UKDivider from "@onlineworkspace/uikit-solid/src/components/divider/UKDiv
 import UKText from "@onlineworkspace/uikit-solid/src/components/text/UKText.jsx";
 import UKTopAppBar from "@onlineworkspace/uikit-solid/src/components/topAppBar/UKTopAppBar.jsx";
 import { useNavigate } from "@solidjs/router";
-import { type Component, createEffect, createSignal, For } from "solid-js";
+import {type Component, createEffect, createSignal, For, Show} from "solid-js";
 import trpc from "../../../lib/trpc.ts";
 import TriColorPreview from "./components/TriColorPreview/TriColorPreview.tsx";
 import styles from "./Index.module.scss";
@@ -386,12 +386,12 @@ const DEFAULT_COLOR_THEMES = {
 const ColorThemePage: Component = () => {
   const navigate = useNavigate();
   const isLightMode = createMediaQuery("(prefers-color-scheme: light)");
-  const [wallpaperScheme, setWallpaperScheme] = createSignal<{ darkMode: Record<string, string>; lightMode: Record<string, string> }>();
+  const [wallpaperScheme, setWallpaperScheme] = createSignal<{ darkMode: Record<string, string>; lightMode: Record<string, string> } | undefined>(undefined);
 
   createEffect(async () => {
     const wallpaperSource = await trpc.customization.wallpaper.getCurrentWallpaper.query();
 
-    if (!wallpaperSource) return;
+    if (wallpaperSource === undefined) return;
 
     const sourceImage = new Image();
     sourceImage.src = wallpaperSource;
@@ -514,6 +514,7 @@ const ColorThemePage: Component = () => {
         }}
       />
       <div class={styles.page}>
+        <Show when={wallpaperScheme() !== undefined}>
         <UKText role="title" size="m">
           Colors matched to your current wallpaper
         </UKText>
@@ -533,6 +534,7 @@ const ColorThemePage: Component = () => {
           }}
         />
         <UKDivider direction="horizontal" />
+        </Show>
         <UKText role="title" size="m">
           Color Theme Presets
         </UKText>

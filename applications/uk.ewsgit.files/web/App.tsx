@@ -3,6 +3,7 @@ import { type Accessor, type Component, createSignal, lazy, onMount } from "soli
 import { createStore, type Store } from "solid-js/store";
 import { AppContext } from "./appContext.ts";
 import trpc from "./lib/trpc.ts";
+import View from "./pages/dir/View.tsx";
 import Redirect from "./Redirect.tsx";
 
 const Layout = lazy(() => import("./layout/Layout.tsx"));
@@ -16,6 +17,8 @@ interface AppContextType {
     homePath: string;
     pinnedDirectories: string[];
   }>;
+  viewItems: Accessor<{ icon: { type: "icon" | "image"; value: string }; path: string }[]>;
+  deletedItemCount: number;
 }
 
 export type { AppContextType };
@@ -39,11 +42,21 @@ const App: Component = () => {
   });
 
   return (
-    <AppContext.Provider
-      value={{
-        isAdministrator: () => false,
-        shootYourselfInTheFoot: () => false,
-        userPreferences: userPreferences,
+    <Route
+      component={(props) => {
+        return (
+          <AppContext.Provider
+            value={{
+              isAdministrator: () => false,
+              shootYourselfInTheFoot: () => false,
+              userPreferences: userPreferences,
+              viewItems: () => [],
+              deletedItemCount: 24,
+            }}
+          >
+            {props.children}
+          </AppContext.Provider>
+        );
       }}
     >
       {!hasLoaded() && <Route path={"*"} component={() => "Loading..."} />}
@@ -55,13 +68,11 @@ const App: Component = () => {
       />
       <Route path={"/welcome"} component={WelcomePage} />
       <Route component={Layout}>
-        <Route path={"/dir"} component={() => "Dir View"} />
+        <Route path={"/dir"} component={View} />
+        <Route path={"/shared"} component={() => "Shared with me page"} />
+        <Route path={"/bin"} component={() => "Bin page"} />
       </Route>
-      {/*<Route component={Layout}>*/}
-      {/*  <Route path={"/dir"} component={ViewContainer} />*/}
-      {/*  <Route path={"/dir/*currentPath"} component={ViewContainer} />*/}
-      {/*</Route>*/}
-    </AppContext.Provider>
+    </Route>
   );
 };
 

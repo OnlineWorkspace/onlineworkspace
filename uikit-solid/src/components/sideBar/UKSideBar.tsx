@@ -41,6 +41,7 @@ const UKSideBar: Component<
   ParentProps<{
     items: (ButtonItem | LabelItem | DividerItem | MarginItem | ComponentItem | undefined)[];
     containerClassName?: string;
+    className?: string;
   }>
 > = (props) => {
   const isMobile = useIsMobile();
@@ -48,7 +49,7 @@ const UKSideBar: Component<
 
   return (
     <div class={clsx(styles.root, props.containerClassName)} data-sidebar-mode-mobile-mode={isMobile()}>
-      <div class={styles.component}>
+      <div class={clsx(styles.component, props.className)}>
         {isMobile() && (
           <UKIconButton
             class={clsx(styles.mobileToggleButton, isMobileToggled() && styles.isMobileToggled)}

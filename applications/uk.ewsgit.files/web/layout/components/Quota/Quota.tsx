@@ -8,11 +8,13 @@ const Quota: Component = () => {
 
   onMount(() => {
     const interval = setInterval(() => {
-      if (used() > 10) {
-        setUsed(0);
-      } else {
-        setUsed((u) => u + 1);
-      }
+      setUsed((u) => {
+        if (u + 1 > 10) {
+          return 0;
+        } else {
+          return u + 1;
+        }
+      });
     }, 500);
 
     onCleanup(() => {
@@ -24,7 +26,7 @@ const Quota: Component = () => {
     <div class={styles.root}>
       <UKLinearProgressIndicator start={0} stop={10} value={used()} />
       <UKText role={"label"} size={"m"}>
-        4 of 10GB Used
+        {used()} of 10GB Used
       </UKText>
     </div>
   );
