@@ -7,3 +7,15 @@
   gap: 0.5rem;
   padding: 1rem;
 }
+
+.item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: center;
+}
+
+.thumbnailIcon {
+  --icon-size: 6rem;
+}

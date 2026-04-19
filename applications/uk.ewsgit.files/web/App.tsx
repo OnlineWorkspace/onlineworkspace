@@ -20,6 +20,7 @@ interface UserPreferences {
 interface ViewState {
   viewItems: ViewItem[];
   selectedItems: string[];
+  lastSelectionTime: number;
 }
 
 interface AppContextType {
@@ -45,6 +46,7 @@ const App: Component = () => {
   const [viewState, setViewState] = createStore<AppContextType["viewState"]>({
     viewItems: [],
     selectedItems: [],
+    lastSelectionTime: -1,
   });
 
   onMount(async () => {

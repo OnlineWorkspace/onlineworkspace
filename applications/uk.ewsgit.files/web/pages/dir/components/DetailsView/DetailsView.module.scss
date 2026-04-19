@@ -1,0 +1,30 @@
+.root {
+  --item-size: 2rem;
+
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-auto-rows: var(--item-size);
+  padding: 1rem;
+}
+
+.columns {
+  display: flex;
+  justify-content: space-between;
+  padding-bottom: 1rem
+}
+
+.item {
+  color: var(--uk-sys-color-on-surface);
+  text-align: start;
+  background: transparent;
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: start;
+  border: none;
+
+  &[data-selected="true"] {
+    background: red;
+  }
+}
