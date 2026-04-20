@@ -13,6 +13,7 @@ import { type Component, Show, useContext } from "solid-js";
 import { AppContext } from "../../../appContext.ts";
 import type { ViewItem } from "../../../pages/dir/viewItem.ts";
 import styles from "./ActionBar.module.scss";
+import UKText from "@onlineworkspace/uikit-solid/src/components/text/UKText.jsx";
 
 const ActionBar: Component = () => {
   const appContext = useContext(AppContext);
@@ -36,7 +37,13 @@ const ActionBar: Component = () => {
         <div class={styles.pathSelector}>
           <div class={styles.pathSegments}>
             {/* Path Segments */}
-            {(searchParams.path || "").split(browserPath.sep).join(" / ")}
+            {(searchParams.path || "").split(browserPath.sep).map((segment) => {
+              return (
+                <UKText role="label" size="m">
+                  {segment}
+                </UKText>
+              );
+            })}
           </div>
           <input class={styles.pathInput} type={"text"} value={searchParams.path} onChange={(e) => setSearchParams({ path: e.currentTarget.value })} />
         </div>

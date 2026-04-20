@@ -4,7 +4,7 @@ import UKDivider from "@onlineworkspace/uikit-solid/src/components/divider/UKDiv
 import UKText from "@onlineworkspace/uikit-solid/src/components/text/UKText.jsx";
 import UKTopAppBar from "@onlineworkspace/uikit-solid/src/components/topAppBar/UKTopAppBar.jsx";
 import { useNavigate } from "@solidjs/router";
-import {type Component, createEffect, createSignal, For, Show} from "solid-js";
+import { type Component, createEffect, createSignal, For, Show } from "solid-js";
 import trpc from "../../../lib/trpc.ts";
 import TriColorPreview from "./components/TriColorPreview/TriColorPreview.tsx";
 import styles from "./Index.module.scss";
@@ -515,25 +515,25 @@ const ColorThemePage: Component = () => {
       />
       <div class={styles.page}>
         <Show when={wallpaperScheme() !== undefined}>
-        <UKText role="title" size="m">
-          Colors matched to your current wallpaper
-        </UKText>
-        <TriColorPreview
-          colors={[
-            `rgb(${wallpaperScheme()?.[isLightMode() ? "lightMode" : "darkMode"].background || "0, 0, 0"})`,
-            `rgb(${wallpaperScheme()?.[isLightMode() ? "lightMode" : "darkMode"]["primary-container"] || "0, 0, 0"})`,
-            `rgb(${wallpaperScheme()?.[isLightMode() ? "lightMode" : "darkMode"].primary || "0, 0, 0"})`,
-          ]}
-          onClick={async () => {
-            const colorScheme = wallpaperScheme();
+          <UKText role="title" size="m">
+            Colors matched to your current wallpaper
+          </UKText>
+          <TriColorPreview
+            colors={[
+              `rgb(${wallpaperScheme()?.[isLightMode() ? "lightMode" : "darkMode"].background || "0, 0, 0"})`,
+              `rgb(${wallpaperScheme()?.[isLightMode() ? "lightMode" : "darkMode"]["primary-container"] || "0, 0, 0"})`,
+              `rgb(${wallpaperScheme()?.[isLightMode() ? "lightMode" : "darkMode"].primary || "0, 0, 0"})`,
+            ]}
+            onClick={async () => {
+              const colorScheme = wallpaperScheme();
 
-            if (!colorScheme) return;
+              if (!colorScheme) return;
 
-            await trpc.customization.colorTheme.setColorTheme.mutate(colorScheme);
-            window.location.reload();
-          }}
-        />
-        <UKDivider direction="horizontal" />
+              await trpc.customization.colorTheme.setColorTheme.mutate(colorScheme);
+              window.location.reload();
+            }}
+          />
+          <UKDivider direction="horizontal" />
         </Show>
         <UKText role="title" size="m">
           Color Theme Presets
@@ -556,10 +556,6 @@ const ColorThemePage: Component = () => {
                     `rgb(${theme?.[isLightMode() ? "lightMode" : "darkMode"].primary || "0, 0, 0"})`,
                   ]}
                   onClick={async () => {
-                    const colorScheme = wallpaperScheme();
-
-                    if (!colorScheme) return;
-
                     await trpc.customization.colorTheme.setColorTheme.mutate(theme);
                     window.location.reload();
                   }}

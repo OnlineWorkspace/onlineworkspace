@@ -37,7 +37,9 @@ const Layout: Component<ParentProps> = (props) => {
           type: "button",
           icon: { type: "icon", value: PERSON_ICON },
           label: "Shared With Me",
-          onClick() {},
+          onClick() {
+            navigate("/app/uk.ewsgit.files/shared");
+          },
         },
         {
           type: "divider",
@@ -68,7 +70,7 @@ const Layout: Component<ParentProps> = (props) => {
           label: "Bin",
           badgeLabel: appContext?.deletedItemCount || undefined,
           onClick() {
-            navigate("/app/uk.ewsgit.files/bin  ");
+            navigate("/app/uk.ewsgit.files/bin");
           },
         },
         {
@@ -85,9 +87,6 @@ const Layout: Component<ParentProps> = (props) => {
       ]}
     >
       <div class={styles.root}>
-        <div class={styles.actionbar}>
-          <ActionBar />
-        </div>
         {props.children}
         <PreviewPane />
         <div class={styles.statusbar}>

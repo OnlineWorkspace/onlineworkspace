@@ -6,6 +6,8 @@ import trpc from "./lib/trpc.ts";
 import View from "./pages/dir/View.tsx";
 import type { ViewItem } from "./pages/dir/viewItem.ts";
 import Redirect from "./Redirect.tsx";
+import ActionBar from "./layout/components/ActionBar/ActionBar.tsx";
+import layoutStyles from "./layout/Layout.module.scss";
 
 const Layout = lazy(() => import("./layout/Layout.tsx"));
 const WelcomePage = lazy(() => import("./pages/welcome/Index.tsx"));
@@ -88,9 +90,28 @@ const App: Component = () => {
       />
       <Route path={"/welcome"} component={WelcomePage} />
       <Route component={Layout}>
-        <Route path={"/dir"} component={View} />
-        <Route path={"/shared"} component={() => "Shared with me page"} />
-        <Route path={"/bin"} component={() => "Bin page"} />
+        <Route
+          path={"/dir"}
+          component={() => (
+            <>
+              <div class={layoutStyles.actionbar}>
+                <ActionBar />
+              </div>
+              <View />
+            </>
+          )}
+        />
+        <Route
+          component={(props) => (
+            <>
+              <div class={layoutStyles.actionbar} />
+              {props.children}
+            </>
+          )}
+        >
+          <Route path={"/shared"} component={() => "Shared with me page"} />
+          <Route path={"/bin"} component={() => "Bin page"} />
+        </Route>
       </Route>
     </Route>
   );
