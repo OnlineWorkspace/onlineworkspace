@@ -17,6 +17,7 @@ const GridView: Component = () => {
           return (
             <UKCard
               class={styles.item}
+              data-fs-item-path={item.path}
               onClick={(e) => onItemClick(e, appContext!, index(), item)}
               color={appContext?.viewState.selectedItems.includes(item.path) ? "outlined" : "filled"}
             >

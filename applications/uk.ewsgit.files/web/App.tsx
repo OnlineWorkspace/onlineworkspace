@@ -99,16 +99,7 @@ const App: Component = () => {
               <div class={layoutStyles.actionbar}>
                 <ActionBar />
               </div>
-              {/** biome-ignore lint/a11y/noStaticElementInteractions: button functionality not required */}
-              {/** biome-ignore lint/a11y/useKeyWithClickEvents: button functionality not required */}
-              <div
-                class={layoutStyles.viewRoot}
-                onClick={(e) => {
-                  if (e.currentTarget === e.target) setViewState("selectedItems", []);
-                }}
-              >
-                <View />
-              </div>
+              <View />
             </>
           )}
         />

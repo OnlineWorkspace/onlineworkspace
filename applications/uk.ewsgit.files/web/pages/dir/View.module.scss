@@ -1,0 +1,11 @@
+.root {
+  height: 100%;
+  width: 100%;
+  overflow-y: auto;
+}
+
+.dragSelectRegion {
+  background: red;
+  opacity: 0.25;
+  position: fixed;
+}
