@@ -4,7 +4,7 @@ import FOLDER_ICON from "@material-symbols/svg-700/outlined/folder.svg";
 import UNKNOWN_ICON from "@material-symbols/svg-700/outlined/unknown_document.svg";
 import type { ViewItem } from "./viewItem.ts";
 
-export default function iconForItemType(type: ViewItem["type"]) {
+export default function iconForItemType(type: ViewItem["type"] | "unknown") {
   switch (type) {
     case "directory":
       return FOLDER_ICON;

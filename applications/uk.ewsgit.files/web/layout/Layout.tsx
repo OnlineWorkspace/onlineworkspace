@@ -7,7 +7,6 @@ import { useNavigate } from "@solidjs/router";
 import browserPath from "path-browserify";
 import { type Component, type ParentProps, useContext } from "solid-js";
 import { AppContext } from "../appContext.ts";
-import ActionBar from "./components/ActionBar/ActionBar";
 import PreviewPane from "./components/PreviewPane/PreviewPane.tsx";
 import Quota from "./components/Quota/Quota.tsx";
 import StatusBar from "./components/StatusBar/StatusBar.tsx";

@@ -4,20 +4,26 @@ import ART_TRACK_ICON from "@material-symbols/svg-700/outlined/art_track.svg";
 import CHEVRON_LEFT_ICON from "@material-symbols/svg-700/outlined/chevron_left.svg";
 import CHEVRON_RIGHT_ICON from "@material-symbols/svg-700/outlined/chevron_right.svg";
 import LISTS_ICON from "@material-symbols/svg-700/outlined/lists.svg";
+import RIGHT_PANEL_CLOSE_ICON from "@material-symbols/svg-700/outlined/right_panel_close.svg";
+import RIGHT_PANEL_OPEN_ICON from "@material-symbols/svg-700/outlined/right_panel_open.svg";
 import UPLOAD_ICON from "@material-symbols/svg-700/outlined/upload.svg";
 import VIEW_MODULE_ICON from "@material-symbols/svg-700/outlined/view_module.svg";
+import UKCard from "@onlineworkspace/uikit-solid/src/components/card/UKCard.tsx";
 import UKIconButton from "@onlineworkspace/uikit-solid/src/components/iconButton/UKIconButton.tsx";
+import UKText from "@onlineworkspace/uikit-solid/src/components/text/UKText.jsx";
+import useIsMobile from "@onlineworkspace/uikit-solid/src/core/useIsMobile.ts";
 import { useSearchParams } from "@solidjs/router";
 import browserPath from "path-browserify";
-import { type Component, Show, useContext } from "solid-js";
+import { type Component, createSignal, Show, useContext } from "solid-js";
 import { AppContext } from "../../../appContext.ts";
 import type { ViewItem } from "../../../pages/dir/viewItem.ts";
 import styles from "./ActionBar.module.scss";
-import UKText from "@onlineworkspace/uikit-solid/src/components/text/UKText.jsx";
 
 const ActionBar: Component = () => {
+  const isMobile = useIsMobile();
   const appContext = useContext(AppContext);
   const [searchParams, setSearchParams] = useSearchParams<{ path: string }>();
+  const [pathQuery, setPathQuery] = createSignal<string | undefined>(undefined);
 
   return (
     <div class={styles.root}>
@@ -37,15 +43,39 @@ const ActionBar: Component = () => {
         <div class={styles.pathSelector}>
           <div class={styles.pathSegments}>
             {/* Path Segments */}
-            {(searchParams.path || "").split(browserPath.sep).map((segment) => {
+            {(searchParams.path || "").split(browserPath.sep).map((segment, index) => {
               return (
                 <UKText role="label" size="m">
                   {segment}
+                  {(searchParams.path || "").split(browserPath.sep).length - 1 === index ? "" : "/"}
                 </UKText>
               );
             })}
           </div>
-          <input class={styles.pathInput} type={"text"} value={searchParams.path} onChange={(e) => setSearchParams({ path: e.currentTarget.value })} />
+          <input
+            class={styles.pathInput}
+            type={"text"}
+            value={searchParams.path}
+            onKeyDown={(e) => {
+              setPathQuery(e.currentTarget.value);
+            }}
+            onChange={(e) => setSearchParams({ path: e.currentTarget.value })}
+          />
+          <UKCard class={styles.pathSuggestions}>
+            {pathQuery()}
+            <UKText role={"body"} size={"m"}>
+              /Suggestion/1
+            </UKText>
+            <UKText role={"body"} size={"m"}>
+              /Suggestion/2
+            </UKText>
+            <UKText role={"body"} size={"m"}>
+              /Suggestion/3
+            </UKText>
+            <UKText role={"body"} size={"m"}>
+              /Suggestion/4
+            </UKText>
+          </UKCard>
         </div>
       </Show>
       <div class={styles.actionButtons}>
@@ -63,13 +93,15 @@ const ActionBar: Component = () => {
           alt={"Grid View"}
           onClick={() => appContext?.setUserPreferences("viewType", "grid")}
         />
-        <UKIconButton
-          icon={ART_TRACK_ICON}
-          disabled={appContext?.userPreferences.viewType === "gallery"}
-          color={appContext?.userPreferences.viewType === "gallery" ? "tonal" : "standard"}
-          alt={"Gallery View"}
-          onClick={() => appContext?.setUserPreferences("viewType", "gallery")}
-        />
+        {!isMobile() && (
+          <UKIconButton
+            icon={ART_TRACK_ICON}
+            disabled={appContext?.userPreferences.viewType === "gallery"}
+            color={appContext?.userPreferences.viewType === "gallery" ? "tonal" : "standard"}
+            alt={"Gallery View"}
+            onClick={() => appContext?.setUserPreferences("viewType", "gallery")}
+          />
+        )}
         <UKIconButton
           icon={UPLOAD_ICON}
           color={"filled"}
@@ -89,6 +121,16 @@ const ActionBar: Component = () => {
             ] as ViewItem[]);
           }}
         />
+        {!isMobile() && (
+          <UKIconButton
+            icon={appContext?.userPreferences.showPreview ? RIGHT_PANEL_OPEN_ICON : RIGHT_PANEL_CLOSE_ICON}
+            color={"filled"}
+            alt={"Create File"}
+            onClick={() => {
+              appContext?.setUserPreferences("showPreview", !appContext?.userPreferences.showPreview);
+            }}
+          />
+        )}
       </div>
     </div>
   );

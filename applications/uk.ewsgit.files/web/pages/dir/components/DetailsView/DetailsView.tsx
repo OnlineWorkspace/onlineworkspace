@@ -34,6 +34,7 @@ const DetailsView: Component = () => {
               class={styles.item}
               onClick={(e) => onItemClick(e, appContext!, index(), item)}
               data-selected={appContext?.viewState.selectedItems.includes(item.path)}
+              data-is-odd={index() % 2 === 1}
             >
               {item.thumbnail !== undefined ? <>thumbnail time</> : <UKIcon>{iconForItemType(item.type)}</UKIcon>}
               {browserPath.basename(item.path)}

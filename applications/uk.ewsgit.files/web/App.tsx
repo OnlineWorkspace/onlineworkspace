@@ -2,12 +2,12 @@ import { Route } from "@solidjs/router";
 import { type Accessor, type Component, createSignal, lazy, onMount } from "solid-js";
 import { createStore, type SetStoreFunction, type Store } from "solid-js/store";
 import { AppContext } from "./appContext.ts";
+import ActionBar from "./layout/components/ActionBar/ActionBar.tsx";
+import layoutStyles from "./layout/Layout.module.scss";
 import trpc from "./lib/trpc.ts";
 import View from "./pages/dir/View.tsx";
 import type { ViewItem } from "./pages/dir/viewItem.ts";
 import Redirect from "./Redirect.tsx";
-import ActionBar from "./layout/components/ActionBar/ActionBar.tsx";
-import layoutStyles from "./layout/Layout.module.scss";
 
 const Layout = lazy(() => import("./layout/Layout.tsx"));
 const WelcomePage = lazy(() => import("./pages/welcome/Index.tsx"));
@@ -17,6 +17,7 @@ interface UserPreferences {
   homePath: string;
   pinnedDirectories: string[];
   viewType: "grid" | "details" | "gallery";
+  showPreview: boolean;
 }
 
 interface ViewState {
@@ -44,6 +45,7 @@ const App: Component = () => {
     homePath: "/Users/1/fs/",
     pinnedDirectories: ["/home"],
     viewType: "details",
+    showPreview: true,
   });
   const [viewState, setViewState] = createStore<AppContextType["viewState"]>({
     viewItems: [],
@@ -97,7 +99,16 @@ const App: Component = () => {
               <div class={layoutStyles.actionbar}>
                 <ActionBar />
               </div>
-              <View />
+              {/** biome-ignore lint/a11y/noStaticElementInteractions: button functionality not required */}
+              {/** biome-ignore lint/a11y/useKeyWithClickEvents: button functionality not required */}
+              <div
+                class={layoutStyles.viewRoot}
+                onClick={(e) => {
+                  if (e.currentTarget === e.target) setViewState("selectedItems", []);
+                }}
+              >
+                <View />
+              </div>
             </>
           )}
         />

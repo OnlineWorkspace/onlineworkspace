@@ -1,6 +1,30 @@
 .root {
   height: 100%;
+  min-width: 16rem;
+  max-width: 32rem;
   padding: 1rem;
   background-color: rgb(var(--uk-sys-color-surface-container-low));
   border-left: 1px solid rgb(var(--uk-sys-color-outline-variant));
+  display: flex;
+  flex-direction: column;
+  margin-right: 0;
+  transition: min-width var(--uk-sys-motion-duration-500) var(--uk-sys-motion-easing-standard-decelerate), margin-right var(--uk-sys-motion-duration-200) var(--uk-sys-motion-easing-standard-decelerate);
+
+  &[data-hide="true"] {
+    width: 0;
+    min-width: 0;
+    margin-right: calc(-2rem - 1px);
+  }
+}
+
+.previewIcon {
+  --icon-size: 8rem;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.previewItemName {
+  margin-bottom: 1rem;
 }

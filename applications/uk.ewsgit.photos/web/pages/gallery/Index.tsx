@@ -17,14 +17,6 @@ const GalleryPage: Component = () => {
             size: { width: 100, height: 100 },
           },
           {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
-            size: { width: 100, height: 100 },
-          },
-          {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
-            size: { width: 100, height: 100 },
-          },
-          {
             src: "https://images.pexels.com/photos/927022/pexels-photo-927022.jpeg",
             size: { width: 100, height: 100 },
           },
@@ -33,27 +25,11 @@ const GalleryPage: Component = () => {
             size: { width: 100, height: 100 },
           },
           {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
-            size: { width: 100, height: 100 },
-          },
-          {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
-            size: { width: 100, height: 100 },
-          },
-          {
             src: "https://images.pexels.com/photos/927022/pexels-photo-927022.jpeg",
             size: { width: 100, height: 100 },
           },
           {
             src: "https://images.pexels.com/photos/927022/pexels-photo-927022.jpeg",
-            size: { width: 100, height: 100 },
-          },
-          {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
-            size: { width: 100, height: 100 },
-          },
-          {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
             size: { width: 100, height: 100 },
           },
           {
@@ -62,14 +38,6 @@ const GalleryPage: Component = () => {
           },
           {
             src: "https://images.pexels.com/photos/927022/pexels-photo-927022.jpeg",
-            size: { width: 100, height: 100 },
-          },
-          {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
-            size: { width: 100, height: 100 },
-          },
-          {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
             size: { width: 100, height: 100 },
           },
           {
@@ -78,46 +46,22 @@ const GalleryPage: Component = () => {
           },
           {
             src: "https://images.pexels.com/photos/927022/pexels-photo-927022.jpeg",
-            size: { width: 100, height: 100 },
-          },
-          {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
             size: { width: 100, height: 100 },
           },
           {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
-            size: { width: 100, height: 100 },
-          },
-          {
             src: "https://images.pexels.com/photos/927022/pexels-photo-927022.jpeg",
             size: { width: 100, height: 100 },
           },
           {
             src: "https://images.pexels.com/photos/927022/pexels-photo-927022.jpeg",
-            size: { width: 100, height: 100 },
-          },
-          {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
             size: { width: 100, height: 100 },
           },
           {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
-            size: { width: 100, height: 100 },
-          },
-          {
             src: "https://images.pexels.com/photos/927022/pexels-photo-927022.jpeg",
             size: { width: 100, height: 100 },
           },
           {
             src: "https://images.pexels.com/photos/927022/pexels-photo-927022.jpeg",
-            size: { width: 100, height: 100 },
-          },
-          {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
-            size: { width: 100, height: 100 },
-          },
-          {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
             size: { width: 100, height: 100 },
           },
           {
@@ -126,14 +70,6 @@ const GalleryPage: Component = () => {
           },
           {
             src: "https://images.pexels.com/photos/927022/pexels-photo-927022.jpeg",
-            size: { width: 100, height: 100 },
-          },
-          {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
-            size: { width: 100, height: 100 },
-          },
-          {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
             size: { width: 100, height: 100 },
           },
           {
@@ -142,14 +78,6 @@ const GalleryPage: Component = () => {
           },
           {
             src: "https://images.pexels.com/photos/927022/pexels-photo-927022.jpeg",
-            size: { width: 100, height: 100 },
-          },
-          {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
-            size: { width: 100, height: 100 },
-          },
-          {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
             size: { width: 100, height: 100 },
           },
           {
@@ -161,14 +89,6 @@ const GalleryPage: Component = () => {
             size: { width: 100, height: 100 },
           },
           {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
-            size: { width: 100, height: 100 },
-          },
-          {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
-            size: { width: 100, height: 100 },
-          },
-          {
             src: "https://images.pexels.com/photos/927022/pexels-photo-927022.jpeg",
             size: { width: 100, height: 100 },
           },
@@ -177,27 +97,11 @@ const GalleryPage: Component = () => {
             size: { width: 100, height: 100 },
           },
           {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
-            size: { width: 100, height: 100 },
-          },
-          {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
-            size: { width: 100, height: 100 },
-          },
-          {
             src: "https://images.pexels.com/photos/927022/pexels-photo-927022.jpeg",
             size: { width: 100, height: 100 },
           },
           {
             src: "https://images.pexels.com/photos/927022/pexels-photo-927022.jpeg",
-            size: { width: 100, height: 100 },
-          },
-          {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
-            size: { width: 100, height: 100 },
-          },
-          {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
             size: { width: 100, height: 100 },
           },
           {
@@ -206,14 +110,6 @@ const GalleryPage: Component = () => {
           },
           {
             src: "https://images.pexels.com/photos/927022/pexels-photo-927022.jpeg",
-            size: { width: 100, height: 100 },
-          },
-          {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
-            size: { width: 100, height: 100 },
-          },
-          {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
             size: { width: 100, height: 100 },
           },
           {
@@ -222,46 +118,22 @@ const GalleryPage: Component = () => {
           },
           {
             src: "https://images.pexels.com/photos/927022/pexels-photo-927022.jpeg",
-            size: { width: 100, height: 100 },
-          },
-          {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
             size: { width: 100, height: 100 },
           },
           {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
-            size: { width: 100, height: 100 },
-          },
-          {
             src: "https://images.pexels.com/photos/927022/pexels-photo-927022.jpeg",
             size: { width: 100, height: 100 },
           },
           {
             src: "https://images.pexels.com/photos/927022/pexels-photo-927022.jpeg",
-            size: { width: 100, height: 100 },
-          },
-          {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
             size: { width: 100, height: 100 },
           },
           {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
-            size: { width: 100, height: 100 },
-          },
-          {
             src: "https://images.pexels.com/photos/927022/pexels-photo-927022.jpeg",
             size: { width: 100, height: 100 },
           },
           {
             src: "https://images.pexels.com/photos/927022/pexels-photo-927022.jpeg",
-            size: { width: 100, height: 100 },
-          },
-          {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
-            size: { width: 100, height: 100 },
-          },
-          {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
             size: { width: 100, height: 100 },
           },
           {
@@ -270,14 +142,6 @@ const GalleryPage: Component = () => {
           },
           {
             src: "https://images.pexels.com/photos/927022/pexels-photo-927022.jpeg",
-            size: { width: 100, height: 100 },
-          },
-          {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
-            size: { width: 100, height: 100 },
-          },
-          {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
             size: { width: 100, height: 100 },
           },
           {
@@ -286,14 +150,6 @@ const GalleryPage: Component = () => {
           },
           {
             src: "https://images.pexels.com/photos/927022/pexels-photo-927022.jpeg",
-            size: { width: 100, height: 100 },
-          },
-          {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
-            size: { width: 100, height: 100 },
-          },
-          {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
             size: { width: 100, height: 100 },
           },
           {
@@ -305,14 +161,6 @@ const GalleryPage: Component = () => {
             size: { width: 100, height: 100 },
           },
           {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
-            size: { width: 100, height: 100 },
-          },
-          {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
-            size: { width: 100, height: 100 },
-          },
-          {
             src: "https://images.pexels.com/photos/927022/pexels-photo-927022.jpeg",
             size: { width: 100, height: 100 },
           },
@@ -321,27 +169,11 @@ const GalleryPage: Component = () => {
             size: { width: 100, height: 100 },
           },
           {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
-            size: { width: 100, height: 100 },
-          },
-          {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
-            size: { width: 100, height: 100 },
-          },
-          {
             src: "https://images.pexels.com/photos/927022/pexels-photo-927022.jpeg",
             size: { width: 100, height: 100 },
           },
           {
             src: "https://images.pexels.com/photos/927022/pexels-photo-927022.jpeg",
-            size: { width: 100, height: 100 },
-          },
-          {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
-            size: { width: 100, height: 100 },
-          },
-          {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
             size: { width: 100, height: 100 },
           },
           {
@@ -350,14 +182,6 @@ const GalleryPage: Component = () => {
           },
           {
             src: "https://images.pexels.com/photos/927022/pexels-photo-927022.jpeg",
-            size: { width: 100, height: 100 },
-          },
-          {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
-            size: { width: 100, height: 100 },
-          },
-          {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
             size: { width: 100, height: 100 },
           },
           {
@@ -366,46 +190,22 @@ const GalleryPage: Component = () => {
           },
           {
             src: "https://images.pexels.com/photos/927022/pexels-photo-927022.jpeg",
-            size: { width: 100, height: 100 },
-          },
-          {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
             size: { width: 100, height: 100 },
           },
           {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
-            size: { width: 100, height: 100 },
-          },
-          {
             src: "https://images.pexels.com/photos/927022/pexels-photo-927022.jpeg",
             size: { width: 100, height: 100 },
           },
           {
             src: "https://images.pexels.com/photos/927022/pexels-photo-927022.jpeg",
-            size: { width: 100, height: 100 },
-          },
-          {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
             size: { width: 100, height: 100 },
           },
           {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
-            size: { width: 100, height: 100 },
-          },
-          {
             src: "https://images.pexels.com/photos/927022/pexels-photo-927022.jpeg",
             size: { width: 100, height: 100 },
           },
           {
             src: "https://images.pexels.com/photos/927022/pexels-photo-927022.jpeg",
-            size: { width: 100, height: 100 },
-          },
-          {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
-            size: { width: 100, height: 100 },
-          },
-          {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
             size: { width: 100, height: 100 },
           },
           {
@@ -414,14 +214,6 @@ const GalleryPage: Component = () => {
           },
           {
             src: "https://images.pexels.com/photos/927022/pexels-photo-927022.jpeg",
-            size: { width: 100, height: 100 },
-          },
-          {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
-            size: { width: 100, height: 100 },
-          },
-          {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
             size: { width: 100, height: 100 },
           },
           {
@@ -430,14 +222,6 @@ const GalleryPage: Component = () => {
           },
           {
             src: "https://images.pexels.com/photos/927022/pexels-photo-927022.jpeg",
-            size: { width: 100, height: 100 },
-          },
-          {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
-            size: { width: 100, height: 100 },
-          },
-          {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
             size: { width: 100, height: 100 },
           },
           {
@@ -449,14 +233,6 @@ const GalleryPage: Component = () => {
             size: { width: 100, height: 100 },
           },
           {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
-            size: { width: 100, height: 100 },
-          },
-          {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
-            size: { width: 100, height: 100 },
-          },
-          {
             src: "https://images.pexels.com/photos/927022/pexels-photo-927022.jpeg",
             size: { width: 100, height: 100 },
           },
@@ -465,27 +241,11 @@ const GalleryPage: Component = () => {
             size: { width: 100, height: 100 },
           },
           {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
-            size: { width: 100, height: 100 },
-          },
-          {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
-            size: { width: 100, height: 100 },
-          },
-          {
             src: "https://images.pexels.com/photos/927022/pexels-photo-927022.jpeg",
             size: { width: 100, height: 100 },
           },
           {
             src: "https://images.pexels.com/photos/927022/pexels-photo-927022.jpeg",
-            size: { width: 100, height: 100 },
-          },
-          {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
-            size: { width: 100, height: 100 },
-          },
-          {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
             size: { width: 100, height: 100 },
           },
           {
@@ -497,11 +257,11 @@ const GalleryPage: Component = () => {
             size: { width: 100, height: 100 },
           },
           {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
+            src: "https://images.pexels.com/photos/927022/pexels-photo-927022.jpeg",
             size: { width: 100, height: 100 },
           },
           {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
+            src: "https://images.pexels.com/photos/927022/pexels-photo-927022.jpeg",
             size: { width: 100, height: 100 },
           },
           {
@@ -513,11 +273,11 @@ const GalleryPage: Component = () => {
             size: { width: 100, height: 100 },
           },
           {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
+            src: "https://images.pexels.com/photos/927022/pexels-photo-927022.jpeg",
             size: { width: 100, height: 100 },
           },
           {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
+            src: "https://images.pexels.com/photos/927022/pexels-photo-927022.jpeg",
             size: { width: 100, height: 100 },
           },
           {
@@ -529,11 +289,11 @@ const GalleryPage: Component = () => {
             size: { width: 100, height: 100 },
           },
           {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
+            src: "https://images.pexels.com/photos/927022/pexels-photo-927022.jpeg",
             size: { width: 100, height: 100 },
           },
           {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
+            src: "https://images.pexels.com/photos/927022/pexels-photo-927022.jpeg",
             size: { width: 100, height: 100 },
           },
           {
@@ -545,11 +305,11 @@ const GalleryPage: Component = () => {
             size: { width: 100, height: 100 },
           },
           {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
+            src: "https://images.pexels.com/photos/927022/pexels-photo-927022.jpeg",
             size: { width: 100, height: 100 },
           },
           {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
+            src: "https://images.pexels.com/photos/927022/pexels-photo-927022.jpeg",
             size: { width: 100, height: 100 },
           },
           {
@@ -561,11 +321,11 @@ const GalleryPage: Component = () => {
             size: { width: 100, height: 100 },
           },
           {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
+            src: "https://images.pexels.com/photos/927022/pexels-photo-927022.jpeg",
             size: { width: 100, height: 100 },
           },
           {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
+            src: "https://images.pexels.com/photos/927022/pexels-photo-927022.jpeg",
             size: { width: 100, height: 100 },
           },
           {
@@ -577,11 +337,11 @@ const GalleryPage: Component = () => {
             size: { width: 100, height: 100 },
           },
           {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
+            src: "https://images.pexels.com/photos/927022/pexels-photo-927022.jpeg",
             size: { width: 100, height: 100 },
           },
           {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
+            src: "https://images.pexels.com/photos/927022/pexels-photo-927022.jpeg",
             size: { width: 100, height: 100 },
           },
           {
@@ -593,11 +353,11 @@ const GalleryPage: Component = () => {
             size: { width: 100, height: 100 },
           },
           {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
+            src: "https://images.pexels.com/photos/927022/pexels-photo-927022.jpeg",
             size: { width: 100, height: 100 },
           },
           {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
+            src: "https://images.pexels.com/photos/927022/pexels-photo-927022.jpeg",
             size: { width: 100, height: 100 },
           },
           {
@@ -609,11 +369,11 @@ const GalleryPage: Component = () => {
             size: { width: 100, height: 100 },
           },
           {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
+            src: "https://images.pexels.com/photos/927022/pexels-photo-927022.jpeg",
             size: { width: 100, height: 100 },
           },
           {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
+            src: "https://images.pexels.com/photos/927022/pexels-photo-927022.jpeg",
             size: { width: 100, height: 100 },
           },
           {
@@ -625,11 +385,11 @@ const GalleryPage: Component = () => {
             size: { width: 100, height: 100 },
           },
           {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
+            src: "https://images.pexels.com/photos/927022/pexels-photo-927022.jpeg",
             size: { width: 100, height: 100 },
           },
           {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
+            src: "https://images.pexels.com/photos/927022/pexels-photo-927022.jpeg",
             size: { width: 100, height: 100 },
           },
           {
@@ -641,11 +401,11 @@ const GalleryPage: Component = () => {
             size: { width: 100, height: 100 },
           },
           {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
+            src: "https://images.pexels.com/photos/927022/pexels-photo-927022.jpeg",
             size: { width: 100, height: 100 },
           },
           {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
+            src: "https://images.pexels.com/photos/927022/pexels-photo-927022.jpeg",
             size: { width: 100, height: 100 },
           },
           {
@@ -657,11 +417,11 @@ const GalleryPage: Component = () => {
             size: { width: 100, height: 100 },
           },
           {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
+            src: "https://images.pexels.com/photos/927022/pexels-photo-927022.jpeg",
             size: { width: 100, height: 100 },
           },
           {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
+            src: "https://images.pexels.com/photos/927022/pexels-photo-927022.jpeg",
             size: { width: 100, height: 100 },
           },
           {
@@ -673,11 +433,11 @@ const GalleryPage: Component = () => {
             size: { width: 100, height: 100 },
           },
           {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
+            src: "https://images.pexels.com/photos/927022/pexels-photo-927022.jpeg",
             size: { width: 100, height: 100 },
           },
           {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
+            src: "https://images.pexels.com/photos/927022/pexels-photo-927022.jpeg",
             size: { width: 100, height: 100 },
           },
           {
@@ -689,11 +449,11 @@ const GalleryPage: Component = () => {
             size: { width: 100, height: 100 },
           },
           {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
+            src: "https://images.pexels.com/photos/927022/pexels-photo-927022.jpeg",
             size: { width: 100, height: 100 },
           },
           {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
+            src: "https://images.pexels.com/photos/927022/pexels-photo-927022.jpeg",
             size: { width: 100, height: 100 },
           },
           {
@@ -705,11 +465,11 @@ const GalleryPage: Component = () => {
             size: { width: 100, height: 100 },
           },
           {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
+            src: "https://images.pexels.com/photos/927022/pexels-photo-927022.jpeg",
             size: { width: 100, height: 100 },
           },
           {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
+            src: "https://images.pexels.com/photos/927022/pexels-photo-927022.jpeg",
             size: { width: 100, height: 100 },
           },
           {
@@ -721,11 +481,11 @@ const GalleryPage: Component = () => {
             size: { width: 100, height: 100 },
           },
           {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
+            src: "https://images.pexels.com/photos/927022/pexels-photo-927022.jpeg",
             size: { width: 100, height: 100 },
           },
           {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
+            src: "https://images.pexels.com/photos/927022/pexels-photo-927022.jpeg",
             size: { width: 100, height: 100 },
           },
           {
@@ -737,11 +497,11 @@ const GalleryPage: Component = () => {
             size: { width: 100, height: 100 },
           },
           {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
+            src: "https://images.pexels.com/photos/927022/pexels-photo-927022.jpeg",
             size: { width: 100, height: 100 },
           },
           {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
+            src: "https://images.pexels.com/photos/927022/pexels-photo-927022.jpeg",
             size: { width: 100, height: 100 },
           },
           {
@@ -753,11 +513,11 @@ const GalleryPage: Component = () => {
             size: { width: 100, height: 100 },
           },
           {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
+            src: "https://images.pexels.com/photos/927022/pexels-photo-927022.jpeg",
             size: { width: 100, height: 100 },
           },
           {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
+            src: "https://images.pexels.com/photos/927022/pexels-photo-927022.jpeg",
             size: { width: 100, height: 100 },
           },
           {
@@ -769,11 +529,11 @@ const GalleryPage: Component = () => {
             size: { width: 100, height: 100 },
           },
           {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
+            src: "https://images.pexels.com/photos/927022/pexels-photo-927022.jpeg",
             size: { width: 100, height: 100 },
           },
           {
-            src: "https://images.pexels.com/photos/1133742/pexels-photo-1133742.jpeg",
+            src: "https://images.pexels.com/photos/927022/pexels-photo-927022.jpeg",
             size: { width: 100, height: 100 },
           },
         ]}

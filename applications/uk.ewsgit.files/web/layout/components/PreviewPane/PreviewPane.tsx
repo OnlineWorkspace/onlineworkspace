@@ -1,35 +1,54 @@
 import UKDivider from "@onlineworkspace/uikit-solid/src/components/divider/UKDivider.tsx";
+import UKIcon from "@onlineworkspace/uikit-solid/src/components/icon/UKIcon.tsx";
 import UKText from "@onlineworkspace/uikit-solid/src/components/text/UKText.tsx";
+import useIsMobile from "@onlineworkspace/uikit-solid/src/core/useIsMobile.ts";
+import browserPath from "path-browserify";
 import { type Component, useContext } from "solid-js";
 import { AppContext } from "../../../appContext.ts";
+import iconForItemType from "../../../pages/dir/iconForItemType.ts";
 import styles from "./PreviewPane.module.scss";
-import browserPath from "path-browserify";
 
 const PreviewPane: Component = () => {
+  const isMobile = useIsMobile();
   const appContext = useContext(AppContext);
 
   return (
-    <div class={styles.root}>
+    <div class={styles.root} data-hide={!appContext?.userPreferences.showPreview || isMobile()}>
       <UKText role={"title"} size={"m"}>
         Preview
       </UKText>
       <UKDivider direction={"horizontal"} />
-      {(appContext?.viewState.selectedItems.length || 0) > 0 ? (
-        appContext!.viewState.selectedItems.length > 1 ? (
-          <>
-            <div></div>
-            <UKText role="body" size="l">
-              {appContext!.viewState.selectedItems.length} items
-            </UKText>
-          </>
-        ) : (
-          <>
-            <div></div>
-            <UKText role="body" size="l">
-              {browserPath.basename(appContext!.viewState.selectedItems[0])}
-            </UKText>
-          </>
-        )
+      {!isMobile() && appContext?.userPreferences.showPreview && (appContext?.viewState.selectedItems.length || 0) > 0 ? (
+        <>
+          {appContext!.viewState.selectedItems.length > 1 ? (
+            <>
+              <UKIcon class={styles.previewIcon}>{iconForItemType("unknown")}</UKIcon>
+              <UKText class={styles.previewItemName} role="body" size="l" align={"center"}>
+                {appContext!.viewState.selectedItems.length} items
+              </UKText>
+            </>
+          ) : (
+            <>
+              <UKIcon class={styles.previewIcon}>
+                {iconForItemType(
+                  appContext?.viewState.viewItems.find((item) => {
+                    return item.path === appContext!.viewState.selectedItems[0];
+                  })?.type || "file",
+                )}
+              </UKIcon>
+              <UKText class={styles.previewItemName} role="body" size="l" align={"center"}>
+                {browserPath.basename(appContext!.viewState.selectedItems[0])}
+              </UKText>
+            </>
+          )}
+          <UKText role={"title"} size={"m"}>
+            Details
+          </UKText>
+          <UKDivider direction={"horizontal"} />
+          <UKText role={"body"} size={"m"}>
+            Dimensions: ...x...
+          </UKText>
+        </>
       ) : null}
     </div>
   );

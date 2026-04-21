@@ -24,6 +24,17 @@
   display: flex;
 }
 
+.pathSuggestions {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+}
+
 .pathInput {
   position: absolute;
   left: 0;
