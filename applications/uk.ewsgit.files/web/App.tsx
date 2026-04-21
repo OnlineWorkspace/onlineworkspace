@@ -96,7 +96,7 @@ const App: Component = () => {
           path={"/dir"}
           component={() => (
             <>
-              <div class={layoutStyles.actionbar}>
+              <div class={layoutStyles.actionBar}>
                 <ActionBar />
               </div>
               <View />
@@ -106,7 +106,7 @@ const App: Component = () => {
         <Route
           component={(props) => (
             <>
-              <div class={layoutStyles.actionbar} />
+              <div class={layoutStyles.actionBar} />
               {props.children}
             </>
           )}
