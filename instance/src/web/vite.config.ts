@@ -1,6 +1,6 @@
 // import devtools from "solid-devtools/vite";
-import { defineConfig } from "vite";
-import { compression } from "vite-plugin-compression2";
+import {defineConfig} from "vite";
+import {compression} from "vite-plugin-compression2";
 import solid from "vite-plugin-solid";
 
 export default defineConfig({
@@ -15,7 +15,7 @@ export default defineConfig({
   ],
   server: {
     host: true,
-    allowedHosts: [process.env.ALLOW_HOST || "localhost"],
+    allowedHosts: [ process.env.ALLOW_HOST || "localhost" ],
     hmr: {
       clientPort: 443,
       protocol: "wss",

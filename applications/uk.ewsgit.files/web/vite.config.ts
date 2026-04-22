@@ -1,11 +1,26 @@
-// INFO: this file is purely for webstorm to infer the application's web as being a solid application
-
-import { defineConfig } from "vite";
+import {defineConfig} from "vite";
+import {compression} from "vite-plugin-compression2";
 import solid from "vite-plugin-solid";
 
 export default defineConfig({
-  plugins: [solid()],
+  plugins: [
+    solid(),
+    compression(),
+  ],
   server: {
     host: true,
+    allowedHosts: [ process.env.ALLOW_HOST || "localhost" ],
+    hmr: {
+      clientPort: 443,
+      protocol: "wss",
+      host: process.env.ALLOW_HOST || "localhost",
+    },
+  },
+  resolve: {
+    alias: {
+      "@solidjs/router": "/../../../node_modules/@solidjs/router",
+      "@onlineworkspace/uikit-solid": "/../../../node_modules/@onlineworkspace/uikit-solid",
+      "@onlineworkspace/workspaces-applications": "/../../../fs/Applications.tsx",
+    },
   },
 });
