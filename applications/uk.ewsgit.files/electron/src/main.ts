@@ -1,7 +1,7 @@
-import {app, BrowserWindow} from "electron"
-import path from "node:path"
+import path from "node:path";
+import {app, BrowserWindow, session} from "electron";
 
-function createWindow() {
+async function createWindow() {
   const window = new BrowserWindow({
     width: 1000,
     height: 800,
@@ -12,28 +12,31 @@ function createWindow() {
     titleBarStyle: "hidden",
     frame: true,
     webPreferences: {
-      preload: path.join(process.cwd(), "./src/preload.js")
-    }
-  })
+      preload: path.join(process.cwd(), "./src/preload.js"),
+    },
+  });
 
-  window.loadURL("https://localhost/app/uk.ewsgit.files")
+  if ((await session.defaultSession.cookies.get({url: "https://localhost"})).length === 0) {
+    window.loadURL("https://localhost/?redirect=/app/uk.ewsgit.files/");
+  } else {
+    window.loadURL("https://localhost/app/uk.ewsgit.files");
+  }
 
-  return window
+  return window;
 }
 
 app.whenReady().then(() => {
-  createWindow()
+  createWindow();
 
-  app.on('activate', () => {
+  app.on("activate", () => {
     if (BrowserWindow.getAllWindows().length === 0) {
-      createWindow()
+      createWindow();
     }
-  })
-})
+  });
+});
 
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    app.quit()
+app.on("window-all-closed", () => {
+  if (process.platform !== "darwin") {
+    app.quit();
   }
-})
-
+});

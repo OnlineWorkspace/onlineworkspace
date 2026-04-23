@@ -1,13 +1,15 @@
 import UKCard from "@onlineworkspace/uikit-solid/src/components/card/UKCard.tsx";
 import UKIcon from "@onlineworkspace/uikit-solid/src/components/icon/UKIcon.tsx";
 import browserPath from "path-browserify";
-import { type Component, For, useContext } from "solid-js";
-import { AppContext } from "../../../../appContext.ts";
+import {type Component, For, useContext} from "solid-js";
+import {AppContext} from "../../../../appContext.ts";
 import iconForItemType from "../../iconForItemType.ts";
 import onItemClick from "../../itemSelection.ts";
 import styles from "./GridView.module.scss";
+import {useSearchParams} from "@solidjs/router";
 
 const GridView: Component = () => {
+  const [ _, setSearchParams ] = useSearchParams();
   const appContext = useContext(AppContext);
 
   return (
@@ -18,10 +20,10 @@ const GridView: Component = () => {
             <UKCard
               class={styles.item}
               data-fs-item-path={item.path}
-              onClick={(e) => onItemClick(e, appContext!, index(), item)}
+              onClick={(e) => onItemClick(e, appContext!, index(), item, setSearchParams)}
               color={appContext?.viewState.selectedItems.includes(item.path) ? "outlined" : "filled"}
             >
-              {item.thumbnail !== undefined ? <>thumbnail time</> : <UKIcon class={styles.thumbnailIcon}>{iconForItemType(item.type)}</UKIcon>}
+              {item.thumbnail !== undefined ? <img class={styles.itemThumbnail} alt="" src={item.thumbnail} loading="lazy" /> : <UKIcon class={styles.thumbnailIcon}>{iconForItemType(item.type)}</UKIcon>}
               {browserPath.basename(item.path)}
             </UKCard>
           );

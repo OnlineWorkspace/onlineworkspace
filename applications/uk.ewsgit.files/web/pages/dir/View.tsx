@@ -1,111 +1,142 @@
-import { useSearchParams } from "@solidjs/router";
-import { type Component, createEffect, Match, Switch, useContext } from "solid-js";
-import { createStore } from "solid-js/store";
-import { AppContext } from "../../appContext.ts";
+import {useSearchParams} from "@solidjs/router";
+import {type Component, createEffect, Match, Switch, useContext} from "solid-js";
+import {createStore} from "solid-js/store";
+import {AppContext} from "../../appContext.ts";
+import trpc from "../../lib/trpc.ts";
 import DetailsView from "./components/DetailsView/DetailsView.tsx";
 import GridView from "./components/GridView/GridView.tsx";
 import styles from "./View.module.scss";
+import filesystemInterface, {type UniformResourceLocator} from "../../lib/filesystemInterface.ts";
 
 const View: Component = () => {
-  const [searchParams, setSearchParams] = useSearchParams<{ path?: string }>();
+  const [ searchParams, setSearchParams ] = useSearchParams<{path?: UniformResourceLocator}>();
   const appContext = useContext(AppContext);
-  const [dragSelectRegion, setDragSelectRegion] = createStore<{
-    origin?: { x: number; y: number };
-    size?: { x: number; y: number };
-    transOrigin?: { x: number; y: number };
+  const [ dragSelectRegion, setDragSelectRegion ] = createStore<{
+    origin?: {x: number; y: number};
+    size?: {x: number; y: number};
+    transOrigin?: {x: number; y: number};
   }>({
     origin: undefined,
     size: undefined,
   });
 
-  createEffect(() => {
+  createEffect(async () => {
     if (!searchParams.path) {
-      setSearchParams({ path: appContext?.userPreferences.homePath });
+      setSearchParams({path: appContext?.userPreferences.homePath});
+      return;
     }
-  }, []);
+
+    const newItems = await filesystemInterface.readDirectory(searchParams.path || "remote:/")
+
+    console.log({path: searchParams.path, newItems})
+
+    if (newItems.status === "ok") {
+      appContext?.setViewState("selectedItems", []);
+      appContext?.setViewState("lastSelectionTime", -1);
+      appContext?.setViewState("viewItems", []);
+
+      for (const itemPath of newItems.items) {
+        const viewEntry = await filesystemInterface.getViewEntry(itemPath, appContext!.userPreferences.viewType === "details" ? "details" : "grid")
+
+        if (viewEntry.status === "ok") {
+          appContext?.setViewState("viewItems", [ ...appContext.viewState.viewItems, viewEntry.data ]);
+        }
+      }
+
+    }
+  });
 
   return (
     /** biome-ignore lint/a11y/noStaticElementInteractions: button functionality not required */
-    /** biome-ignore lint/a11y/useKeyWithClickEvents: button functionality not required */
     <div
       class={styles.root}
-      onClick={(e) => {
+      onDblClick={(e) => {
         if (e.currentTarget === e.target) appContext!.setViewState("selectedItems", []);
       }}
-      onMouseDown={(downEvent) => {
-        document.body.style.userSelect = "none";
-        setDragSelectRegion("origin", { x: downEvent.clientX, y: downEvent.clientY });
-        setDragSelectRegion("transOrigin", { x: downEvent.clientX, y: downEvent.clientY });
+    // onMouseDown={(downEvent) => {
+    //   document.body.style.userSelect = "none";
+    //   setDragSelectRegion("origin", {x: downEvent.clientX, y: downEvent.clientY});
+    //   setDragSelectRegion("transOrigin", {x: downEvent.clientX, y: downEvent.clientY});
 
-        const currentTarget = downEvent.currentTarget as HTMLDivElement;
-        const currentTargetBounds = currentTarget.getBoundingClientRect();
-        const selectableItems = currentTarget.querySelectorAll("[data-fs-item-path]");
+    //   const currentTarget = downEvent.currentTarget as HTMLDivElement;
+    //   const currentTargetBounds = currentTarget.getBoundingClientRect();
+    //   const selectableItems = currentTarget.querySelectorAll("[data-fs-item-path]");
 
-        function mouseUp() {
-          document.body.style.userSelect = "unset";
+    //   function mouseUp() {
+    //     document.body.style.userSelect = "unset";
 
-          setDragSelectRegion("origin", undefined);
-          setDragSelectRegion("size", undefined);
-          setDragSelectRegion("transOrigin", undefined);
+    //     setDragSelectRegion("origin", undefined);
+    //     setDragSelectRegion("size", undefined);
+    //     setDragSelectRegion("transOrigin", undefined);
 
-          document.removeEventListener("mouseup", mouseUp);
-          document.removeEventListener("mousemove", mouseMove);
-        }
+    //     document.removeEventListener("mouseup", mouseUp);
+    //     document.removeEventListener("mousemove", mouseMove);
+    //   }
 
-        function mouseMove(e: MouseEvent) {
-          if (!dragSelectRegion.origin) return;
-          if (!dragSelectRegion.transOrigin) return;
+    //   let itemInRegionCalculationTimeout: NodeJS.Timeout | undefined;
 
-          const mouseX = Math.min(Math.max(e.clientX, currentTargetBounds.left), currentTargetBounds.right);
-          const mouseY = Math.min(Math.max(e.clientY, currentTargetBounds.top), currentTargetBounds.bottom);
+    //   function itemInRegionCalculation() {
+    //     appContext?.setViewState("selectedItems", []);
 
-          let sizeX = 0;
-          let sizeY = 0;
+    //     for (const item of selectableItems) {
+    //       const boundingRect = item.getBoundingClientRect();
 
-          sizeX = mouseX - dragSelectRegion.origin.x;
-          sizeY = mouseY - dragSelectRegion.origin.y;
+    //       const tl1 = {x: dragSelectRegion.transOrigin?.x || 0, y: dragSelectRegion.transOrigin?.y || 0};
+    //       const br1 = {x: tl1.x + (dragSelectRegion.size?.x || 0), y: tl1.y + (dragSelectRegion.size?.y || 0)};
 
-          if (mouseX < dragSelectRegion.origin.x) {
-            setDragSelectRegion("transOrigin", { x: mouseX, y: dragSelectRegion.transOrigin.y });
-            sizeX = dragSelectRegion.origin.x - mouseX;
-          }
+    //       const tl2 = {x: boundingRect.left, y: boundingRect.top};
+    //       const br2 = {x: boundingRect.right, y: boundingRect.bottom};
 
-          if (mouseY < dragSelectRegion.origin.y) {
-            setDragSelectRegion("transOrigin", { x: dragSelectRegion.transOrigin.x, y: mouseY });
-            sizeY = dragSelectRegion.origin.y - mouseY;
-          }
+    //       if (tl1.x > br2.x || tl2.x > br1.x) continue;
 
-          setDragSelectRegion("size", {
-            x: sizeX,
-            y: sizeY,
-          });
+    //       if (tl1.y > br2.y || tl2.y > br1.y) continue;
 
-          appContext?.setViewState("selectedItems", []);
+    //       const itemPath = item.getAttribute("data-fs-item-path");
+    //       if (!itemPath) return;
+    //       if (!appContext?.viewState.selectedItems.includes(itemPath)) {
+    //         appContext?.setViewState("selectedItems", [ ...appContext.viewState.selectedItems, itemPath ]);
+    //       }
+    //     }
+    //   }
 
-          for (const item of selectableItems) {
-            const boundingRect = item.getBoundingClientRect();
+    //   function mouseMove(e: MouseEvent) {
+    //     if (!dragSelectRegion.origin) return;
+    //     if (!dragSelectRegion.transOrigin) return;
 
-            const tl1 = { x: dragSelectRegion.transOrigin.x, y: dragSelectRegion.transOrigin.y };
-            const br1 = { x: tl1.x + dragSelectRegion.size!.x, y: tl1.y + dragSelectRegion.size!.y };
+    //     const mouseX = Math.min(Math.max(e.clientX, currentTargetBounds.left), currentTargetBounds.right);
+    //     const mouseY = Math.min(Math.max(e.clientY, currentTargetBounds.top), currentTargetBounds.bottom);
 
-            const tl2 = { x: boundingRect.left, y: boundingRect.top };
-            const br2 = { x: boundingRect.right, y: boundingRect.bottom };
+    //     let sizeX = 0;
+    //     let sizeY = 0;
 
-            if (tl1.x > br2.x || tl2.x > br1.x) continue;
+    //     sizeX = mouseX - dragSelectRegion.origin.x;
+    //     sizeY = mouseY - dragSelectRegion.origin.y;
 
-            if (tl1.y > br2.y || tl2.y > br1.y) continue;
+    //     if (mouseX < dragSelectRegion.origin.x) {
+    //       setDragSelectRegion("transOrigin", {x: mouseX, y: dragSelectRegion.transOrigin.y});
+    //       sizeX = dragSelectRegion.origin.x - mouseX;
+    //     }
 
-            const itemPath = item.getAttribute("data-fs-item-path");
-            if (!itemPath) return;
-            if (!appContext?.viewState.selectedItems.includes(itemPath)) {
-              appContext?.setViewState("selectedItems", [...appContext.viewState.selectedItems, itemPath]);
-            }
-          }
-        }
+    //     if (mouseY < dragSelectRegion.origin.y) {
+    //       setDragSelectRegion("transOrigin", {x: dragSelectRegion.transOrigin.x, y: mouseY});
+    //       sizeY = dragSelectRegion.origin.y - mouseY;
+    //     }
 
-        document.addEventListener("mouseup", mouseUp);
-        document.addEventListener("mousemove", mouseMove);
-      }}
+    //     setDragSelectRegion("size", {
+    //       x: sizeX,
+    //       y: sizeY,
+    //     });
+
+    //     if (itemInRegionCalculationTimeout) clearTimeout(itemInRegionCalculationTimeout);
+
+    //     itemInRegionCalculationTimeout = setTimeout(() => {
+    //       itemInRegionCalculation();
+    //     }, 2);
+    //   }
+
+    //   document.addEventListener("mouseup", mouseUp);
+    //   document.addEventListener("mousemove", mouseMove);
+    // }}
     >
       <Switch>
         <Match when={appContext?.userPreferences.viewType === "grid"}>

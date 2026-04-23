@@ -88,4 +88,14 @@
   > td:last-child {
     border-radius: 0 0.5rem 0.5rem 0;
   }
+
+  .itemThumbnail {
+    height: var(--item-size);
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    object-position: center;
+  }
+
+  .itemIcon {
+  }
 }

@@ -17,7 +17,9 @@
 
 .remainingIndicator {
   border-radius: 100rem;
+  box-sizing: border-box;
   display: flex;
+  flex-grow: 1;
   align-items: center;
   background-color: rgb(var(--uk-sys-color-secondary-container));
   position: relative;
@@ -26,13 +28,11 @@
 
 .stopIndicator {
   position: absolute;
-  right: 0;
+  right: calc(calc(var(--thickness, 0.25rem) - 0.25rem) / 2);
   top: 50%;
   transform: translateY(-50%);
   height: 0.25rem;
   width: 0.25rem;
   border-radius: 100rem;
-  background-color: rgb(var(--uk-sys-color-primary));
-  margin-left: auto;
-  margin-right: calc(calc(var(--thickness) - 0.5rem) / 2);
+  background-color: rgb(var(--uk-sys-color-primary), 0.5);
 }

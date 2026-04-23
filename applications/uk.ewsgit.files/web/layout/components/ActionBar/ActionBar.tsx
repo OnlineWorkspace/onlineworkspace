@@ -21,6 +21,7 @@ import {type Component, createSignal, Show, useContext} from "solid-js";
 import {AppContext} from "../../../appContext.ts";
 import type {ViewItem} from "../../../pages/dir/viewItem.ts";
 import styles from "./ActionBar.module.scss";
+import clsx from "clsx"
 
 const ActionBar: Component = () => {
   const isMobile = useIsMobile();
@@ -157,6 +158,7 @@ const ActionBar: Component = () => {
               size="s"
               shape="square"
               alt={"minimize window"}
+              class={styles.windowIcon}
               onClick={() => {
                 window.close()
               }}
@@ -167,6 +169,7 @@ const ActionBar: Component = () => {
               size="s"
               shape="square"
               alt={"maximize window"}
+              class={styles.windowIcon}
               onClick={() => {
                 window.close()
               }}
@@ -177,7 +180,7 @@ const ActionBar: Component = () => {
               size="s"
               shape="square"
               alt={"close window"}
-              class={styles.closeWindowIcon}
+              class={clsx(styles.closeWindowIcon, styles.windowIcon)}
               onClick={() => {
                 window.close()
               }}

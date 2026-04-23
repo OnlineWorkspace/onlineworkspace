@@ -361,10 +361,96 @@ const router = t.router({
     get: procedure.query(async (opt) => {
       return {
         showWelcome: false,
-        homePath: `/Users/${opt.ctx.userId}/fs/`,
-        pinnedDirectories: ["/home", "/Photos", "/Documents"],
+        homePath: `remote:/users/${opt.ctx.userId}/fs`,
+        pinnedDirectories: [`remote:/users/${opt.ctx.userId}/fs/Photos`, `remote:/users/${opt.ctx.userId}/fs/Documents`],
       };
     }),
+  },
+  readDirectory: procedure
+    .input(z.object({ path: z.string() }))
+    .output(
+      z
+        .object({ items: z.undefined(), status: z.enum(["missing_permission", "invalid_path"]) })
+        .or(z.object({ items: z.string().array(), status: z.literal("ok") })),
+    )
+    .query(async (opt) => {
+      const resolvedPath = path.join(instance.sys.filesystem.FS_ROOT, opt.input.path);
+
+      log.info(`Read Directory requested by user ${opt.ctx.userId} ${resolvedPath}`);
+      const userPermissions = await instance.sys.filesystem.getUserPermissions(opt.ctx.userId, resolvedPath);
+
+      if (!userPermissions.read) {
+        return { status: "missing_permission" };
+      }
+
+      try {
+        const directoryContents = await fs.readdir(resolvedPath);
+
+        return { items: directoryContents, status: "ok" };
+      } catch (_) {
+        return { status: "invalid_path" };
+      }
+    }),
+  view: {
+    getEntry: procedure
+      .input(z.object({ path: z.string(), thumbnailSize: z.number() }))
+      .output(
+        z
+          .object({
+            status: z.literal("ok"),
+            data: z.object({
+              path: z.string(),
+              type: z.enum(["file", "directory", "link"]),
+              thumbnail: z.string().optional(),
+              shared: z.boolean().optional(),
+              size: z.number().optional(),
+            }),
+          })
+          .or(z.object({ status: z.enum(["missing_permission", "invalid_path"]) })),
+      )
+      .query(async (opt) => {
+        const resolvedPath = path.join(instance.sys.filesystem.FS_ROOT, opt.input.path);
+
+        log.info(`View entry requested by user ${opt.ctx.userId} ${resolvedPath}`);
+        const userPermissions = await instance.sys.filesystem.getUserPermissions(opt.ctx.userId, resolvedPath);
+
+        if (!userPermissions.read) {
+          return {
+            status: "missing_permission",
+          };
+        }
+
+        try {
+          const itemStats = await fs.lstat(resolvedPath);
+
+          return {
+            status: "ok",
+            data: {
+              path: opt.input.path,
+              type: itemStats.isSymbolicLink() ? "link" : itemStats.isDirectory() ? "directory" : itemStats.isFile() ? "file" : "file",
+              // TODO: implement sharing first
+              shared: false,
+              size: itemStats.size,
+              thumbnail: itemStats.isFile()
+                ? instance.sys.filesystem.getFileType(opt.input.path) === "image"
+                  ? await instance.sys.image.serveImage(opt.ctx.userId, resolvedPath, {
+                      resize: {
+                        fit: "cover",
+                        position: "centre",
+                        dimensions: { width: opt.input.thumbnailSize, height: opt.input.thumbnailSize },
+                        changeFormatTo: "webp",
+                      },
+                    })
+                  : undefined
+                : undefined,
+            },
+          };
+        } catch (_) {
+          return {
+            status: "invalid_path",
+          };
+        }
+      }),
   },
 });
 

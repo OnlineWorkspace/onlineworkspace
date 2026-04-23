@@ -7,6 +7,7 @@ const onItemClick = (
   appContext: AppContextType,
   itemIndex: number,
   item: ViewItem,
+  setSearchParams: (params: { [key: string]: string }) => void,
 ) => {
   if (e.shiftKey && (appContext?.viewState.selectedItems.length || 0) > 0) {
     // get the index of the selected item, select all items from that index to the current index
@@ -65,8 +66,13 @@ const onItemClick = (
   } else {
     if (appContext?.viewState.selectedItems.length === 1 && appContext.viewState.selectedItems[0] === item.path) {
       if (appContext.viewState.lastSelectionTime > Date.now() - 500) {
-        // Open the item!
-        alert("Open this item!");
+        if (item.type === "file") {
+          alert("Implement this when we can open items!");
+          return;
+        }
+
+        setSearchParams({ path: item.path });
+
         return;
       }
 

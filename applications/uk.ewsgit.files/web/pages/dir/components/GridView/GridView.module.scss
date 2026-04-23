@@ -14,8 +14,15 @@
   gap: 0.5rem;
   align-items: center;
   justify-content: center;
-}
 
-.thumbnailIcon {
-  --icon-size: 6rem;
+  .thumbnailIcon {
+    --icon-size: 6rem;
+  }
+
+  .itemThumbnail {
+    height: 128px;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    object-position: center;
+  }
 }

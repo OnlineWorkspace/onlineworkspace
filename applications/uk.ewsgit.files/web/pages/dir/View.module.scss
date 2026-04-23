@@ -5,6 +5,8 @@
 }
 
 .dragSelectRegion {
-  background: rgb(var(--uk-sys-color-primary), 0.25);
+  background: rgb(var(--uk-sys-color-primary), 0.5);
+  border: 1px solid rgb(var(--uk-sys-color-primary), 0.25);
   position: fixed;
+  border-radius: var(--uk-sys-shape-corner-small);
 }

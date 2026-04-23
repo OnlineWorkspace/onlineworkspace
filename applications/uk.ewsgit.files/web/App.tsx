@@ -1,12 +1,12 @@
-import { Route } from "@solidjs/router";
-import { type Accessor, type Component, createSignal, lazy, onMount } from "solid-js";
-import { createStore, type SetStoreFunction, type Store } from "solid-js/store";
-import { AppContext } from "./appContext.ts";
+import {Route} from "@solidjs/router";
+import {type Accessor, type Component, createSignal, lazy, onMount} from "solid-js";
+import {createStore, type SetStoreFunction, type Store} from "solid-js/store";
+import {AppContext} from "./appContext.ts";
 import ActionBar from "./layout/components/ActionBar/ActionBar.tsx";
 import layoutStyles from "./layout/Layout.module.scss";
 import trpc from "./lib/trpc.ts";
 import View from "./pages/dir/View.tsx";
-import type { ViewItem } from "./pages/dir/viewItem.ts";
+import type {ViewItem} from "./pages/dir/viewItem.ts";
 import Redirect from "./Redirect.tsx";
 
 const Layout = lazy(() => import("./layout/Layout.tsx"));
@@ -37,18 +37,18 @@ interface AppContextType {
   isDesktopApp: boolean;
 }
 
-export type { AppContextType };
+export type {AppContextType};
 
 const App: Component = () => {
-  const [hasLoaded, setHasLoaded] = createSignal<boolean>(false);
-  const [userPreferences, setUserPreferences] = createStore<AppContextType["userPreferences"]>({
+  const [ hasLoaded, setHasLoaded ] = createSignal<boolean>(false);
+  const [ userPreferences, setUserPreferences ] = createStore<AppContextType[ "userPreferences" ]>({
     showWelcome: true,
-    homePath: "/Users/1/fs/",
-    pinnedDirectories: ["/home"],
+    homePath: "remote:/users/1/fs/",
+    pinnedDirectories: [ "~/home" ],
     viewType: "details",
     showPreview: true,
   });
-  const [viewState, setViewState] = createStore<AppContextType["viewState"]>({
+  const [ viewState, setViewState ] = createStore<AppContextType[ "viewState" ]>({
     viewItems: [],
     selectedItems: [],
     lastSelectionTime: -1,

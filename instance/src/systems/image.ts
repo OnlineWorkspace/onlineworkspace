@@ -15,7 +15,7 @@ export default class ImageSystem extends System {
         public?: boolean;
         resize?: {
           dimensions: { width: number; height: number };
-          changeFormatTo?: "avif" | "jpeg" | "png";
+          changeFormatTo?: "avif" | "jpeg" | "png" | "webp";
           position?: "top" | "right top" | "right" | "right bottom" | "bottom" | "left bottom" | "left" | "left top" | "centre";
           fit?: "cover" | "contain" | "fill";
           background?: string;
@@ -59,7 +59,7 @@ export default class ImageSystem extends System {
                   width: number;
                   height: number;
                 });
-            changeFormatTo?: "avif" | "jpeg" | "png";
+            changeFormatTo?: "avif" | "jpeg" | "png" | "webp";
             position?: "top" | "right top" | "right" | "right bottom" | "bottom" | "left bottom" | "left" | "left top" | "centre";
             fit?: "cover" | "contain" | "fill";
             background?: string;

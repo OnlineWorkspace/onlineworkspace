@@ -52,8 +52,12 @@
   }
 }
 
+.windowIcon {
+}
+
 .closeWindowIcon {
-  &:hover {
+  &:hover,
+  &:active {
     background-color: #cc4444;
   }
 }

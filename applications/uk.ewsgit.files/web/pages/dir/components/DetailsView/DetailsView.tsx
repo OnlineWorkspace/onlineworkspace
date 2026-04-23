@@ -1,14 +1,17 @@
 import UKIcon from "@onlineworkspace/uikit-solid/src/components/icon/UKIcon.tsx";
 import UKText from "@onlineworkspace/uikit-solid/src/components/text/UKText.tsx";
 import browserPath from "path-browserify";
-import { type Component, For, useContext } from "solid-js";
-import { AppContext } from "../../../../appContext.ts";
+import {type Component, For, useContext} from "solid-js";
+import {AppContext} from "../../../../appContext.ts";
 import iconForItemType from "../../iconForItemType.ts";
 import onItemClick from "../../itemSelection.ts";
 import styles from "./DetailsView.module.scss";
-import type { DOMElement } from "solid-js/jsx-runtime";
+import type {DOMElement} from "solid-js/jsx-runtime";
+import {useSearchParams} from "@solidjs/router";
+import humanReadableSize from "../../../../lib/humanReadableSize.ts";
 
 const DetailsView: Component = () => {
+  const [ _, setSearchParams ] = useSearchParams();
   const appContext = useContext(AppContext);
 
   return (
@@ -48,11 +51,11 @@ const DetailsView: Component = () => {
                     data-fs-item-path={item.path}
                     class={styles.item}
                     onClick={(e) =>
-                      onItemClick(e as unknown as MouseEvent & { currentTarget: HTMLButtonElement; target: DOMElement }, appContext!, index(), item)
+                      onItemClick(e as unknown as MouseEvent & {currentTarget: HTMLButtonElement; target: DOMElement}, appContext!, index(), item, setSearchParams)
                     }
                     data-selected={appContext?.viewState.selectedItems.includes(item.path)}
                   >
-                    <td>{item.thumbnail !== undefined ? <>thumbnail time</> : <UKIcon class={styles.itemIcon}>{iconForItemType(item.type)}</UKIcon>}</td>
+                    <td>{item.thumbnail !== undefined ? <img class={styles.itemThumbnail} alt="" src={item.thumbnail} loading="lazy" /> : <UKIcon class={styles.itemIcon}>{iconForItemType(item.type)}</UKIcon>}</td>
                     <td>
                       <UKText size="m" role="body">
                         {browserPath.basename(item.path)}
@@ -70,7 +73,7 @@ const DetailsView: Component = () => {
                     </td>
                     <td>
                       <UKText size="m" role="body">
-                        100 Bytes
+                        {humanReadableSize(item.size || 0)}
                       </UKText>
                     </td>
                   </tr>

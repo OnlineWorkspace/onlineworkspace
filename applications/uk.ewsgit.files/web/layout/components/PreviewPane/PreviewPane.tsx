@@ -3,10 +3,11 @@ import UKIcon from "@onlineworkspace/uikit-solid/src/components/icon/UKIcon.tsx"
 import UKText from "@onlineworkspace/uikit-solid/src/components/text/UKText.tsx";
 import useIsMobile from "@onlineworkspace/uikit-solid/src/core/useIsMobile.ts";
 import browserPath from "path-browserify";
-import { type Component, useContext } from "solid-js";
-import { AppContext } from "../../../appContext.ts";
+import {type Component, useContext} from "solid-js";
+import {AppContext} from "../../../appContext.ts";
 import iconForItemType from "../../../pages/dir/iconForItemType.ts";
 import styles from "./PreviewPane.module.scss";
+import humanReadableSize from "../../../lib/humanReadableSize.ts";
 
 const PreviewPane: Component = () => {
   const isMobile = useIsMobile();
@@ -26,18 +27,24 @@ const PreviewPane: Component = () => {
               <UKText class={styles.previewItemName} role="body" size="l" align={"center"}>
                 {appContext!.viewState.selectedItems.length} items
               </UKText>
+              <UKText class={styles.previewItemName} role="body" size="s" align={"center"}>
+                ({humanReadableSize(appContext.viewState.viewItems.filter(i => appContext.viewState.selectedItems.includes(i.path)).map(i => i?.size || 0).reduce((accumulator, currentValue) => accumulator + currentValue, 0))})
+              </UKText>
             </>
           ) : (
             <>
               <UKIcon class={styles.previewIcon}>
                 {iconForItemType(
                   appContext?.viewState.viewItems.find((item) => {
-                    return item.path === appContext!.viewState.selectedItems[0];
+                    return item.path === appContext!.viewState.selectedItems[ 0 ];
                   })?.type || "file",
                 )}
               </UKIcon>
               <UKText class={styles.previewItemName} role="body" size="l" align={"center"}>
-                {browserPath.basename(appContext!.viewState.selectedItems[0])}
+                {browserPath.basename(appContext!.viewState.selectedItems[ 0 ])}
+              </UKText>
+              <UKText class={styles.previewItemName} role="body" size="s" align={"center"}>
+                ({humanReadableSize(appContext.viewState.viewItems.find(i => i.path === appContext.viewState.selectedItems[ 0 ])?.size || 0)})
               </UKText>
             </>
           )}
