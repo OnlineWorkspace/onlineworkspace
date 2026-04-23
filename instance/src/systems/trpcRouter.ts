@@ -1,16 +1,16 @@
 import * as nodeCrypto from "node:crypto";
-import { on } from "node:events";
-import { initTRPC, TRPCError } from "@trpc/server";
-import type { FetchCreateContextFnOptions } from "@trpc/server/adapters/fetch";
-import type { Server } from "bun";
-import { encode as hiBase32Encode } from "hi-base32";
+import {on} from "node:events";
+import {initTRPC, TRPCError} from "@trpc/server";
+import type {FetchCreateContextFnOptions} from "@trpc/server/adapters/fetch";
+import type {Server} from "bun";
+import {encode as hiBase32Encode} from "hi-base32";
 import * as OTPAuth from "otpauth";
 import z from "zod";
-import type { Instance } from "../index.js";
-import { AuthorizedDeviceType } from "./authorization.js";
-import { WorkspacesFeatureFlags } from "./configuration.js";
-import { type WorkspacesNotification, WorkspacesNotificationEventEmitterEvent } from "./notifications.js";
-import type { WorkspacesUser } from "./users.js";
+import type {Instance} from "../index.js";
+import {AuthorizedDeviceType} from "./authorization.js";
+import {WorkspacesFeatureFlags} from "./configuration.js";
+import {type WorkspacesNotification, WorkspacesNotificationEventEmitterEvent} from "./notifications.js";
+import type {WorkspacesUser} from "./users.js";
 
 export const createTRPCContext = (instance: Instance) => (opt: FetchCreateContextFnOptions, server: Server<object>) => {
   return {
@@ -67,7 +67,7 @@ export const procedure = t.procedure.use(async (opt) => {
   const userId = await opt.ctx.instance.sys.authorization.verifySession(decodeURIComponent(parsedCookie.value));
 
   if (userId === undefined) {
-    throw new TRPCError({ code: "UNAUTHORIZED", message: "invalid session" });
+    throw new TRPCError({code: "UNAUTHORIZED", message: "invalid session"});
   }
 
   return opt.next({
@@ -83,7 +83,7 @@ export const adminProcedure = procedure.use(async (opt) => {
   const user = await opt.ctx.instance.sys.users.getUserById(opt.ctx.userId);
 
   if (!user) {
-    throw new TRPCError({ code: "UNAUTHORIZED", message: "invalid session" });
+    throw new TRPCError({code: "UNAUTHORIZED", message: "invalid session"});
   }
 
   if (!(await user.isAdministrator())) {
@@ -122,7 +122,7 @@ export const workspacesRouter = t.router({
         return opt.ctx.instance.sys.configuration.signupRequirements;
       }),
     checkEmailAddressOwnership: publicProcedure
-      .input(z.object({ emailAddress: z.string() }))
+      .input(z.object({emailAddress: z.string()}))
       .output(z.boolean().or(z.string()))
       .mutation(async (opt) => {
         if (emailSignupVerificationCodes.has(opt.input.emailAddress)) {
@@ -132,7 +132,7 @@ export const workspacesRouter = t.router({
         let emailCode = "";
         const CODE_LENGTH = 8;
         const CODE_VALID_CHARS = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        for (let i = CODE_LENGTH; i > 0; --i) emailCode += CODE_VALID_CHARS[Math.floor(Math.random() * CODE_VALID_CHARS.length)];
+        for (let i = CODE_LENGTH; i > 0; --i) emailCode += CODE_VALID_CHARS[ Math.floor(Math.random() * CODE_VALID_CHARS.length) ];
 
         emailSignupVerificationCodes.set(opt.input.emailAddress, emailCode);
         // TODO: send an email...
@@ -140,7 +140,7 @@ export const workspacesRouter = t.router({
 
         return true;
       }),
-    validateEmailCode: publicProcedure.input(z.object({ emailAddress: z.string(), emailCode: z.string() })).query(async (opt) => {
+    validateEmailCode: publicProcedure.input(z.object({emailAddress: z.string(), emailCode: z.string()})).query(async (opt) => {
       if (emailSignupVerificationCodes.get(opt.input.emailAddress) === opt.input.emailCode) {
         return true;
       }
@@ -180,7 +180,7 @@ export const workspacesRouter = t.router({
       )
       .output(
         z.union([
-          z.object({ type: z.literal("error"), message: z.string() }),
+          z.object({type: z.literal("error"), message: z.string()}),
           z.object({
             type: z.literal("success"),
             sessionToken: z.string(),
@@ -229,7 +229,7 @@ export const workspacesRouter = t.router({
           };
 
         const splitDisplayName = opt.input.displayName.split(" ");
-        await user.setFullName(splitDisplayName[0], splitDisplayName.slice(1).join(" "));
+        await user.setFullName(splitDisplayName[ 0 ], splitDisplayName.slice(1).join(" "));
 
         if ("emailAddress" in opt.input) {
           await user.setEmail(opt.input.emailAddress);
@@ -247,7 +247,7 @@ export const workspacesRouter = t.router({
           opt.input.password,
           AuthorizedDeviceType.UnknownBrowser,
           undefined,
-          opt.ctx.rawRequest.req.headers.get("X-Real-IP")?.split(":")?.[0] || "missing-caddy-ip",
+          opt.ctx.rawRequest.req.headers.get("X-Real-IP")?.split(":")?.[ 0 ] || "missing-caddy-ip",
         );
 
         if (session === undefined) {
@@ -261,6 +261,7 @@ export const workspacesRouter = t.router({
           "set-cookie",
           Bun.Cookie.from("Authorization", session, {
             secure: false,
+            expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 14).toUTCString()
           }).serialize(),
         );
 
@@ -269,7 +270,7 @@ export const workspacesRouter = t.router({
           sessionToken: session,
         };
       }),
-    confirmTwoFactor: procedure.input(z.object({ twoFactorCode: z.string() })).mutation(async (opt) => {
+    confirmTwoFactor: procedure.input(z.object({twoFactorCode: z.string()})).mutation(async (opt) => {
       const user = await opt.ctx.user();
       const secretString = temporaryTwoFactorSecrets.get(user.userId);
 
@@ -282,14 +283,14 @@ export const workspacesRouter = t.router({
       }
 
       const totp = new OTPAuth.TOTP({
-        issuer: opt.ctx.instance.sys.configuration.webUrl[0],
+        issuer: opt.ctx.instance.sys.configuration.webUrl[ 0 ],
         label: `${opt.ctx.instance.sys.configuration.displayName} (Workspace)`,
         algorithm: "SHA1",
         digits: 6,
         secret: secretString,
       });
 
-      if (totp.validate({ token: opt.input.twoFactorCode }) !== null) {
+      if (totp.validate({token: opt.input.twoFactorCode}) !== null) {
         temporaryTwoFactorSecrets.delete(user.userId);
         await opt.ctx.instance.sys.authorization.setTwoFactorAuthenticationSecret(user.userId, secretString);
         opt.ctx.instance.log.system.success(`(${user.userId})${await user.getUsername()} Setup two-factor authentication on their account!`);
@@ -333,7 +334,7 @@ export const workspacesRouter = t.router({
         }
 
         const totp = new OTPAuth.TOTP({
-          issuer: opt.ctx.instance.sys.configuration.webUrl[0],
+          issuer: opt.ctx.instance.sys.configuration.webUrl[ 0 ],
           label: `${opt.ctx.instance.sys.configuration.displayName} (Workspace)`,
           algorithm: "SHA1",
           digits: 6,
@@ -357,9 +358,9 @@ export const workspacesRouter = t.router({
       )
       .output(
         z.union([
-          z.object({ type: z.literal("error"), message: z.string() }),
-          z.object({ type: z.literal("success"), sessionToken: z.string() }),
-          z.object({ type: z.literal("twofactor") }),
+          z.object({type: z.literal("error"), message: z.string()}),
+          z.object({type: z.literal("success"), sessionToken: z.string()}),
+          z.object({type: z.literal("twofactor")}),
         ]),
       )
       .mutation(async (opt) => {
@@ -384,7 +385,7 @@ export const workspacesRouter = t.router({
           opt.input.password,
           AuthorizedDeviceType.UnknownBrowser,
           opt.input.twoFactorCode,
-          opt.ctx.rawRequest.req.headers.get("X-Real-IP")?.split(":")?.[0] || "missing-caddy-ip",
+          opt.ctx.rawRequest.req.headers.get("X-Real-IP")?.split(":")?.[ 0 ] || "missing-caddy-ip",
         );
 
         if (session === undefined) {
@@ -398,6 +399,7 @@ export const workspacesRouter = t.router({
           "set-cookie",
           Bun.Cookie.from("Authorization", session, {
             secure: false,
+            expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 14).toUTCString()
           }).serialize(),
         );
 
@@ -442,7 +444,7 @@ export const workspacesRouter = t.router({
           user.userId,
           AuthorizedDeviceType.UnknownBrowser,
           opt.input.passkeyResponse,
-          opt.ctx.rawRequest.req.headers.get("X-Real-IP")?.split(":")?.[0] || "missing-caddy-ip",
+          opt.ctx.rawRequest.req.headers.get("X-Real-IP")?.split(":")?.[ 0 ] || "missing-caddy-ip",
         );
 
         if (session === undefined) {
@@ -456,6 +458,7 @@ export const workspacesRouter = t.router({
           "set-cookie",
           Bun.Cookie.from("Authorization", session, {
             secure: false,
+            expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 14).toUTCString()
           }).serialize(),
         );
 
@@ -464,7 +467,7 @@ export const workspacesRouter = t.router({
           sessionToken: session,
         };
       }),
-    isAuthenticated: publicProcedure.output(z.object({ authenticated: z.boolean() })).query(async (opt) => {
+    isAuthenticated: publicProcedure.output(z.object({authenticated: z.boolean()})).query(async (opt) => {
       const cookieString = opt.ctx.rawRequest.req.headers?.get("cookie");
 
       if (cookieString === null) {
@@ -487,7 +490,7 @@ export const workspacesRouter = t.router({
         authenticated: true,
       };
     }),
-    logout: procedure.output(z.object({ success: z.literal(true) })).mutation(async (opt) => {
+    logout: procedure.output(z.object({success: z.literal(true)})).mutation(async (opt) => {
       const cookieString = opt.ctx.rawRequest.req.headers?.get("cookie");
 
       if (cookieString === null) {
@@ -529,7 +532,7 @@ export const workspacesRouter = t.router({
     };
 
     const day: number = date.getDate();
-    const formattedDate: string = `${day}${getOrdinalSuffix(day)} ${localeDateString.split(" ")[1]}, ${localeDateString.split(" ")[2]}`;
+    const formattedDate: string = `${day}${getOrdinalSuffix(day)} ${localeDateString.split(" ")[ 1 ]}, ${localeDateString.split(" ")[ 2 ]}`;
 
     return `Terms of Use: ${opt.ctx.instance.sys.configuration.displayName}
 Effective Date: ${formattedDate}
@@ -550,12 +553,12 @@ ${opt.ctx.instance.sys.configuration.termsOfUse.message}`;
           .query(async (opt) => {
             const db = opt.ctx.instance.sys.database.postgres();
 
-            const user = (await db`SELECT username, forename, surname FROM users WHERE id = ${opt.ctx.userId};`)?.[0];
+            const user = (await db`SELECT username, forename, surname FROM users WHERE id = ${opt.ctx.userId};`)?.[ 0 ];
 
             if (!user) {
               throw new TRPCError({
                 code: "NOT_FOUND",
-                cause: { message: "User does not exist" },
+                cause: {message: "User does not exist"},
               });
             }
 
@@ -571,11 +574,11 @@ ${opt.ctx.instance.sys.configuration.termsOfUse.message}`;
           z.array(
             z.object({
               location: z.object({
-                type: z.union([z.literal("local"), z.literal("remote")]),
+                type: z.union([ z.literal("local"), z.literal("remote") ]),
                 value: z.string(),
               }),
               icon: z.object({
-                type: z.union([z.literal("icon"), z.literal("image")]),
+                type: z.union([ z.literal("icon"), z.literal("image") ]),
                 value: z.string(),
               }),
               label: z.string(),
@@ -618,7 +621,7 @@ ${opt.ctx.instance.sys.configuration.termsOfUse.message}`;
           });
         }),
       getQuickShortcuts: procedure.query(async (opt) => {
-        const a = opt.ctx.instance.sys.settings.applicationSettings["core"].find((s) => s.id === "quick_shortcuts");
+        const a = opt.ctx.instance.sys.settings.applicationSettings[ "core" ].find((s) => s.id === "quick_shortcuts");
 
         if (!a) throw "The core:quick_shortcuts setting is somehow missing???";
 
@@ -669,7 +672,7 @@ ${opt.ctx.instance.sys.configuration.termsOfUse.message}`;
       listener: procedure
         // @ts-ignore
         .subscription(async function* (opt) {
-          for await (const [data] of on(opt.ctx.instance.sys.notifications.eventEmitter, WorkspacesNotificationEventEmitterEvent.SendNotification, {
+          for await (const [ data ] of on(opt.ctx.instance.sys.notifications.eventEmitter, WorkspacesNotificationEventEmitterEvent.SendNotification, {
             signal: opt.signal,
           })) {
             const notification = data as WorkspacesNotification;
@@ -692,8 +695,8 @@ ${opt.ctx.instance.sys.configuration.termsOfUse.message}`;
           z.object({
             ok: z.boolean(),
             action: z
-              .object({ type: z.literal("navigate"), value: z.string() })
-              .or(z.object({ type: z.literal("reload") }))
+              .object({type: z.literal("navigate"), value: z.string()})
+              .or(z.object({type: z.literal("reload")}))
               .optional(),
           }),
         )
@@ -723,7 +726,7 @@ ${opt.ctx.instance.sys.configuration.termsOfUse.message}`;
           //   }
           // }
 
-          return { ok: false };
+          return {ok: false};
         }),
     },
   },
@@ -734,7 +737,7 @@ ${opt.ctx.instance.sys.configuration.termsOfUse.message}`;
       // biome-ignore lint/suspicious/noExplicitAny: unrequired
       const themeValues = (await db`SELECT color_scheme FROM public.users WHERE id = ${opt.ctx.userId}`) as any;
 
-      return themeValues?.[0]?.color_scheme || false;
+      return themeValues?.[ 0 ]?.color_scheme || false;
     }),
   },
 });

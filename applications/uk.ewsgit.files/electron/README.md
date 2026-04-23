@@ -1,1 +1,1 @@
-# uk.ewsgit.Files Electron App Build Support
+# uk.ewsgit.Files Desktop App Build Support

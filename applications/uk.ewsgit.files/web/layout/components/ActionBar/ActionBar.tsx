@@ -1,3 +1,6 @@
+import CLOSE_ICON from "@material-symbols/svg-700/outlined/close.svg";
+import MINIMIZE_ICON from "@material-symbols/svg-700/outlined/minimize.svg"
+import CROP_SQUARE_ICON from "@material-symbols/svg-700/outlined/crop_square.svg"
 import ADD_ICON from "@material-symbols/svg-700/outlined/add.svg";
 import ARROW_UPWARD_ICON from "@material-symbols/svg-700/outlined/arrow_upward.svg";
 import ART_TRACK_ICON from "@material-symbols/svg-700/outlined/art_track.svg";
@@ -12,19 +15,19 @@ import UKCard from "@onlineworkspace/uikit-solid/src/components/card/UKCard.tsx"
 import UKIconButton from "@onlineworkspace/uikit-solid/src/components/iconButton/UKIconButton.tsx";
 import UKText from "@onlineworkspace/uikit-solid/src/components/text/UKText.jsx";
 import useIsMobile from "@onlineworkspace/uikit-solid/src/core/useIsMobile.ts";
-import { useSearchParams } from "@solidjs/router";
+import {useSearchParams} from "@solidjs/router";
 import browserPath from "path-browserify";
-import { type Component, createSignal, Show, useContext } from "solid-js";
-import { AppContext } from "../../../appContext.ts";
-import type { ViewItem } from "../../../pages/dir/viewItem.ts";
+import {type Component, createSignal, Show, useContext} from "solid-js";
+import {AppContext} from "../../../appContext.ts";
+import type {ViewItem} from "../../../pages/dir/viewItem.ts";
 import styles from "./ActionBar.module.scss";
 
 const ActionBar: Component = () => {
   const isMobile = useIsMobile();
   const appContext = useContext(AppContext);
-  const [searchParams, setSearchParams] = useSearchParams<{ path: string }>();
-  const [pathQuery, setPathQuery] = createSignal<string | undefined>(undefined);
-  const [showTextualPath, setShowTextualPath] = createSignal<boolean>(false);
+  const [ searchParams, setSearchParams ] = useSearchParams<{path: string}>();
+  const [ pathQuery, setPathQuery ] = createSignal<string | undefined>(undefined);
+  const [ showTextualPath, setShowTextualPath ] = createSignal<boolean>(false);
 
   return (
     <div class={styles.root}>
@@ -70,7 +73,7 @@ const ActionBar: Component = () => {
             }}
             onClick={() => setShowTextualPath(true)}
             data-visible={showTextualPath()}
-            onChange={(e) => setSearchParams({ path: e.currentTarget.value })}
+            onChange={(e) => setSearchParams({path: e.currentTarget.value})}
           />
           <UKCard class={styles.pathSuggestions}>
             {pathQuery()}
@@ -113,14 +116,16 @@ const ActionBar: Component = () => {
             onClick={() => appContext?.setUserPreferences("viewType", "gallery")}
           />
         )}
-        <UKIconButton
-          icon={UPLOAD_ICON}
-          color={"filled"}
-          alt={"Upload File"}
-          onClick={() => {
-            console.log("Does nothing");
-          }}
-        />
+        {!appContext?.isDesktopApp && (
+          <UKIconButton
+            icon={UPLOAD_ICON}
+            color={"filled"}
+            alt={"Upload File"}
+            onClick={() => {
+              console.log("Does nothing");
+            }}
+          />
+        )}
         <UKIconButton
           icon={ADD_ICON}
           color={"filled"}
@@ -129,7 +134,7 @@ const ActionBar: Component = () => {
             for (let i = 0; i < 10; i++) {
               appContext?.setViewState("viewItems", [
                 ...appContext.viewState.viewItems,
-                { type: "file", path: `/randomNewItem${Math.round(Math.random() * 100000000)}` },
+                {type: "file", path: `/randomNewItem${Math.round(Math.random() * 100000000)}`},
               ] as ViewItem[]);
             }
           }}
@@ -143,6 +148,41 @@ const ActionBar: Component = () => {
               appContext?.setUserPreferences("showPreview", !appContext?.userPreferences.showPreview);
             }}
           />
+        )}
+        {appContext?.isDesktopApp && (
+          <>
+            <UKIconButton
+              icon={MINIMIZE_ICON}
+              color={"standard"}
+              size="s"
+              shape="square"
+              alt={"minimize window"}
+              onClick={() => {
+                window.close()
+              }}
+            />
+            <UKIconButton
+              icon={CROP_SQUARE_ICON}
+              color={"standard"}
+              size="s"
+              shape="square"
+              alt={"maximize window"}
+              onClick={() => {
+                window.close()
+              }}
+            />
+            <UKIconButton
+              icon={CLOSE_ICON}
+              color={"standard"}
+              size="s"
+              shape="square"
+              alt={"close window"}
+              class={styles.closeWindowIcon}
+              onClick={() => {
+                window.close()
+              }}
+            />
+          </>
         )}
       </div>
     </div>

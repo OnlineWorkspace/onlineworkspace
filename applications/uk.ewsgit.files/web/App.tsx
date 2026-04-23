@@ -34,6 +34,7 @@ interface AppContextType {
   viewState: Store<ViewState>;
   setViewState: SetStoreFunction<ViewState>;
   deletedItemCount: number;
+  isDesktopApp: boolean;
 }
 
 export type { AppContextType };
@@ -76,6 +77,7 @@ const App: Component = () => {
               viewState: viewState,
               setViewState: setViewState,
               deletedItemCount: 24,
+              isDesktopApp: localStorage.getItem("onlineworkspace_workspace_desktop_app") === "true"
             }}
           >
             {props.children}

@@ -4,11 +4,13 @@
   display: flex;
   gap: 0.5rem;
   padding: 0.5rem;
+  -webkit-app-region: drag;
 }
 
 .actionButtons {
   display: flex;
   gap: 0.5rem;
+  -webkit-app-region: no-drag;
 }
 
 .pathSelector {
@@ -34,6 +36,7 @@
   pointer-events: none;
   opacity: 0;
   visibility: hidden;
+  -webkit-app-region: no-drag;
 }
 
 .pathInput {
@@ -42,8 +45,15 @@
   top: 0;
   height: 100%;
   opacity: 0.5;
+  -webkit-app-region: no-drag;
 
   &[data-visible="true"] {
     z-index: 2;
+  }
+}
+
+.closeWindowIcon {
+  &:hover {
+    background-color: #cc4444;
   }
 }

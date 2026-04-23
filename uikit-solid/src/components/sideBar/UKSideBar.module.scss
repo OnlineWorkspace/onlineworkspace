@@ -45,6 +45,7 @@
   padding-top: 1rem;
   padding-bottom: 1rem;
   background-color: rgb(var(--uk-sys-color-surface-container-low));
+  -webkit-app-region: drag;
 
   .button {
     height: 3.5rem;
@@ -65,6 +66,7 @@
     outline-offset: 0;
     outline-width: 0;
     outline-color: transparent;
+    -webkit-app-region: no-drag;
 
     &::after {
       content: "";
