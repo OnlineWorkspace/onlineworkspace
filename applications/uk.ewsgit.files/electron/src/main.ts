@@ -1,6 +1,7 @@
 import path from "node:path";
 import { app, BrowserWindow, ipcMain, session } from "electron";
 import { promises as fs } from "node:fs";
+import sharp from "sharp";
 
 async function createWindow() {
   const window = new BrowserWindow({
@@ -88,6 +89,19 @@ app.whenReady().then(async () => {
     try {
       const itemStats = await fs.lstat(resolvedPath);
 
+      let thumbnail: Buffer | undefined = undefined;
+
+      if (getFileType(p) === "image") {
+        thumbnail = await new Promise<Buffer>((resolve) => {
+          sharp(resolvedPath)
+            .toFormat("webp")
+            .resize(thumbnailSize)
+            .toBuffer((_, buffer) => {
+              resolve(buffer);
+            });
+        });
+      }
+
       return {
         status: "ok",
         data: {
@@ -96,10 +110,7 @@ app.whenReady().then(async () => {
           // TODO: implement sharing first
           shared: false,
           size: itemStats.size,
-          thumbnail:
-            getFileType(p) === "image"
-              ? `data:image/${path.extname(resolvedPath)};base64,${await fs.readFile(resolvedPath, { encoding: "base64" })}`
-              : undefined,
+          thumbnail: thumbnail ? `data:image/${path.extname(resolvedPath)};base64,${thumbnail}` : undefined,
         },
       };
     } catch (_) {

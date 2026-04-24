@@ -23,5 +23,8 @@
     "package": "electron-forge package",
     "make": "tsc && electron-forge make",
     "publish": "electron-forge publish"
+  },
+  "dependencies": {
+    "sharp": "^0.34.5"
   }
 }

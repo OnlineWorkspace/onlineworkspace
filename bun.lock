@@ -128,6 +128,9 @@
     "applications/uk.ewsgit.files/electron": {
       "name": "uk-ewsgit-files-electron",
       "version": "0.0.1",
+      "dependencies": {
+        "sharp": "^0.34.5",
+      },
       "devDependencies": {
         "@electron-forge/cli": "^7.11.1",
         "@electron-forge/maker-deb": "^7.11.1",
