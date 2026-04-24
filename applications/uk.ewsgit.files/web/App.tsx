@@ -1,5 +1,5 @@
 import {Route} from "@solidjs/router";
-import {type Accessor, type Component, createSignal, lazy, onMount} from "solid-js";
+import {type Accessor, type Component, createSignal, lazy, onMount, type Setter} from "solid-js";
 import {createStore, type SetStoreFunction, type Store} from "solid-js/store";
 import {AppContext} from "./appContext.ts";
 import ActionBar from "./layout/components/ActionBar/ActionBar.tsx";
@@ -24,6 +24,7 @@ interface ViewState {
   viewItems: ViewItem[];
   selectedItems: string[];
   lastSelectionTime: number;
+  viewId: number;
 }
 
 interface AppContextType {
@@ -35,9 +36,23 @@ interface AppContextType {
   setViewState: SetStoreFunction<ViewState>;
   deletedItemCount: number;
   isDesktopApp: boolean;
+  tasks: Accessor<Task[]>;
+  setTasks: Setter<Task[]>;
 }
 
-export type {AppContextType};
+interface Task {
+  parent: `view${number}` | string,
+  max: number,
+  current: number,
+  // replaces %m with max and %c with current
+  message: string,
+  id: string,
+
+  // Internal use only
+  invalid?: boolean
+}
+
+export type {AppContextType, Task};
 
 const App: Component = () => {
   const [ hasLoaded, setHasLoaded ] = createSignal<boolean>(false);
@@ -46,13 +61,15 @@ const App: Component = () => {
     homePath: "remote:/users/1/fs/",
     pinnedDirectories: [ "~/home" ],
     viewType: "details",
-    showPreview: true,
+    showPreview: false,
   });
   const [ viewState, setViewState ] = createStore<AppContextType[ "viewState" ]>({
     viewItems: [],
     selectedItems: [],
     lastSelectionTime: -1,
+    viewId: 0
   });
+  const [ taskStatus, setTaskStatus ] = createSignal<Task[]>([])
 
   onMount(async () => {
     const userServerPreferences = await trpc.userPreferences.get.query();
@@ -77,7 +94,9 @@ const App: Component = () => {
               viewState: viewState,
               setViewState: setViewState,
               deletedItemCount: 24,
-              isDesktopApp: localStorage.getItem("onlineworkspace_workspace_desktop_app") === "true"
+              isDesktopApp: localStorage.getItem("onlineworkspace_workspace_desktop_app") === "true",
+              tasks: taskStatus,
+              setTasks: setTaskStatus
             }}
           >
             {props.children}

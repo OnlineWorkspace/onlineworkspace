@@ -15,3 +15,19 @@
 .margin {
   margin-right: auto;
 }
+
+.taskStatus {
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
+  align-items: center;
+  text-wrap: nowrap;
+  flex-shrink: 0;
+  width: max-content;
+  opacity: 0;
+  transition: opacity 200ms var(--uk-sys-motion-easing-standard-accelerate);
+
+  &.visible {
+    opacity: 1;
+  }
+}

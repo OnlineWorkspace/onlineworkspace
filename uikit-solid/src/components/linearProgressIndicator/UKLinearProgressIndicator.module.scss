@@ -4,7 +4,8 @@
 
   display: flex;
   flex-direction: row;
-  width: 100%;
+  max-width: 100%;
+  min-width: 10rem;
   border-radius: 100rem;
   height: var(--track-height);
 }

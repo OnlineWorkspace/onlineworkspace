@@ -7,6 +7,7 @@ import { initTRPC } from "@trpc/server";
 import { octetInputParser } from "@trpc/server/http";
 import { randomUUIDv7 } from "bun";
 import z from "zod";
+import fastFolderSize from "fast-folder-size/sync.js";
 
 const log = instance.log.createLogger("uk.ewsgit.files");
 
@@ -384,9 +385,16 @@ const router = t.router({
       }
 
       try {
-        const directoryContents = await fs.readdir(resolvedPath);
+        const directoryContents = await fs.readdir(resolvedPath, { withFileTypes: true });
 
-        return { items: directoryContents, status: "ok" };
+        directoryContents.sort((a, b) => {
+          if (a.isDirectory() && !b.isDirectory()) return -1;
+          if (!a.isDirectory() && b.isDirectory()) return 1;
+
+          return a.name.localeCompare(b.name, undefined, { sensitivity: "base" });
+        });
+
+        return { items: directoryContents.map((ent) => ent.name), status: "ok" };
       } catch (_) {
         return { status: "invalid_path" };
       }
@@ -452,6 +460,16 @@ const router = t.router({
         }
       }),
   },
+  quota: procedure.output(z.object({ currentUsage: z.number(), maximum: z.number() })).query(async (opt) => {
+    const quotaMax = (await (await opt.ctx.user()).getQuota()) || 8000000000;
+
+    const resp = {
+      maximum: Number(quotaMax),
+      currentUsage: fastFolderSize((await opt.ctx.user()).getPath()) || -1,
+    };
+
+    return resp;
+  }),
 });
 
 export type TRPCRouter = typeof router;

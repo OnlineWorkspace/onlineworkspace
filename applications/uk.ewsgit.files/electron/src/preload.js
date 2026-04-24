@@ -1,15 +1,21 @@
-const { contextBridge, ipcRenderer } = require('electron/renderer')
+const { contextBridge, ipcRenderer } = require("electron/renderer");
 
-contextBridge.exposeInMainWorld('electronAPI', {
+contextBridge.exposeInMainWorld("electronAPI", {
   minimize_window: () => ipcRenderer.send("minimize_window"),
   maximize_window: () => ipcRenderer.send("maximize_window"),
-  close_window: () => ipcRenderer.send("close_window")
-})
+  close_window: () => ipcRenderer.send("close_window"),
+  fs: {
+    readdir: (path, options) => ipcRenderer.invoke("fs:readdir", [path, options]),
+  },
+  files: {
+    get_entry: (path, thumbnailSize) => ipcRenderer.invoke("files:get_entry", [path, thumbnailSize]),
+  },
+});
 
 localStorage.setItem("onlineworkspace_workspace_no_app_navigation_rail", "true");
 localStorage.setItem("onlineworkspace_workspace_desktop_app", "true");
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener("DOMContentLoaded", () => {
   const elem = document.createElement("style");
 
   elem.innerHTML = `:root { background-color: transparent !important; }`;
@@ -20,5 +26,3 @@ document.addEventListener('DOMContentLoaded', () => {
   document.body.style.overflow = "hidden";
   document.body.style.border = "1px solid #646464";
 });
-
-

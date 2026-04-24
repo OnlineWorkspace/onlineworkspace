@@ -44,10 +44,20 @@ class FilesystemInterface {
     }
 
     if (parsedUrl.type === "local") {
-      // Do some electron things
-      return { status: "missing_permission" as const };
+      // @ts-ignore
+      const readDirectoryResponse = await window.electronAPI.fs.readdir(parsedUrl.path);
+
+      if (readDirectoryResponse.status === "ok") {
+        return {
+          status: readDirectoryResponse.status,
+          items: readDirectoryResponse.items.map((newItem: string) => {
+            return `${parsedUrl.type}:${path.join(parsedUrl.path, newItem)}` as UniformResourceLocator;
+          }),
+        };
+      } else {
+        return { status: readDirectoryResponse.status };
+      }
     } else {
-      console.log(parsedUrl.path);
       const readDirectoryResponse = await trpc.readDirectory.query({ path: parsedUrl.path });
 
       if (readDirectoryResponse.status === "ok") {
@@ -71,8 +81,20 @@ class FilesystemInterface {
     }
 
     if (parsedUrl.type === "local") {
-      // Do some electron things
-      return { status: "missing_permission" as const };
+      // @ts-ignore
+      const getEntryResponse = await window.electronAPI.files.get_entry(parsedUrl.path, viewType === "details" ? 32 : 128);
+
+      if (getEntryResponse.status === "ok") {
+        return {
+          status: getEntryResponse.status,
+          data: {
+            ...getEntryResponse.data,
+            path: `${parsedUrl.type}:${getEntryResponse.data.path}`,
+          },
+        };
+      } else {
+        return { status: getEntryResponse.status };
+      }
     } else {
       const getEntryResponse = await trpc.view.getEntry.query({ path: parsedUrl.path, thumbnailSize: viewType === "details" ? 32 : 128 });
 
@@ -88,6 +110,14 @@ class FilesystemInterface {
         return { status: getEntryResponse.status };
       }
     }
+  }
+
+  async getQuota(location: "local" | "remote") {
+    if (location === "local") return { maximum: -1, currentUsage: -1 };
+
+    const quota = await trpc.quota.query();
+
+    return quota;
   }
 
   joinUrls(...urls: UniformResourceLocator[]) {
@@ -116,7 +146,7 @@ class FilesystemInterface {
     if (url.startsWith("local:")) {
       return {
         type: "local",
-        path: url.substring(7),
+        path: url.substring(6),
       };
     } else if (url.startsWith("remote:")) {
       return {

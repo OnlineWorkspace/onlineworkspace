@@ -139,7 +139,7 @@ export class WorkspacesUser {
   }
 
   /**
-    Sets the user's quota to the provided quota
+    Sets the user's quota to the provided quota in bits
     @returns `false` - failed to set the quota
     @returns `true` - successfully set the quota
   */
@@ -156,7 +156,7 @@ export class WorkspacesUser {
   }
 
   /**
-    Get the user's quota
+    Get the user's quota in bits
     @returns `number` - the users quota
     @returns `undefined` - could not get the user's quota
   */
@@ -488,7 +488,7 @@ export default class UsersSystem extends System {
       surname TEXT DEFAULT '',
       gender TEXT DEFAULT 'other',
       bio TEXT,
-      storage_quota BIGINT DEFAULT 10,
+      storage_quota BIGINT DEFAULT 8000000000,
       email TEXT,
       is_administrator BOOL DEFAULT FALSE,
       is_email_verified BOOL DEFAULT FALSE,

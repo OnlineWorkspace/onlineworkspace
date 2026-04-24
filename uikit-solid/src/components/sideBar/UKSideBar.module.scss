@@ -20,6 +20,7 @@
 
 .mobileToggleButton {
   width: max-content;
+  -webkit-app-region: no-drag;
 
   > div {
     rotate: 0deg;

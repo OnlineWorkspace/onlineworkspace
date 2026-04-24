@@ -67,6 +67,16 @@ const Layout: Component<ParentProps> = (props) => {
           label: string;
           onClick(): void;
         }[]),
+        {type: "divider"},
+        {type: "label", label: "Local"},
+        {
+          type: "button",
+          icon: {type: "icon", value: FOLDER_ICON},
+          label: "Local Root",
+          onClick() {
+            navigate(`/app/uk.ewsgit.files/dir?path=local:/`);
+          },
+        },
         {type: "margin"},
         {
           type: "button",

@@ -1,30 +1,14 @@
 import UKLinearProgressIndicator from "@onlineworkspace/uikit-solid/src/components/linearProgressIndicator/UKLinearProgressIndicator.tsx";
 import UKText from "@onlineworkspace/uikit-solid/src/components/text/UKText.tsx";
-import { type Component, createEffect, createSignal, onCleanup, onMount, useContext } from "solid-js";
-import { AppContext } from "../../../appContext.ts";
+import {type Component, createEffect, createSignal, onCleanup, onMount, useContext} from "solid-js";
+import {AppContext} from "../../../appContext.ts";
 import humanReadableSize from "../../../lib/humanReadableSize.ts";
 import styles from "./StatusBar.module.scss";
+import clsx from "clsx";
 
 const StatusBar: Component = () => {
   const appContext = useContext(AppContext);
-  const [statusProgression, setStatusProgression] = createSignal(0);
-  const [dirContents, setDirContents] = createSignal<string>("");
-
-  onMount(() => {
-    const interval = setInterval(() => {
-      setStatusProgression((u) => {
-        if (u + 10 > 100) {
-          return 0;
-        } else {
-          return u + 10;
-        }
-      });
-    }, 500);
-
-    onCleanup(() => {
-      clearInterval(interval);
-    });
-  });
+  const [ dirContents, setDirContents ] = createSignal<string>("");
 
   createEffect(() => {
     const viewItems = appContext?.viewState.viewItems;
@@ -62,8 +46,35 @@ const StatusBar: Component = () => {
       outputString += ` - Selected ${selectedItems.length} item${selectedItems.length !== 1 ? "s" : ""}`;
     }
 
+    if (outputString === "") {
+      outputString = "Empty directory"
+    }
+
     setDirContents(outputString);
   });
+
+  createEffect(() => {
+    for (const task of appContext?.tasks() || []) {
+      if (task.current === task.max) {
+        setTimeout(() => {
+          appContext?.setTasks(tasks => tasks.map(t => {
+            if (t.id === task.id) {
+              return {
+                ...t,
+                invalid: true
+              }
+            }
+
+            return t
+          }))
+
+          setTimeout(() => {
+            appContext?.setTasks(tasks => tasks.filter(t => t.id !== task.id))
+          }, 250)
+        }, 1000)
+      }
+    }
+  })
 
   return (
     <div class={styles.root}>
@@ -71,10 +82,12 @@ const StatusBar: Component = () => {
         {dirContents()}
       </UKText>
       <div class={styles.margin}></div>
-      <UKLinearProgressIndicator class={styles.progressBar} start={0} stop={100} value={statusProgression()} />
-      <UKText role={"label"} size={"m"}>
-        Status Message
-      </UKText>
+      <div class={clsx(styles.taskStatus, appContext!.tasks()[ 0 ] && !(appContext!.tasks()[ 0 ]?.invalid) && styles.visible)}>
+        <UKLinearProgressIndicator class={styles.progressBar} start={0} stop={appContext!.tasks()[ 0 ]?.max || 1} value={appContext!.tasks()[ 0 ]?.current || 0} />
+        <UKText role={"label"} size={"m"}>
+          {appContext!.tasks()[ 0 ]?.message.replaceAll("%c", appContext!.tasks()[ 0 ].current.toString()).replaceAll("%m", appContext!.tasks()[ 0 ].max.toString())}
+        </UKText>
+      </div>
     </div>
   );
 };

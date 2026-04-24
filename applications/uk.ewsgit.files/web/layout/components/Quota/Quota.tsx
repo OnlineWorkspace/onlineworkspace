@@ -1,32 +1,26 @@
 import UKLinearProgressIndicator from "@onlineworkspace/uikit-solid/src/components/linearProgressIndicator/UKLinearProgressIndicator.tsx";
 import UKText from "@onlineworkspace/uikit-solid/src/components/text/UKText.tsx";
-import { type Component, createSignal, onCleanup, onMount } from "solid-js";
+import {type Component, createSignal, onCleanup, onMount} from "solid-js";
 import styles from "./Quota.module.scss";
+import filesystemInterface from "../../../lib/filesystemInterface";
+import humanReadableSize from "../../../lib/humanReadableSize";
 
 const Quota: Component = () => {
-  const [used, setUsed] = createSignal(0);
+  const [ used, setUsed ] = createSignal(0);
+  const [ maxUsed, setMaxUsed ] = createSignal(0);
 
-  onMount(() => {
-    const interval = setInterval(() => {
-      setUsed((u) => {
-        if (u + 1 > 10) {
-          return 0;
-        } else {
-          return u + 1;
-        }
-      });
-    }, 500);
+  onMount(async () => {
+    const quota = await filesystemInterface.getQuota("remote")
 
-    onCleanup(() => {
-      clearInterval(interval);
-    });
+    setUsed(quota.currentUsage)
+    setMaxUsed(quota.maximum)
   });
 
   return (
     <div class={styles.root}>
-      <UKLinearProgressIndicator start={0} stop={10} value={used()} />
+      <UKLinearProgressIndicator start={0} stop={maxUsed()} value={used()} />
       <UKText role={"label"} size={"m"}>
-        {used()} of 10GB Used
+        {humanReadableSize(used())} of {humanReadableSize(maxUsed())} Used
       </UKText>
     </div>
   );
