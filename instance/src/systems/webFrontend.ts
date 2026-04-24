@@ -11,14 +11,6 @@ export default class WebFrontendSystem extends System {
   }
 
   async startup(): Promise<boolean> {
-    if (process.platform === "darwin") {
-      this.log.info(
-        "You will have to run the vite server separately as it breaks under MacOS, change into the `instance/src` directory and run `npx vite --config ./web/vite.config.ts ./web`",
-      );
-
-      return false;
-    }
-
     if (this.instance.sys.configuration.isDevMode) {
       this.viteServer = await createViteServer({
         configFile: path.join(this.instance.sys.filesystem.SRC_ROOT, "web/vite.config.ts"),
