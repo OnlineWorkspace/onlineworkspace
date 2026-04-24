@@ -23,6 +23,7 @@ const trpc = createTRPCClient<TRPCRouter>({
         }),
         false: httpBatchLink({
           url: ENDPOINT_URL,
+          maxURLLength: 512,
           fetch(input, init) {
             return fetch(input, { credentials: "include", ...init });
           },

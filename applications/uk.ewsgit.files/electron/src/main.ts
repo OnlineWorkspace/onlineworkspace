@@ -1,5 +1,5 @@
 import path from "node:path";
-import {app, BrowserWindow, session} from "electron";
+import { app, BrowserWindow, ipcMain, session } from "electron";
 
 async function createWindow() {
   const window = new BrowserWindow({
@@ -16,7 +16,7 @@ async function createWindow() {
     },
   });
 
-  if ((await session.defaultSession.cookies.get({url: "https://localhost"})).length === 0) {
+  if ((await session.defaultSession.cookies.get({ url: "https://localhost" })).length === 0) {
     window.loadURL("https://localhost/?redirect=/app/uk.ewsgit.files/");
   } else {
     window.loadURL("https://localhost/app/uk.ewsgit.files");
@@ -25,8 +25,12 @@ async function createWindow() {
   return window;
 }
 
-app.whenReady().then(() => {
-  createWindow();
+app.whenReady().then(async () => {
+  const window = await createWindow();
+
+  ipcMain.on("minimize_window", () => window.minimize());
+  ipcMain.on("maximize_window", () => (window.isMaximized() ? window.unmaximize() : window.maximize()));
+  ipcMain.on("close_window", () => window.close());
 
   app.on("activate", () => {
     if (BrowserWindow.getAllWindows().length === 0) {

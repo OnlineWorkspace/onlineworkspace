@@ -160,7 +160,8 @@ const ActionBar: Component = () => {
               alt={"minimize window"}
               class={styles.windowIcon}
               onClick={() => {
-                window.close()
+                // @ts-ignore
+                window.electronAPI.minimize_window();
               }}
             />
             <UKIconButton
@@ -171,7 +172,8 @@ const ActionBar: Component = () => {
               alt={"maximize window"}
               class={styles.windowIcon}
               onClick={() => {
-                window.close()
+                // @ts-ignore
+                window.electronAPI.maximize_window();
               }}
             />
             <UKIconButton
@@ -182,7 +184,8 @@ const ActionBar: Component = () => {
               alt={"close window"}
               class={clsx(styles.closeWindowIcon, styles.windowIcon)}
               onClick={() => {
-                window.close()
+                // @ts-ignore
+                window.electronAPI.close_window();
               }}
             />
           </>

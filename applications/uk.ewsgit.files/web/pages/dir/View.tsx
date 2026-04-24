@@ -36,11 +36,11 @@ const View: Component = () => {
       appContext?.setViewState("viewItems", []);
 
       for (const itemPath of newItems.items) {
-        const viewEntry = await filesystemInterface.getViewEntry(itemPath, appContext!.userPreferences.viewType === "details" ? "details" : "grid")
-
-        if (viewEntry.status === "ok") {
-          appContext?.setViewState("viewItems", [ ...appContext.viewState.viewItems, viewEntry.data ]);
-        }
+        filesystemInterface.getViewEntry(itemPath, appContext!.userPreferences.viewType === "details" ? "details" : "grid").then((viewEntry) => {
+          if (viewEntry.status === "ok") {
+            appContext?.setViewState("viewItems", [ ...appContext.viewState.viewItems, viewEntry.data ]);
+          }
+        })
       }
 
     }
