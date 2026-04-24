@@ -48,6 +48,10 @@
   background-color: rgb(var(--uk-sys-color-surface-container-low));
   -webkit-app-region: drag;
 
+  &.darwinTopMargin {
+    padding-top: 3rem;
+  }
+
   .button {
     height: 3.5rem;
     border: none;

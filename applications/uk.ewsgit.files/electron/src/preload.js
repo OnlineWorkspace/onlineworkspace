@@ -13,6 +13,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
 });
 
 localStorage.setItem("onlineworkspace_workspace_no_app_navigation_rail", "true");
+localStorage.setItem("onlineworkspace_workspace_desktop_platform", ipcRenderer.invoke("files:os_platform"));
 localStorage.setItem("onlineworkspace_workspace_desktop_app", "true");
 
 document.addEventListener("DOMContentLoaded", () => {

@@ -19,6 +19,7 @@ const Layout: Component<ParentProps> = (props) => {
   return (
     <UKSideBar
       className={styles.sidebar}
+      darwinAdditionalTopMargin={localStorage.getItem("onlineworkspace_workspace_desktop_platform") === "darwin"}
       items={[
         {
           type: "label",

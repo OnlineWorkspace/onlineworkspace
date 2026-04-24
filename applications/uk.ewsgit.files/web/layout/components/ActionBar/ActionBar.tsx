@@ -150,7 +150,7 @@ const ActionBar: Component = () => {
             }}
           />
         )}
-        {appContext?.isDesktopApp && (
+        {appContext?.isDesktopApp && (localStorage.getItem("onlineworkspace_workspace_desktop_platform") !== "darwin") && (
           <>
             <UKIconButton
               icon={MINIMIZE_ICON}

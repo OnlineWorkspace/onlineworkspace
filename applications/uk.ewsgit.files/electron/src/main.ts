@@ -120,6 +120,10 @@ app.whenReady().then(async () => {
     }
   });
 
+  ipcMain.handle("files:os_platform", () => {
+    return process.platform;
+  });
+
   app.on("activate", () => {
     if (BrowserWindow.getAllWindows().length === 0) {
       createWindow();

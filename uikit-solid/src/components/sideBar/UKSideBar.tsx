@@ -1,7 +1,7 @@
 import MENU_ICON from "@material-symbols/svg-700/outlined/menu.svg";
 import MENU_OPEN_ICON from "@material-symbols/svg-700/outlined/menu_open.svg";
 import clsx from "clsx";
-import { type Component, createSignal, Index, type ParentProps, Show } from "solid-js";
+import {type Component, createSignal, Index, type ParentProps, Show} from "solid-js";
 import useIsMobile from "../../core/useIsMobile.ts";
 import UKDivider from "../divider/UKDivider.tsx";
 import UKIcon from "../icon/UKIcon.tsx";
@@ -10,7 +10,7 @@ import styles from "./UKSideBar.module.scss";
 
 interface ButtonItem {
   type: "button";
-  icon: { type: "icon" | "image"; value: string };
+  icon: {type: "icon" | "image"; value: string};
   imageIcon?: string;
   label: string;
   onClick: () => void;
@@ -42,14 +42,15 @@ const UKSideBar: Component<
     items: (ButtonItem | LabelItem | DividerItem | MarginItem | ComponentItem | undefined)[];
     containerClassName?: string;
     className?: string;
+    darwinAdditionalTopMargin?: boolean;
   }>
 > = (props) => {
   const isMobile = useIsMobile();
-  const [isMobileToggled, setIsMobileToggled] = createSignal<boolean>(false);
+  const [ isMobileToggled, setIsMobileToggled ] = createSignal<boolean>(false);
 
   return (
     <div class={clsx(styles.root, props.containerClassName)} data-sidebar-mode-mobile-mode={isMobile()}>
-      <div class={clsx(styles.component, props.className)}>
+      <div class={clsx(styles.component, props.className, props.darwinAdditionalTopMargin && styles.darwinTopMargin)}>
         {isMobile() && (
           <UKIconButton
             class={clsx(styles.mobileToggleButton, isMobileToggled() && styles.isMobileToggled)}
