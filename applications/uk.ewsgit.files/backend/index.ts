@@ -461,7 +461,7 @@ const router = t.router({
       }),
   },
   quota: procedure.output(z.object({ currentUsage: z.number(), maximum: z.number() })).query(async (opt) => {
-    const quotaMax = (await (await opt.ctx.user()).getQuota()) || 8000000000;
+    const quotaMax = (await (await opt.ctx.user()).getQuota()) || 8589934592;
 
     const resp = {
       maximum: Number(quotaMax),
