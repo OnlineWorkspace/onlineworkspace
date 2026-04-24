@@ -110,7 +110,7 @@ app.whenReady().then(async () => {
           // TODO: implement sharing first
           shared: false,
           size: itemStats.size,
-          thumbnail: thumbnail ? `data:image/webp;base64,${thumbnail.toBase64()}` : undefined,
+          thumbnail: thumbnail ? `data:image/webp;base64,${thumbnail.toString("base64")}` : undefined,
         },
       };
     } catch (_) {
