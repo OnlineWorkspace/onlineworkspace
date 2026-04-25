@@ -20,22 +20,22 @@ const DetailsView: Component = () => {
       <thead>
         <tr class={styles.columns}>
           <th scope="col"></th>
-          <th scope="col">
+          <th scope="col" style={{"max-width": "48rem", "width": "100%"}}>
             <UKText role={"title"} size={"s"}>
               Name
             </UKText>
           </th>
-          <th scope="col">
+          <th scope="col" style={{"min-width": "8rem", "max-width": "12rem", "width": "100%"}}>
             <UKText role={"title"} size={"s"}>
               Modified
             </UKText>
           </th>
-          <th scope="col">
+          <th scope="col" style={{"min-width": "8rem", "max-width": "12rem", "width": "100%"}}>
             <UKText role={"title"} size={"s"}>
               Created
             </UKText>
           </th>
-          <th scope="col">
+          <th scope="col" style={{"min-width": "8rem", "max-width": "12rem", "width": "100%"}}>
             <UKText role={"title"} size={"s"}>
               Size
             </UKText>

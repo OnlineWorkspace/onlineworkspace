@@ -5,7 +5,6 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 1rem;
 }
 
 .contentContainer {
@@ -15,6 +14,10 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 1rem;
+  gap: 0.5rem;
   padding: 1rem;
+}
+
+.icon {
+  --icon-size: 6rem;
 }

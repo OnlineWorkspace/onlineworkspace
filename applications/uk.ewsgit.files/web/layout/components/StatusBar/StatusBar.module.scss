@@ -4,7 +4,8 @@
   flex-direction: row;
   gap: 0.5rem;
   align-items: center;
-  padding: 0.5rem;
+  padding: 0.25rem;
+  padding-left: 0.5rem;
   border-top: 1px solid rgb(var(--uk-sys-color-outline-variant));
 }
 
@@ -30,4 +31,10 @@
   &.visible {
     opacity: 1;
   }
+}
+
+.sizeControls {
+  display: flex;
+  flex-direction: row;
+  gap: 0.25rem;
 }

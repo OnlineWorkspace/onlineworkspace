@@ -126,33 +126,35 @@ const ActionBar: Component = () => {
           />
         )}
         {!appContext?.isDesktopApp && (
-          <UKIconButton
-            icon={UPLOAD_ICON}
-            color={"filled"}
-            alt={"Upload File"}
-            onClick={() => {
-              console.log("Does nothing");
-            }}
-          />
+          <>
+            <UKIconButton
+              icon={UPLOAD_ICON}
+              color={"filled"}
+              alt={"Upload File"}
+              onClick={() => {
+                console.log("Does nothing");
+              }}
+            />
+            <UKIconButton
+              icon={ADD_ICON}
+              color={"filled"}
+              alt={"Create File"}
+              onClick={() => {
+                for (let i = 0; i < 10; i++) {
+                  appContext?.setViewState("viewItems", [
+                    ...appContext.viewState.viewItems,
+                    {type: "file", path: `/randomNewItem${Math.round(Math.random() * 100000000)}`},
+                  ] as ViewItem[]);
+                }
+              }}
+            />
+          </>
         )}
-        <UKIconButton
-          icon={ADD_ICON}
-          color={"filled"}
-          alt={"Create File"}
-          onClick={() => {
-            for (let i = 0; i < 10; i++) {
-              appContext?.setViewState("viewItems", [
-                ...appContext.viewState.viewItems,
-                {type: "file", path: `/randomNewItem${Math.round(Math.random() * 100000000)}`},
-              ] as ViewItem[]);
-            }
-          }}
-        />
         {!isMobile() && (
           <UKIconButton
             icon={appContext?.userPreferences.showPreview ? RIGHT_PANEL_OPEN_ICON : RIGHT_PANEL_CLOSE_ICON}
             color={"filled"}
-            alt={"Create File"}
+            alt={"Toggle Preview"}
             onClick={() => {
               appContext?.setUserPreferences("showPreview", !appContext?.userPreferences.showPreview);
             }}

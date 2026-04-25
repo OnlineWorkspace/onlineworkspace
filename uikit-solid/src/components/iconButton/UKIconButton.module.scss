@@ -19,30 +19,20 @@
 
   transition:
     all var(--uk-sys-motion-duration-50) var(--transition-all, linear),
-    outline-color var(--uk-sys-motion-duration-100)
-      var(--uk-sys-motion-easing-standard-decelerate),
+    outline-color var(--uk-sys-motion-duration-100) var(--uk-sys-motion-easing-standard-decelerate),
     outline-width 0ms linear,
-    background-color var(--uk-sys-motion-duration-100)
-      var(--uk-sys-motion-easing-standard-normal),
-    color var(--uk-sys-motion-duration-100)
-      var(--uk-sys-motion-easing-standard-normal),
-    padding-left var(--uk-sys-motion-duration-50)
-      var(--uk-sys-motion-easing-linear),
-    margin-left var(--uk-sys-motion-duration-50)
-      var(--uk-sys-motion-easing-linear),
-    padding-right var(--uk-sys-motion-duration-50)
-      var(--uk-sys-motion-easing-linear),
-    margin-right var(--uk-sys-motion-duration-50)
-      var(--uk-sys-motion-easing-linear),
-    border-radius
-      var(--border-radius-duration, var(--uk-sys-motion-duration-50))
-      var(--uk-sys-motion-easing-linear);
+    background-color var(--uk-sys-motion-duration-100) var(--uk-sys-motion-easing-standard-normal),
+    color var(--uk-sys-motion-duration-100) var(--uk-sys-motion-easing-standard-normal),
+    padding-left var(--uk-sys-motion-duration-50) var(--uk-sys-motion-easing-linear),
+    margin-left var(--uk-sys-motion-duration-50) var(--uk-sys-motion-easing-linear),
+    padding-right var(--uk-sys-motion-duration-50) var(--uk-sys-motion-easing-linear),
+    margin-right var(--uk-sys-motion-duration-50) var(--uk-sys-motion-easing-linear),
+    border-radius var(--border-radius-duration, var(--uk-sys-motion-duration-50)) var(--uk-sys-motion-easing-linear);
 
   &::before {
     content: "";
     position: absolute;
-    transition: background-color var(--uk-sys-motion-duration-100)
-      var(--uk-sys-motion-easing-standard-normal);
+    transition: background-color var(--uk-sys-motion-duration-100) var(--uk-sys-motion-easing-standard-normal);
     background-color: transparent;
     top: 0;
     left: 0;
@@ -69,6 +59,48 @@
     background-color: rgb(var(--uk-sys-color-on-surface), 0.1);
     color: rgb(var(--uk-sys-color-on-surface), 0.38);
     cursor: not-allowed;
+  }
+
+  &[data-size="xxs"] {
+    height: 24px;
+    border-width: 1px;
+    --icon-size: 16px;
+    --outline-width: 1px;
+
+    &[data-width="narrow"] {
+      --padding-left: 2px;
+      --padding-right: 2px;
+    }
+
+    &[data-width="default"] {
+      --padding-left: 4px;
+      --padding-right: 4px;
+    }
+
+    &[data-width="wide"] {
+      --padding-left: 8px;
+      --padding-right: 8px;
+    }
+
+    &[data-shape="round"] {
+      border-radius: 24px;
+
+      &[data-selected="true"] {
+        border-radius: var(--uk-sys-shape-corner-medium);
+      }
+    }
+
+    &[data-shape="square"] {
+      border-radius: var(--uk-sys-shape-corner-medium);
+
+      &[data-selected="true"] {
+        border-radius: 24px;
+      }
+    }
+
+    &:active:not(:disabled) {
+      border-radius: var(--uk-sys-shape-corner-small) !important;
+    }
   }
 
   &[data-size="xs"] {
@@ -299,20 +331,14 @@
       color: rgb(var(--uk-sys-color-on-primary));
 
       &::before {
-        background-color: rgb(
-          var(--uk-sys-color-on-primary),
-          var(--uk-sys-state-focus-state-layer-opacity)
-        );
+        background-color: rgb(var(--uk-sys-color-on-primary), var(--uk-sys-state-focus-state-layer-opacity));
       }
 
       &[data-type="toggle"] {
         color: rgb(var(--uk-sys-color-on-surface-variant));
 
         &::before {
-          background-color: rgb(
-            var(--uk-sys-color-on-surface-variant),
-            var(--uk-sys-state-focus-state-layer-opacity)
-          );
+          background-color: rgb(var(--uk-sys-color-on-surface-variant), var(--uk-sys-state-focus-state-layer-opacity));
         }
       }
 
@@ -320,10 +346,7 @@
         color: rgb(var(--uk-sys-color-on-primary));
 
         &::before {
-          background-color: rgb(
-            var(--uk-sys-color-on-surface-variant),
-            var(--uk-sys-state-focus-state-layer-opacity)
-          );
+          background-color: rgb(var(--uk-sys-color-on-surface-variant), var(--uk-sys-state-focus-state-layer-opacity));
         }
       }
     }
@@ -332,20 +355,14 @@
       color: rgb(var(--uk-sys-color-on-primary));
 
       &::before {
-        background-color: rgb(
-          var(--uk-sys-color-on-primary),
-          var(--uk-sys-state-hover-state-layer-opacity)
-        );
+        background-color: rgb(var(--uk-sys-color-on-primary), var(--uk-sys-state-hover-state-layer-opacity));
       }
 
       &[data-type="toggle"] {
         color: rgb(var(--uk-sys-color-on-surface-variant));
 
         &::before {
-          background-color: rgb(
-            var(--uk-sys-color-on-surface-variant),
-            var(--uk-sys-state-hover-state-layer-opacity)
-          );
+          background-color: rgb(var(--uk-sys-color-on-surface-variant), var(--uk-sys-state-hover-state-layer-opacity));
         }
       }
 
@@ -353,10 +370,7 @@
         color: rgb(var(--uk-sys-color-on-primary));
 
         &::before {
-          background-color: rgb(
-            var(--uk-sys-color-on-surface-variant),
-            var(--uk-sys-state-hover-state-layer-opacity)
-          );
+          background-color: rgb(var(--uk-sys-color-on-surface-variant), var(--uk-sys-state-hover-state-layer-opacity));
         }
       }
     }
@@ -365,10 +379,7 @@
       color: rgb(var(--uk-sys-color-on-primary));
 
       &::before {
-        background-color: rgb(
-          var(--uk-sys-color-on-primary),
-          var(--uk-sys-state-pressed-state-layer-opacity)
-        );
+        background-color: rgb(var(--uk-sys-color-on-primary), var(--uk-sys-state-pressed-state-layer-opacity));
       }
 
       &[data-type="toggle"] {
@@ -455,10 +466,7 @@
         color: rgb(var(--uk-sys-color-on-secondary));
 
         &::before {
-          background-color: rgb(
-            var(--uk-sys-color-on-secondary),
-            var(--uk-sys-state-focus-state-layer-opacity)
-          );
+          background-color: rgb(var(--uk-sys-color-on-secondary), var(--uk-sys-state-focus-state-layer-opacity));
         }
       }
     }
@@ -488,10 +496,7 @@
         color: rgb(var(--uk-sys-color-on-secondary));
 
         &::before {
-          background-color: rgb(
-            var(--uk-sys-color-on-secondary),
-            var(--uk-sys-state-hover-state-layer-opacity)
-          );
+          background-color: rgb(var(--uk-sys-color-on-secondary), var(--uk-sys-state-hover-state-layer-opacity));
         }
       }
     }
@@ -521,10 +526,7 @@
         color: rgb(var(--uk-sys-color-on-secondary));
 
         &::before {
-          background-color: rgb(
-            var(--uk-sys-color-on-secondary),
-            var(--uk-sys-state-pressed-state-layer-opacity)
-          );
+          background-color: rgb(var(--uk-sys-color-on-secondary), var(--uk-sys-state-pressed-state-layer-opacity));
         }
       }
     }
@@ -570,10 +572,7 @@
       color: rgb(var(--uk-sys-color-on-surface-variant));
 
       &::before {
-        background-color: rgb(
-          var(--uk-sys-color-on-surface-variant),
-          var(--uk-sys-state-focus-state-layer-opacity)
-        );
+        background-color: rgb(var(--uk-sys-color-on-surface-variant), var(--uk-sys-state-focus-state-layer-opacity));
       }
 
       &[data-type="toggle"] {
@@ -591,10 +590,7 @@
         color: rgb(var(--uk-sys-color-inverse-on-surface));
 
         &::before {
-          background-color: rgb(
-            var(--uk-sys-color-inverse-on-surface),
-            var(--uk-sys-state-focus-state-layer-opacity)
-          );
+          background-color: rgb(var(--uk-sys-color-inverse-on-surface), var(--uk-sys-state-focus-state-layer-opacity));
         }
       }
     }
@@ -603,20 +599,14 @@
       color: rgb(var(--uk-sys-color-on-surface-variant));
 
       &::before {
-        background-color: rgb(
-          var(--uk-sys-color-on-surface-variant),
-          var(--uk-sys-state-hover-state-layer-opacity)
-        );
+        background-color: rgb(var(--uk-sys-color-on-surface-variant), var(--uk-sys-state-hover-state-layer-opacity));
       }
 
       &[data-type="toggle"] {
         color: rgb(var(--uk-sys-color-on-surface-variant));
 
         &::before {
-          background-color: rgb(
-            var(--uk-sys-color-on-surface-variant),
-            var(--uk-sys-state-hover-state-layer-opacity)
-          );
+          background-color: rgb(var(--uk-sys-color-on-surface-variant), var(--uk-sys-state-hover-state-layer-opacity));
         }
       }
 
@@ -624,10 +614,7 @@
         color: rgb(var(--uk-sys-color-inverse-on-surface));
 
         &::before {
-          background-color: rgb(
-            var(--uk-sys-color-inverse-on-surface),
-            var(--uk-sys-state-hover-state-layer-opacity)
-          );
+          background-color: rgb(var(--uk-sys-color-inverse-on-surface), var(--uk-sys-state-hover-state-layer-opacity));
         }
       }
     }
@@ -636,10 +623,7 @@
       color: rgb(var(--uk-sys-color-on-surface-variant));
 
       &::before {
-        background-color: rgb(
-          var(--uk-sys-color-on-surface-variant),
-          var(--uk-sys-state-pressed-state-layer-opacity)
-        );
+        background-color: rgb(var(--uk-sys-color-on-surface-variant), var(--uk-sys-state-pressed-state-layer-opacity));
       }
 
       &[data-type="toggle"] {
@@ -703,20 +687,14 @@
       color: rgb(var(--uk-sys-color-on-surface-variant));
 
       &::before {
-        background-color: rgb(
-          var(--uk-sys-color-on-surface-variant),
-          var(--uk-sys-state-focus-state-layer-opacity)
-        );
+        background-color: rgb(var(--uk-sys-color-on-surface-variant), var(--uk-sys-state-focus-state-layer-opacity));
       }
 
       &[data-type="toggle"] {
         color: rgb(var(--uk-sys-color-on-surface-variant));
 
         &::before {
-          background-color: rgb(
-            var(--uk-sys-color-on-surface-variant),
-            var(--uk-sys-state-focus-state-layer-opacity)
-          );
+          background-color: rgb(var(--uk-sys-color-on-surface-variant), var(--uk-sys-state-focus-state-layer-opacity));
         }
       }
 
@@ -724,10 +702,7 @@
         color: rgb(var(--uk-sys-color-primary));
 
         &::before {
-          background-color: rgb(
-            var(--uk-sys-color-primary),
-            var(--uk-sys-state-focus-state-layer-opacity)
-          );
+          background-color: rgb(var(--uk-sys-color-primary), var(--uk-sys-state-focus-state-layer-opacity));
         }
       }
     }
@@ -736,20 +711,14 @@
       color: rgb(var(--uk-sys-color-on-surface-variant));
 
       &::before {
-        background-color: rgb(
-          var(--uk-sys-color-on-surface-variant),
-          var(--uk-sys-state-hover-state-layer-opacity)
-        );
+        background-color: rgb(var(--uk-sys-color-on-surface-variant), var(--uk-sys-state-hover-state-layer-opacity));
       }
 
       &[data-type="toggle"] {
         color: rgb(var(--uk-sys-color-on-surface-variant));
 
         &::before {
-          background-color: rgb(
-            var(--uk-sys-color-on-surface-variant),
-            var(--uk-sys-state-hover-state-layer-opacity)
-          );
+          background-color: rgb(var(--uk-sys-color-on-surface-variant), var(--uk-sys-state-hover-state-layer-opacity));
         }
       }
 
@@ -757,10 +726,7 @@
         color: rgb(var(--uk-sys-color-primary));
 
         &::before {
-          background-color: rgb(
-            var(--uk-sys-color-primary),
-            var(--uk-sys-state-hover-state-layer-opacity)
-          );
+          background-color: rgb(var(--uk-sys-color-primary), var(--uk-sys-state-hover-state-layer-opacity));
         }
       }
     }
@@ -769,10 +735,7 @@
       color: rgb(var(--uk-sys-color-on-surface-variant));
 
       &::before {
-        background-color: rgb(
-          var(--uk-sys-color-on-surface-variant),
-          var(--uk-sys-state-pressed-state-layer-opacity)
-        );
+        background-color: rgb(var(--uk-sys-color-on-surface-variant), var(--uk-sys-state-pressed-state-layer-opacity));
       }
 
       &[data-type="toggle"] {
@@ -790,10 +753,7 @@
         color: rgb(var(--uk-sys-color-primary));
 
         &::before {
-          background-color: rgb(
-            var(--uk-sys-color-primary),
-            var(--uk-sys-state-pressed-state-layer-opacity)
-          );
+          background-color: rgb(var(--uk-sys-color-primary), var(--uk-sys-state-pressed-state-layer-opacity));
         }
       }
     }

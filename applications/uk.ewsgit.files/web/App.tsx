@@ -28,6 +28,7 @@ interface ViewState {
   selectedItems: string[];
   lastSelectionTime: number;
   viewId: number;
+  isLoading: boolean;
 }
 
 interface AppContextType {
@@ -74,6 +75,7 @@ const App: Component = () => {
     selectedItems: [],
     lastSelectionTime: -1,
     viewId: 0,
+    isLoading: true,
   });
   const [ taskStatus, setTaskStatus ] = createSignal<Task[]>([])
 

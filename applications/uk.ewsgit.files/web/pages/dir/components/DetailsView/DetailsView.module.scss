@@ -17,7 +17,8 @@
   padding: 0.5rem;
   border-spacing: 0;
   user-select: none;
-  width: 100%;
+  max-width: 100%;
+  width: 72rem;
 }
 
 .columns {
@@ -34,11 +35,7 @@
     &:first-child {
       padding-left: 0;
       padding-right: 0;
-      width: 0;
-    }
-
-    &:nth-child(2) {
-      width: 50%;
+      width: calc(calc(var(--col-spacing) * 2) + var(--icon-size));
     }
   }
 }
@@ -62,6 +59,7 @@
     height: var(--item-height);
     box-sizing: border-box;
     vertical-align: middle;
+    white-space: nowrap;
   }
 
   &::after {

@@ -1,4 +1,5 @@
 import ERROR_ICON from "@material-symbols/svg-700/outlined/error.svg";
+import FOLDER_LIMITED_ICON from "@material-symbols/svg-700/outlined/folder_limited.svg";
 import {useSearchParams} from "@solidjs/router";
 import {type Component, createEffect, createSignal, Match, Switch, useContext} from "solid-js";
 import {createStore} from "solid-js/store";
@@ -27,19 +28,15 @@ const View: Component = () => {
   let navigationCounter = 0;
 
   createEffect(async () => {
-    searchParams.path;
-
-    navigationCounter++
-  })
-
-  createEffect(async () => {
     if (!searchParams.path) {
       setSearchParams({path: appContext?.userPreferences.homePath});
       return;
     }
 
+    navigationCounter++
     const currentNavigationCount = navigationCounter;
 
+    appContext?.setViewState("isLoading", true)
     const newItems = await filesystemInterface.readDirectory(searchParams.path || "remote:/");
 
     if (currentNavigationCount !== navigationCounter) return;
@@ -135,6 +132,8 @@ const View: Component = () => {
           resolve();
         });
       }
+
+      appContext?.setViewState("isLoading", false)
     } else {
       setErrorMessage(newItems.status);
     }
@@ -144,8 +143,25 @@ const View: Component = () => {
     <>
       {errorMessage() ? (
         <ViewMessage icon={ERROR_ICON} title={"An error has occurred"} message={errorMessage() || "Missing Error Message?"}></ViewMessage>
-      ) : appContext?.viewState.viewItems.length === 0 ? (
-        <ViewMessage icon={ERROR_ICON} title={"Nothing Here."} message="You have no files"></ViewMessage>
+      ) : appContext?.viewState.viewItems.length === 0 && !appContext.viewState.isLoading ? (
+        <ViewMessage icon={FOLDER_LIMITED_ICON} title={"Nothing Here."} message="You have no files" actions={[
+          {
+            color: "filled",
+            label: "Create new File",
+            onClick() {
+              // TODO: create a new file
+              // Do nothing Currently
+            }
+          },
+          {
+            color: "filled",
+            label: "Create new Folder",
+            onClick() {
+              // TODO: create a new folder
+              // Do nothing Currently
+            }
+          }
+        ]} />
       ) : (
         <>
           {/** biome-ignore lint/a11y/noStaticElementInteractions: button functionality not required */}

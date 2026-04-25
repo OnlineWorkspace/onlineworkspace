@@ -7,12 +7,13 @@ async function createWindow() {
   const window = new BrowserWindow({
     width: 1000,
     height: 800,
-    minHeight: 600,
-    minWidth: 769,
+    minHeight: 800,
+    minWidth: 1000,
     transparent: true,
     autoHideMenuBar: true,
     titleBarStyle: "hidden",
     frame: true,
+    icon: path.join(process.cwd(), "../assets/uk.ewsgit.files64.png"),
     webPreferences: {
       preload: path.join(process.cwd(), "./src/preload.js"),
     },

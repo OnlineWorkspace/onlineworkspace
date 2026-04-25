@@ -5,6 +5,11 @@ import {AppContext} from "../../../appContext.ts";
 import humanReadableSize from "../../../lib/humanReadableSize.ts";
 import styles from "./StatusBar.module.scss";
 import clsx from "clsx";
+import UKButtonGroup from "@onlineworkspace/uikit-solid/src/components/buttonGroup/UKButtonGroup.jsx";
+import UKIconButton from "@onlineworkspace/uikit-solid/src/components/iconButton/UKIconButton.jsx";
+import ZOOM_IN_ICON from "@material-symbols/svg-700/outlined/zoom_in.svg"
+import ZOOM_OUT_ICON from "@material-symbols/svg-700/outlined/zoom_out.svg"
+import VIEW_REAL_SIZE_ICON from "@material-symbols/svg-700/outlined/view_real_size.svg"
 
 const StatusBar: Component = () => {
   const appContext = useContext(AppContext);
@@ -87,6 +92,11 @@ const StatusBar: Component = () => {
         <UKText role={"label"} size={"m"}>
           {appContext!.tasks()[ 0 ]?.message.replaceAll("%c", appContext!.tasks()[ 0 ].current.toString()).replaceAll("%m", appContext!.tasks()[ 0 ].max.toString())}
         </UKText>
+      </div>
+      <div class={styles.sizeControls}>
+        <UKIconButton size="xxs" alt="Zoom In" icon={ZOOM_IN_ICON} color="standard" onClick={() => appContext?.setUserPreferences("gridViewIconSize", appContext.userPreferences.gridViewIconSize + 2)} />
+        <UKIconButton size="xxs" alt="Reset Zoom" icon={VIEW_REAL_SIZE_ICON} color="standard" onClick={() => appContext?.setUserPreferences("gridViewIconSize", appContext.userPreferences.gridViewIconSize + 2)} />
+        <UKIconButton size="xxs" alt="Zoom Out" icon={ZOOM_OUT_ICON} color="standard" onClick={() => appContext?.setUserPreferences("gridViewIconSize", appContext.userPreferences.gridViewIconSize + 2)} />
       </div>
     </div>
   );
