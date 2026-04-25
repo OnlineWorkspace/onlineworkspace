@@ -1,6 +1,7 @@
 import type { DOMElement } from "solid-js/jsx-runtime";
 import type { AppContextType } from "../../App.tsx";
 import type { ViewItem } from "./viewItem.ts";
+import filesystemInterface, { type UniformResourceLocator } from "../../lib/filesystemInterface.ts";
 
 const onItemClick = (
   e: MouseEvent & { currentTarget: HTMLButtonElement; target: DOMElement },
@@ -67,7 +68,7 @@ const onItemClick = (
     if (appContext?.viewState.selectedItems.length === 1 && appContext.viewState.selectedItems[0] === item.path) {
       if (appContext.viewState.lastSelectionTime > Date.now() - 500) {
         if (item.type === "file") {
-          alert("Implement this when we can open items!");
+          filesystemInterface.openInDefaultApplication(item.path as UniformResourceLocator);
           return;
         }
 

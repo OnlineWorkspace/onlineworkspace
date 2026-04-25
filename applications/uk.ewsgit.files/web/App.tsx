@@ -18,6 +18,9 @@ interface UserPreferences {
   pinnedDirectories: string[];
   viewType: "grid" | "details" | "gallery";
   showPreview: boolean;
+  detailsViewIconSize: number;
+  gridViewIconSize: number;
+  showHidden: boolean;
 }
 
 interface ViewState {
@@ -59,15 +62,18 @@ const App: Component = () => {
   const [ userPreferences, setUserPreferences ] = createStore<AppContextType[ "userPreferences" ]>({
     showWelcome: true,
     homePath: "remote:/users/1/fs/",
-    pinnedDirectories: [ "~/home" ],
+    pinnedDirectories: [ "remote:/users/1/fs/" ],
     viewType: "details",
     showPreview: false,
+    detailsViewIconSize: 32,
+    gridViewIconSize: 128,
+    showHidden: false
   });
   const [ viewState, setViewState ] = createStore<AppContextType[ "viewState" ]>({
     viewItems: [],
     selectedItems: [],
     lastSelectionTime: -1,
-    viewId: 0
+    viewId: 0,
   });
   const [ taskStatus, setTaskStatus ] = createSignal<Task[]>([])
 

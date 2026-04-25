@@ -7,7 +7,8 @@
 }
 
 .root {
-  --item-size: 2rem;
+  --icon-size: 2rem;
+  --item-height: calc(var(--icon-size) + 1rem);
   --col-spacing: 0.5rem;
 
   // display: grid;
@@ -28,12 +29,16 @@
     // gap: 5rem;
     padding-left: var(--col-spacing);
     padding-right: var(--col-spacing);
-    padding-top: 0.25rem;
     padding-bottom: 0.25rem;
 
     &:first-child {
       padding-left: 0;
       padding-right: 0;
+      width: 0;
+    }
+
+    &:nth-child(2) {
+      width: 50%;
     }
   }
 }
@@ -49,11 +54,14 @@
   // justify-content: start;
   // border: none;
   position: relative;
+  animation: forwards fadeItemIn 200ms var(--uk-sys-motion-easing-standard-decelerate);
 
   > td {
-    height: var(--item-size);
     padding-left: var(--col-spacing);
     padding-right: var(--col-spacing);
+    height: var(--item-height);
+    box-sizing: border-box;
+    vertical-align: middle;
   }
 
   &::after {
@@ -65,6 +73,12 @@
     height: 100%;
     background: transparent;
     border-radius: 0.5rem;
+    pointer-events: none;
+  }
+
+  &.itemHidden {
+    opacity: 0.6;
+    animation: forwards fadeHiddenItemIn 200ms var(--uk-sys-motion-easing-standard-decelerate);
   }
 
   &:nth-child(even) {
@@ -80,8 +94,7 @@
   }
 
   > td:first-child {
-    --icon-size: 1.5rem;
-    padding-left: calc(calc(var(--item-size) - var(--icon-size)) / 2);
+    padding-left: 0.5rem;
     border-radius: 0.5rem 0 0 0.5rem;
   }
 
@@ -90,12 +103,32 @@
   }
 
   .itemThumbnail {
-    height: var(--item-size);
+    height: var(--icon-size, 24px);
     aspect-ratio: 1 / 1;
     object-fit: cover;
     object-position: center;
+    display: block;
   }
 
   .itemIcon {
+    display: block;
+  }
+}
+
+@keyframes fadeItemIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeHiddenItemIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 0.6;
   }
 }

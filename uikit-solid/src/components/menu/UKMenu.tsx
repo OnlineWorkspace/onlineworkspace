@@ -1,48 +1,48 @@
 import clsx from "clsx";
-import { type Accessor, type Component, createSignal, For } from "solid-js";
-import { Portal } from "solid-js/web";
+import {type Accessor, type Component, createSignal, For} from "solid-js";
+import {Portal} from "solid-js/web";
 import UKDivider from "../divider/UKDivider.tsx";
 import UKIcon from "../icon/UKIcon.tsx";
 import UKText from "../text/UKText.tsx";
 import styles from "./UKMenu.module.scss";
 
-type MenuItem =
+export type MenuItem =
   | {
-      type: "button";
-      leadingIcon?: string;
-      label?: string;
-      supportingText?: string;
-      badge?: string;
-      onClick(): void | Promise<void>;
-      selected?: boolean;
-      disabled?: boolean;
-    }
+    type: "button";
+    leadingIcon?: string;
+    label?: string;
+    supportingText?: string;
+    badge?: string;
+    onClick(): void | Promise<void>;
+    selected?: boolean;
+    disabled?: boolean;
+  }
   | {
-      type: "category";
-      leadingIcon?: string;
-      supportingText?: string;
-      label?: string;
-      badge?: string;
-      children?: MenuItem[];
-      onClick?(): void;
-      selected?: boolean;
-      disabled?: boolean;
-    }
+    type: "category";
+    leadingIcon?: string;
+    supportingText?: string;
+    label?: string;
+    badge?: string;
+    children?: MenuItem[];
+    onClick?(): void;
+    selected?: boolean;
+    disabled?: boolean;
+  }
   | {
-      type: "divider";
-    }
+    type: "divider";
+  }
   | {
-      type: "spacer";
-    };
+    type: "spacer";
+  };
 
 const UKMenu: Component<{
   items: (MenuItem | undefined)[];
   class?: string;
-  showMenu: Accessor<{ x: number; y: number } | false>;
+  showMenu: Accessor<{x: number; y: number} | false>;
   closeMenu(): void;
   vibrant?: boolean;
 }> = (props) => {
-  const [ref, setRef] = createSignal<Element | undefined>();
+  const [ ref, setRef ] = createSignal<Element | undefined>();
 
   return (
     <>
@@ -53,11 +53,11 @@ const UKMenu: Component<{
                     items={(props.items[selected() as number] as { children: MenuItem[] }).children || []}
                 />
             )}*/}
-      <div style={{ position: "fixed", "pointer-events": "none", visibility: "hidden", display: "none" }} ref={setRef}></div>
+      <div style={{position: "fixed", "pointer-events": "none", visibility: "hidden", display: "none"}} ref={setRef}></div>
       {props.showMenu() !== false && (
         <Portal mount={ref()?.closest('[data-uikit-root="true"]') || document.body}>
-          {/** biome-ignore lint/a11y/useKeyWithClickEvents: <explanation> */}
-          {/** biome-ignore lint/a11y/noStaticElementInteractions: <explanation> */}
+          {/** biome-ignore lint/a11y/useKeyWithClickEvents: TODO: create an explanation for this */}
+          {/** biome-ignore lint/a11y/noStaticElementInteractions: TODO: create an explanation for this */}
           <div
             class={styles.background}
             onClick={(e) => {
@@ -88,16 +88,16 @@ const UKMenu: Component<{
               e.stopPropagation();
             }}
           ></div>
-          {/** biome-ignore lint/a11y/useKeyWithClickEvents: <explanation> */}
-          {/** biome-ignore lint/a11y/noStaticElementInteractions: <explanation> */}
+          {/** biome-ignore lint/a11y/useKeyWithClickEvents: TODO: create an explanation for this */}
+          {/** biome-ignore lint/a11y/noStaticElementInteractions: TODO: create an explanation for this */}
           <div
             data-vibrant={props.vibrant}
             onContextMenu={(e) => e.preventDefault()}
             onClick={() => props.closeMenu()}
             class={clsx(styles.root, props.class)}
             style={{
-              top: `${(props.showMenu() as { y: number }).y}px`,
-              left: `${(props.showMenu() as { x: number }).x}px`,
+              top: `${(props.showMenu() as {y: number}).y}px`,
+              left: `${(props.showMenu() as {x: number}).x}px`,
             }}
           >
             <For each={props.items}>

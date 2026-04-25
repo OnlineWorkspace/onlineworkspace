@@ -409,6 +409,7 @@ export class WorkspacesUser {
       "/assets/avatar",
       "/assets/wallpapers",
       "/assets/wallpapers/resized",
+      "/mounts",
       "/system",
       "/system/logs",
       "/system/temp",

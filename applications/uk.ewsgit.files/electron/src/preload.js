@@ -9,6 +9,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
   },
   files: {
     get_entry: (path, thumbnailSize) => ipcRenderer.invoke("files:get_entry", [path, thumbnailSize]),
+    open_in_default_application: (path) => ipcRenderer.invoke("files:open_in_default_application", [path]),
   },
 });
 

@@ -4,86 +4,101 @@ import browserPath from "path-browserify";
 import {type Component, For, useContext} from "solid-js";
 import {AppContext} from "../../../../appContext.ts";
 import iconForItemType from "../../iconForItemType.ts";
-import onItemClick from "../../itemSelection.ts";
+import onItemClick from "../../itemClick.ts";
 import styles from "./DetailsView.module.scss";
 import type {DOMElement} from "solid-js/jsx-runtime";
 import {useSearchParams} from "@solidjs/router";
 import humanReadableSize from "../../../../lib/humanReadableSize.ts";
+import clsx from "clsx";
 
 const DetailsView: Component = () => {
   const [ _, setSearchParams ] = useSearchParams();
   const appContext = useContext(AppContext);
 
   return (
-    <>
-      {appContext?.viewState.viewItems.length === 0 ? (
-        <div class={styles.noFiles}>You have no files</div>
-      ) : (
-        <table class={styles.root}>
-          <tbody>
-            <tr class={styles.columns}>
-              <th></th>
-              <th>
-                <UKText role={"title"} size={"s"}>
-                  Name
-                </UKText>
-              </th>
-              <th>
-                <UKText role={"title"} size={"s"}>
-                  Date Modified
-                </UKText>
-              </th>
-              <th>
-                <UKText role={"title"} size={"s"}>
-                  Time Modified
-                </UKText>
-              </th>
-              <th>
-                <UKText role={"title"} size={"s"}>
-                  Size
-                </UKText>
-              </th>
-            </tr>
-            <For each={appContext?.viewState.viewItems}>
-              {(item, index) => {
-                return (
-                  <tr
-                    data-fs-item-path={item.path}
-                    class={styles.item}
-                    onClick={(e) =>
-                      onItemClick(e as unknown as MouseEvent & {currentTarget: HTMLButtonElement; target: DOMElement}, appContext!, index(), item, setSearchParams)
-                    }
-                    data-selected={appContext?.viewState.selectedItems.includes(item.path)}
-                  >
-                    <td>{item.thumbnail !== undefined ? <img class={styles.itemThumbnail} alt="" src={item.thumbnail} loading="lazy" /> : <UKIcon class={styles.itemIcon}>{iconForItemType(item.type)}</UKIcon>}</td>
-                    <td>
-                      <UKText size="m" role="body">
-                        {browserPath.basename(item.path)}
-                      </UKText>
-                    </td>
-                    <td>
-                      <UKText size="m" role="body">
-                        1/1/1970
-                      </UKText>
-                    </td>
-                    <td>
-                      <UKText size="m" role="body">
-                        00:23
-                      </UKText>
-                    </td>
-                    <td>
-                      <UKText size="m" role="body">
-                        {humanReadableSize(item.size || 0)}
-                      </UKText>
-                    </td>
-                  </tr>
-                );
-              }}
-            </For>
-          </tbody>
-        </table>
-      )}
-    </>
+    <table class={styles.root}>
+      <thead>
+        <tr class={styles.columns}>
+          <th scope="col"></th>
+          <th scope="col">
+            <UKText role={"title"} size={"s"}>
+              Name
+            </UKText>
+          </th>
+          <th scope="col">
+            <UKText role={"title"} size={"s"}>
+              Modified
+            </UKText>
+          </th>
+          <th scope="col">
+            <UKText role={"title"} size={"s"}>
+              Created
+            </UKText>
+          </th>
+          <th scope="col">
+            <UKText role={"title"} size={"s"}>
+              Size
+            </UKText>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <For each={appContext?.viewState.viewItems}>
+          {(item, index) => {
+            if (!appContext?.userPreferences.showHidden && item.hidden) return null;
+
+            let modifiedAtString = (new Date(item.modifiedAt || 0)).toLocaleString()
+            const createdAtString = (new Date(item.createdAt || 0)).toLocaleString()
+
+            if (modifiedAtString === createdAtString) {
+              modifiedAtString = "-"
+            }
+
+            return (
+              <tr
+                data-fs-item-path={item.path}
+                class={clsx(styles.item, item.hidden && styles.itemHidden)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onItemClick(e as unknown as MouseEvent & {currentTarget: HTMLButtonElement; target: DOMElement}, appContext!, index(), item, setSearchParams)
+                }}
+                onMouseDown={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                }}
+                onDblClick={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                }}
+                data-selected={appContext?.viewState.selectedItems.includes(item.path)}
+              >
+                <td>{item.thumbnail !== undefined ? <img class={styles.itemThumbnail} alt="" src={item.thumbnail} loading="lazy" /> : <UKIcon class={styles.itemIcon}>{iconForItemType(item.type)}</UKIcon>}</td>
+                <td>
+                  <UKText size="m" role="body">
+                    {browserPath.basename(item.path)}
+                  </UKText>
+                </td>
+                <td>
+                  <UKText size="m" role="body">
+                    {modifiedAtString}
+                  </UKText>
+                </td>
+                <td>
+                  <UKText size="m" role="body">
+                    {createdAtString}
+                  </UKText>
+                </td>
+                <td>
+                  <UKText size="m" role="body">
+                    {humanReadableSize(item.size || 0)}
+                  </UKText>
+                </td>
+              </tr>
+            );
+          }}
+        </For>
+      </tbody>
+    </table>
   );
 };
 
