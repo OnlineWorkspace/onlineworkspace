@@ -11,6 +11,7 @@ import filesystemInterface, {type UniformResourceLocator} from "../../lib/filesy
 import DetailsView from "./components/DetailsView/DetailsView.tsx";
 import GridView from "./components/GridView/GridView.tsx";
 import styles from "./View.module.scss";
+import GalleryView from "./components/GalleryView/GalleryView.tsx";
 
 const View: Component = () => {
   const [ searchParams, setSearchParams ] = useSearchParams<{path?: UniformResourceLocator}>();
@@ -33,6 +34,7 @@ const View: Component = () => {
       return;
     }
 
+    appContext?.userPreferences.viewType;
     navigationCounter++
     const currentNavigationCount = navigationCounter;
 
@@ -273,7 +275,9 @@ const View: Component = () => {
               <Match when={appContext?.userPreferences.viewType === "details"}>
                 <DetailsView />
               </Match>
-              <Match when={appContext?.userPreferences.viewType === "gallery"}>Gallery View</Match>
+              <Match when={appContext?.userPreferences.viewType === "gallery"}>
+                <GalleryView />
+              </Match>
             </Switch>
             {dragSelectRegion.transOrigin !== undefined ? (
               <div

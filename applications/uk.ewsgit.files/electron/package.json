@@ -17,7 +17,8 @@
     "fast-folder-size": "^2.4.0"
   },
   "trustedDependencies": [
-    "fast-folder-size"
+    "fast-folder-size",
+    "electron"
   ],
   "peerDependencies": {
     "typescript": "^5"

@@ -449,6 +449,7 @@
     },
   },
   "trustedDependencies": [
+    "electron",
     "fast-folder-size",
   ],
   "packages": {

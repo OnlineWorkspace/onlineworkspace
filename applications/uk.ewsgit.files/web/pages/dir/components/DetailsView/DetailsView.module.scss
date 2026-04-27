@@ -19,6 +19,7 @@
   user-select: none;
   max-width: 100%;
   width: 72rem;
+  table-layout: fixed;
 }
 
 .columns {
@@ -51,7 +52,7 @@
   // justify-content: start;
   // border: none;
   position: relative;
-  animation: forwards fadeItemIn 200ms var(--uk-sys-motion-easing-standard-decelerate);
+  animation: forwards fadeItemIn 150ms var(--uk-sys-motion-easing-standard-decelerate);
 
   > td {
     padding-left: var(--col-spacing);
@@ -60,6 +61,8 @@
     box-sizing: border-box;
     vertical-align: middle;
     white-space: nowrap;
+    overflow-x: hidden;
+    text-overflow: ellipsis;
   }
 
   &::after {

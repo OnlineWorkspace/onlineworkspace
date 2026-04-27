@@ -24,6 +24,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   document.body.appendChild(elem);
 
+  document.head.querySelector("title").innerText = "OW Files";
   document.body.style.overflow = "hidden";
   document.body.style.boxShadow = "1px 0px #646464 inset, 0 0 1px 0px #646464";
   document.body.style.border = "1px solid #646464";

@@ -25,6 +25,37 @@
   top: 0;
   display: flex;
   z-index: 1;
+  height: 100%;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem;
+  border-radius: var(--uk-sys-shape-corner-medium);
+  background-color: rgb(var(--uk-sys-color-surface-container));
+
+  > * {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 0.25rem;
+
+    &:first-child {
+      margin-right: 0.5rem;
+    }
+
+    > * {
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    &:hover {
+      outline: 1px solid red;
+    }
+  }
 }
 
 .pathSuggestions {
@@ -44,11 +75,13 @@
   left: 0;
   top: 0;
   height: 100%;
-  opacity: 0.5;
+  width: 100%;
+  opacity: 0;
   -webkit-app-region: no-drag;
 
   &[data-visible="true"] {
     z-index: 2;
+    opacity: 1;
   }
 }
 

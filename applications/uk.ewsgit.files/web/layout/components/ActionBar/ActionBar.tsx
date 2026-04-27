@@ -55,21 +55,36 @@ const ActionBar: Component = () => {
       <Show when={searchParams.path !== undefined}>
         <div class={styles.pathSelector}>
           <div class={styles.pathSegments}>
-            {/* Path Segments */}
-            {(searchParams.path || "").split(browserPath.sep).map((segment, index) => {
+            {(searchParams.path || "").split(browserPath.sep).slice(0, 1).map((segment, index) => {
               return (
                 <>
-                  <UKText role="label" size="m">
+                  <UKText role="label" size="l">
+                    {segment.slice(0, -1).toUpperCase()}
+                  </UKText>
+                  {(searchParams.path || "").split(browserPath.sep).length - 1 === index ? (
+                    ""
+                  ) : (
+                    <UKText role="label" size="l">
+                      /
+                    </UKText>
+                  )}
+                </>
+              );
+            })}
+            {(searchParams.path || "").split(browserPath.sep).slice(1).map((segment, index) => {
+              return (
+                <div>
+                  <UKText role="label" size="l">
                     {segment}
                   </UKText>
                   {(searchParams.path || "").split(browserPath.sep).length - 1 === index ? (
                     ""
                   ) : (
-                    <UKText role="label" size="m">
+                    <UKText role="label" size="l">
                       /
                     </UKText>
                   )}
-                </>
+                </div>
               );
             })}
           </div>
@@ -80,6 +95,7 @@ const ActionBar: Component = () => {
             onKeyDown={(e) => {
               setPathQuery(e.currentTarget.value);
             }}
+            onBlur={() => setShowTextualPath(false)}
             onClick={() => setShowTextualPath(true)}
             data-visible={showTextualPath()}
             onChange={(e) => setSearchParams({path: e.currentTarget.value})}
