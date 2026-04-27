@@ -401,7 +401,7 @@ const router = t.router({
     }),
   view: {
     getEntry: procedure
-      .input(z.object({ path: z.string(), thumbnailSize: z.number() }))
+      .input(z.object({ path: z.string(), thumbnailSize: z.number().optional() }))
       .output(
         z
           .object({
@@ -412,6 +412,9 @@ const router = t.router({
               thumbnail: z.string().optional(),
               shared: z.boolean().optional(),
               size: z.number().optional(),
+              hidden: z.boolean().optional(),
+              createdAt: z.number().optional(),
+              modifiedAt: z.number().optional(),
             }),
           })
           .or(z.object({ status: z.enum(["missing_permission", "invalid_path"]) })),
@@ -439,18 +442,22 @@ const router = t.router({
               // TODO: implement sharing first
               shared: false,
               size: itemStats.size,
-              thumbnail: itemStats.isFile()
-                ? instance.sys.filesystem.getFileType(opt.input.path) === "image"
-                  ? await instance.sys.image.serveImage(opt.ctx.userId, resolvedPath, {
-                      resize: {
-                        fit: "cover",
-                        position: "centre",
-                        dimensions: { width: opt.input.thumbnailSize, height: opt.input.thumbnailSize },
-                        changeFormatTo: "webp",
-                      },
-                    })
-                  : undefined
-                : undefined,
+              thumbnail:
+                opt.input.thumbnailSize !== undefined && itemStats.isFile()
+                  ? instance.sys.filesystem.getFileType(opt.input.path) === "image"
+                    ? await instance.sys.image.serveImage(opt.ctx.userId, resolvedPath, {
+                        resize: {
+                          fit: "cover",
+                          position: "centre",
+                          dimensions: { width: opt.input.thumbnailSize, height: opt.input.thumbnailSize },
+                          changeFormatTo: "webp",
+                        },
+                      })
+                    : undefined
+                  : undefined,
+              hidden: path.basename(opt.input.path).startsWith("."),
+              createdAt: itemStats.ctimeMs,
+              modifiedAt: itemStats.atimeMs,
             },
           };
         } catch (_) {
@@ -461,7 +468,7 @@ const router = t.router({
       }),
   },
   quota: procedure.output(z.object({ currentUsage: z.number(), maximum: z.number() })).query(async (opt) => {
-    const quotaMax = (await (await opt.ctx.user()).getQuota()) || 8000000000;
+    const quotaMax = (await (await opt.ctx.user()).getQuota()) || 8589934592;
 
     const resp = {
       maximum: Number(quotaMax),

@@ -9,6 +9,9 @@
     "url": "https://github.com/onlineworkspace/workspace"
   },
   "private": true,
+  "trustedDependencies": [
+    "fast-folder-size"
+  ],
   "dependencies": {
     "@simplewebauthn/server": "^13.3.0",
     "@trpc/server": "^11.8.0",
@@ -38,6 +41,7 @@
     "vite": "^7.3.0",
     "vite-plugin-solid": "^2.11.10",
     "ws": "^8.18.3",
-    "zod": "^4.0.17"
+    "zod": "^4.0.17",
+    "fast-folder-size": "^2.4.0"
   }
 }

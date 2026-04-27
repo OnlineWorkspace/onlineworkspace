@@ -140,6 +140,7 @@
         "@electron-forge/shared-types": "^7.11.1",
         "@types/node": "latest",
         "electron": "^41.3.0",
+        "fast-folder-size": "^2.4.0",
       },
       "peerDependencies": {
         "typescript": "^5",
@@ -381,6 +382,7 @@
         "dockerode": "^4.0.7",
         "dotenv": "^17.2.1",
         "express": "^5.1.0",
+        "fast-folder-size": "^2.4.0",
         "hi-base32": "^0.5.1",
         "minimist": "^1.2.8",
         "nodemailer": "^7.0.12",
@@ -446,6 +448,10 @@
       },
     },
   },
+  "trustedDependencies": [
+    "electron",
+    "fast-folder-size",
+  ],
   "packages": {
     "@acemir/cssom": ["@acemir/cssom@0.9.31", "", {}, "sha512-ZnR3GSaH+/vJ0YlHau21FjfLYjMpYVIzTD8M8vIEQvIGxeOXyXdzCI140rrCY862p/C/BbzWsjc1dgnM9mkoTA=="],
 

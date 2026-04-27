@@ -1,6 +1,7 @@
 import DELETE_ICON from "@material-symbols/svg-700/outlined/delete.svg";
 import FOLDER_ICON from "@material-symbols/svg-700/outlined/folder.svg";
 import HOUSE_ICON from "@material-symbols/svg-700/outlined/house.svg";
+import HARD_DRIVE_ICON from "@material-symbols/svg-700/outlined/hard_drive.svg"
 import PERSON_ICON from "@material-symbols/svg-700/outlined/person.svg";
 import UKSideBar from "@onlineworkspace/uikit-solid/src/components/sideBar/UKSideBar.tsx";
 import {useNavigate} from "@solidjs/router";
@@ -19,6 +20,7 @@ const Layout: Component<ParentProps> = (props) => {
   return (
     <UKSideBar
       className={styles.sidebar}
+      darwinAdditionalTopMargin={localStorage.getItem("onlineworkspace_workspace_desktop_platform") === "darwin"}
       items={[
         {
           type: "label",
@@ -72,8 +74,8 @@ const Layout: Component<ParentProps> = (props) => {
           {type: "label", label: "Local"},
           {
             type: "button",
-            icon: {type: "icon", value: FOLDER_ICON},
-            label: "Local Root",
+            icon: {type: "icon", value: HARD_DRIVE_ICON},
+            label: "Root (Local)",
             onClick() {
               navigate(`/app/uk.ewsgit.files/dir?path=local:/`);
             },

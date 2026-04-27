@@ -2,7 +2,12 @@
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  width: calc(100% - 2rem);
   margin-left: auto;
   margin-right: auto;
+  width: calc(100% - 2rem);
+  -webkit-app-region: no-drag;
+}
+
+.linearProgressIndicator {
+  min-width: unset !important;
 }

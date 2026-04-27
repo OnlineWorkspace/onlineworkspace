@@ -17,11 +17,13 @@ import UKText from "@onlineworkspace/uikit-solid/src/components/text/UKText.jsx"
 import useIsMobile from "@onlineworkspace/uikit-solid/src/core/useIsMobile.ts";
 import {useSearchParams} from "@solidjs/router";
 import browserPath from "path-browserify";
-import {type Component, createSignal, Show, useContext} from "solid-js";
+import {type Component, createEffect, createSignal, Show, useContext} from "solid-js";
 import {AppContext} from "../../../appContext.ts";
 import type {ViewItem} from "../../../pages/dir/viewItem.ts";
 import styles from "./ActionBar.module.scss";
 import clsx from "clsx"
+import {canViewNavigateUp, viewNavigateUp} from "../../../pages/dir/viewHistory.ts";
+import type {UniformResourceLocator} from "../../../lib/filesystemInterface.ts";
 
 const ActionBar: Component = () => {
   const isMobile = useIsMobile();
@@ -29,6 +31,11 @@ const ActionBar: Component = () => {
   const [ searchParams, setSearchParams ] = useSearchParams<{path: string}>();
   const [ pathQuery, setPathQuery ] = createSignal<string | undefined>(undefined);
   const [ showTextualPath, setShowTextualPath ] = createSignal<boolean>(false);
+  const [ canNavigateUp, setCanNavigateUp ] = createSignal<boolean>(false);
+
+  createEffect(() => {
+    setCanNavigateUp(canViewNavigateUp((searchParams.path || "invalid:") as UniformResourceLocator))
+  })
 
   return (
     <div class={styles.root}>
@@ -38,30 +45,46 @@ const ActionBar: Component = () => {
         <UKIconButton
           icon={ARROW_UPWARD_ICON}
           color={"standard"}
+          disabled={!canNavigateUp()}
           alt={"go up one directory"}
           onClick={() => {
-            console.log("Implement this");
+            viewNavigateUp((p) => setSearchParams({path: p}), (searchParams.path || "invalid:") as UniformResourceLocator)
           }}
         />
       </div>
       <Show when={searchParams.path !== undefined}>
         <div class={styles.pathSelector}>
           <div class={styles.pathSegments}>
-            {/* Path Segments */}
-            {(searchParams.path || "").split(browserPath.sep).map((segment, index) => {
+            {(searchParams.path || "").split(browserPath.sep).slice(0, 1).map((segment, index) => {
               return (
                 <>
-                  <UKText role="label" size="m">
+                  <UKText role="label" size="l">
+                    {segment.slice(0, -1).toUpperCase()}
+                  </UKText>
+                  {(searchParams.path || "").split(browserPath.sep).length - 1 === index ? (
+                    ""
+                  ) : (
+                    <UKText role="label" size="l">
+                      /
+                    </UKText>
+                  )}
+                </>
+              );
+            })}
+            {(searchParams.path || "").split(browserPath.sep).slice(1).map((segment, index) => {
+              return (
+                <div>
+                  <UKText role="label" size="l">
                     {segment}
                   </UKText>
                   {(searchParams.path || "").split(browserPath.sep).length - 1 === index ? (
                     ""
                   ) : (
-                    <UKText role="label" size="m">
+                    <UKText role="label" size="l">
                       /
                     </UKText>
                   )}
-                </>
+                </div>
               );
             })}
           </div>
@@ -72,6 +95,7 @@ const ActionBar: Component = () => {
             onKeyDown={(e) => {
               setPathQuery(e.currentTarget.value);
             }}
+            onBlur={() => setShowTextualPath(false)}
             onClick={() => setShowTextualPath(true)}
             data-visible={showTextualPath()}
             onChange={(e) => setSearchParams({path: e.currentTarget.value})}
@@ -118,39 +142,41 @@ const ActionBar: Component = () => {
           />
         )}
         {!appContext?.isDesktopApp && (
-          <UKIconButton
-            icon={UPLOAD_ICON}
-            color={"filled"}
-            alt={"Upload File"}
-            onClick={() => {
-              console.log("Does nothing");
-            }}
-          />
+          <>
+            <UKIconButton
+              icon={UPLOAD_ICON}
+              color={"filled"}
+              alt={"Upload File"}
+              onClick={() => {
+                console.log("Does nothing");
+              }}
+            />
+            <UKIconButton
+              icon={ADD_ICON}
+              color={"filled"}
+              alt={"Create File"}
+              onClick={() => {
+                for (let i = 0; i < 10; i++) {
+                  appContext?.setViewState("viewItems", [
+                    ...appContext.viewState.viewItems,
+                    {type: "file", path: `/randomNewItem${Math.round(Math.random() * 100000000)}`},
+                  ] as ViewItem[]);
+                }
+              }}
+            />
+          </>
         )}
-        <UKIconButton
-          icon={ADD_ICON}
-          color={"filled"}
-          alt={"Create File"}
-          onClick={() => {
-            for (let i = 0; i < 10; i++) {
-              appContext?.setViewState("viewItems", [
-                ...appContext.viewState.viewItems,
-                {type: "file", path: `/randomNewItem${Math.round(Math.random() * 100000000)}`},
-              ] as ViewItem[]);
-            }
-          }}
-        />
         {!isMobile() && (
           <UKIconButton
             icon={appContext?.userPreferences.showPreview ? RIGHT_PANEL_OPEN_ICON : RIGHT_PANEL_CLOSE_ICON}
             color={"filled"}
-            alt={"Create File"}
+            alt={"Toggle Preview"}
             onClick={() => {
               appContext?.setUserPreferences("showPreview", !appContext?.userPreferences.showPreview);
             }}
           />
         )}
-        {appContext?.isDesktopApp && (
+        {appContext?.isDesktopApp && (localStorage.getItem("onlineworkspace_workspace_desktop_platform") !== "darwin") && (
           <>
             <UKIconButton
               icon={MINIMIZE_ICON}

@@ -1,18 +1,19 @@
-import path from "node:path";
-import { app, BrowserWindow, ipcMain, session } from "electron";
 import { promises as fs } from "node:fs";
+import path from "node:path";
+import { app, BrowserWindow, ipcMain, session, shell } from "electron";
 import sharp from "sharp";
 
 async function createWindow() {
   const window = new BrowserWindow({
     width: 1000,
     height: 800,
-    minHeight: 600,
-    minWidth: 769,
+    minHeight: 800,
+    minWidth: 1000,
     transparent: true,
     autoHideMenuBar: true,
     titleBarStyle: "hidden",
     frame: true,
+    icon: path.join(process.cwd(), "../assets/uk.ewsgit.files64.png"),
     webPreferences: {
       preload: path.join(process.cwd(), "./src/preload.js"),
     },
@@ -28,7 +29,7 @@ async function createWindow() {
 }
 
 function getFileType(path: string) {
-  const extension = path.split(".").pop();
+  const extension = path.split(".").pop()?.toLowerCase();
 
   switch (extension) {
     case "avif":
@@ -89,13 +90,13 @@ app.whenReady().then(async () => {
     try {
       const itemStats = await fs.lstat(resolvedPath);
 
-      let thumbnail: Buffer | undefined = undefined;
+      let thumbnail: Buffer | undefined;
 
       if (getFileType(p) === "image") {
         thumbnail = await new Promise<Buffer>((resolve) => {
           sharp(resolvedPath)
             .toFormat("webp")
-            .resize(thumbnailSize)
+            .resize(thumbnailSize, thumbnailSize)
             .toBuffer((_, buffer) => {
               resolve(buffer);
             });
@@ -110,7 +111,10 @@ app.whenReady().then(async () => {
           // TODO: implement sharing first
           shared: false,
           size: itemStats.size,
-          thumbnail: thumbnail ? `data:image/webp;base64,${thumbnail.toString("base64")}` : undefined,
+          thumbnail: thumbnail,
+          hidden: path.basename(p).startsWith("."),
+          createdAt: itemStats.ctimeMs,
+          modifiedAt: itemStats.atimeMs,
         },
       };
     } catch (_) {
@@ -118,6 +122,20 @@ app.whenReady().then(async () => {
         status: "invalid_path",
       };
     }
+  });
+
+  ipcMain.handle("files:os_platform", () => {
+    return process.platform;
+  });
+
+  ipcMain.handle("files:open_in_default_application", async (_, [p]: [string]) => {
+    const errorMessage = await shell.openPath(p);
+
+    if (errorMessage !== "") {
+      return { status: errorMessage };
+    }
+
+    return { status: "ok" };
   });
 
   app.on("activate", () => {

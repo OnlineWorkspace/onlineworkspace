@@ -73,7 +73,21 @@ class FilesystemInterface {
     }
   }
 
-  async getViewEntry(url: UniformResourceLocator, viewType: "details" | "grid") {
+  getViewEntryBatchSize(url: UniformResourceLocator) {
+    const parsedUrl = this.urlToPath(url);
+
+    if (parsedUrl.type === "invalid") {
+      return 0;
+    }
+
+    if (parsedUrl.type === "local") {
+      return 4;
+    } else {
+      return 8;
+    }
+  }
+
+  async getViewEntry(url: UniformResourceLocator, thumbnailSize?: number) {
     const parsedUrl = this.urlToPath(url);
 
     if (parsedUrl.type === "invalid") {
@@ -82,21 +96,31 @@ class FilesystemInterface {
 
     if (parsedUrl.type === "local") {
       // @ts-ignore
-      const getEntryResponse = await window.electronAPI.files.get_entry(parsedUrl.path, viewType === "details" ? 32 : 128);
+      const getEntryResponse = await window.electronAPI.files.get_entry(parsedUrl.path, thumbnailSize);
 
       if (getEntryResponse.status === "ok") {
+        let thumbnail: string | undefined;
+
+        if (getEntryResponse.data.thumbnail) {
+          // @ts-ignore
+          const blob = new Blob([getEntryResponse.data.thumbnail]);
+
+          thumbnail = URL.createObjectURL(blob);
+        }
+
         return {
           status: getEntryResponse.status,
           data: {
             ...getEntryResponse.data,
             path: `${parsedUrl.type}:${getEntryResponse.data.path}`,
+            thumbnail: thumbnail,
           },
         };
       } else {
         return { status: getEntryResponse.status };
       }
     } else {
-      const getEntryResponse = await trpc.view.getEntry.query({ path: parsedUrl.path, thumbnailSize: viewType === "details" ? 32 : 128 });
+      const getEntryResponse = await trpc.view.getEntry.query({ path: parsedUrl.path, thumbnailSize: thumbnailSize });
 
       if (getEntryResponse.status === "ok") {
         return {
@@ -118,6 +142,27 @@ class FilesystemInterface {
     const quota = await trpc.quota.query();
 
     return quota;
+  }
+
+  async openInDefaultApplication(url: UniformResourceLocator) {
+    const parsedUrl = this.urlToPath(url);
+
+    if (parsedUrl.type === "invalid") {
+      return { status: "invalid_path" as const };
+    }
+
+    if (parsedUrl.type === "local") {
+      // @ts-ignore
+      const openInDefaultApplicationResponse = await window.electronAPI.files.open_in_default_application(parsedUrl.path);
+
+      if (openInDefaultApplicationResponse.status === "ok") {
+        return { status: openInDefaultApplicationResponse.status };
+      } else {
+        return { status: openInDefaultApplicationResponse.status };
+      }
+    } else {
+      alert("Cannot open remote files as no applications exist to open them yet.");
+    }
   }
 
   joinUrls(...urls: UniformResourceLocator[]) {

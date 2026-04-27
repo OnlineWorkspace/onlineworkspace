@@ -18,7 +18,7 @@ const Quota: Component = () => {
 
   return (
     <div class={styles.root}>
-      <UKLinearProgressIndicator start={0} stop={maxUsed()} value={used()} />
+      <UKLinearProgressIndicator class={styles.linearProgressIndicator} start={0} stop={maxUsed()} value={used()} />
       <UKText role={"label"} size={"m"}>
         {humanReadableSize(used())} of {humanReadableSize(maxUsed())} Used
       </UKText>
