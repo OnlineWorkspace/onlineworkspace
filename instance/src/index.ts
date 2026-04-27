@@ -23,7 +23,6 @@ import TRPCSystem from "./systems/trpc.js";
 import { createTRPCContext as createWorkspacesTRPCContext, workspacesRouter } from "./systems/trpcRouter.js";
 import UsersSystem from "./systems/users.js";
 import WebFrontendSystem from "./systems/webFrontend.js";
-import {cache} from "sharp";
 
 export enum InstanceStatus {
   Online,
@@ -236,13 +235,13 @@ class Instance {
                 this.sys.image.log.info(`Served Image -> '${(req.params as { imageId: string }).imageId} @ ${resolutionParam}'`);
                 return new Response(file(sourceImage.path));
               } else {
-                const cachedFilePath = path.join(this.sys.filesystem.CACHE_PATH, sourceImage.path.replaceAll(":", ""))
+                const cachedFilePath = path.join(this.sys.filesystem.CACHE_PATH, sourceImage.path.replaceAll(":", ""));
                 const outputPath = path.join(cachedFilePath, resolutionParam);
-                const hashPath = path.join(`${outputPath}.hash`)
+                const hashPath = path.join(`${outputPath}.hash`);
 
                 if (fsExistsSync(outputPath)) {
-                  const fileHash = Bun.hash.rapidhash(await fs.readFile(sourceImage.path)).toString()
-                  const cacheFileHash = (await fs.readFile(hashPath)).toString()
+                  const fileHash = Bun.hash.rapidhash(await fs.readFile(sourceImage.path)).toString();
+                  const cacheFileHash = (await fs.readFile(hashPath)).toString();
 
                   if (fileHash === cacheFileHash) {
                     this.sys.image.log.info(`Served Image -> '${(req.params as { imageId: string }).imageId} @ ${resolutionParam}'`);
@@ -256,9 +255,9 @@ class Instance {
                   });
                 }
 
-                const fileHash = Bun.hash.rapidhash(await fs.readFile(sourceImage.path)).toString()
+                const fileHash = Bun.hash.rapidhash(await fs.readFile(sourceImage.path)).toString();
                 await this.sys.image.resizeImage(sourceImage.path, outputPath, sourceImage.resize!.dimensions, sourceImage.resize!);
-                await fs.writeFile(hashPath, fileHash)
+                await fs.writeFile(hashPath, fileHash);
 
                 this.sys.image.log.info(`Served Image -> '${(req.params as { imageId: string }).imageId} @ ${resolutionParam}'`);
                 return new Response(file(outputPath));
@@ -319,7 +318,7 @@ class Instance {
     this.log.system.success(`Listening for http requests on port ${this.webServer.port}`);
 
     this.log.system.info("Startup complete");
-    this.status = InstanceStatus.Online
+    this.status = InstanceStatus.Online;
 
     return this;
   }
@@ -330,13 +329,13 @@ class Instance {
   }
 
   async shutdown() {
-    this.status = InstanceStatus.Stopping
+    this.status = InstanceStatus.Stopping;
     this.sys.consoleCommands.currentCommandInterface.active = true;
     this.sys.consoleCommands.currentCommandInterface.cb = () => 0;
     this.log.system.info("Shutting down...");
 
     this.sys.event.invoke(WorkspacesEvent.BeforeShutdown);
-    this.status = InstanceStatus.Offline
+    this.status = InstanceStatus.Offline;
 
     if (process.stdout.cursorTo) {
       process.stdout.cursorTo(0, 0);

@@ -170,6 +170,8 @@ const View: Component = () => {
           <div
             class={styles.root}
             onMouseDown={(downEvent) => {
+              if (appContext?.userPreferences.viewType === "gallery") return;
+
               if (lastClickTime() > Date.now() - 250) {
                 setLastClickTime(-1);
 
