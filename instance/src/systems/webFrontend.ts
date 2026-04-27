@@ -16,6 +16,9 @@ export default class WebFrontendSystem extends System {
         configFile: path.join(this.instance.sys.filesystem.SRC_ROOT, "web/vite.config.ts"),
         root: path.join(this.instance.sys.filesystem.SRC_ROOT, "web"),
         clearScreen: false,
+        optimizeDeps: {
+          exclude: ["fsevents"],
+        },
       });
       await this.viteServer.listen();
       this.log.info("Listening for web requests:");
