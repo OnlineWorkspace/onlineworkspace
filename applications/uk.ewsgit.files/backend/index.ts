@@ -4,8 +4,6 @@ import { promises as fs, existsSync as fsExists } from "node:fs";
 import * as path from "node:path";
 import { createTRPCContext, procedure } from "@onlineworkspace/workspace-instance/src/systems/trpcRouter.js";
 import { initTRPC } from "@trpc/server";
-import { octetInputParser } from "@trpc/server/http";
-import { randomUUIDv7 } from "bun";
 import z from "zod";
 import fastFolderSize from "fast-folder-size/sync.js";
 
@@ -466,6 +464,34 @@ const router = t.router({
           };
         }
       }),
+    getGalleryItem: procedure.input(z.object({ path: z.string().or(z.undefined()), height: z.number() })).query(async (opt) => {
+      let dimensions: { width: number; height: number } = { width: 0, height: 0 };
+
+      if (opt.input.path === undefined) {
+        return { image: "/assets/generic_background.svg", dimensions };
+      }
+
+      const resolvedPath = path.join(instance.sys.filesystem.FS_ROOT, opt.input.path);
+
+      return {
+        image:
+          instance.sys.filesystem.getFileType(opt.input.path) === "image"
+            ? await instance.sys.image.serveImage(opt.ctx.userId, resolvedPath, {
+                resize: {
+                  fit: "cover",
+                  position: "centre",
+                  dimensions: ({ width: fileWidth, height: fileHeight }) => {
+                    dimensions = { width: fileWidth, height: fileHeight };
+
+                    return { width: Math.floor((fileWidth / fileHeight) * opt.input.height), height: opt.input.height };
+                  },
+                  changeFormatTo: "webp",
+                },
+              })
+            : undefined,
+        dimensions,
+      };
+    }),
   },
   quota: procedure.output(z.object({ currentUsage: z.number(), maximum: z.number() })).query(async (opt) => {
     const quotaMax = (await (await opt.ctx.user()).getQuota()) || 8589934592;

@@ -18,8 +18,7 @@ interface UserPreferences {
   pinnedDirectories: string[];
   viewType: "grid" | "details" | "gallery";
   showPreview: boolean;
-  detailsViewIconSize: number;
-  gridViewIconSize: number;
+  zoomPercentage: number;
   showHidden: boolean;
 }
 
@@ -66,8 +65,7 @@ const App: Component = () => {
     pinnedDirectories: [ "remote:/users/1/fs/" ],
     viewType: "details",
     showPreview: false,
-    detailsViewIconSize: 32,
-    gridViewIconSize: 128,
+    zoomPercentage: 1,
     showHidden: false
   });
   const [ viewState, setViewState ] = createStore<AppContextType[ "viewState" ]>({

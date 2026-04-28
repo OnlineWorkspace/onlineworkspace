@@ -7,8 +7,8 @@
 }
 
 .root {
-  --icon-size: 2rem;
-  --item-height: calc(var(--icon-size) + 1rem);
+  --icon-size: calc(2rem * var(--zoom-percentage, 1));
+  --item-height: calc(calc(var(--icon-size) + 1rem) * var(--zoom-percentage, 1));
   --col-spacing: 0.5rem;
 
   // display: grid;

@@ -17,7 +17,7 @@ const DetailsView: Component = () => {
 
   return (
     <Show when={(appContext?.viewState.viewItems.length || 0) > 0}>
-      <table class={styles.root}>
+      <table class={styles.root} style={{"--zoom-percentage": appContext?.userPreferences.zoomPercentage}}>
         <thead>
           <tr class={styles.columns}>
             <th scope="col"></th>

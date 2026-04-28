@@ -94,9 +94,9 @@ const StatusBar: Component = () => {
         </UKText>
       </div>
       <div class={styles.sizeControls}>
-        <UKIconButton size="xxs" alt="Zoom In" icon={ZOOM_IN_ICON} color="standard" onClick={() => appContext?.setUserPreferences("gridViewIconSize", appContext.userPreferences.gridViewIconSize + 2)} />
-        <UKIconButton size="xxs" alt="Reset Zoom" icon={VIEW_REAL_SIZE_ICON} color="standard" onClick={() => appContext?.setUserPreferences("gridViewIconSize", appContext.userPreferences.gridViewIconSize + 2)} />
-        <UKIconButton size="xxs" alt="Zoom Out" icon={ZOOM_OUT_ICON} color="standard" onClick={() => appContext?.setUserPreferences("gridViewIconSize", appContext.userPreferences.gridViewIconSize + 2)} />
+        <UKIconButton size="xxs" alt="Zoom In" icon={ZOOM_IN_ICON} color="standard" onClick={() => appContext?.setUserPreferences("zoomPercentage", appContext.userPreferences.zoomPercentage + 0.2)} />
+        <UKIconButton size="xxs" alt="Reset Zoom" icon={VIEW_REAL_SIZE_ICON} color={appContext?.userPreferences.zoomPercentage === 0 ? "filled" : "standard"} onClick={() => appContext?.setUserPreferences("zoomPercentage", 1)} />
+        <UKIconButton size="xxs" alt="Zoom Out" icon={ZOOM_OUT_ICON} color="standard" onClick={() => appContext?.setUserPreferences("zoomPercentage", Math.max(appContext.userPreferences.zoomPercentage - 0.2, 0.2))} />
       </div>
     </div>
   );

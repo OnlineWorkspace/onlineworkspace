@@ -35,6 +35,7 @@ const View: Component = () => {
     }
 
     appContext?.userPreferences.viewType;
+    appContext?.userPreferences.zoomPercentage;
     navigationCounter++
     const currentNavigationCount = navigationCounter;
 
@@ -83,9 +84,9 @@ const View: Component = () => {
               filesystemInterface
                 .getViewEntry(
                   itemPath as UniformResourceLocator,
-                  appContext!.userPreferences.viewType === "details"
-                    ? appContext?.userPreferences.detailsViewIconSize
-                    : appContext?.userPreferences.gridViewIconSize,
+                  Math.floor(appContext!.userPreferences.zoomPercentage * (appContext!.userPreferences.viewType === "details"
+                    ? 32
+                    : 128)),
                 )
                 .then((viewEntry) => {
                   if (viewEntry.status === "ok") {

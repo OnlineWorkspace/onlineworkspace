@@ -83,7 +83,7 @@ class FilesystemInterface {
     if (parsedUrl.type === "local") {
       return 4;
     } else {
-      return 8;
+      return 10;
     }
   }
 

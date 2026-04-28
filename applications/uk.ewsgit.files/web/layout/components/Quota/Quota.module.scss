@@ -11,3 +11,7 @@
 .linearProgressIndicator {
   min-width: unset !important;
 }
+
+.lowOnQuota {
+  --linear-indicator-background: 200, 55, 55;
+}

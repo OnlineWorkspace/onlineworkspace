@@ -1,2 +1,137 @@
-.galleryItems {
+.page {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr auto;
+  height: 100%;
+  width: 100%;
+}
+
+.galleryHeader {
+  display: flex;
+  flex-direction: row;
+  padding: 1rem;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
+
+  .galleryItems {
+    display: flex;
+    flex-direction: row;
+    align-items: end;
+    flex-shrink: 1;
+    height: 100%;
+    flex-grow: 1;
+    overflow: hidden;
+    perspective: 1024px;
+
+    .galleryItem {
+      background: linear-gradient(to bottom right, pink, purple);
+      flex-grow: 1;
+      height: 100%;
+      width: auto;
+    }
+
+    &:first-child {
+      .galleryItem {
+        &:first-child {
+          height: 80%;
+          transform: rotateY(-20deg);
+          transform-origin: right;
+        }
+        &:last-child {
+          height: 90%;
+          transform: rotateY(-10deg);
+          transform-origin: right;
+        }
+      }
+    }
+
+    &:last-child {
+      .galleryItem {
+        &:first-child {
+          height: 90%;
+          transform: rotateY(10deg);
+          z-index: 3;
+          transform-origin: left;
+        }
+        &:last-child {
+          height: 80%;
+          z-index: 2;
+          transform: rotateY(20deg);
+          transform-origin: left;
+        }
+      }
+    }
+  }
+
+  .galleryPreviewMain {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .galleryPreviewMainImage {
+    max-width: 100%;
+    max-height: 100%;
+  }
+}
+
+.galleryItemsGrid {
+  display: flex;
+  gap: 0.5rem;
+  width: 100%;
+  overflow-x: auto;
+  padding: 1rem;
+  border-top: 1px solid rgb(var(--uk-sys-color-outline-variant));
+
+  .item {
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    gap: 0.5rem;
+    align-items: center;
+    justify-content: center;
+    animation: forwards fadeItemIn 200ms var(--uk-sys-motion-easing-standard-decelerate);
+
+    .thumbnailIcon {
+      --icon-size: 6rem;
+    }
+
+    &.itemHidden {
+      opacity: 0.6;
+      animation: forwards fadeHiddenItemIn 200ms var(--uk-sys-motion-easing-standard-decelerate);
+    }
+
+    .itemThumbnail {
+      height: 128px;
+      aspect-ratio: 1 / 1;
+      object-fit: cover;
+      object-position: center;
+    }
+  }
+
+  @keyframes fadeItemIn {
+    from {
+      opacity: 0;
+      scale: 0.9;
+    }
+    to {
+      opacity: 1;
+      scale: 1;
+    }
+  }
+
+  @keyframes fadeHiddenItemIn {
+    from {
+      opacity: 0;
+      scale: 0.9;
+    }
+    to {
+      opacity: 0.6;
+      scale: 1;
+    }
+  }
 }
