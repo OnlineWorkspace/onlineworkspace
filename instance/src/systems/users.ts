@@ -410,6 +410,7 @@ export class WorkspacesUser {
       "/assets/wallpapers",
       "/assets/wallpapers/resized",
       "/mounts",
+      "/recycle_bin",
       "/system",
       "/system/logs",
       "/system/temp",

@@ -1,15 +1,14 @@
+import VIEW_REAL_SIZE_ICON from "@material-symbols/svg-700/outlined/view_real_size.svg";
+import ZOOM_IN_ICON from "@material-symbols/svg-700/outlined/zoom_in.svg";
+import ZOOM_OUT_ICON from "@material-symbols/svg-700/outlined/zoom_out.svg";
+import UKIconButton from "@onlineworkspace/uikit-solid/src/components/iconButton/UKIconButton.jsx";
 import UKLinearProgressIndicator from "@onlineworkspace/uikit-solid/src/components/linearProgressIndicator/UKLinearProgressIndicator.tsx";
 import UKText from "@onlineworkspace/uikit-solid/src/components/text/UKText.tsx";
-import {type Component, createEffect, createSignal, onCleanup, onMount, useContext} from "solid-js";
+import clsx from "clsx";
+import {type Component, createEffect, createSignal, useContext} from "solid-js";
 import {AppContext} from "../../../appContext.ts";
 import humanReadableSize from "../../../lib/humanReadableSize.ts";
 import styles from "./StatusBar.module.scss";
-import clsx from "clsx";
-import UKButtonGroup from "@onlineworkspace/uikit-solid/src/components/buttonGroup/UKButtonGroup.jsx";
-import UKIconButton from "@onlineworkspace/uikit-solid/src/components/iconButton/UKIconButton.jsx";
-import ZOOM_IN_ICON from "@material-symbols/svg-700/outlined/zoom_in.svg"
-import ZOOM_OUT_ICON from "@material-symbols/svg-700/outlined/zoom_out.svg"
-import VIEW_REAL_SIZE_ICON from "@material-symbols/svg-700/outlined/view_real_size.svg"
 
 const StatusBar: Component = () => {
   const appContext = useContext(AppContext);
@@ -52,7 +51,7 @@ const StatusBar: Component = () => {
     }
 
     if (outputString === "") {
-      outputString = "Empty directory"
+      outputString = "Empty directory";
     }
 
     setDirContents(outputString);
@@ -62,24 +61,26 @@ const StatusBar: Component = () => {
     for (const task of appContext?.tasks() || []) {
       if (task.current === task.max) {
         setTimeout(() => {
-          appContext?.setTasks(tasks => tasks.map(t => {
-            if (t.id === task.id) {
-              return {
-                ...t,
-                invalid: true
+          appContext?.setTasks((tasks) =>
+            tasks.map((t) => {
+              if (t.id === task.id) {
+                return {
+                  ...t,
+                  invalid: true,
+                };
               }
-            }
 
-            return t
-          }))
+              return t;
+            }),
+          );
 
           setTimeout(() => {
-            appContext?.setTasks(tasks => tasks.filter(t => t.id !== task.id))
-          }, 250)
-        }, 1000)
+            appContext?.setTasks((tasks) => tasks.filter((t) => t.id !== task.id));
+          }, 250);
+        }, 1000);
       }
     }
-  })
+  });
 
   return (
     <div class={styles.root}>
@@ -87,16 +88,34 @@ const StatusBar: Component = () => {
         {dirContents()}
       </UKText>
       <div class={styles.margin}></div>
-      <div class={clsx(styles.taskStatus, appContext!.tasks()[ 0 ] && !(appContext!.tasks()[ 0 ]?.invalid) && styles.visible)}>
+      <div class={clsx(styles.taskStatus, appContext!.tasks()[ 0 ] && !appContext!.tasks()[ 0 ]?.invalid && styles.visible)}>
         <UKLinearProgressIndicator class={styles.progressBar} start={0} stop={appContext!.tasks()[ 0 ]?.max || 1} value={appContext!.tasks()[ 0 ]?.current || 0} />
         <UKText role={"label"} size={"m"}>
           {appContext!.tasks()[ 0 ]?.message.replaceAll("%c", appContext!.tasks()[ 0 ].current.toString()).replaceAll("%m", appContext!.tasks()[ 0 ].max.toString())}
         </UKText>
       </div>
       <div class={styles.sizeControls}>
-        <UKIconButton size="xxs" alt="Zoom In" icon={ZOOM_IN_ICON} color="standard" onClick={() => appContext?.setUserPreferences("zoomPercentage", appContext.userPreferences.zoomPercentage + 0.2)} />
-        <UKIconButton size="xxs" alt="Reset Zoom" icon={VIEW_REAL_SIZE_ICON} color={appContext?.userPreferences.zoomPercentage === 0 ? "filled" : "standard"} onClick={() => appContext?.setUserPreferences("zoomPercentage", 1)} />
-        <UKIconButton size="xxs" alt="Zoom Out" icon={ZOOM_OUT_ICON} color="standard" onClick={() => appContext?.setUserPreferences("zoomPercentage", Math.max(appContext.userPreferences.zoomPercentage - 0.2, 0.2))} />
+        <UKIconButton
+          size="xxs"
+          alt="Zoom Out"
+          icon={ZOOM_OUT_ICON}
+          color="standard"
+          onClick={() => appContext?.setUserPreferences("zoomPercentage", Math.max(appContext.userPreferences.zoomPercentage - 0.2, 0.2))}
+        />
+        <UKIconButton
+          size="xxs"
+          alt="Reset Zoom"
+          icon={VIEW_REAL_SIZE_ICON}
+          color={appContext?.userPreferences.zoomPercentage === 0 ? "filled" : "standard"}
+          onClick={() => appContext?.setUserPreferences("zoomPercentage", 1)}
+        />
+        <UKIconButton
+          size="xxs"
+          alt="Zoom In"
+          icon={ZOOM_IN_ICON}
+          color="standard"
+          onClick={() => appContext?.setUserPreferences("zoomPercentage", appContext.userPreferences.zoomPercentage + 0.2)}
+        />
       </div>
     </div>
   );
