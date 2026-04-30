@@ -1,13 +1,13 @@
 import DELETE_ICON from "@material-symbols/svg-700/outlined/delete.svg";
 import FOLDER_ICON from "@material-symbols/svg-700/outlined/folder.svg";
+import HARD_DRIVE_ICON from "@material-symbols/svg-700/outlined/hard_drive.svg";
 import HOUSE_ICON from "@material-symbols/svg-700/outlined/house.svg";
-import HARD_DRIVE_ICON from "@material-symbols/svg-700/outlined/hard_drive.svg"
 import PERSON_ICON from "@material-symbols/svg-700/outlined/person.svg";
 import UKSideBar from "@onlineworkspace/uikit-solid/src/components/sideBar/UKSideBar.tsx";
-import {useNavigate} from "@solidjs/router";
+import { useNavigate } from "@solidjs/router";
 import browserPath from "path-browserify";
-import {type Component, type ParentProps, useContext} from "solid-js";
-import {AppContext} from "../appContext.ts";
+import { type Component, type ParentProps, useContext } from "solid-js";
+import { AppContext } from "../appContext.ts";
 import PreviewPane from "./components/PreviewPane/PreviewPane.tsx";
 import Quota from "./components/Quota/Quota.tsx";
 import StatusBar from "./components/StatusBar/StatusBar.tsx";
@@ -28,7 +28,7 @@ const Layout: Component<ParentProps> = (props) => {
         },
         {
           type: "button",
-          icon: {type: "icon", value: HOUSE_ICON},
+          icon: { type: "icon", value: HOUSE_ICON },
           label: "Home",
           onClick() {
             navigate(`/app/uk.ewsgit.files/dir?path=${appContext?.userPreferences.homePath}`);
@@ -36,7 +36,7 @@ const Layout: Component<ParentProps> = (props) => {
         },
         {
           type: "button",
-          icon: {type: "icon", value: PERSON_ICON},
+          icon: { type: "icon", value: PERSON_ICON },
           label: "Shared With Me",
           onClick() {
             navigate("/app/uk.ewsgit.files/shared");
@@ -52,44 +52,45 @@ const Layout: Component<ParentProps> = (props) => {
         ...((appContext?.userPreferences.pinnedDirectories || []).map((dir) => {
           return {
             type: "button",
-            icon: {type: "icon", value: FOLDER_ICON},
+            icon: { type: "icon", value: FOLDER_ICON },
             label: browserPath.basename(dir),
             onClick() {
-              let transformedPath = dir
+              let transformedPath = dir;
 
-              if (dir.startsWith("~"))
-                transformedPath = dir.replace("~", appContext?.userPreferences.homePath || "~")
+              if (dir.startsWith("~")) transformedPath = dir.replace("~", appContext?.userPreferences.homePath || "~");
 
               navigate(`/app/uk.ewsgit.files/dir?path=${transformedPath}`);
             },
           };
         }) as {
           type: "button";
-          icon: {type: "icon"; value: string};
+          icon: { type: "icon"; value: string };
           label: string;
           onClick(): void;
         }[]),
-        ...(appContext?.isDesktopApp ? [
-          {type: "divider"},
-          {type: "label", label: "Local"},
-          {
-            type: "button",
-            icon: {type: "icon", value: HARD_DRIVE_ICON},
-            label: "Root (Local)",
-            onClick() {
-              navigate(`/app/uk.ewsgit.files/dir?path=local:/`);
-            },
-          },
-        ] : []) as {
+        ...((appContext?.isDesktopApp
+          ? [
+              { type: "divider" },
+              { type: "label", label: "Local" },
+              {
+                type: "button",
+                icon: { type: "icon", value: HARD_DRIVE_ICON },
+                label: "Root (Local)",
+                onClick() {
+                  navigate(`/app/uk.ewsgit.files/dir?path=local:/`);
+                },
+              },
+            ]
+          : []) as {
           type: "button";
-          icon: {type: "icon"; value: string};
+          icon: { type: "icon"; value: string };
           label: string;
           onClick(): void;
-        }[],
-        {type: "margin"},
+        }[]),
+        { type: "margin" },
         {
           type: "button",
-          icon: {type: "icon", value: DELETE_ICON},
+          icon: { type: "icon", value: DELETE_ICON },
           label: "Bin",
           badgeLabel: appContext?.deletedItemCount || undefined,
           onClick() {

@@ -13,12 +13,12 @@
     "@electron-forge/maker-rpm": "^7.11.1",
     "@electron-forge/shared-types": "^7.11.1",
     "@types/node": "latest",
-    "electron": "^41.3.0",
-    "fast-folder-size": "^2.4.0"
+    "electron": "^41.3.0"
   },
   "trustedDependencies": [
     "fast-folder-size",
-    "electron"
+    "electron",
+    "node-fuse-bindings"
   ],
   "peerDependencies": {
     "typescript": "^5"
@@ -30,6 +30,8 @@
     "publish": "electron-forge publish"
   },
   "dependencies": {
-    "sharp": "^0.34.5"
+    "node-fuse-bindings": "git+https://github.com/asivery/node-fuse-bindings.git",
+    "sharp": "^0.34.5",
+    "fast-folder-size": "^2.4.0"
   }
 }
