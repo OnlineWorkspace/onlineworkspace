@@ -1,13 +1,13 @@
 import UKCard from "@onlineworkspace/uikit-solid/src/components/card/UKCard.tsx";
 import UKIcon from "@onlineworkspace/uikit-solid/src/components/icon/UKIcon.tsx";
+import {useSearchParams} from "@solidjs/router";
+import clsx from "clsx";
 import browserPath from "path-browserify";
 import {type Component, For, useContext} from "solid-js";
 import {AppContext} from "../../../../appContext.ts";
 import iconForItemType from "../../iconForItemType.ts";
 import onItemClick from "../../itemClick.ts";
 import styles from "./GridView.module.scss";
-import {useSearchParams} from "@solidjs/router";
-import clsx from "clsx";
 
 const GridView: Component = () => {
   const [ _, setSearchParams ] = useSearchParams();
@@ -25,22 +25,26 @@ const GridView: Component = () => {
               data-fs-item-path={item.path}
               onClick={(e) => onItemClick(e, appContext!, index(), item, setSearchParams)}
               onMouseDown={(e) => {
-                e.preventDefault()
-                e.stopPropagation()
+                e.preventDefault();
+                e.stopPropagation();
               }}
               onDblClick={(e) => {
-                e.preventDefault()
-                e.stopPropagation()
+                e.preventDefault();
+                e.stopPropagation();
               }}
               color={appContext?.viewState.selectedItems.includes(item.path) ? "outlined" : "filled"}
             >
-              {item.thumbnail !== undefined ? <img class={styles.itemThumbnail} alt="" src={item.thumbnail} loading="lazy" /> : <UKIcon class={styles.thumbnailIcon}>{iconForItemType(item.type)}</UKIcon>}
+              {item.thumbnail !== undefined ? (
+                <img class={styles.itemThumbnail} alt="" src={item.thumbnail} loading="lazy" />
+              ) : (
+                <UKIcon class={styles.thumbnailIcon}>{iconForItemType(item.type)}</UKIcon>
+              )}
               {browserPath.basename(item.path)}
             </UKCard>
           );
         }}
       </For>
-    </div >
+    </div>
   );
 };
 

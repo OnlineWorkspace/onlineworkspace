@@ -26,17 +26,17 @@ const DetailsView: Component = () => {
                 Name
               </UKText>
             </th>
-            <th scope="col" style={{"min-width": "8rem", "max-width": "12rem", width: "100%"}}>
+            <th scope="col" style={{"width": "8rem"}}>
               <UKText role={"title"} size={"s"}>
                 Modified
               </UKText>
             </th>
-            <th scope="col" style={{"min-width": "8rem", "max-width": "12rem", width: "100%"}}>
+            <th scope="col" style={{"width": "8rem"}}>
               <UKText role={"title"} size={"s"}>
                 Created
               </UKText>
             </th>
-            <th scope="col" style={{"min-width": "8rem", "max-width": "12rem", width: "100%"}}>
+            <th scope="col" style={{"width": "8rem"}}>
               <UKText role={"title"} size={"s"}>
                 Size
               </UKText>

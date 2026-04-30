@@ -39,6 +39,7 @@ const View: Component = () => {
     navigationCounter++
     const currentNavigationCount = navigationCounter;
 
+    appContext?.setTasks((tasks) => tasks.filter(t => t.type !== "view_fetch_items"))
     appContext?.setViewState("isLoading", true)
     const newItems = await filesystemInterface.readDirectory(searchParams.path || "remote:/");
 
@@ -57,6 +58,7 @@ const View: Component = () => {
         max: newItems.items.length,
         current: 0,
         message: `Fetched %c of %m items`,
+        type: "view_fetch_items"
       };
 
       appContext?.setTasks((tasks) => [ ...tasks, task ]);
@@ -65,16 +67,6 @@ const View: Component = () => {
 
       for (const itemPathGroup of chunkArray(newItems.items, CHUNK_SIZE)) {
         if (currentNavigationCount !== navigationCounter) {
-          appContext?.setTasks((tasks) => {
-            return tasks.map((t) => {
-              if (task.id === t.id) {
-                return task;
-              }
-
-              return t;
-            });
-          })
-
           return;
         };
         await new Promise<void>(async (resolve) => {
@@ -98,16 +90,6 @@ const View: Component = () => {
 
           const itemGroupResponseResolvedPromises = await Promise.all(itemGroupResponsePromises)
           if (currentNavigationCount !== navigationCounter) {
-            appContext?.setTasks((tasks) => {
-              return tasks.map((t) => {
-                if (task.id === t.id) {
-                  return task;
-                }
-
-                return t;
-              });
-            })
-
             resolve();
             return;
           }

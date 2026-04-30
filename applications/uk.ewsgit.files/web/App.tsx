@@ -50,6 +50,7 @@ interface Task {
   // replaces %m with max and %c with current
   message: string,
   id: string,
+  type: string,
 
   // Internal use only
   invalid?: boolean
