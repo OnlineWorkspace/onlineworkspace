@@ -447,7 +447,7 @@ const router = t.router({
                         resize: {
                           fit: "cover",
                           position: "centre",
-                          dimensions: { width: opt.input.thumbnailSize, height: opt.input.thumbnailSize },
+                          dimensions: { width: opt.input.thumbnailSize, height: Math.floor((opt.input.thumbnailSize / 16) * 9) },
                           changeFormatTo: "webp",
                         },
                       })

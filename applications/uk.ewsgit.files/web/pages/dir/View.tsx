@@ -1,7 +1,7 @@
 import ERROR_ICON from "@material-symbols/svg-700/outlined/error.svg";
 import FOLDER_LIMITED_ICON from "@material-symbols/svg-700/outlined/folder_limited.svg";
 import {useSearchParams} from "@solidjs/router";
-import {type Component, createEffect, createSignal, Match, Switch, useContext} from "solid-js";
+import {type Component, createEffect, createSignal, Match, onCleanup, onMount, Switch, useContext} from "solid-js";
 import {createStore} from "solid-js/store";
 import type {Task} from "../../App.tsx";
 import {AppContext} from "../../appContext.ts";
@@ -24,7 +24,6 @@ const View: Component = () => {
     origin: undefined,
     size: undefined,
   });
-  const [ lastClickTime, setLastClickTime ] = createSignal<number>(-1);
   const [ errorMessage, setErrorMessage ] = createSignal<string | undefined>(undefined);
   let navigationCounter = 0;
 
@@ -36,6 +35,10 @@ const View: Component = () => {
 
     appContext?.userPreferences.viewType;
     appContext?.userPreferences.zoomPercentage;
+
+    appContext?.setViewState("isRenaming", false)
+    appContext?.setViewState("selectedItems", [])
+
     navigationCounter++
     const currentNavigationCount = navigationCounter;
 
@@ -124,6 +127,27 @@ const View: Component = () => {
     }
   });
 
+  const onKeyDown = (e: KeyboardEvent) => {
+    e.preventDefault();
+
+    if (e.key === "F2") {
+      appContext?.setViewState("isRenaming", true)
+    }
+
+    if (e.key === "Escape") {
+      appContext?.setViewState("isRenaming", false)
+      appContext?.setViewState("selectedItems", [])
+    }
+  }
+
+  onMount(async () => {
+    window.addEventListener("keydown", onKeyDown)
+  });
+
+  onCleanup(() => {
+    window.removeEventListener("keydown", onKeyDown)
+  })
+
   return (
     <>
       {errorMessage() ? (
@@ -155,98 +179,71 @@ const View: Component = () => {
             onMouseDown={(downEvent) => {
               if (appContext?.userPreferences.viewType === "gallery") return;
 
-              if (lastClickTime() > Date.now() - 250) {
-                setLastClickTime(-1);
+              const target = downEvent.target as HTMLElement;
+              const itemPath = target.closest("[data-fs-item-path]")?.getAttribute("data-fs-item-path");
+              const currentSelected = appContext?.viewState.selectedItems || [];
 
-                if (appContext?.viewState.selectedItems.length === 0) {
-                  appContext!.setViewState(
-                    "selectedItems",
-                    appContext.viewState.viewItems.map((i) => i.path),
-                  );
-                } else {
-                  appContext!.setViewState("selectedItems", []);
-                }
+              if (itemPath) {
+                const isSelected = currentSelected.includes(itemPath);
+                const newSelection = isSelected
+                  ? currentSelected.filter(path => path !== itemPath)
+                  : [ ...currentSelected, itemPath ];
+
+                appContext?.setViewState("selectedItems", newSelection);
+              } else {
+                appContext?.setViewState("selectedItems", []);
               }
 
-              setLastClickTime(Date.now());
+              const originX = downEvent.clientX;
+              const originY = downEvent.clientY;
+
               document.body.style.userSelect = "none";
-              setDragSelectRegion("origin", {x: downEvent.clientX, y: downEvent.clientY});
-              setDragSelectRegion("transOrigin", {x: downEvent.clientX, y: downEvent.clientY});
+              setDragSelectRegion("origin", {x: originX, y: originY});
 
               const currentTarget = downEvent.currentTarget as HTMLDivElement;
-              const currentTargetBounds = currentTarget.getBoundingClientRect();
-              const selectableItems = currentTarget.querySelectorAll("[data-fs-item-path]");
+              const bounds = currentTarget.getBoundingClientRect();
+              const selectableItems = Array.from(currentTarget.querySelectorAll("[data-fs-item-path]"));
+
+              function mouseMove(e: MouseEvent) {
+                const mouseX = Math.min(Math.max(e.clientX, bounds.left), bounds.right);
+                const mouseY = Math.min(Math.max(e.clientY, bounds.top), bounds.bottom);
+
+                const left = Math.min(originX, mouseX);
+                const top = Math.min(originY, mouseY);
+                const width = Math.abs(mouseX - originX);
+                const height = Math.abs(mouseY - originY);
+
+                setDragSelectRegion("transOrigin", {x: left, y: top});
+                setDragSelectRegion("size", {x: width, y: height});
+
+                const boxRight = left + width;
+                const boxBottom = top + height;
+
+                const newlySelected: string[] = [];
+                for (const item of selectableItems) {
+                  const itemRect = item.getBoundingClientRect();
+                  const path = item.getAttribute("data-fs-item-path");
+
+                  const isIntersecting = !(
+                    itemRect.left > boxRight ||
+                    itemRect.right < left ||
+                    itemRect.top > boxBottom ||
+                    itemRect.bottom < top
+                  );
+
+                  if (isIntersecting && path) newlySelected.push(path);
+                }
+
+                appContext?.setViewState("selectedItems", newlySelected);
+              }
 
               function mouseUp() {
                 document.body.style.userSelect = "unset";
-
                 setDragSelectRegion("origin", undefined);
                 setDragSelectRegion("size", undefined);
                 setDragSelectRegion("transOrigin", undefined);
-
                 document.removeEventListener("mouseup", mouseUp);
                 document.removeEventListener("mousemove", mouseMove);
-              }
-
-              let itemInRegionCalculationTimeout: NodeJS.Timeout | undefined;
-
-              function itemInRegionCalculation() {
-                appContext?.setViewState("selectedItems", []);
-
-                for (const item of selectableItems) {
-                  const boundingRect = item.getBoundingClientRect();
-
-                  const tl1 = {x: dragSelectRegion.transOrigin?.x || 0, y: dragSelectRegion.transOrigin?.y || 0};
-                  const br1 = {x: tl1.x + (dragSelectRegion.size?.x || 0), y: tl1.y + (dragSelectRegion.size?.y || 0)};
-
-                  const tl2 = {x: boundingRect.left, y: boundingRect.top};
-                  const br2 = {x: boundingRect.right, y: boundingRect.bottom};
-
-                  if (tl1.x > br2.x || tl2.x > br1.x) continue;
-
-                  if (tl1.y > br2.y || tl2.y > br1.y) continue;
-
-                  const itemPath = item.getAttribute("data-fs-item-path");
-                  if (!itemPath) return;
-                  if (!appContext?.viewState.selectedItems.includes(itemPath)) {
-                    appContext?.setViewState("selectedItems", [ ...appContext.viewState.selectedItems, itemPath ]);
-                  }
-                }
-              }
-
-              function mouseMove(e: MouseEvent) {
-                if (!dragSelectRegion.origin) return;
-                if (!dragSelectRegion.transOrigin) return;
-
-                const mouseX = Math.min(Math.max(e.clientX, currentTargetBounds.left), currentTargetBounds.right);
-                const mouseY = Math.min(Math.max(e.clientY, currentTargetBounds.top), currentTargetBounds.bottom);
-
-                let sizeX = 0;
-                let sizeY = 0;
-
-                sizeX = mouseX - dragSelectRegion.origin.x;
-                sizeY = mouseY - dragSelectRegion.origin.y;
-
-                if (mouseX < dragSelectRegion.origin.x) {
-                  setDragSelectRegion("transOrigin", {x: mouseX, y: dragSelectRegion.transOrigin.y});
-                  sizeX = dragSelectRegion.origin.x - mouseX;
-                }
-
-                if (mouseY < dragSelectRegion.origin.y) {
-                  setDragSelectRegion("transOrigin", {x: dragSelectRegion.transOrigin.x, y: mouseY});
-                  sizeY = dragSelectRegion.origin.y - mouseY;
-                }
-
-                setDragSelectRegion("size", {
-                  x: sizeX,
-                  y: sizeY,
-                });
-
-                if (itemInRegionCalculationTimeout) clearTimeout(itemInRegionCalculationTimeout);
-
-                itemInRegionCalculationTimeout = setTimeout(() => {
-                  itemInRegionCalculation();
-                }, 2);
               }
 
               document.addEventListener("mouseup", mouseUp);

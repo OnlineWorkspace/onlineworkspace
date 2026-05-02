@@ -6,11 +6,15 @@
     "value": "./icon.png"
   },
   "bannerImage": "./banner.svg",
-  "description": "The Ghostty Terminal for Workspaces",
+  "description": "The Ghostty Terminal for Workspaces (Mostly a Placeholder)",
   "authors": [
     {
       "name": "Ewsgit",
       "link": "<https://ewsgit.uk>"
+    },
+    {
+      "name": "The Ghostty Developers",
+      "link": "<https://github.com/ghostty-org/ghostty/>"
     }
   ],
   "license": "MIT",

@@ -1,5 +1,5 @@
 import {Route} from "@solidjs/router";
-import {type Accessor, type Component, createSignal, lazy, onMount, type Setter} from "solid-js";
+import {type Accessor, type Component, createSignal, lazy, onCleanup, onMount, type Setter} from "solid-js";
 import {createStore, type SetStoreFunction, type Store} from "solid-js/store";
 import {AppContext} from "./appContext.ts";
 import ActionBar from "./layout/components/ActionBar/ActionBar.tsx";
@@ -28,6 +28,7 @@ interface ViewState {
   lastSelectionTime: number;
   viewId: number;
   isLoading: boolean;
+  isRenaming: boolean;
 }
 
 interface AppContextType {
@@ -62,8 +63,8 @@ const App: Component = () => {
   const [ hasLoaded, setHasLoaded ] = createSignal<boolean>(false);
   const [ userPreferences, setUserPreferences ] = createStore<AppContextType[ "userPreferences" ]>({
     showWelcome: true,
-    homePath: "remote:/users/1/fs/",
-    pinnedDirectories: [ "remote:/users/1/fs/" ],
+    homePath: "remote:/users",
+    pinnedDirectories: [ "remote:/users" ],
     viewType: "details",
     showPreview: false,
     zoomPercentage: 1,
@@ -75,6 +76,7 @@ const App: Component = () => {
     lastSelectionTime: -1,
     viewId: 0,
     isLoading: true,
+    isRenaming: false
   });
   const [ taskStatus, setTaskStatus ] = createSignal<Task[]>([])
 

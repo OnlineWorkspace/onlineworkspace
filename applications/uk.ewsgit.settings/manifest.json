@@ -6,7 +6,7 @@
     "value": "./web/node_modules/@material-symbols/svg-700/outlined/settings.svg"
   },
   "bannerImage": "./settings_banner.svg",
-  "description": "The Workspaces Settings Manager",
+  "description": "The Online Workspace Settings Manager",
   "authors": [
     {
       "name": "Ewsgit",

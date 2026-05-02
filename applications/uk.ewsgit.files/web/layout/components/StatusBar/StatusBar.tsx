@@ -9,6 +9,8 @@ import {type Component, createEffect, createSignal, useContext} from "solid-js";
 import {AppContext} from "../../../appContext.ts";
 import humanReadableSize from "../../../lib/humanReadableSize.ts";
 import styles from "./StatusBar.module.scss";
+import {MAX_ZOOM_VALUE, MIN_ZOOM_VALUE} from "../../../lib/constants.ts";
+import UKDivider from "@onlineworkspace/uikit-solid/src/components/divider/UKDivider.jsx";
 
 const StatusBar: Component = () => {
   const appContext = useContext(AppContext);
@@ -94,13 +96,17 @@ const StatusBar: Component = () => {
           {appContext!.tasks()[ 0 ]?.message.replaceAll("%c", appContext!.tasks()[ 0 ].current.toString()).replaceAll("%m", appContext!.tasks()[ 0 ].max.toString())}
         </UKText>
       </div>
+      <UKDivider direction={"vertical"} class={styles.divider} width="full" />
       <div class={styles.sizeControls}>
+        <UKText role={"label"} size={"m"}>
+          {((appContext?.userPreferences.zoomPercentage || 1) * 100) + "%"}
+        </UKText>
         <UKIconButton
           size="xxs"
           alt="Zoom Out"
           icon={ZOOM_OUT_ICON}
           color="standard"
-          onClick={() => appContext?.setUserPreferences("zoomPercentage", Math.max(appContext.userPreferences.zoomPercentage - 0.2, 0.2))}
+          onClick={() => appContext?.setUserPreferences("zoomPercentage", Math.max(appContext.userPreferences.zoomPercentage - 0.2, MIN_ZOOM_VALUE))}
         />
         <UKIconButton
           size="xxs"
@@ -114,7 +120,7 @@ const StatusBar: Component = () => {
           alt="Zoom In"
           icon={ZOOM_IN_ICON}
           color="standard"
-          onClick={() => appContext?.setUserPreferences("zoomPercentage", appContext.userPreferences.zoomPercentage + 0.2)}
+          onClick={() => appContext?.setUserPreferences("zoomPercentage", Math.min(appContext.userPreferences.zoomPercentage + 0.2, MAX_ZOOM_VALUE))}
         />
       </div>
     </div>
