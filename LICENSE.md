@@ -1,4 +1,4 @@
-# Copyright © 2026 Ewsgit
+# Copyright © 2026 Ewsgit <ewsgit@ewsgit.uk>
 
 Licensed under the MIT License
 

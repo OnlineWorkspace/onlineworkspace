@@ -1,6 +1,6 @@
-![Online Workspace](./metaAssets/online_workspace_wordmark.svg)
+![Online Workspace](./.gitmeta/online_workspace_wordmark.svg)
 
-A self-hosted web platform for applications & services.
+A self-hosted web platform for applications & services with design based on Google's Material 3 Expressive.
 
 ---
 
@@ -9,7 +9,18 @@ A self-hosted web platform for applications & services.
 
 ### Links
 
-- Source Code (GitHub) -> <https://github.com/onlineworkspace/workspace>
+- Source Code (Tangled) -> <https://tangled.org/ewsgit.uk/onlineworkspace>
+- Source Code (GitHub Mirror) -> <https://github.com/onlineworkspace/workspace>
+- Installation Guide (NON Production) -> [Installation Guide for Development Environments](#installation-guide-for-development-environments)
+
+## Screenshots
+
+![dashboard_expanded_navigation](.gitmeta/preview_screenshots/dashboard_expanded_navigation.png)
+![dashboard](.gitmeta/preview_screenshots/dashboard.png)
+![files_grid](.gitmeta/preview_screenshots/files_grid.png)
+![settings_application](.gitmeta/preview_screenshots/settings_application.png)
+![settings_overview](.gitmeta/preview_screenshots/settings_overview.png)
+![wallpaper](.gitmeta/preview_screenshots/wallpaper.png)
 
 <!--
 ## Installation Guide for Production Environments (Docker)
@@ -66,10 +77,8 @@ A self-hosted web platform for applications & services.
 
 ## Installation Guide for Development Environments
 
----
-
-> [!TIP]
-> If you are struggling with the following instructions, please ask for help in the project's discord server which can be found in the links section.
+<!-- > [!TIP]
+> If you are struggling with the following instructions, please ask for help in the project's discord server which can be found in the links section. -->
 
 ### Dependencies
 
@@ -89,10 +98,11 @@ A self-hosted web platform for applications & services.
         3. Switch to the postgres user -> `sudo su postgres`
         4. Open PostgreSQL with psql -> `psql`
         5. Create a PostgreSQL database with the following query -> `CREATE DATABASE onlineworkspace_workspace;`
-        6. Change the PostgreSQL password with the following query -> `ALTER USER postgres WITH PASSWORD 'postgres';`
+        6. Change the PostgreSQL password with the following query -> `ALTER USER postgres WITH PASSWORD 'postgres';` (Please note: you should set the password to anything other than the example shown here, please ensure if you use another password to use an autoinstall configuration with the non-default password specified - see [auto-install Configuration](#auto-install-configuration))
         7. Exit psql -> `exit;`
         8. Logout from the postgres user -> `exit`
         9. Install Caddy -> `sudo apt install caddy`
+        10. When installing Caddy, a systemd service is automatically setup. If you are only using Caddy for development purposes, you will need to either modify the system Caddyfile to contain the contents of `./Caddyfile` in `/etc/caddy/Caddyfile` OR disable the systemd service with `sudo systemctl disable caddy && sudo systemctl stop caddy` before manually running Caddy.
     - Windows
         1. Simply install postgreSQL with the setup file downloaded from the postgreSQL website
         2. Open your database viewer of choice (DBeaver Community Edition is recommended)
@@ -104,13 +114,16 @@ A self-hosted web platform for applications & services.
 3. Ensure all auto-install configuration is set before proceeding, if you want a vanilla setup this step can be skipped (see [auto-install Configuration](#auto-install-configuration) section in the documentation for more details)
 4. Run `bun run dev` to start up the web interface and backend in development mode
 5. If on Linux or MacOS, ensure that caddy is allowed to bind to ports lower than 1024 by running `sudo setcap 'cap_net_bind_service=+ep' $(which caddy)`.
-6. Run `caddy run`(Linux) or `.\caddy.exe run`(Windows) to start the caddy server with the provided configuration (this will serve the web interface on `https://localhost` by default)
+6. Run Caddy
+
+- Linux & MacOS (Note: if you have chosen to keep the systemd service and have copied the contents of `./Caddyfile` into `/etc/caddy/Caddyfile` then you should skip this step and navigate to `https://localhost`)
+  - Run `sudo caddy run --config ./Caddyfile` to start the caddy server with the provided configuration (this will serve the web interface on `https://localhost` by default)
+- Windows
+    Run `.\caddy.exe run --config ./Caddyfile` to start the caddy server with the provided configuration (this will serve the web interface on `https://localhost` by default)
 
 ## Auto-install Configuration
 
----
-
-To automatically configure a workspaces instance on the first run, create a directory called `autoinstall` in the project root and place a `config.json` file inside with the following structure:
+To automatically configure an onlineworkspace instance on the first run, create a directory called `autoinstall` in the project root and place a `config.json` file inside with the following structure:
 
 ```json
 {

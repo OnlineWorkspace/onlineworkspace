@@ -21,10 +21,10 @@
   },
   "private": true,
   "dependencies": {
-    "@typescript/native-preview": "^7.0.0-dev.20260304.1",
-    "prettier": "^3.8.1"
+    "@typescript/native-preview": "^7.0.0-dev.20260502.1",
+    "prettier": "^3.8.3"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.4.8"
+    "@biomejs/biome": "^2.4.14"
   }
 }
