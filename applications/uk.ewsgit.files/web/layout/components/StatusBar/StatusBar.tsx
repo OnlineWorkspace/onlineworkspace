@@ -1,16 +1,16 @@
 import VIEW_REAL_SIZE_ICON from "@material-symbols/svg-700/outlined/view_real_size.svg";
 import ZOOM_IN_ICON from "@material-symbols/svg-700/outlined/zoom_in.svg";
 import ZOOM_OUT_ICON from "@material-symbols/svg-700/outlined/zoom_out.svg";
+import UKDivider from "@onlineworkspace/uikit-solid/src/components/divider/UKDivider.jsx";
 import UKIconButton from "@onlineworkspace/uikit-solid/src/components/iconButton/UKIconButton.jsx";
 import UKLinearProgressIndicator from "@onlineworkspace/uikit-solid/src/components/linearProgressIndicator/UKLinearProgressIndicator.tsx";
 import UKText from "@onlineworkspace/uikit-solid/src/components/text/UKText.tsx";
 import clsx from "clsx";
 import {type Component, createEffect, createSignal, useContext} from "solid-js";
 import {AppContext} from "../../../appContext.ts";
+import {MAX_ZOOM_VALUE, MIN_ZOOM_VALUE} from "../../../lib/constants.ts";
 import humanReadableSize from "../../../lib/humanReadableSize.ts";
 import styles from "./StatusBar.module.scss";
-import {MAX_ZOOM_VALUE, MIN_ZOOM_VALUE} from "../../../lib/constants.ts";
-import UKDivider from "@onlineworkspace/uikit-solid/src/components/divider/UKDivider.jsx";
 
 const StatusBar: Component = () => {
   const appContext = useContext(AppContext);
@@ -99,14 +99,16 @@ const StatusBar: Component = () => {
       <UKDivider direction={"vertical"} class={styles.divider} width="full" />
       <div class={styles.sizeControls}>
         <UKText role={"label"} size={"m"}>
-          {((appContext?.userPreferences.zoomPercentage || 1) * 100) + "%"}
+          {`${((appContext?.userPreferences.zoomPercentage || 1) * 100).toFixed(0)}%`}
         </UKText>
         <UKIconButton
           size="xxs"
           alt="Zoom Out"
           icon={ZOOM_OUT_ICON}
           color="standard"
-          onClick={() => appContext?.setUserPreferences("zoomPercentage", Math.max(appContext.userPreferences.zoomPercentage - 0.2, MIN_ZOOM_VALUE))}
+          onClick={() =>
+            appContext?.setUserPreferences("zoomPercentage", Number(Math.max(appContext.userPreferences.zoomPercentage - 0.2, MIN_ZOOM_VALUE).toFixed(2)))
+          }
         />
         <UKIconButton
           size="xxs"
@@ -120,7 +122,9 @@ const StatusBar: Component = () => {
           alt="Zoom In"
           icon={ZOOM_IN_ICON}
           color="standard"
-          onClick={() => appContext?.setUserPreferences("zoomPercentage", Math.min(appContext.userPreferences.zoomPercentage + 0.2, MAX_ZOOM_VALUE))}
+          onClick={() =>
+            appContext?.setUserPreferences("zoomPercentage", Number(Math.min(appContext.userPreferences.zoomPercentage + 0.2, MAX_ZOOM_VALUE).toFixed(2)))
+          }
         />
       </div>
     </div>

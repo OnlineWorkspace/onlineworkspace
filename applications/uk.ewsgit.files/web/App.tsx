@@ -1,5 +1,5 @@
 import {Route} from "@solidjs/router";
-import {type Accessor, type Component, createSignal, lazy, onCleanup, onMount, type Setter} from "solid-js";
+import {type Accessor, type Component, createSignal, lazy, onMount, type Setter} from "solid-js";
 import {createStore, type SetStoreFunction, type Store} from "solid-js/store";
 import {AppContext} from "./appContext.ts";
 import ActionBar from "./layout/components/ActionBar/ActionBar.tsx";
@@ -31,6 +31,10 @@ interface ViewState {
   isRenaming: boolean;
 }
 
+interface GlobalState {
+  showPreview: string | undefined;
+}
+
 interface AppContextType {
   isAdministrator: Accessor<boolean>;
   shootYourselfInTheFoot: Accessor<boolean>;
@@ -38,6 +42,8 @@ interface AppContextType {
   setUserPreferences: SetStoreFunction<UserPreferences>;
   viewState: Store<ViewState>;
   setViewState: SetStoreFunction<ViewState>;
+  globalState: Store<GlobalState>;
+  setGlobalState: SetStoreFunction<GlobalState>;
   deletedItemCount: number;
   isDesktopApp: boolean;
   tasks: Accessor<Task[]>;
@@ -78,6 +84,9 @@ const App: Component = () => {
     isLoading: true,
     isRenaming: false
   });
+  const [ globalState, setGlobalState ] = createStore<GlobalState>({
+    showPreview: undefined
+  })
   const [ taskStatus, setTaskStatus ] = createSignal<Task[]>([])
 
   onMount(async () => {
@@ -102,6 +111,8 @@ const App: Component = () => {
               setUserPreferences: setUserPreferences,
               viewState: viewState,
               setViewState: setViewState,
+              globalState: globalState,
+              setGlobalState: setGlobalState,
               deletedItemCount: 24,
               isDesktopApp: localStorage.getItem("onlineworkspace_workspace_desktop_app") === "true",
               tasks: taskStatus,

@@ -1,0 +1,39 @@
+.background {
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 9;
+  background: #2224;
+  border: none;
+}
+
+.component {
+  position: fixed;
+
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 0.5rem;
+  gap: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  z-index: 10;
+  animation: animateIn forwards 200ms ease-in-out;
+}
+
+@keyframes animateIn {
+  from {
+    transform: translate(-50%, -50%) scale(0);
+  }
+  to {
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+.header {
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
+}

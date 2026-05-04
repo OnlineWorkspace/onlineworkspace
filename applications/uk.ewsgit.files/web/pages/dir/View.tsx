@@ -134,7 +134,12 @@ const View: Component = () => {
       appContext?.setViewState("isRenaming", true)
     }
 
+    if (e.key === " ") {
+      appContext?.setGlobalState("showPreview", appContext.viewState.selectedItems[ 0 ])
+    }
+
     if (e.key === "Escape") {
+      appContext?.setGlobalState("showPreview", undefined)
       appContext?.setViewState("isRenaming", false)
       appContext?.setViewState("selectedItems", [])
     }
