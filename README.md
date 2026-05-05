@@ -1,4 +1,4 @@
-![Online Workspace](./.gitmeta/online_workspace_wordmark.svg)
+![Online Workspace](./.gitmeta/online_workspace_wordmark@4x.png)
 
 A self-hosted web platform for applications & services with design based on Google's Material 3 Expressive.
 
