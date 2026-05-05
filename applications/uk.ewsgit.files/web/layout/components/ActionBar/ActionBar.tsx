@@ -1,12 +1,12 @@
-import CLOSE_ICON from "@material-symbols/svg-700/outlined/close.svg";
-import MINIMIZE_ICON from "@material-symbols/svg-700/outlined/minimize.svg"
-import CROP_SQUARE_ICON from "@material-symbols/svg-700/outlined/crop_square.svg"
 import ADD_ICON from "@material-symbols/svg-700/outlined/add.svg";
 import ARROW_UPWARD_ICON from "@material-symbols/svg-700/outlined/arrow_upward.svg";
 import ART_TRACK_ICON from "@material-symbols/svg-700/outlined/art_track.svg";
 import CHEVRON_LEFT_ICON from "@material-symbols/svg-700/outlined/chevron_left.svg";
 import CHEVRON_RIGHT_ICON from "@material-symbols/svg-700/outlined/chevron_right.svg";
+import CLOSE_ICON from "@material-symbols/svg-700/outlined/close.svg";
+import CROP_SQUARE_ICON from "@material-symbols/svg-700/outlined/crop_square.svg";
 import LISTS_ICON from "@material-symbols/svg-700/outlined/lists.svg";
+import MINIMIZE_ICON from "@material-symbols/svg-700/outlined/minimize.svg";
 import RIGHT_PANEL_CLOSE_ICON from "@material-symbols/svg-700/outlined/right_panel_close.svg";
 import RIGHT_PANEL_OPEN_ICON from "@material-symbols/svg-700/outlined/right_panel_open.svg";
 import UPLOAD_ICON from "@material-symbols/svg-700/outlined/upload.svg";
@@ -15,27 +15,27 @@ import UKCard from "@onlineworkspace/uikit-solid/src/components/card/UKCard.tsx"
 import UKIconButton from "@onlineworkspace/uikit-solid/src/components/iconButton/UKIconButton.tsx";
 import UKText from "@onlineworkspace/uikit-solid/src/components/text/UKText.jsx";
 import useIsMobile from "@onlineworkspace/uikit-solid/src/core/useIsMobile.ts";
-import {useSearchParams} from "@solidjs/router";
+import { useSearchParams } from "@solidjs/router";
+import clsx from "clsx";
 import browserPath from "path-browserify";
-import {type Component, createEffect, createSignal, Show, useContext} from "solid-js";
-import {AppContext} from "../../../appContext.ts";
-import type {ViewItem} from "../../../pages/dir/viewItem.ts";
+import { type Component, createEffect, createSignal, Show, useContext } from "solid-js";
+import { AppContext } from "../../../appContext.ts";
+import type { UniformResourceLocator } from "../../../lib/filesystemInterface.ts";
+import { canViewNavigateUp, viewNavigateUp } from "../../../pages/dir/viewHistory.ts";
+import type { ViewItem } from "../../../pages/dir/viewItem.ts";
 import styles from "./ActionBar.module.scss";
-import clsx from "clsx"
-import {canViewNavigateUp, viewNavigateUp} from "../../../pages/dir/viewHistory.ts";
-import type {UniformResourceLocator} from "../../../lib/filesystemInterface.ts";
 
 const ActionBar: Component = () => {
   const isMobile = useIsMobile();
   const appContext = useContext(AppContext);
-  const [ searchParams, setSearchParams ] = useSearchParams<{path: string}>();
-  const [ pathQuery, setPathQuery ] = createSignal<string | undefined>(undefined);
-  const [ showTextualPath, setShowTextualPath ] = createSignal<boolean>(false);
-  const [ canNavigateUp, setCanNavigateUp ] = createSignal<boolean>(false);
+  const [searchParams, setSearchParams] = useSearchParams<{ path: string }>();
+  const [pathQuery, setPathQuery] = createSignal<string | undefined>(undefined);
+  const [showTextualPath, setShowTextualPath] = createSignal<boolean>(false);
+  const [canNavigateUp, setCanNavigateUp] = createSignal<boolean>(false);
 
   createEffect(() => {
-    setCanNavigateUp(canViewNavigateUp((searchParams.path || "invalid:") as UniformResourceLocator))
-  })
+    setCanNavigateUp(canViewNavigateUp((searchParams.path || "invalid:") as UniformResourceLocator));
+  });
 
   return (
     <div class={styles.root}>
@@ -48,45 +48,51 @@ const ActionBar: Component = () => {
           disabled={!canNavigateUp()}
           alt={"go up one directory"}
           onClick={() => {
-            viewNavigateUp((p) => setSearchParams({path: p}), (searchParams.path || "invalid:") as UniformResourceLocator)
+            viewNavigateUp((p) => setSearchParams({ path: p }), (searchParams.path || "invalid:") as UniformResourceLocator);
           }}
         />
       </div>
       <Show when={searchParams.path !== undefined}>
         <div class={styles.pathSelector}>
           <div class={styles.pathSegments}>
-            {(searchParams.path || "").split(browserPath.sep).slice(0, 1).map((segment, index) => {
-              return (
-                <>
-                  <UKText role="label" size="l">
-                    {segment.slice(0, -1).toUpperCase()}
-                  </UKText>
-                  {(searchParams.path || "").split(browserPath.sep).length - 1 === index ? (
-                    ""
-                  ) : (
+            {(searchParams.path || "")
+              .split(browserPath.sep)
+              .slice(0, 1)
+              .map((segment, index) => {
+                return (
+                  <>
                     <UKText role="label" size="l">
-                      /
+                      {segment.slice(0, -1).toUpperCase()}
                     </UKText>
-                  )}
-                </>
-              );
-            })}
-            {(searchParams.path || "").split(browserPath.sep).slice(1).map((segment, index) => {
-              return (
-                <div>
-                  <UKText role="label" size="l">
-                    {segment}
-                  </UKText>
-                  {(searchParams.path || "").split(browserPath.sep).length - 1 === index ? (
-                    ""
-                  ) : (
+                    {(searchParams.path || "").split(browserPath.sep).length - 1 === index ? (
+                      ""
+                    ) : (
+                      <UKText role="label" size="l">
+                        /
+                      </UKText>
+                    )}
+                  </>
+                );
+              })}
+            {(searchParams.path || "")
+              .split(browserPath.sep)
+              .slice(1)
+              .map((segment, index) => {
+                return (
+                  <div>
                     <UKText role="label" size="l">
-                      /
+                      {segment}
                     </UKText>
-                  )}
-                </div>
-              );
-            })}
+                    {(searchParams.path || "").split(browserPath.sep).length - 1 === index ? (
+                      ""
+                    ) : (
+                      <UKText role="label" size="l">
+                        /
+                      </UKText>
+                    )}
+                  </div>
+                );
+              })}
           </div>
           <input
             class={styles.pathInput}
@@ -98,7 +104,7 @@ const ActionBar: Component = () => {
             onBlur={() => setShowTextualPath(false)}
             onClick={() => setShowTextualPath(true)}
             data-visible={showTextualPath()}
-            onChange={(e) => setSearchParams({path: e.currentTarget.value})}
+            onChange={(e) => setSearchParams({ path: e.currentTarget.value })}
           />
           <UKCard class={styles.pathSuggestions}>
             {pathQuery()}
@@ -159,7 +165,7 @@ const ActionBar: Component = () => {
                 for (let i = 0; i < 10; i++) {
                   appContext?.setViewState("viewItems", [
                     ...appContext.viewState.viewItems,
-                    {type: "file", path: `/randomNewItem${Math.round(Math.random() * 100000000)}`},
+                    { type: "file", path: `/randomNewItem${Math.round(Math.random() * 100000000)}` },
                   ] as ViewItem[]);
                 }
               }}
@@ -176,7 +182,7 @@ const ActionBar: Component = () => {
             }}
           />
         )}
-        {appContext?.isDesktopApp && (localStorage.getItem("onlineworkspace_workspace_desktop_platform") !== "darwin") && (
+        {appContext?.isDesktopApp && localStorage.getItem("onlineworkspace_workspace_desktop_platform") !== "darwin" && (
           <>
             <UKIconButton
               icon={MINIMIZE_ICON}
