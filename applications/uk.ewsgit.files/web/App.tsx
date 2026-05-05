@@ -26,13 +26,15 @@ interface ViewState {
   viewItems: ViewItem[];
   selectedItems: string[];
   lastSelectionTime: number;
+  lastSelectedItem: string | undefined;
   viewId: number;
   isLoading: boolean;
-  isRenaming: boolean;
+  isRenaming: string | undefined;
 }
 
 interface GlobalState {
-  showPreview: string | undefined;
+  showPreview: boolean;
+  disableShortcuts: boolean;
 }
 
 interface AppContextType {
@@ -80,12 +82,14 @@ const App: Component = () => {
     viewItems: [],
     selectedItems: [],
     lastSelectionTime: -1,
+    lastSelectedItem: undefined,
     viewId: 0,
     isLoading: true,
-    isRenaming: false
+    isRenaming: undefined
   });
   const [ globalState, setGlobalState ] = createStore<GlobalState>({
-    showPreview: undefined
+    showPreview: false,
+    disableShortcuts: false,
   })
   const [ taskStatus, setTaskStatus ] = createSignal<Task[]>([])
 

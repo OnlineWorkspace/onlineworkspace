@@ -73,7 +73,7 @@
   }
 
   .thumbnailIcon {
-    --icon-size: calc(6rem * var(--zoom-percentage, 1));
+    --icon-size: calc(calc(calc(128px / 16) * 9) * var(--zoom-percentage, 1));
   }
 
   &.itemHidden {

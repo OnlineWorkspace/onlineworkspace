@@ -67,7 +67,7 @@
 
   &[data-color="outlined"] {
     background-color: rgb(var(--uk-sys-color-surface));
-    color: rgb(var(--uk-sys-color-primary));
+    color: rgb(var(--uk-sys-color-on-surface));
     box-shadow: 0 0 1px rgb(var(--uk-sys-color-shadow));
     border-radius: var(--uk-sys-shape-corner-medium);
     border-width: 1px;

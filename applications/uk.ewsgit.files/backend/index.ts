@@ -379,7 +379,7 @@ const router = t.router({
       const userPermissions = await instance.sys.filesystem.getUserPermissions(opt.ctx.userId, resolvedPath);
 
       if (!userPermissions.read) {
-        return { status: "missing_permission" };
+        return { status: "missing_permission" as const };
       }
 
       try {
@@ -394,7 +394,7 @@ const router = t.router({
 
         return { items: directoryContents.map((ent) => ent.name), status: "ok" };
       } catch (_) {
-        return { status: "invalid_path" };
+        return { status: "invalid_path" as const };
       }
     }),
   view: {
@@ -425,7 +425,7 @@ const router = t.router({
 
         if (!userPermissions.read) {
           return {
-            status: "missing_permission",
+            status: "missing_permission" as const,
           };
         }
 
@@ -433,7 +433,7 @@ const router = t.router({
           const itemStats = await fs.lstat(resolvedPath);
 
           return {
-            status: "ok",
+            status: "ok" as const,
             data: {
               path: opt.input.path,
               type: itemStats.isSymbolicLink() ? "link" : itemStats.isDirectory() ? "directory" : itemStats.isFile() ? "file" : "file",
@@ -460,7 +460,7 @@ const router = t.router({
           };
         } catch (_) {
           return {
-            status: "invalid_path",
+            status: "invalid_path" as const,
           };
         }
       }),
@@ -503,6 +503,44 @@ const router = t.router({
 
     return resp;
   }),
+  previewDialog: {
+    get: procedure.input(z.object({ path: z.string() })).query(async (opt) => {
+      const resolvedPath = path.join(instance.sys.filesystem.FS_ROOT, opt.input.path);
+
+      const pathStat = await fs.lstat(resolvedPath);
+      const isDirectory = pathStat.isDirectory();
+
+      const fileType = instance.sys.filesystem.getFileType(resolvedPath);
+
+      let imageDimensions: { width: number; height: number } = { width: 0, height: 0 };
+
+      return {
+        status: "ok" as const,
+        data: {
+          assets:
+            fileType === "image"
+              ? {
+                  original: await instance.sys.image.serveImage(opt.ctx.userId, resolvedPath),
+                  small: await instance.sys.image.serveImage(opt.ctx.userId, resolvedPath, {
+                    resize: {
+                      dimensions: (original) => {
+                        imageDimensions = original;
+
+                        return { width: 1024, height: Math.floor((original.height / original.width) * 1024) };
+                      },
+                    },
+                  }),
+                }
+              : undefined,
+          metadata: {
+            size: pathStat.size,
+            itemCount: isDirectory ? (await fs.readdir(resolvedPath)).length : undefined,
+            pixelate: imageDimensions.width !== 0 && imageDimensions.height !== 0 && imageDimensions.width < 640 && imageDimensions.height < 640,
+          },
+        },
+      };
+    }),
+  },
 });
 
 export type TRPCRouter = typeof router;

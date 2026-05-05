@@ -165,6 +165,27 @@ class FilesystemInterface {
     }
   }
 
+  async getPreviewDialogMetadata(url: UniformResourceLocator) {
+    const parsedUrl = this.urlToPath(url);
+
+    if (parsedUrl.type === "invalid") {
+      return { status: "invalid_path" as const };
+    }
+
+    if (parsedUrl.type === "local") {
+      alert("Cannot open the preview dialog for local files currently.");
+      return { status: "invalid_operation" as const };
+    } else {
+      const getEntryResponse = await trpc.previewDialog.get.query({ path: parsedUrl.path });
+
+      if (getEntryResponse.status === "ok") {
+        return getEntryResponse;
+      } else {
+        return { status: getEntryResponse.status };
+      }
+    }
+  }
+
   joinUrls(...urls: UniformResourceLocator[]) {
     const firstUrlType = this.urlToPath(urls[0]).type;
 

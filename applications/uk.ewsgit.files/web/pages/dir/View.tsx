@@ -12,6 +12,7 @@ import DetailsView from "./components/DetailsView/DetailsView.tsx";
 import GridView from "./components/GridView/GridView.tsx";
 import styles from "./View.module.scss";
 import GalleryView from "./components/GalleryView/GalleryView.tsx";
+import {deselectAllItems, selectNextItem, selectPreviousItem} from "./itemSelection.ts";
 
 const View: Component = () => {
   const [ searchParams, setSearchParams ] = useSearchParams<{path?: UniformResourceLocator}>();
@@ -25,6 +26,7 @@ const View: Component = () => {
     size: undefined,
   });
   const [ errorMessage, setErrorMessage ] = createSignal<string | undefined>(undefined);
+  const [ forceViewItemUpdate, setForceViewItemUpdate ] = createSignal<number>(0)
   let navigationCounter = 0;
 
   createEffect(async () => {
@@ -35,8 +37,9 @@ const View: Component = () => {
 
     appContext?.userPreferences.viewType;
     appContext?.userPreferences.zoomPercentage;
+    forceViewItemUpdate();
 
-    appContext?.setViewState("isRenaming", false)
+    appContext?.setViewState("isRenaming", undefined)
     appContext?.setViewState("selectedItems", [])
 
     navigationCounter++
@@ -130,18 +133,58 @@ const View: Component = () => {
   const onKeyDown = (e: KeyboardEvent) => {
     e.preventDefault();
 
-    if (e.key === "F2") {
-      appContext?.setViewState("isRenaming", true)
-    }
+    if (e.key !== "Escape" && appContext?.globalState.disableShortcuts)
+      return;
 
-    if (e.key === " ") {
-      appContext?.setGlobalState("showPreview", appContext.viewState.selectedItems[ 0 ])
-    }
+    switch (e.key) {
+      case "F2": {
+        appContext?.setViewState("isRenaming", appContext.viewState.lastSelectedItem)
+        break;
+      }
+      case " ": {
+        if (appContext?.viewState.lastSelectedItem === undefined)
+          return;
 
-    if (e.key === "Escape") {
-      appContext?.setGlobalState("showPreview", undefined)
-      appContext?.setViewState("isRenaming", false)
-      appContext?.setViewState("selectedItems", [])
+        if (appContext?.globalState.showPreview === false) {
+          appContext?.setGlobalState("showPreview", true)
+        } else {
+          appContext?.setGlobalState("showPreview", false)
+        }
+        break;
+      }
+      case "Escape": {
+        appContext?.setGlobalState("showPreview", false)
+        appContext?.setViewState("isRenaming", undefined)
+        appContext?.setViewState("selectedItems", [])
+        appContext?.setGlobalState("disableShortcuts", false)
+        break;
+      }
+      case "ArrowLeft": {
+        selectPreviousItem(appContext!)
+        break;
+      }
+      case "ArrowRight": {
+        selectNextItem(appContext!)
+        break;
+      }
+      case "ArrowUp": {
+        selectPreviousItem(appContext!)
+        break;
+      }
+      case "ArrowDown": {
+        selectNextItem(appContext!)
+        break;
+      }
+      case "F5": {
+        setForceViewItemUpdate(p => p + 1)
+        break;
+      }
+      case "r": {
+        if (e.ctrlKey) {
+          setForceViewItemUpdate(p => p + 1)
+        }
+        break;
+      }
     }
   }
 
@@ -196,7 +239,7 @@ const View: Component = () => {
 
                 appContext?.setViewState("selectedItems", newSelection);
               } else {
-                appContext?.setViewState("selectedItems", []);
+                deselectAllItems(appContext!)
               }
 
               const originX = downEvent.clientX;

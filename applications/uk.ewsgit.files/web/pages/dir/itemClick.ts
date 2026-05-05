@@ -1,7 +1,8 @@
 import type { DOMElement } from "solid-js/jsx-runtime";
 import type { AppContextType } from "../../App.tsx";
-import type { ViewItem } from "./viewItem.ts";
 import filesystemInterface, { type UniformResourceLocator } from "../../lib/filesystemInterface.ts";
+import { deselectAllItems, selectItem } from "./itemSelection.ts";
+import type { ViewItem } from "./viewItem.ts";
 
 const onItemClick = (
   e: MouseEvent & { currentTarget: HTMLButtonElement; target: DOMElement },
@@ -16,18 +17,18 @@ const onItemClick = (
     const firstSelectionIndex = appContext?.viewState.viewItems.findIndex((viewItem) => viewItem.path === appContext.viewState.selectedItems[0]!);
 
     if (firstSelectionIndex === undefined) {
-      appContext?.setViewState("selectedItems", [item.path]);
+      selectItem(appContext, item.path);
       return;
     }
 
     if (firstSelectionIndex === currentIndex) {
-      appContext?.setViewState("selectedItems", []);
+      deselectAllItems(appContext);
       return;
     }
 
     if (firstSelectionIndex > currentIndex) {
       // for all intermediate items, select them
-      appContext?.setViewState("selectedItems", []);
+      deselectAllItems(appContext);
 
       const newViewSelectedItems: string[] = [];
 
@@ -35,13 +36,14 @@ const onItemClick = (
         newViewSelectedItems.push(appContext!.viewState.viewItems[i].path);
       }
 
+      appContext.setViewState("lastSelectedItem", newViewSelectedItems[0]);
       appContext?.setViewState("selectedItems", newViewSelectedItems);
       return;
     }
 
     if (firstSelectionIndex < currentIndex) {
       // for all intermediate items, select them
-      appContext?.setViewState("selectedItems", []);
+      deselectAllItems(appContext);
 
       const newViewSelectedItems: string[] = [];
 
@@ -49,6 +51,7 @@ const onItemClick = (
         newViewSelectedItems.push(appContext!.viewState.viewItems[i].path);
       }
 
+      appContext.setViewState("lastSelectedItem", newViewSelectedItems[0]);
       appContext?.setViewState("selectedItems", newViewSelectedItems);
 
       return;
@@ -77,12 +80,12 @@ const onItemClick = (
         return;
       }
 
-      appContext?.setViewState("selectedItems", []);
-      appContext.setViewState("lastSelectionTime", -1);
+      deselectAllItems(appContext);
       return;
     }
-    appContext?.setViewState("selectedItems", [item.path]);
-    appContext.setViewState("lastSelectionTime", Date.now());
+
+    selectItem(appContext, item.path);
   }
 };
+
 export default onItemClick;

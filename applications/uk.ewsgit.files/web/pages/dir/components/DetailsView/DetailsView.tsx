@@ -87,7 +87,7 @@ const DetailsView: Component = () => {
                     )}
                   </td>
                   <td>
-                    {appContext?.viewState.isRenaming && appContext.viewState.selectedItems[ 0 ] === item.path ?
+                    {appContext?.viewState.isRenaming === item.path ?
                       <div>Hello Renaming World!</div>
                       : <UKText size="m" role="body">
                         {browserPath.basename(item.path)}

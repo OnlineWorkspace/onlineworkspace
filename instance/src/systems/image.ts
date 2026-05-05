@@ -159,8 +159,10 @@ export default class ImageSystem extends System {
   ): Promise<boolean> {
     const sharpInstance = sharp(inputPath);
 
+    const originalDimensions = await sharpInstance.metadata();
+
     if (typeof dimensions === "function") {
-      dimensions = dimensions(await sharpInstance.metadata());
+      dimensions = dimensions(originalDimensions);
     }
 
     sharpInstance.resize(dimensions.width, dimensions.height, {
@@ -168,6 +170,7 @@ export default class ImageSystem extends System {
       position: options?.position,
       fit: options?.fit,
       background: options?.background,
+      kernel: originalDimensions.width / 2 > dimensions.width || originalDimensions.height / 2 > dimensions.height ? "cubic" : "mks2021",
     });
 
     if (options) {

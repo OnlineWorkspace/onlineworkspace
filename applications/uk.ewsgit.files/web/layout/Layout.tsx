@@ -13,6 +13,7 @@ import PreviewPane from "./components/PreviewPane/PreviewPane.tsx";
 import Quota from "./components/Quota/Quota.tsx";
 import StatusBar from "./components/StatusBar/StatusBar.tsx";
 import styles from "./Layout.module.scss";
+import type {UniformResourceLocator} from "../lib/filesystemInterface.ts";
 
 const Layout: Component<ParentProps> = (props) => {
   const navigate = useNavigate();
@@ -120,8 +121,8 @@ const Layout: Component<ParentProps> = (props) => {
           </div>
         </div>
       </UKSideBar>
-      <Show when={appContext?.globalState.showPreview !== undefined && appContext.isDesktopApp === false}>
-        <PreviewDialog path={appContext!.globalState.showPreview!} />
+      <Show when={appContext?.globalState.showPreview === true && appContext.isDesktopApp === false}>
+        <PreviewDialog pathUrl={appContext!.viewState.lastSelectedItem! as UniformResourceLocator} />
       </Show>
     </>
   );
