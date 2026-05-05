@@ -1,7 +1,7 @@
 import ERROR_ICON from "@material-symbols/svg-700/outlined/error.svg";
 import FOLDER_LIMITED_ICON from "@material-symbols/svg-700/outlined/folder_limited.svg";
 import {useSearchParams} from "@solidjs/router";
-import {type Component, createEffect, createSignal, Match, onCleanup, onMount, Switch, useContext} from "solid-js";
+import {type Component, createEffect, createSignal, Match, onCleanup, onMount, Suspense, Switch, useContext} from "solid-js";
 import {createStore} from "solid-js/store";
 import type {Task} from "../../App.tsx";
 import {AppContext} from "../../appContext.ts";
@@ -159,6 +159,22 @@ const View: Component = () => {
         appContext?.setGlobalState("disableShortcuts", false)
         break;
       }
+      case "Enter": {
+        if (appContext?.viewState.lastSelectedItem) {
+            const item = appContext.viewState.viewItems.find(i => i.path === appContext.viewState.lastSelectedItem)
+
+          if (!item) return;
+
+          if (item.type === "file") {
+              filesystemInterface.openInDefaultApplication(item.path as UniformResourceLocator);
+              return;
+            }
+
+            setSearchParams({ path: item.path });
+        }
+        deselectAllItems(appContext!)
+        break;
+      }
       case "ArrowLeft": {
         selectPreviousItem(appContext!)
         break;
@@ -197,7 +213,7 @@ const View: Component = () => {
   })
 
   return (
-    <>
+    <Suspense>
       {errorMessage() ? (
         <ViewMessage icon={ERROR_ICON} title={"An error has occurred"} message={errorMessage() || "Missing Error Message?"}></ViewMessage>
       ) : appContext?.viewState.viewItems.length === 0 && !appContext.viewState.isLoading ? (
@@ -323,7 +339,7 @@ const View: Component = () => {
           </div>
         </>
       )}
-    </>
+    </Suspense>
   );
 };
 

@@ -5,7 +5,7 @@
   top: 0;
   left: 0;
   z-index: 9;
-  background: #2224;
+  background: transparent;
   border: none;
 }
 
@@ -33,18 +33,16 @@
   &.expanded {
     max-width: 100%;
   }
-
-  &.loadingData {
-    height: 256px;
-  }
 }
 
 @keyframes animateIn {
   from {
-    transform: translate(-50%, -50%) scale(0);
+    transform: translate(-50%, -50%) scale(0.75);
+    opacity: 0;
   }
   to {
     transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
   }
 }
 
@@ -100,4 +98,25 @@
 
 .originalHasLoaded {
   opacity: 1;
+}
+
+.generalContent {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: row;
+  gap: 1rem;
+  width: 100%;
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+
+  .generalIcon {
+      --icon-size: 8rem;
+  }
+
+  .metadata {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
 }

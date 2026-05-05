@@ -6,7 +6,7 @@ import PERSON_ICON from "@material-symbols/svg-700/outlined/person.svg";
 import UKSideBar from "@onlineworkspace/uikit-solid/src/components/sideBar/UKSideBar.tsx";
 import {useNavigate} from "@solidjs/router";
 import browserPath from "path-browserify";
-import {type Component, type ParentProps, Show, useContext} from "solid-js";
+import {type Component, type ParentProps, Show, Suspense, useContext} from "solid-js";
 import {AppContext} from "../appContext.ts";
 import PreviewDialog from "./components/PreviewDialog/PreviewDialog.tsx";
 import PreviewPane from "./components/PreviewPane/PreviewPane.tsx";
@@ -121,9 +121,11 @@ const Layout: Component<ParentProps> = (props) => {
           </div>
         </div>
       </UKSideBar>
+      <Suspense>
       <Show when={appContext?.globalState.showPreview === true && appContext.isDesktopApp === false}>
         <PreviewDialog pathUrl={appContext!.viewState.lastSelectedItem! as UniformResourceLocator} />
-      </Show>
+        </Show>
+      </Suspense>
     </>
   );
 };

@@ -9,9 +9,10 @@ export function selectItem(appContext: AppContextType, path: string) {
 }
 
 export function deselectAllItems(appContext: AppContextType) {
-  appContext?.setViewState("lastSelectedItem", undefined);
-  appContext?.setViewState("selectedItems", []);
+  appContext.setViewState("lastSelectedItem", undefined);
+  appContext.setViewState("selectedItems", []);
   appContext.setViewState("lastSelectionTime", -1);
+  appContext.setGlobalState("showPreview", false)
 
   return true;
 }

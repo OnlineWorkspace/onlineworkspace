@@ -13,12 +13,16 @@ import {AppContext} from "../../../appContext";
 import styles from "./PreviewDialog.module.scss";
 import clsx from "clsx";
 import filesystemInterface, {type UniformResourceLocator} from "../../../lib/filesystemInterface";
+import UKDivider from "@onlineworkspace/uikit-solid/src/components/divider/UKDivider.jsx";
+import UKIcon from "@onlineworkspace/uikit-solid/src/components/icon/UKIcon.jsx";
+import iconForItemType from "../../../pages/dir/iconForItemType";
+import humanReadableSize from "../../../lib/humanReadableSize";
 
 const PreviewDialog: Component<{pathUrl: UniformResourceLocator}> = (props) => {
   const appContext = useContext(AppContext);
   const [ isExpanded, setIsExpanded ] = createSignal<boolean>(false);
   const [ originalHasLoaded, setOriginalHasLoaded ] = createSignal<boolean>(false);
-  const [ data ] = createResource(() => props.pathUrl, (url) => filesystemInterface.getPreviewDialogMetadata(url as UniformResourceLocator))
+  const [data] = createResource(() => props.pathUrl, (url) => filesystemInterface.getPreviewDialogMetadata(url as UniformResourceLocator))
 
   return (
     <>
@@ -29,7 +33,7 @@ const PreviewDialog: Component<{pathUrl: UniformResourceLocator}> = (props) => {
           appContext?.setGlobalState("showPreview", false);
         }}
       />
-      <UKCard color="outlined" class={clsx(styles.component, isExpanded() && styles.expanded, data() === undefined && styles.loadingData)}>
+      <UKCard color="outlined" class={clsx(styles.component, isExpanded() && styles.expanded)}>
         <div class={styles.header}>
           {
             !appContext?.isDesktopApp && <>
@@ -53,9 +57,11 @@ const PreviewDialog: Component<{pathUrl: UniformResourceLocator}> = (props) => {
               />
             </>
           }
+          <Suspense>
           <UKText size="m" role="title" class={styles.title}>
             Preview for {path.basename(props.pathUrl)}
-          </UKText>
+            </UKText>
+          </Suspense>
           <UKIconButton
             size="xxs"
             width="wide"
@@ -84,8 +90,18 @@ const PreviewDialog: Component<{pathUrl: UniformResourceLocator}> = (props) => {
           </UKButton>
         </div>
         <div class={clsx(styles.previewContentContainer, (data() as Extract<ReturnType<typeof data>, {status: "ok"}>)?.data?.metadata?.pixelate && styles.pixelate)}>
-          <Suspense>
             <Show when={data()!}>
+              <Show when={!!(data() as Extract<ReturnType<typeof data>, { status: "ok" }>).data.assets} fallback={<>
+                <div class={styles.generalContent}>
+                <UKIcon class={styles.generalIcon}>{ iconForItemType((data() as Extract<ReturnType<typeof data>, { status: "ok" }>).data.metadata.type as unknown as any) }</UKIcon>
+                <UKDivider direction="vertical" />
+                <div class={styles.metadata}>
+                  <UKText size="l" role="headline">{path.basename(props.pathUrl)}</UKText>
+                  <UKText size="l" role="body">Contains { (data() as Extract<ReturnType<typeof data>, { status: "ok" }>).data.metadata.itemCount} items</UKText>
+                  <UKText size="l" role="label">{humanReadableSize((data() as Extract<ReturnType<typeof data>, { status: "ok" }>).data.metadata.size)}</UKText>
+                </div>
+              </div>
+              </>}>
               {
                 data()!.status === "ok" && <>
                   <img loading="eager" class={styles.smallPreview} src={(data() as Extract<ReturnType<typeof data>, {status: "ok"}>).data.assets?.small || ""} alt="preview"></img>
@@ -93,11 +109,11 @@ const PreviewDialog: Component<{pathUrl: UniformResourceLocator}> = (props) => {
                     <img loading="lazy" class={clsx(originalHasLoaded() && styles.originalHasLoaded, styles.originalPreview)} onLoad={() => setOriginalHasLoaded(true)} src={(data() as Extract<ReturnType<typeof data>, {status: "ok"}>).data.assets?.original || ""} alt="preview"></img>
                   }
                 </>
-              }
+                }
+              </Show>
             </Show>
-          </Suspense>
-        </div>
-      </UKCard >
+          </div>
+      </UKCard>
     </>
   );
 };

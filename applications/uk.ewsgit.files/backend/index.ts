@@ -510,7 +510,7 @@ const router = t.router({
       const pathStat = await fs.lstat(resolvedPath);
       const isDirectory = pathStat.isDirectory();
 
-      const fileType = instance.sys.filesystem.getFileType(resolvedPath);
+      const fileType = !isDirectory ? instance.sys.filesystem.getFileType(resolvedPath) : "directory";
 
       let imageDimensions: { width: number; height: number } = { width: 0, height: 0 };
 
@@ -534,6 +534,7 @@ const router = t.router({
               : undefined,
           metadata: {
             size: pathStat.size,
+            type: pathStat.isSymbolicLink() ? "link" : pathStat.isDirectory() ? "directory" : pathStat.isFile() ? "file" : "file",
             itemCount: isDirectory ? (await fs.readdir(resolvedPath)).length : undefined,
             pixelate: imageDimensions.width !== 0 && imageDimensions.height !== 0 && imageDimensions.width < 640 && imageDimensions.height < 640,
           },
