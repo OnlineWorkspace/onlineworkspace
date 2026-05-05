@@ -1,37 +1,37 @@
 import ERROR_ICON from "@material-symbols/svg-700/outlined/error.svg";
 import FOLDER_LIMITED_ICON from "@material-symbols/svg-700/outlined/folder_limited.svg";
-import {useSearchParams} from "@solidjs/router";
-import {type Component, createEffect, createSignal, Match, onCleanup, onMount, Suspense, Switch, useContext} from "solid-js";
-import {createStore} from "solid-js/store";
-import type {Task} from "../../App.tsx";
-import {AppContext} from "../../appContext.ts";
+import { useSearchParams } from "@solidjs/router";
+import { type Component, createEffect, createSignal, Match, onCleanup, onMount, Suspense, Switch, useContext } from "solid-js";
+import { createStore } from "solid-js/store";
+import type { Task } from "../../App.tsx";
+import { AppContext } from "../../appContext.ts";
 import ViewMessage from "../../layout/components/ViewMessage/ViewMessage.tsx";
 import chunkArray from "../../lib/chunk.ts";
-import filesystemInterface, {type UniformResourceLocator} from "../../lib/filesystemInterface.ts";
+import filesystemInterface, { type UniformResourceLocator } from "../../lib/filesystemInterface.ts";
 import DetailsView from "./components/DetailsView/DetailsView.tsx";
-import GridView from "./components/GridView/GridView.tsx";
-import styles from "./View.module.scss";
 import GalleryView from "./components/GalleryView/GalleryView.tsx";
-import {deselectAllItems, selectNextItem, selectPreviousItem} from "./itemSelection.ts";
+import GridView from "./components/GridView/GridView.tsx";
+import { deselectAllItems, selectNextItem, selectPreviousItem } from "./itemSelection.ts";
+import styles from "./View.module.scss";
 
 const View: Component = () => {
-  const [ searchParams, setSearchParams ] = useSearchParams<{path?: UniformResourceLocator}>();
+  const [searchParams, setSearchParams] = useSearchParams<{ path?: UniformResourceLocator }>();
   const appContext = useContext(AppContext);
-  const [ dragSelectRegion, setDragSelectRegion ] = createStore<{
-    origin?: {x: number; y: number};
-    size?: {x: number; y: number};
-    transOrigin?: {x: number; y: number};
+  const [dragSelectRegion, setDragSelectRegion] = createStore<{
+    origin?: { x: number; y: number };
+    size?: { x: number; y: number };
+    transOrigin?: { x: number; y: number };
   }>({
     origin: undefined,
     size: undefined,
   });
-  const [ errorMessage, setErrorMessage ] = createSignal<string | undefined>(undefined);
-  const [ forceViewItemUpdate, setForceViewItemUpdate ] = createSignal<number>(0)
+  const [errorMessage, setErrorMessage] = createSignal<string | undefined>(undefined);
+  const [forceViewItemUpdate, setForceViewItemUpdate] = createSignal<number>(0);
   let navigationCounter = 0;
 
   createEffect(async () => {
     if (!searchParams.path) {
-      setSearchParams({path: appContext?.userPreferences.homePath});
+      setSearchParams({ path: appContext?.userPreferences.homePath });
       return;
     }
 
@@ -39,14 +39,14 @@ const View: Component = () => {
     appContext?.userPreferences.zoomPercentage;
     forceViewItemUpdate();
 
-    appContext?.setViewState("isRenaming", undefined)
-    appContext?.setViewState("selectedItems", [])
+    appContext?.setViewState("isRenaming", undefined);
+    appContext?.setViewState("selectedItems", []);
 
-    navigationCounter++
+    navigationCounter++;
     const currentNavigationCount = navigationCounter;
 
-    appContext?.setTasks((tasks) => tasks.filter(t => t.type !== "view_fetch_items"))
-    appContext?.setViewState("isLoading", true)
+    appContext?.setTasks((tasks) => tasks.filter((t) => t.type !== "view_fetch_items"));
+    appContext?.setViewState("isLoading", true);
     const newItems = await filesystemInterface.readDirectory(searchParams.path || "remote:/");
 
     if (currentNavigationCount !== navigationCounter) return;
@@ -64,17 +64,17 @@ const View: Component = () => {
         max: newItems.items.length,
         current: 0,
         message: `Fetched %c of %m items`,
-        type: "view_fetch_items"
+        type: "view_fetch_items",
       };
 
-      appContext?.setTasks((tasks) => [ ...tasks, task ]);
+      appContext?.setTasks((tasks) => [...tasks, task]);
 
       const CHUNK_SIZE = filesystemInterface.getViewEntryBatchSize(searchParams.path);
 
       for (const itemPathGroup of chunkArray(newItems.items, CHUNK_SIZE)) {
         if (currentNavigationCount !== navigationCounter) {
           return;
-        };
+        }
         await new Promise<void>(async (resolve) => {
           const itemGroupResponsePromises = [];
           for (const itemPath of itemPathGroup) {
@@ -82,9 +82,7 @@ const View: Component = () => {
               filesystemInterface
                 .getViewEntry(
                   itemPath as UniformResourceLocator,
-                  Math.floor(appContext!.userPreferences.zoomPercentage * (appContext!.userPreferences.viewType === "details"
-                    ? 32
-                    : 128)),
+                  Math.floor(appContext!.userPreferences.zoomPercentage * (appContext!.userPreferences.viewType === "details" ? 32 : 128)),
                 )
                 .then((viewEntry) => {
                   if (viewEntry.status === "ok") {
@@ -94,14 +92,14 @@ const View: Component = () => {
             );
           }
 
-          const itemGroupResponseResolvedPromises = await Promise.all(itemGroupResponsePromises)
+          const itemGroupResponseResolvedPromises = await Promise.all(itemGroupResponsePromises);
           if (currentNavigationCount !== navigationCounter) {
             resolve();
             return;
           }
           appContext?.setViewState("viewItems", [
             ...appContext.viewState.viewItems,
-            ...(itemGroupResponseResolvedPromises).map((ig) => ig?.data || undefined).filter((ig) => ig !== undefined),
+            ...itemGroupResponseResolvedPromises.map((ig) => ig?.data || undefined).filter((ig) => ig !== undefined),
           ]);
 
           if (!(task.current + CHUNK_SIZE > task.max)) {
@@ -124,7 +122,7 @@ const View: Component = () => {
         });
       }
 
-      appContext?.setViewState("isLoading", false)
+      appContext?.setViewState("isLoading", false);
     } else {
       setErrorMessage(newItems.status);
     }
@@ -133,108 +131,121 @@ const View: Component = () => {
   const onKeyDown = (e: KeyboardEvent) => {
     e.preventDefault();
 
-    if (e.key !== "Escape" && appContext?.globalState.disableShortcuts)
-      return;
+    if (e.key !== "Escape" && appContext?.globalState.disableShortcuts) return;
 
     switch (e.key) {
       case "F2": {
-        appContext?.setViewState("isRenaming", appContext.viewState.lastSelectedItem)
+        appContext?.setViewState("isRenaming", appContext.viewState.lastSelectedItem);
         break;
       }
       case " ": {
-        if (appContext?.viewState.lastSelectedItem === undefined)
-          return;
+        if (appContext?.viewState.lastSelectedItem === undefined) return;
 
         if (appContext?.globalState.showPreview === false) {
-          appContext?.setGlobalState("showPreview", true)
+          appContext?.setGlobalState("showPreview", true);
         } else {
-          appContext?.setGlobalState("showPreview", false)
+          appContext?.setGlobalState("showPreview", false);
         }
         break;
       }
       case "Escape": {
-        appContext?.setGlobalState("showPreview", false)
-        appContext?.setViewState("isRenaming", undefined)
-        appContext?.setViewState("selectedItems", [])
-        appContext?.setGlobalState("disableShortcuts", false)
+        appContext?.setGlobalState("showPreview", false);
+        appContext?.setViewState("isRenaming", undefined);
+        appContext?.setViewState("selectedItems", []);
+        appContext?.setGlobalState("disableShortcuts", false);
         break;
       }
       case "Enter": {
         if (appContext?.viewState.lastSelectedItem) {
-            const item = appContext.viewState.viewItems.find(i => i.path === appContext.viewState.lastSelectedItem)
+          const item = appContext.viewState.viewItems.find((i) => i.path === appContext.viewState.lastSelectedItem);
 
           if (!item) return;
 
           if (item.type === "file") {
-              filesystemInterface.openInDefaultApplication(item.path as UniformResourceLocator);
-              return;
-            }
+            filesystemInterface.openInDefaultApplication(item.path as UniformResourceLocator);
+            return;
+          }
 
-            setSearchParams({ path: item.path });
+          setSearchParams({ path: item.path });
         }
-        deselectAllItems(appContext!)
+        deselectAllItems(appContext!);
         break;
       }
       case "ArrowLeft": {
-        selectPreviousItem(appContext!)
+        if (e.altKey) {
+          window.history.back();
+          return;
+        }
+
+        selectPreviousItem(appContext!);
         break;
       }
       case "ArrowRight": {
-        selectNextItem(appContext!)
+        if (e.altKey) {
+          window.history.forward();
+          return;
+        }
+
+        selectNextItem(appContext!);
         break;
       }
       case "ArrowUp": {
-        selectPreviousItem(appContext!)
+        selectPreviousItem(appContext!);
         break;
       }
       case "ArrowDown": {
-        selectNextItem(appContext!)
+        selectNextItem(appContext!);
         break;
       }
       case "F5": {
-        setForceViewItemUpdate(p => p + 1)
+        setForceViewItemUpdate((p) => p + 1);
         break;
       }
       case "r": {
         if (e.ctrlKey) {
-          setForceViewItemUpdate(p => p + 1)
+          setForceViewItemUpdate((p) => p + 1);
         }
         break;
       }
     }
-  }
+  };
 
   onMount(async () => {
-    window.addEventListener("keydown", onKeyDown)
+    window.addEventListener("keydown", onKeyDown);
   });
 
   onCleanup(() => {
-    window.removeEventListener("keydown", onKeyDown)
-  })
+    window.removeEventListener("keydown", onKeyDown);
+  });
 
   return (
     <Suspense>
       {errorMessage() ? (
         <ViewMessage icon={ERROR_ICON} title={"An error has occurred"} message={errorMessage() || "Missing Error Message?"}></ViewMessage>
       ) : appContext?.viewState.viewItems.length === 0 && !appContext.viewState.isLoading ? (
-        <ViewMessage icon={FOLDER_LIMITED_ICON} title={"Nothing Here."} message="You have no files" actions={[
-          {
-            color: "filled",
-            label: "Create new File",
-            onClick() {
-              // TODO: create a new file
-              // Do nothing Currently
-            }
-          },
-          {
-            color: "filled",
-            label: "Create new Folder",
-            onClick() {
-              // TODO: create a new folder
-              // Do nothing Currently
-            }
-          }
-        ]} />
+        <ViewMessage
+          icon={FOLDER_LIMITED_ICON}
+          title={"Nothing Here."}
+          message="You have no files"
+          actions={[
+            {
+              color: "filled",
+              label: "Create new File",
+              onClick() {
+                // TODO: create a new file
+                // Do nothing Currently
+              },
+            },
+            {
+              color: "filled",
+              label: "Create new Folder",
+              onClick() {
+                // TODO: create a new folder
+                // Do nothing Currently
+              },
+            },
+          ]}
+        />
       ) : (
         <>
           {/** biome-ignore lint/a11y/noStaticElementInteractions: button functionality not required */}
@@ -249,20 +260,18 @@ const View: Component = () => {
 
               if (itemPath) {
                 const isSelected = currentSelected.includes(itemPath);
-                const newSelection = isSelected
-                  ? currentSelected.filter(path => path !== itemPath)
-                  : [ ...currentSelected, itemPath ];
+                const newSelection = isSelected ? currentSelected.filter((path) => path !== itemPath) : [...currentSelected, itemPath];
 
                 appContext?.setViewState("selectedItems", newSelection);
               } else {
-                deselectAllItems(appContext!)
+                deselectAllItems(appContext!);
               }
 
               const originX = downEvent.clientX;
               const originY = downEvent.clientY;
 
               document.body.style.userSelect = "none";
-              setDragSelectRegion("origin", {x: originX, y: originY});
+              setDragSelectRegion("origin", { x: originX, y: originY });
 
               const currentTarget = downEvent.currentTarget as HTMLDivElement;
               const bounds = currentTarget.getBoundingClientRect();
@@ -277,8 +286,8 @@ const View: Component = () => {
                 const width = Math.abs(mouseX - originX);
                 const height = Math.abs(mouseY - originY);
 
-                setDragSelectRegion("transOrigin", {x: left, y: top});
-                setDragSelectRegion("size", {x: width, y: height});
+                setDragSelectRegion("transOrigin", { x: left, y: top });
+                setDragSelectRegion("size", { x: width, y: height });
 
                 const boxRight = left + width;
                 const boxBottom = top + height;
@@ -288,12 +297,7 @@ const View: Component = () => {
                   const itemRect = item.getBoundingClientRect();
                   const path = item.getAttribute("data-fs-item-path");
 
-                  const isIntersecting = !(
-                    itemRect.left > boxRight ||
-                    itemRect.right < left ||
-                    itemRect.top > boxBottom ||
-                    itemRect.bottom < top
-                  );
+                  const isIntersecting = !(itemRect.left > boxRight || itemRect.right < left || itemRect.top > boxBottom || itemRect.bottom < top);
 
                   if (isIntersecting && path) newlySelected.push(path);
                 }
