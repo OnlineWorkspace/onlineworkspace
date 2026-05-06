@@ -157,7 +157,9 @@ const App: Component = () => {
           )}
         >
           <Route path={"/shared"} component={() => "Shared with me page"} />
-          <Route path={"/bin"} component={() => "Bin page"} />
+          <Route path={"/bin"} component={() => <>
+              <View pathOverride="remote:/users/1/recycle_bin" />
+          </>} />
         </Route>
       </Route>
     </Route>

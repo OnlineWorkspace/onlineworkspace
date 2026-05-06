@@ -1,6 +1,7 @@
 import ERROR_ICON from "@material-symbols/svg-700/outlined/error.svg";
 import FOLDER_LIMITED_ICON from "@material-symbols/svg-700/outlined/folder_limited.svg";
 import { useSearchParams } from "@solidjs/router";
+import path from "path-browserify";
 import { type Component, createEffect, createSignal, Match, onCleanup, onMount, Suspense, Switch, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
 import type { Task } from "../../App.tsx";
@@ -14,7 +15,7 @@ import GridView from "./components/GridView/GridView.tsx";
 import { deselectAllItems, selectNextItem, selectPreviousItem } from "./itemSelection.ts";
 import styles from "./View.module.scss";
 
-const View: Component = () => {
+const View: Component<{ pathOverride?: string }> = (props) => {
   const [searchParams, setSearchParams] = useSearchParams<{ path?: UniformResourceLocator }>();
   const appContext = useContext(AppContext);
   const [dragSelectRegion, setDragSelectRegion] = createStore<{
@@ -31,7 +32,7 @@ const View: Component = () => {
 
   createEffect(async () => {
     if (!searchParams.path) {
-      setSearchParams({ path: appContext?.userPreferences.homePath });
+      setSearchParams({ path: props.pathOverride || appContext?.userPreferences.homePath });
       return;
     }
 
@@ -239,9 +240,16 @@ const View: Component = () => {
             {
               color: "filled",
               label: "Create new Folder",
-              onClick() {
-                // TODO: create a new folder
-                // Do nothing Currently
+              async onClick() {
+                const resolvedPath = filesystemInterface.urlToPath(searchParams.path || "remote:/");
+
+                if (resolvedPath.type === "invalid")
+                  throw "Error resolving searchParams path";
+
+                const joinedPath = path.join(resolvedPath.path, "Untitled Folder");
+
+               await filesystemInterface.createDirectory(`${resolvedPath.type}:${joinedPath}`);
+               setForceViewItemUpdate(pv => pv + 1)
               },
             },
           ]}

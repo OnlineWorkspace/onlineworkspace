@@ -20,7 +20,7 @@ class FilesystemInterface {
     }
   }
 
-  createDirectory(url: UniformResourceLocator) {
+  async createDirectory(url: UniformResourceLocator) {
     const parsedUrl = this.urlToPath(url);
 
     if (parsedUrl.type === "invalid") {
@@ -31,8 +31,11 @@ class FilesystemInterface {
       // Do some electron things
       return true;
     } else {
-      // Call tRPC to perform the required actions
-      return true;
+      const createDirectoryResponse = await trpc.create.directory.mutate({ path: parsedUrl.path });
+
+      return {
+        status: createDirectoryResponse.status,
+      };
     }
   }
 
