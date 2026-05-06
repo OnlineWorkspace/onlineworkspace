@@ -1,6 +1,6 @@
+import fs from "node:fs";
+import path from "node:path";
 import { randomUUIDv7 } from "bun";
-import fs from "fs";
-import path from "path";
 import type { Instance } from "../index.js";
 import System from "../system.js";
 import { WorkspacesEvent } from "./events.js";
@@ -9,6 +9,7 @@ export default class FilesystemSystem extends System {
   readonly SRC_ROOT = path.resolve("./instance/src/");
   readonly FS_ROOT = path.resolve("./fs/");
   readonly CACHE_PATH = path.join(this.FS_ROOT, "cache");
+  readonly SYSTEM_PATH = path.join(this.FS_ROOT, "system");
   readonly AUTOINSTALL_PATH = path.join(process.cwd(), "autoinstall");
 
   _internalAssets: Map<string, { userId: number; path: string; validUntil: number; public?: boolean }>;
@@ -18,6 +19,12 @@ export default class FilesystemSystem extends System {
     super("filesystem", instance);
 
     fs.mkdirSync(this.FS_ROOT, { recursive: true });
+
+    if (!fs.existsSync(this.SYSTEM_PATH)) {
+      fs.mkdirSync(this.SYSTEM_PATH, {
+        recursive: true,
+      });
+    }
 
     if (fs.existsSync(this.CACHE_PATH)) {
       fs.rmSync(this.CACHE_PATH, { recursive: true });
@@ -42,6 +49,12 @@ export default class FilesystemSystem extends System {
     if (!fs.existsSync(path.join(this.FS_ROOT, "assets/login/background.png"))) {
       fs.cpSync(path.join(this.SRC_ROOT, "assets/wallpapers/pexels-steve-29708303.jpg"), path.join(this.FS_ROOT, "assets/login/background.png"));
     }
+
+    if (!fs.existsSync(path.join(this.SYSTEM_PATH, "fs_template_files"))) {
+      fs.mkdirSync(path.join(this.SYSTEM_PATH, "fs_template_files"))
+      fs.cpSync(path.join(this.SRC_ROOT, "assets/fs_template_files/"), path.join(this.SYSTEM_PATH, "fs_template_files"), { recursive: true })
+    }
+
 
     this._internalAssets = new Map();
     this._internalAssetPaths = new Map();
@@ -140,6 +153,7 @@ export default class FilesystemSystem extends System {
     return `/api/asset/raw/${assetId}`;
   }
 
+  // TODO: properly implement this instead of this stop-gap solution.
   async getUserPermissions(userId: number, fsPath: string): Promise<{ read: boolean; write: boolean }> {
     const user = (await this.instance.sys.users.getUserById(userId))!;
 
