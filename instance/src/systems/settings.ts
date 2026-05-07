@@ -11,8 +11,6 @@ export default class SettingsSystem extends System {
     super("settings", instance);
 
     this.applicationSettings = {};
-
-    return this;
   }
 
   async getUserSettings(userId: number): Promise<Record<string, any>> {

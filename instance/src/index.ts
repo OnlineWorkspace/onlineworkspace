@@ -17,6 +17,7 @@ import EventSystem, { WorkspacesEvent } from "./systems/events.js";
 import FilesystemSystem from "./systems/filesystem.js";
 import ImageSystem from "./systems/image.js";
 import NotificationsSystem from "./systems/notifications.js";
+import ReverseProxySystem from "./systems/reverseProxy.js";
 import { StringListApplicationSetting } from "./systems/settings/applicationSetting/stringListSetting.js";
 import SettingsSystem from "./systems/settings.js";
 import TRPCSystem from "./systems/trpc.js";
@@ -57,6 +58,7 @@ class Instance {
     this.sys.settings = new SettingsSystem(this);
     this.sys.webFrontend = new WebFrontendSystem(this);
     this.sys.email = new EmailSystem(this);
+    this.sys.reverseProxy = new ReverseProxySystem(this);
 
     this.status = InstanceStatus.Offline;
   }

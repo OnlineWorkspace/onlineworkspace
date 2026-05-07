@@ -6,7 +6,8 @@ import type { WorkspacesApplication } from "./applications/application.js";
 import type { WorkspacesApplicationServiceStatus } from "./applications/serviceStatus.js";
 import { WorkspacesNotificationPriority } from "./notifications.js";
 
-const APPLICATIONS_CONFIG_FILE_PATH = (subsystem: System) => path.join(subsystem.instance.sys.filesystem.FS_ROOT, "applications.json");
+const APPLICATIONS_CONFIG_FILE_PATH = (subsystem: System) => path.join(subsystem.instance.sys.filesystem.SYSTEM_PATH, "vite", "applications.json");
+const APPLICATIONS_TSX_FILE_PATH = (subsystem: System) => path.join(subsystem.instance.sys.filesystem.SYSTEM_PATH, "vite", "Applications.tsx");
 
 interface AvailableWorkspacesApplication {
   path: string;
@@ -37,7 +38,7 @@ export default class ApplicationsSystem extends System {
     for (const app of this.availableApplications) {
       if (this.enabledApplications.find((a) => a === app.manifest?.id)) {
         if (app.manifest?.modules.web) {
-          applicationImportsInfill += `const App${ind}Router = lazy(() => import("${path.relative(path.join(this.instance.sys.filesystem.FS_ROOT), path.join(app.path, app.manifest.modules.web.path, "/App.tsx")).replaceAll("\\", "/")}"));`;
+          applicationImportsInfill += `const App${ind}Router = lazy(() => import("${path.relative(path.join(this.instance.sys.filesystem.SYSTEM_PATH, "vite"), path.join(app.path, app.manifest.modules.web.path, "/App.tsx")).replaceAll("\\", "/")}"));`;
           applicationsInfill += `<Suspense fallback={<UKCircularProgressIndicator/>}><Route path="${app.manifest.id}/*"><App${ind}Router/></Route></Suspense>`;
           ind++;
         }
@@ -50,7 +51,7 @@ export default class ApplicationsSystem extends System {
 
     const applicationsWebRouterTemplate = `import { Route } from "@solidjs/router";import { type Component, lazy, Suspense } from "solid-js";import UKCircularProgressIndicator from "@onlineworkspace/uikit-solid/src/components/circularProgressIndicator/UKCircularProgressIndicator.tsx";${applicationImportsInfill};const ApplicationsRouter: Component = () => {return (<>${applicationsInfill}</>);};export default ApplicationsRouter`;
 
-    await fs.writeFile(path.join(this.instance.sys.filesystem.FS_ROOT, "Applications.tsx"), applicationsWebRouterTemplate);
+    await fs.writeFile(APPLICATIONS_TSX_FILE_PATH(this), applicationsWebRouterTemplate);
 
     return true;
   }
@@ -83,9 +84,9 @@ export default class ApplicationsSystem extends System {
 
       await this.updateWebRouter();
 
-      if (!fsExistsSync(path.join(this.instance.sys.filesystem.FS_ROOT, "package.json"))) {
+      if (!fsExistsSync(path.join(this.instance.sys.filesystem.SYSTEM_PATH, "vite", "package.json"))) {
         await fs.writeFile(
-          path.join(this.instance.sys.filesystem.FS_ROOT, "package.json"),
+          path.join(this.instance.sys.filesystem.SYSTEM_PATH, "vite", "package.json"),
           `{
     "name": "workspaces-fs",
     "author": "Ewsgit",
@@ -99,7 +100,7 @@ export default class ApplicationsSystem extends System {
         );
 
         const child = Bun.spawn({
-          cwd: this.instance.sys.filesystem.FS_ROOT,
+          cwd: path.join(this.instance.sys.filesystem.SYSTEM_PATH, "vite"),
           cmd: ["bun", "install"],
           stdout: "pipe",
           stderr: "pipe",
@@ -107,21 +108,21 @@ export default class ApplicationsSystem extends System {
 
         // @ts-ignore
         for await (const msg of child.stdout) {
-          this.log.info("Applications Initial Startup -> " + Buffer.from(msg).toString());
+          this.log.info(`Applications Initial Startup -> ${Buffer.from(msg).toString()}`);
         }
 
         // @ts-ignore
         for await (const msg of child.stderr) {
-          this.log.info("Applications Initial Startup -> " + Buffer.from(msg).toString());
+          this.log.info(`Applications Initial Startup -> ${Buffer.from(msg).toString()}`);
         }
 
         await fs.cp(
           path.join(this.instance.sys.filesystem.SRC_ROOT, "web/tsconfig.app.json"),
-          path.join(this.instance.sys.filesystem.FS_ROOT, "tsconfig.json"),
+          path.join(this.instance.sys.filesystem.SYSTEM_PATH, "vite", "tsconfig.json"),
         );
         await fs.writeFile(
-          path.join(this.instance.sys.filesystem.FS_ROOT, "tsconfig.json"),
-          (await fs.readFile(path.join(this.instance.sys.filesystem.FS_ROOT, "tsconfig.json")))
+          path.join(this.instance.sys.filesystem.SYSTEM_PATH, "vite", "tsconfig.json"),
+          (await fs.readFile(path.join(this.instance.sys.filesystem.SYSTEM_PATH, "vite", "tsconfig.json")))
             .toString()
             .replace(`"include": ["src"]`, `"include": ["./Applications.tsx"]`),
         );

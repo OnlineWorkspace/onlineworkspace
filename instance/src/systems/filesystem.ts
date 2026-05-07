@@ -26,11 +26,9 @@ export default class FilesystemSystem extends System {
       });
     }
 
-    if (fs.existsSync(this.CACHE_PATH)) {
-      fs.rmSync(this.CACHE_PATH, { recursive: true });
+    if (!fs.existsSync(this.CACHE_PATH)) {
+      fs.mkdirSync(this.CACHE_PATH, { recursive: true });
     }
-
-    fs.mkdirSync(this.CACHE_PATH, { recursive: true });
 
     if (!fs.existsSync(path.join(this.FS_ROOT, "assets/login"))) {
       fs.mkdirSync(path.join(this.FS_ROOT, "assets/login"), {
@@ -51,10 +49,13 @@ export default class FilesystemSystem extends System {
     }
 
     if (!fs.existsSync(path.join(this.SYSTEM_PATH, "fs_template_files"))) {
-      fs.mkdirSync(path.join(this.SYSTEM_PATH, "fs_template_files"))
-      fs.cpSync(path.join(this.SRC_ROOT, "assets/fs_template_files/"), path.join(this.SYSTEM_PATH, "fs_template_files"), { recursive: true })
+      fs.mkdirSync(path.join(this.SYSTEM_PATH, "fs_template_files"));
+      fs.cpSync(path.join(this.SRC_ROOT, "assets/fs_template_files/"), path.join(this.SYSTEM_PATH, "fs_template_files"), { recursive: true });
     }
 
+    if (!fs.existsSync(path.join(this.SYSTEM_PATH, "vite"))) {
+      fs.mkdirSync(path.join(this.SYSTEM_PATH, "vite"));
+    }
 
     this._internalAssets = new Map();
     this._internalAssetPaths = new Map();
@@ -213,14 +214,23 @@ export default class FilesystemSystem extends System {
       const db = this.instance.sys.database.postgres();
 
       await db`CREATE TABLE IF NOT EXISTS filesystem_permission_overrides (
-                file_path TEXT,
-                recursive BOOL,
-                read_permission_groups TEXT[],
-                read_permission_users TEXT[],
-                write_permission_groups TEXT[],
-                write_permission_users TEXT[],
-                owner TEXT[]
-        )`;
+  file_path TEXT,
+  recursive BOOL,
+  read_permission_groups TEXT[],
+  read_permission_users TEXT[],
+  write_permission_groups TEXT[],
+  write_permission_users TEXT[],
+  owner TEXT[]
+)`;
+
+      if (!this.instance.sys.configuration.isDevMode) {
+        if (fs.existsSync(this.CACHE_PATH)) {
+          fs.rmSync(this.CACHE_PATH, { recursive: true });
+          fs.mkdirSync(this.CACHE_PATH, { recursive: true });
+        }
+      } else {
+        this.log.warning("Cache was not cleared as we are running in devMode");
+      }
     });
 
     return true;

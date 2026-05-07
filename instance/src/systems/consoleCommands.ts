@@ -1,12 +1,10 @@
+import { promises as fs } from "node:fs";
+import path from "node:path";
+import * as readline from "node:readline";
 import type { Instance } from "../index.js";
 import System from "../system.js";
-import * as readline from "readline";
-import { promises as fs } from "fs";
-import path from "path";
-import Command, {
-  type ICommandRuntimeParameters,
-} from "./consoleCommands/command.js";
-import ansiEscapes from "ansi-escapes";
+import type Command from "./consoleCommands/command.js";
+import type { ICommandRuntimeParameters } from "./consoleCommands/command.js";
 
 export default class ConsoleCommandsSystem extends System {
   rlInterface!: readline.Interface;
@@ -23,36 +21,17 @@ export default class ConsoleCommandsSystem extends System {
 
     this.commands = [];
     this.commandHistory = [];
-
-    return this;
   }
 
   override async startup() {
-    if (
-      !this.instance.sys.configuration.hasFeature("slash_commands") ||
-      !process.stdout.cursorTo
-    )
-      return true;
+    if (!this.instance.sys.configuration.hasFeature("slash_commands") || !process.stdout.cursorTo) return true;
 
-    const commands = await fs.readdir(
-      path.join(
-        this.instance.sys.filesystem.SRC_ROOT,
-        "/systems/consoleCommands/commands/",
-      ),
-    );
+    const commands = await fs.readdir(path.join(this.instance.sys.filesystem.SRC_ROOT, "/systems/consoleCommands/commands/"));
     for (const cmd of commands) {
-      const importedCommand = await import(
-        path.join(
-          this.instance.sys.filesystem.SRC_ROOT,
-          "/systems/consoleCommands/commands/",
-          cmd,
-        )
-      );
+      const importedCommand = await import(path.join(this.instance.sys.filesystem.SRC_ROOT, "/systems/consoleCommands/commands/", cmd));
       this.commands.push(new importedCommand.default(cmd, this.instance));
       this.log.info(`Registered command ${cmd}`);
     }
-
-    const self = this;
 
     this.currentCommandInterface = {
       active: false,
@@ -60,175 +39,123 @@ export default class ConsoleCommandsSystem extends System {
       minCursorPositionOffset: 0,
     };
 
-    await (async function () {
+    await (async () => {
       readline.emitKeypressEvents(process.stdin);
-      self.rlInterface = readline.createInterface({
+      this.rlInterface = readline.createInterface({
         input: process.stdin,
-        tabSize: 2,
         terminal: false,
-        historySize: 30,
       });
 
-      process.stdin.setRawMode(true);
-      self.currentCommandInterface.active = false;
+      if (process.stdin.isTTY) process.stdin.setRawMode(true);
+      this.currentCommandInterface.active = false;
 
-      const CURSOR_MIN_POS = () =>
-        36 +
-        (self.currentCommandInterface.active
-          ? self.currentCommandInterface.minCursorPositionOffset
-          : 0);
+      const CURSOR_MIN_POS = () => 36 + (this.currentCommandInterface.active ? this.currentCommandInterface.minCursorPositionOffset : 0);
+
       let cursorPos = CURSOR_MIN_POS();
-      let historyIndex = 0;
+      let historyIndex = this.commandHistory.length;
       let line = "";
 
-      process.stdin.on("data", async (key) => {
-        let keyStr = key.toString();
+      const renderLine = () => {
+        process.stdout.cursorTo(CURSOR_MIN_POS());
+        process.stdout.clearLine(1);
+        process.stdout.write(line);
+        process.stdout.cursorTo(cursorPos);
+      };
 
-        if (keyStr === "\u0003") {
-          await self.instance.shutdown();
+      process.stdin.on("keypress", async (str, key) => {
+        if (key.ctrl && key.name === "c") {
+          await this.instance.shutdown();
           return;
         }
-      });
 
-      process.stdin.on("keypress", async (_str, key) => {
+        const relativePos = cursorPos - CURSOR_MIN_POS();
+
         if (key.name === "up") {
-          if (historyIndex === 0) {
-            return;
+          if (historyIndex > 0) {
+            historyIndex--;
+            line = this.commandHistory[historyIndex].join(" ");
+            cursorPos = CURSOR_MIN_POS() + line.length;
+            renderLine();
           }
-
-          historyIndex--;
-
-          line = self.commandHistory[historyIndex].join(" ");
-          cursorPos = CURSOR_MIN_POS() + line.length;
-
-          process.stdout.cursorTo(CURSOR_MIN_POS());
-          process.stdout.clearLine(1);
-          process.stdout.write(line);
-          process.stdout.cursorTo(cursorPos);
-
           return;
         } else if (key.name === "down") {
-          if (historyIndex + 1 > self.commandHistory.length - 1) {
+          if (historyIndex < this.commandHistory.length - 1) {
+            historyIndex++;
+            line = this.commandHistory[historyIndex].join(" ");
+          } else {
+            historyIndex = this.commandHistory.length;
             line = "";
-            cursorPos = CURSOR_MIN_POS();
-
-            process.stdout.cursorTo(CURSOR_MIN_POS());
-            process.stdout.clearLine(1);
-            process.stdout.write(line);
-            process.stdout.cursorTo(cursorPos);
-
-            return;
           }
-          historyIndex++;
-
-          line = self.commandHistory[historyIndex].join(" ");
           cursorPos = CURSOR_MIN_POS() + line.length;
-
-          process.stdout.cursorTo(CURSOR_MIN_POS());
-          process.stdout.clearLine(1);
-          process.stdout.write(line);
-          process.stdout.cursorTo(cursorPos);
-
+          renderLine();
           return;
         } else if (key.name === "left") {
-          if (cursorPos <= CURSOR_MIN_POS()) {
-            return;
+          if (cursorPos > CURSOR_MIN_POS()) {
+            cursorPos--;
+            process.stdout.moveCursor(-1, 0);
           }
-          cursorPos--;
-          process.stdout.moveCursor(-1, 0);
           return;
         } else if (key.name === "right") {
-          if (cursorPos - CURSOR_MIN_POS() >= line.length) {
-            return;
+          if (relativePos < line.length) {
+            cursorPos++;
+            process.stdout.moveCursor(1, 0);
           }
-
-          cursorPos++;
-          process.stdout.moveCursor(1, 0);
           return;
         } else if (key.name === "enter" || key.name === "return") {
-          cursorPos = CURSOR_MIN_POS();
-          process.stdout.cursorTo(CURSOR_MIN_POS(), 0);
           process.stdout.write("\n");
+          const executedLine = line;
+          line = "";
+          cursorPos = CURSOR_MIN_POS();
 
-          if (self.currentCommandInterface.active) {
-            self.currentCommandInterface.cb(line);
-            line = "";
+          if (this.currentCommandInterface.active) {
+            this.currentCommandInterface.cb(executedLine);
             return;
           }
 
-          line = line.trim();
-          let segments = line.split(" ");
-          let cmdId = segments.shift()?.toLowerCase();
-          // self.log.info("invoked_command", `> ${line}`);
+          const trimmed = executedLine.trim();
+          if (!trimmed) return;
 
-          if (!cmdId) {
-            self.log.info("Invalid CommandId");
-            line = "";
-            return;
-          }
+          const segments = trimmed.split(" ");
+          const cmdId = segments[0].toLowerCase();
 
-          self.commandHistory.push(line.split(" "));
-          historyIndex = self.commandHistory.length - 1;
+          this.commandHistory.push(segments);
+          historyIndex = this.commandHistory.length;
 
-          let command = self.commands.find(
-            (cmd) => cmd.commandId === cmdId || cmd.aliases.includes(cmdId),
-          );
+          const command = this.commands.find((cmd) => cmd.commandId === cmdId || cmd.aliases.includes(cmdId));
 
           if (!command) {
-            self.log.info(
-              "command_manager",
-              `Unable to find the command with id '${cmdId}'`,
-            );
-            line = "";
+            this.log.info("command_manager", `Unable to find command '${cmdId}'`);
             return;
           }
 
-          if (
-            command.makeDevModeOnly &&
-            !self.instance.sys.configuration.isDevMode
-          ) {
-            self.log.info(
-              "command_manager",
-              `You are unable to execute the command '${command.commandId}' as this instance is not running in developer mode`,
-            );
-            line = "";
+          if (command.makeDevModeOnly && !this.instance.sys.configuration.isDevMode) {
+            this.log.info("command_manager", `Dev mode required for '${cmdId}'`);
             return;
           }
 
-          line = "";
-          self.currentCommandInterface.active = true;
-
-          await self.executeCommand(cmdId, {
-            arguments: segments,
+          this.currentCommandInterface.active = true;
+          await this.executeCommand(cmdId, {
+            arguments: segments.slice(1),
             flags: {},
-            rawArgv: line.slice(cmdId.length + 1),
+            rawArgv: trimmed.slice(cmdId.length).trim(),
           });
 
-          line = "";
+          this.currentCommandInterface.active = false;
           return;
         } else if (key.name === "backspace") {
-          if (cursorPos <= CURSOR_MIN_POS()) {
-            return;
+          if (cursorPos > CURSOR_MIN_POS()) {
+            line = line.slice(0, relativePos - 1) + line.slice(relativePos);
+            cursorPos--;
+            renderLine();
           }
-          cursorPos--;
-          line =
-            line.slice(0, cursorPos - CURSOR_MIN_POS()) +
-            line.slice(cursorPos - (CURSOR_MIN_POS() - 1));
-          process.stdout.cursorTo(CURSOR_MIN_POS());
-          process.stdout.clearLine(1);
-          process.stdout.write(line);
-          process.stdout.write(ansiEscapes.cursorTo(cursorPos));
-          return;
-        } else if (key.name === "space") {
-          cursorPos++;
-          process.stdout.write(" ");
-          line += " ";
           return;
         }
 
-        cursorPos++;
-        line += key.sequence;
-        process.stdout.write(key.sequence);
+        if (str && str.length === 1 && !key.ctrl && !key.meta) {
+          line = line.slice(0, relativePos) + str + line.slice(relativePos);
+          cursorPos++;
+          renderLine();
+        }
       });
     })();
 
@@ -241,19 +168,11 @@ export default class ConsoleCommandsSystem extends System {
     return this;
   }
 
-  async executeCommand(
-    commandId: string,
-    parameters: ICommandRuntimeParameters,
-  ) {
-    let com = this.commands.find(
-      (com) => com.commandId === commandId || com.aliases.includes(commandId),
-    );
+  async executeCommand(commandId: string, parameters: ICommandRuntimeParameters) {
+    const com = this.commands.find((com) => com.commandId === commandId || com.aliases.includes(commandId));
 
     if (!com) {
-      this.log.error(
-        "command_manager",
-        `Unable to execute command "${commandId}" as no such command exists.`,
-      );
+      this.log.error("command_manager", `Unable to execute command "${commandId}" as no such command exists.`);
 
       return this;
     }

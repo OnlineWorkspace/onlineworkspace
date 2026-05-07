@@ -1,11 +1,9 @@
 import {defineConfig} from "vite";
-import {compression} from "vite-plugin-compression2";
 import solid from "vite-plugin-solid";
 
 export default defineConfig({
   plugins: [
     solid(),
-    compression(),
   ],
   server: {
     host: true,

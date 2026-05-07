@@ -138,7 +138,7 @@ To automatically configure an onlineworkspace instance on the first run, create 
     }
   },
   "backendUrl": "https://localhost",
-  "webUrl": ["https://localhost"],
+  "proxyUrl": ["https://localhost"],
   "signupRequirements": {
     "email": false,
     "twoFactorAuthentication": false,

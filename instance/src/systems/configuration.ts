@@ -1,5 +1,4 @@
-import { existsSync as fsExistsSync, promises as fs, readFileSync as fsReadFileSync } from "node:fs";
-import * as os from "node:os";
+import { promises as fs, existsSync as fsExistsSync, readFileSync as fsReadFileSync } from "node:fs";
 import path from "node:path";
 import type { Instance } from "../index.js";
 import System from "../system.js";
@@ -28,10 +27,7 @@ export default class ConfigurationSystem extends System {
       database: string;
     };
   };
-  // https://localhost
-  backendUrl: string;
-  // https://localhost
-  webUrl: string[];
+  proxyUrl: string;
   enabledFeatures: (WorkspacesFeatureFlags | string)[];
   signupRequirements: {
     email: boolean;
@@ -75,16 +71,7 @@ export default class ConfigurationSystem extends System {
 
     if (process.env.POSTGRES_DATABASE_HOST) this.databases.postgres.host = process.env.POSTGRES_DATABASE_HOST;
 
-    this.backendUrl = "https://localhost";
-    // localhost and the current machine's local ip
-    this.webUrl = [
-      "https://localhost",
-      // @ts-ignore
-      Object.values(os.networkInterfaces())
-        .flat()
-        .filter((networkInterface) => !networkInterface!.internal && networkInterface!.family === "IPv4")
-        .map((networkInterface) => `https://${networkInterface!.address}`),
-    ];
+    this.proxyUrl = "https://localhost";
     this.signupRequirements = {
       email: false,
       twoFactorAuthentication: false,
@@ -184,7 +171,7 @@ export default class ConfigurationSystem extends System {
     const configurationFileContents: Record<string, unknown> = {};
 
     for (const propertyKey of allowedProperties) {
-      console.log(propertyKey)
+      console.log(propertyKey);
       configurationFileContents[propertyKey] = this[propertyKey];
     }
 

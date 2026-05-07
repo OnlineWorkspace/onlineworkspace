@@ -56,7 +56,7 @@ export default class AuthorizationSystem extends System {
         }
 
         const totp = new OTPAuth.TOTP({
-          issuer: this.instance.sys.configuration.webUrl[0],
+          issuer: this.instance.sys.configuration.proxyUrl,
           label: `${this.instance.sys.configuration.displayName} (Workspace)`,
           algorithm: "SHA1",
           digits: 6,
@@ -262,7 +262,7 @@ export default class AuthorizationSystem extends System {
 
     const passkeyCreationOptions: PublicKeyCredentialCreationOptionsJSON = await generateRegistrationOptions({
       rpName: this.instance.sys.configuration.displayName,
-      rpID: this.instance.sys.configuration.webUrl[0].replace("https://", ""),
+      rpID: this.instance.sys.configuration.proxyUrl.replace("https://", ""),
       userName: (await (await this.instance.sys.users.getUserById(userId))?.getUsername()) || `${userId}`,
       excludeCredentials: userPasskeys.map((passkey: { passkey_id: string; transports: string }) => {
         return {
@@ -293,8 +293,8 @@ export default class AuthorizationSystem extends System {
     const verification = await verifyRegistrationResponse({
       response: input,
       expectedChallenge: expectedChallenge.challenge,
-      expectedOrigin: this.instance.sys.configuration.webUrl[0],
-      expectedRPID: this.instance.sys.configuration.webUrl[0].replace("https://", ""),
+      expectedOrigin: this.instance.sys.configuration.proxyUrl,
+      expectedRPID: this.instance.sys.configuration.proxyUrl.replace("https://", ""),
     });
 
     const registrationInfo = verification.registrationInfo!;
@@ -330,7 +330,7 @@ export default class AuthorizationSystem extends System {
     const userPasskeys = await db`SELECT * FROM public.passkeys WHERE user_id = ${userId}`;
 
     const passkeyOptions: PublicKeyCredentialRequestOptionsJSON = await generateAuthenticationOptions({
-      rpID: this.instance.sys.configuration.webUrl[0].replace("https://", ""),
+      rpID: this.instance.sys.configuration.proxyUrl.replace("https://", ""),
       allowCredentials: userPasskeys.map((passkey: { passkey_id: string; transports: string }) => {
         return {
           id: passkey.passkey_id,
@@ -360,8 +360,8 @@ export default class AuthorizationSystem extends System {
     const verification = await verifyAuthenticationResponse({
       response: input,
       expectedChallenge: expectedChallenge.challenge,
-      expectedOrigin: this.instance.sys.configuration.webUrl[0],
-      expectedRPID: this.instance.sys.configuration.webUrl[0].replace("https://", ""),
+      expectedOrigin: this.instance.sys.configuration.proxyUrl,
+      expectedRPID: this.instance.sys.configuration.proxyUrl.replace("https://", ""),
       credential: {
         id: passkey.id,
         publicKey: passkey.public_key,

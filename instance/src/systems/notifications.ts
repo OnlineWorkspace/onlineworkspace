@@ -1,6 +1,6 @@
+import EventEmitter from "node:events";
 import type { Instance } from "../index.js";
 import System from "../system.js";
-import EventEmitter from "node:events";
 
 export enum WorkspacesNoticeType {
   Login,
@@ -28,9 +28,7 @@ export interface WorkspacesNotificationOptions {
 }
 
 export interface WorkspacesNotificationOptionsCallbacks {
-  onButton(
-    optionId: string,
-  ): void | {
+  onButton(optionId: string): void | {
     action: { type: "navigate"; value: string } | { type: "reload" };
   };
 }
@@ -52,8 +50,6 @@ export default class NotificationsSystem extends System {
     super("notifications", instance);
 
     this.eventEmitter = new EventEmitter();
-
-    return this;
   }
 
   // TODO: implement this
@@ -70,20 +66,17 @@ export default class NotificationsSystem extends System {
     options?: WorkspacesNotificationOptions,
     optionsCallbacks?: WorkspacesNotificationOptionsCallbacks,
   ) {
-    this.eventEmitter.emit(
-      WorkspacesNotificationEventEmitterEvent.SendNotification,
-      {
-        recipient,
-        sourceId,
-        priority,
-        content,
-        uuid: Bun.randomUUIDv7(),
-        options: {
-          buttons: options?.buttons || [],
-        },
-        optionsCallbacks: optionsCallbacks,
-      } satisfies WorkspacesNotification,
-    );
+    this.eventEmitter.emit(WorkspacesNotificationEventEmitterEvent.SendNotification, {
+      recipient,
+      sourceId,
+      priority,
+      content,
+      uuid: Bun.randomUUIDv7(),
+      options: {
+        buttons: options?.buttons || [],
+      },
+      optionsCallbacks: optionsCallbacks,
+    } satisfies WorkspacesNotification);
 
     return this;
   }

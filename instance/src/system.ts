@@ -10,6 +10,7 @@ import type EventSystem from "./systems/events.js";
 import type FilesystemSubsystem from "./systems/filesystem.js";
 import type ImageSubsystem from "./systems/image.js";
 import type NotificationsSubsystem from "./systems/notifications.js";
+import type ReverseProxySystem from "./systems/reverseProxy.js";
 import type SettingsSubsystem from "./systems/settings.js";
 import type TRPCSubsystem from "./systems/trpc.js";
 import type UsersSubsystem from "./systems/users.js";
@@ -30,6 +31,7 @@ export type Sys = {
   webFrontend: WebFrontendSubsystem;
   email: EmailSystem;
   event: EventSystem;
+  reverseProxy: ReverseProxySystem;
 } & { [key: string]: System };
 
 export default abstract class System {
