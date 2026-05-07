@@ -4,16 +4,15 @@ import HARD_DRIVE_ICON from "@material-symbols/svg-700/outlined/hard_drive.svg";
 import HOUSE_ICON from "@material-symbols/svg-700/outlined/house.svg";
 import PERSON_ICON from "@material-symbols/svg-700/outlined/person.svg";
 import UKSideBar from "@onlineworkspace/uikit-solid/src/components/sideBar/UKSideBar.tsx";
-import {useNavigate} from "@solidjs/router";
+import { useNavigate } from "@solidjs/router";
 import browserPath from "path-browserify";
-import {type Component, type ParentProps, Show, Suspense, useContext} from "solid-js";
-import {AppContext} from "../appContext.ts";
+import { type Component, type ParentProps, Show, Suspense, useContext } from "solid-js";
+import { AppContext } from "../appContext.ts";
+import type { UniformResourceLocator } from "../lib/filesystemInterface.ts";
 import PreviewDialog from "./components/PreviewDialog/PreviewDialog.tsx";
 import PreviewPane from "./components/PreviewPane/PreviewPane.tsx";
 import Quota from "./components/Quota/Quota.tsx";
-import StatusBar from "./components/StatusBar/StatusBar.tsx";
 import styles from "./Layout.module.scss";
-import type {UniformResourceLocator} from "../lib/filesystemInterface.ts";
 
 const Layout: Component<ParentProps> = (props) => {
   const navigate = useNavigate();
@@ -31,7 +30,7 @@ const Layout: Component<ParentProps> = (props) => {
           },
           {
             type: "button",
-            icon: {type: "icon", value: HOUSE_ICON},
+            icon: { type: "icon", value: HOUSE_ICON },
             label: "Home",
             onClick() {
               navigate(`/app/uk.ewsgit.files/dir?path=${appContext?.userPreferences.homePath}`);
@@ -39,7 +38,7 @@ const Layout: Component<ParentProps> = (props) => {
           },
           {
             type: "button",
-            icon: {type: "icon", value: PERSON_ICON},
+            icon: { type: "icon", value: PERSON_ICON },
             label: "Shared With Me",
             onClick() {
               navigate("/app/uk.ewsgit.files/shared");
@@ -55,7 +54,7 @@ const Layout: Component<ParentProps> = (props) => {
           ...((appContext?.userPreferences.pinnedDirectories || []).map((dir) => {
             return {
               type: "button",
-              icon: {type: "icon", value: FOLDER_ICON},
+              icon: { type: "icon", value: FOLDER_ICON },
               label: browserPath.basename(dir),
               onClick() {
                 let transformedPath = dir;
@@ -67,33 +66,33 @@ const Layout: Component<ParentProps> = (props) => {
             };
           }) as {
             type: "button";
-            icon: {type: "icon"; value: string};
+            icon: { type: "icon"; value: string };
             label: string;
             onClick(): void;
           }[]),
           ...((appContext?.isDesktopApp
             ? [
-              {type: "divider"},
-              {type: "label", label: "Local"},
-              {
-                type: "button",
-                icon: {type: "icon", value: HARD_DRIVE_ICON},
-                label: "Root (Local)",
-                onClick() {
-                  navigate(`/app/uk.ewsgit.files/dir?path=local:/`);
+                { type: "divider" },
+                { type: "label", label: "Local" },
+                {
+                  type: "button",
+                  icon: { type: "icon", value: HARD_DRIVE_ICON },
+                  label: "Root (Local)",
+                  onClick() {
+                    navigate(`/app/uk.ewsgit.files/dir?path=local:/`);
+                  },
                 },
-              },
-            ]
+              ]
             : []) as {
-              type: "button";
-              icon: {type: "icon"; value: string};
-              label: string;
-              onClick(): void;
-            }[]),
-          {type: "margin"},
+            type: "button";
+            icon: { type: "icon"; value: string };
+            label: string;
+            onClick(): void;
+          }[]),
+          { type: "margin" },
           {
             type: "button",
-            icon: {type: "icon", value: DELETE_ICON},
+            icon: { type: "icon", value: DELETE_ICON },
             label: "Bin",
             badgeLabel: appContext?.deletedItemCount || undefined,
             onClick() {
@@ -116,16 +115,13 @@ const Layout: Component<ParentProps> = (props) => {
         <div class={styles.root}>
           {props.children}
           <PreviewPane />
-          <div class={styles.statusbar}>
-            <StatusBar />
-          </div>
         </div>
       </UKSideBar>
-      <Suspense>
-      <Show when={appContext?.globalState.showPreview === true && appContext.isDesktopApp === false}>
-        <PreviewDialog pathUrl={appContext!.viewState.lastSelectedItem! as UniformResourceLocator} />
+      {/* <Suspense>
+        <Show when={appContext?.globalState.showPreview === true && appContext.isDesktopApp === false}>
+          <PreviewDialog pathUrl={appContext!.viewState.lastSelectedItem! as UniformResourceLocator} />
         </Show>
-      </Suspense>
+      </Suspense> */}
     </>
   );
 };

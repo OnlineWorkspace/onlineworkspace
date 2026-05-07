@@ -18,14 +18,12 @@ export interface WorkspacesApplication {
   };
   graphicsAcceleration?: string;
   modules: {
-    // NOTICE: not yet supported
-    docker?: object[];
     // located at /app/[id]/
     web?: { path: string };
     // run bun ./[path.ts]
-    bun?: { path: string };
+    internal?: { path: string };
     // run ./[path]
-    script?: { path: string };
+    external?: { path: string };
   };
   version?: string;
 }

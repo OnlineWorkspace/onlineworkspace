@@ -1,42 +1,44 @@
 import UKIcon from "@onlineworkspace/uikit-solid/src/components/icon/UKIcon.tsx";
 import UKText from "@onlineworkspace/uikit-solid/src/components/text/UKText.tsx";
-import {useSearchParams} from "@solidjs/router";
+import { useSearchParams } from "@solidjs/router";
 import clsx from "clsx";
 import browserPath from "path-browserify";
-import {type Component, For, Show, useContext} from "solid-js";
-import type {DOMElement} from "solid-js/jsx-runtime";
-import {AppContext} from "../../../../appContext.ts";
+import { type Component, For, Show, useContext } from "solid-js";
+import type { DOMElement } from "solid-js/jsx-runtime";
+import { AppContext } from "../../../../appContext.ts";
 import humanReadableSize from "../../../../lib/humanReadableSize.ts";
 import iconForItemType from "../../iconForItemType.ts";
 import onItemClick from "../../itemClick.ts";
+import { ViewContext } from "../../viewContext.ts";
 import styles from "./DetailsView.module.scss";
 
 const DetailsView: Component = () => {
-  const [ _, setSearchParams ] = useSearchParams();
+  const [_, setSearchParams] = useSearchParams();
   const appContext = useContext(AppContext);
+  const viewContext = useContext(ViewContext);
 
   return (
-    <Show when={(appContext?.viewState.viewItems.length || 0) > 0}>
-      <table class={styles.root} style={{"--zoom-percentage": appContext?.userPreferences.zoomPercentage}}>
+    <Show when={(viewContext?.viewState.viewItems.length || 0) > 0}>
+      <table class={styles.root} style={{ "--zoom-percentage": appContext?.userPreferences.zoomPercentage }}>
         <thead>
           <tr class={styles.columns}>
             <th scope="col"></th>
-            <th scope="col" style={{"max-width": "48rem", width: "100%"}}>
+            <th scope="col" style={{ "max-width": "48rem", width: "100%" }}>
               <UKText role={"title"} size={"s"}>
                 Name
               </UKText>
             </th>
-            <th scope="col" style={{"width": "8rem"}}>
+            <th scope="col" style={{ width: "8rem" }}>
               <UKText role={"title"} size={"s"}>
                 Modified
               </UKText>
             </th>
-            <th scope="col" style={{"width": "8rem"}}>
+            <th scope="col" style={{ width: "8rem" }}>
               <UKText role={"title"} size={"s"}>
                 Created
               </UKText>
             </th>
-            <th scope="col" style={{"width": "8rem"}}>
+            <th scope="col" style={{ width: "8rem" }}>
               <UKText role={"title"} size={"s"}>
                 Size
               </UKText>
@@ -44,7 +46,7 @@ const DetailsView: Component = () => {
           </tr>
         </thead>
         <tbody>
-          <For each={appContext?.viewState.viewItems}>
+          <For each={viewContext?.viewState.viewItems}>
             {(item, index) => {
               if (!appContext?.userPreferences.showHidden && item.hidden) return null;
 
@@ -62,8 +64,9 @@ const DetailsView: Component = () => {
                   onClick={(e) => {
                     e.stopPropagation();
                     onItemClick(
-                      e as unknown as MouseEvent & {currentTarget: HTMLButtonElement; target: DOMElement},
+                      e as unknown as MouseEvent & { currentTarget: HTMLButtonElement; target: DOMElement },
                       appContext!,
+                      viewContext!,
                       index(),
                       item,
                       setSearchParams,
@@ -77,7 +80,7 @@ const DetailsView: Component = () => {
                     e.preventDefault();
                     e.stopPropagation();
                   }}
-                  data-selected={appContext?.viewState.selectedItems.includes(item.path)}
+                  data-selected={viewContext?.viewState.selectedItems.includes(item.path)}
                 >
                   <td>
                     {item.thumbnail !== undefined ? (
@@ -87,12 +90,13 @@ const DetailsView: Component = () => {
                     )}
                   </td>
                   <td>
-                    {appContext?.viewState.isRenaming === item.path ?
+                    {viewContext?.viewState.isRenaming === item.path ? (
                       <div>Hello Renaming World!</div>
-                      : <UKText size="m" role="body">
+                    ) : (
+                      <UKText size="m" role="body">
                         {browserPath.basename(item.path)}
                       </UKText>
-                    }
+                    )}
                   </td>
                   <td>
                     <UKText size="m" role="body">

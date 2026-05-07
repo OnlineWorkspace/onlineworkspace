@@ -31,7 +31,7 @@ const router = t.router({
         return isAdministrator ? "Administrator" : "User";
       }),
       getAvatar: procedure.output(z.string()).query(async (opt) => {
-        return `${opt.ctx.instance.sys.configuration.backendUrl}/api/user/me/avatar/l`;
+        return `${opt.ctx.instance.sys.configuration.proxyUrl}/api/user/me/avatar/l`;
       }),
     },
   },
@@ -143,7 +143,7 @@ const router = t.router({
       return true;
     }),
     getProfilePicture: procedure.output(z.string()).query(async (opt) => {
-      return `${opt.ctx.instance.sys.configuration.backendUrl}/api/user/me/avatar/l`;
+      return `${opt.ctx.instance.sys.configuration.proxyUrl}/api/user/me/avatar/l`;
     }),
   },
   authentication: {
@@ -515,7 +515,7 @@ const router = t.router({
           output.push({
             name: wallpaperName,
             previewSrc:
-              opt.ctx.instance.sys.configuration.backendUrl +
+              opt.ctx.instance.sys.configuration.proxyUrl +
               (await instance.sys.image.serveImage(opt.ctx.userId, wallpaperPath, {
                 resize: {
                   dimensions: { width: 296, height: 192 },
@@ -540,7 +540,7 @@ const router = t.router({
           output.push({
             name: wallpaperName,
             previewSrc:
-              opt.ctx.instance.sys.configuration.backendUrl +
+              opt.ctx.instance.sys.configuration.proxyUrl +
               (await instance.sys.image.serveImage(opt.ctx.userId, wallpaperPath, { resize: { dimensions: { height: 140, width: 250 }, position: "centre" } })),
           });
         }
@@ -574,7 +574,7 @@ const router = t.router({
         }
 
         return (
-          opt.ctx.instance.sys.configuration.backendUrl +
+          opt.ctx.instance.sys.configuration.proxyUrl +
           (await opt.ctx.instance.sys.image.serveImage(opt.ctx.userId, requiredResizedWallpaperPath, {
             isPublic: false,
             dontCachePath: true,
@@ -752,12 +752,12 @@ const router = t.router({
                     if (app.manifest.icon.type === "image") {
                       icon = {
                         type: "image",
-                        value: `${opt.ctx.instance.sys.configuration.backendUrl}/api/application/${app.manifest.id}/icon/`,
+                        value: `${opt.ctx.instance.sys.configuration.proxyUrl}/api/application/${app.manifest.id}/icon/`,
                       };
                     } else {
                       icon = {
                         type: "icon",
-                        value: `${opt.ctx.instance.sys.configuration.backendUrl}/api/application/${app.manifest.id}/icon/`,
+                        value: `${opt.ctx.instance.sys.configuration.proxyUrl}/api/application/${app.manifest.id}/icon/`,
                       };
                     }
                   }
@@ -807,7 +807,7 @@ const router = t.router({
             if (application.manifest.icon.type === "image") {
               icon = {
                 type: "image",
-                value: `${opt.ctx.instance.sys.configuration.backendUrl}/api/application/${application.manifest.id}/icon/`,
+                value: `${opt.ctx.instance.sys.configuration.proxyUrl}/api/application/${application.manifest.id}/icon/`,
               };
             } else {
               icon = application.manifest.icon;
@@ -964,12 +964,12 @@ const router = t.router({
           if (application.manifest.icon.type === "image") {
             icon = {
               type: "image",
-              value: `${opt.ctx.instance.sys.configuration.backendUrl}/api/application/${application.manifest.id}/icon/`,
+              value: `${opt.ctx.instance.sys.configuration.proxyUrl}/api/application/${application.manifest.id}/icon/`,
             };
           } else {
             icon = {
               type: "icon",
-              value: `${opt.ctx.instance.sys.configuration.backendUrl}/api/application/${application.manifest.id}/icon/`,
+              value: `${opt.ctx.instance.sys.configuration.proxyUrl}/api/application/${application.manifest.id}/icon/`,
             };
           }
         }

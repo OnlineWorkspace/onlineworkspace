@@ -82,9 +82,9 @@ class Instance {
       const subSystemState = await sys.startup();
 
       if (subSystemState) {
-        sys.log.success(`System Startup Complete!`);
+        this.log.system.success(`System '${sys.id}' Startup Complete!`);
       } else {
-        sys.log.error(`System Startup Failed!`);
+        this.log.system.error(`System '${sys.id}' Startup Failed!`);
       }
     }
 

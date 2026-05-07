@@ -20,7 +20,7 @@
     "web": {
       "path": "./web"
     },
-    "bun": {
+    "internal": {
       "path": "./backend/index.ts"
     }
   }

@@ -6,7 +6,7 @@ import type { WorkspacesApplication } from "./applications/application.js";
 import type { WorkspacesApplicationServiceStatus } from "./applications/serviceStatus.js";
 import { WorkspacesNotificationPriority } from "./notifications.js";
 
-const APPLICATIONS_CONFIG_FILE_PATH = (subsystem: System) => path.join(subsystem.instance.sys.filesystem.SYSTEM_PATH, "vite", "applications.json");
+const APPLICATIONS_CONFIG_FILE_PATH = (subsystem: System) => path.join(subsystem.instance.sys.filesystem.SYSTEM_PATH, "applications.json");
 const APPLICATIONS_TSX_FILE_PATH = (subsystem: System) => path.join(subsystem.instance.sys.filesystem.SYSTEM_PATH, "vite", "Applications.tsx");
 
 interface AvailableWorkspacesApplication {
@@ -28,7 +28,9 @@ export default class ApplicationsSystem extends System {
   }
 
   getEnabledApplications(): AvailableWorkspacesApplication[] {
-    return this.enabledApplications.map((a) => this.availableApplications.find((aa) => aa.manifest?.id === a)).filter((a) => a !== undefined);
+    return this.enabledApplications
+      .map((a) => this.availableApplications.find((aa) => aa.manifest?.id === a))
+      .filter((a) => a !== undefined) as AvailableWorkspacesApplication[];
   }
 
   async updateWebRouter() {
@@ -296,22 +298,22 @@ export default class ApplicationsSystem extends System {
     await this.saveApplicationsConfig();
     await this.updateWebRouter();
 
-    if (app?.manifest?.modules.bun) {
+    if (app?.manifest?.modules.internal) {
       try {
         // @ts-ignore
         globalThis.instance = this.instance;
-        await import(path.join(app.path, app.manifest.modules.bun.path));
+        await import(path.join(app.path, app.manifest.modules.internal.path));
       } catch (err) {
         console.error("problem with application's bun module ->", err);
       }
     }
 
-    if (app?.manifest?.modules.script) {
+    if (app?.manifest?.modules.external) {
       const child = Bun.spawn({
         stderr: "pipe",
         stdout: "pipe",
         stdin: "pipe",
-        cmd: [app.manifest.modules.script.path],
+        cmd: [app.manifest.modules.external.path],
         cwd: app.path,
         env: process.env,
       });
