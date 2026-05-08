@@ -26,6 +26,8 @@ export interface ViewState {
   viewId: number;
   isLoading: boolean;
   isRenaming: string | undefined;
+  zoomPercentage: number;
+  tasks: Task[];
 }
 
 const View: Component<{ pathOverride?: UniformResourceLocator; disallowCreation?: boolean; viewId: number }> = (props) => {
@@ -51,7 +53,7 @@ const View: Component<{ pathOverride?: UniformResourceLocator; disallowCreation?
     }
 
     appContext?.userPreferences.viewType;
-    appContext?.userPreferences.zoomPercentage;
+    appContext?.userPreferences.defaultZoomPercentage;
     forceViewItemUpdate();
 
     appContext?.setViewState(props.viewId, "isRenaming", undefined);
@@ -60,7 +62,7 @@ const View: Component<{ pathOverride?: UniformResourceLocator; disallowCreation?
     navigationCounter++;
     const currentNavigationCount = navigationCounter;
 
-    appContext?.setTasks((tasks) => tasks.filter((t) => t.type !== "view_fetch_items"));
+    appContext.setViewState(props.viewId, "tasks", (val) => val.filter((t) => t.type !== "view_fetch_items"));
     appContext?.setViewState(props.viewId, "isLoading", true);
     const newItems = await filesystemInterface.readDirectory(appContext?.viewState[props.viewId].pathUrl || "remote:/");
 
@@ -74,7 +76,6 @@ const View: Component<{ pathOverride?: UniformResourceLocator; disallowCreation?
       appContext?.setViewState(props.viewId, "viewItems", []);
 
       const task: Task = {
-        parent: "view0",
         id: crypto.randomUUID(),
         max: newItems.items.length,
         current: 0,
@@ -82,7 +83,7 @@ const View: Component<{ pathOverride?: UniformResourceLocator; disallowCreation?
         type: "view_fetch_items",
       };
 
-      appContext?.setTasks((tasks) => [...tasks, task]);
+      appContext.setViewState(props.viewId, "tasks", (tasks) => [...tasks, task]);
 
       const CHUNK_SIZE = filesystemInterface.getViewEntryBatchSize(appContext?.viewState[props.viewId].pathUrl);
 
@@ -97,7 +98,7 @@ const View: Component<{ pathOverride?: UniformResourceLocator; disallowCreation?
               filesystemInterface
                 .getViewEntry(
                   itemPath as UniformResourceLocator,
-                  Math.floor(appContext!.userPreferences.zoomPercentage * (appContext!.userPreferences.viewType === "details" ? 32 : 128)),
+                  Math.floor(appContext!.userPreferences.defaultZoomPercentage * (appContext!.userPreferences.viewType === "details" ? 32 : 128)),
                 )
                 .then((viewEntry) => {
                   if (viewEntry.status === "ok") {
@@ -123,15 +124,15 @@ const View: Component<{ pathOverride?: UniformResourceLocator; disallowCreation?
             task.current = task.max;
           }
 
-          appContext?.setTasks((tasks) => {
-            return tasks.map((t) => {
+          appContext?.setViewState(props.viewId, "tasks", (tasks) =>
+            tasks.map((t) => {
               if (task.id === t.id) {
                 return task;
               }
 
               return t;
-            });
-          });
+            }),
+          );
 
           resolve();
         });
@@ -230,6 +231,8 @@ const View: Component<{ pathOverride?: UniformResourceLocator; disallowCreation?
     window.addEventListener("keydown", onKeyDown);
 
     function mouseMove(e: MouseEvent) {
+      if (!dragSelectRegion) return;
+
       const bounds = itemViewRef()!.getBoundingClientRect();
 
       const mouseX = Math.min(Math.max(e.clientX, bounds.left), bounds.right);
@@ -259,6 +262,10 @@ const View: Component<{ pathOverride?: UniformResourceLocator; disallowCreation?
       appContext?.setViewState(props.viewId, "selectedItems", newlySelected);
     }
 
+    function mouseDown() {
+      appContext?.setGlobalState("activeViewId", props!.viewId);
+    }
+
     function mouseUp() {
       document.body.style.userSelect = "unset";
       setDragSelectRegion("origin", undefined);
@@ -281,13 +288,14 @@ const View: Component<{ pathOverride?: UniformResourceLocator; disallowCreation?
       window.removeEventListener("keydown", onKeyDown);
       window.removeEventListener("mouseup", mouseUp);
       window.removeEventListener("mousemove", mouseMove);
+      window.removeEventListener("mousedown", mouseDown);
     });
   });
 
   return (
     <Suspense>
       <ViewContext.Provider value={{ viewId: props.viewId }}>
-        <div class={styles.root} onFocusIn={() => appContext?.setGlobalState("activeViewId", props.viewId)}>
+        <div class={styles.root}>
           {errorMessage() ? (
             <ViewMessage icon={ERROR_ICON} title={"An error has occurred"} message={errorMessage() || "Missing Error Message?"}></ViewMessage>
           ) : appContext!.viewState[props.viewId].viewItems.length === 0 && !appContext!.viewState[props.viewId].isLoading ? (

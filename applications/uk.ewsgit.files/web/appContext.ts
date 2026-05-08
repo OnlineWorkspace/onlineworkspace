@@ -14,8 +14,6 @@ export interface AppContextType {
   globalState: Store<GlobalState>;
   setGlobalState: SetStoreFunction<GlobalState>;
   isDesktopApp: boolean;
-  tasks: Accessor<Task[]>;
-  setTasks: Setter<Task[]>;
 }
 
 const AppContext = createContext<AppContextType>(undefined);

@@ -1,7 +1,6 @@
-import { type Component, createSignal, onMount, type ParentProps } from "solid-js";
+import { type Component, onMount, type ParentProps } from "solid-js";
 import { createStore } from "solid-js/store";
 import { AppContext, type AppContextType } from "./appContext";
-import type { Task } from "./layout/components/StatusBar/task";
 import type { UniformResourceLocator } from "./lib/filesystemInterface";
 import trpc from "./lib/trpc";
 import type { ViewState } from "./pages/dir/View";
@@ -12,7 +11,7 @@ export interface Preferences {
   pinnedDirectories: string[];
   viewType: "grid" | "details" | "gallery";
   showPreview: boolean;
-  zoomPercentage: number;
+  defaultZoomPercentage: number;
   showHidden: boolean;
 }
 
@@ -30,7 +29,7 @@ const Core: Component<ParentProps> = (props) => {
     pinnedDirectories: ["remote:/users"],
     viewType: "details",
     showPreview: false,
-    zoomPercentage: 1,
+    defaultZoomPercentage: 1,
     showHidden: false,
   });
   const [viewState, setViewState] = createStore<{ [viewId: number]: ViewState }>({
@@ -43,6 +42,8 @@ const Core: Component<ParentProps> = (props) => {
       viewId: 0,
       isLoading: true,
       isRenaming: undefined,
+      zoomPercentage: userPreferences.defaultZoomPercentage,
+      tasks: [],
     },
     1: {
       pathUrl: "remote:/",
@@ -53,6 +54,8 @@ const Core: Component<ParentProps> = (props) => {
       viewId: 0,
       isLoading: true,
       isRenaming: undefined,
+      zoomPercentage: userPreferences.defaultZoomPercentage,
+      tasks: [],
     },
   });
   const [globalState, setGlobalState] = createStore<GlobalState>({
@@ -61,7 +64,6 @@ const Core: Component<ParentProps> = (props) => {
     deletedItemCount: 0,
     activeViewId: 0,
   });
-  const [taskStatus, setTaskStatus] = createSignal<Task[]>([]);
 
   onMount(async () => {
     const userServerPreferences = await trpc.userPreferences.get.query();
@@ -83,8 +85,6 @@ const Core: Component<ParentProps> = (props) => {
         globalState: globalState,
         setGlobalState: setGlobalState,
         isDesktopApp: localStorage.getItem("onlineworkspace_workspace_desktop_app") === "true",
-        tasks: taskStatus,
-        setTasks: setTaskStatus,
       }}
     >
       {props.children}

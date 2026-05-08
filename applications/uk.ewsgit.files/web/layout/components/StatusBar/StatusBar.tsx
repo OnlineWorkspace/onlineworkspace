@@ -62,10 +62,10 @@ const StatusBar: Component = () => {
   });
 
   createEffect(() => {
-    for (const task of appContext?.tasks() || []) {
+    for (const task of appContext?.viewState[viewContext!.viewId].tasks || []) {
       if (task.current === task.max) {
         setTimeout(() => {
-          appContext?.setTasks((tasks) =>
+          appContext?.setViewState(viewContext!.viewId, "tasks", (tasks) =>
             tasks.map((t) => {
               if (t.id === task.id) {
                 return {
@@ -79,7 +79,7 @@ const StatusBar: Component = () => {
           );
 
           setTimeout(() => {
-            appContext?.setTasks((tasks) => tasks.filter((t) => t.id !== task.id));
+            appContext?.setViewState(viewContext!.viewId, "tasks", (tasks) => tasks.filter((t) => t.id !== task.id));
           }, 250);
         }, 1000);
       }
@@ -92,16 +92,28 @@ const StatusBar: Component = () => {
         {dirContents()}
       </UKText>
       <div class={styles.margin}></div>
-      <div class={clsx(styles.taskStatus, appContext!.tasks()[0] && !appContext!.tasks()[0]?.invalid && styles.visible)}>
-        <UKLinearProgressIndicator class={styles.progressBar} start={0} stop={appContext!.tasks()[0]?.max || 1} value={appContext!.tasks()[0]?.current || 0} />
+      <div
+        class={clsx(
+          styles.taskStatus,
+          appContext?.viewState[viewContext!.viewId].tasks[0] && !appContext?.viewState[viewContext!.viewId].tasks[0]?.invalid && styles.visible,
+        )}
+      >
+        <UKLinearProgressIndicator
+          class={styles.progressBar}
+          start={0}
+          stop={appContext?.viewState[viewContext!.viewId].tasks[0]?.max || 1}
+          value={appContext?.viewState[viewContext!.viewId].tasks[0]?.current || 0}
+        />
         <UKText role={"label"} size={"m"}>
-          {appContext!.tasks()[0]?.message.replaceAll("%c", appContext!.tasks()[0].current.toString()).replaceAll("%m", appContext!.tasks()[0].max.toString())}
+          {appContext?.viewState[viewContext!.viewId].tasks[0]?.message
+            .replaceAll("%c", appContext?.viewState[viewContext!.viewId].tasks[0].current.toString())
+            .replaceAll("%m", appContext?.viewState[viewContext!.viewId].tasks[0].max.toString())}
         </UKText>
       </div>
       <UKDivider direction={"vertical"} class={styles.divider} width="full" />
       <div class={styles.sizeControls}>
         <UKText role={"label"} size={"m"}>
-          {`${((appContext?.userPreferences.zoomPercentage || 1) * 100).toFixed(0)}%`}
+          {`${((appContext?.viewState[viewContext!.viewId].zoomPercentage || 1) * 100).toFixed(0)}%`}
         </UKText>
         <UKIconButton
           size="xxs"
@@ -109,15 +121,19 @@ const StatusBar: Component = () => {
           icon={ZOOM_OUT_ICON}
           color="standard"
           onClick={() =>
-            appContext?.setUserPreferences("zoomPercentage", Number(Math.max(appContext.userPreferences.zoomPercentage - 0.2, MIN_ZOOM_VALUE).toFixed(2)))
+            appContext?.setViewState(
+              viewContext!.viewId,
+              "zoomPercentage",
+              Number(Math.max(appContext.viewState[viewContext!.viewId].zoomPercentage - 0.2, MIN_ZOOM_VALUE).toFixed(2)),
+            )
           }
         />
         <UKIconButton
           size="xxs"
           alt="Reset Zoom"
           icon={VIEW_REAL_SIZE_ICON}
-          color={appContext?.userPreferences.zoomPercentage === 0 ? "filled" : "standard"}
-          onClick={() => appContext?.setUserPreferences("zoomPercentage", 1)}
+          color={appContext?.viewState[viewContext!.viewId].zoomPercentage === 0 ? "filled" : "standard"}
+          onClick={() => appContext?.setViewState(viewContext!.viewId, "zoomPercentage", 1)}
         />
         <UKIconButton
           size="xxs"
@@ -125,7 +141,11 @@ const StatusBar: Component = () => {
           icon={ZOOM_IN_ICON}
           color="standard"
           onClick={() =>
-            appContext?.setUserPreferences("zoomPercentage", Number(Math.min(appContext.userPreferences.zoomPercentage + 0.2, MAX_ZOOM_VALUE).toFixed(2)))
+            appContext?.setViewState(
+              viewContext!.viewId,
+              "zoomPercentage",
+              Number(Math.min(appContext.viewState[viewContext!.viewId].zoomPercentage + 0.2, MAX_ZOOM_VALUE).toFixed(2)),
+            )
           }
         />
       </div>

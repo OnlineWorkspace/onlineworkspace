@@ -14,7 +14,7 @@ const GridView: Component = () => {
   const viewContext = useContext(ViewContext);
 
   return (
-    <div class={styles.root} style={{ "--zoom-percentage": appContext?.userPreferences.zoomPercentage }}>
+    <div class={styles.root} style={{ "--zoom-percentage": appContext?.userPreferences.defaultZoomPercentage }}>
       <For each={appContext?.viewState[viewContext!.viewId].viewItems}>
         {(item, index) => {
           if (!appContext?.userPreferences.showHidden && item.hidden) return null;

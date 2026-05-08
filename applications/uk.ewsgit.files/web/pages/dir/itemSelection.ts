@@ -14,6 +14,10 @@ export function deselectAllItems(appContext: AppContextType, viewId: number) {
   appContext.setViewState(viewId, "lastSelectionTime", -1);
   appContext.setGlobalState("showPreview", false);
 
+  for (const key of Object.keys(appContext.viewState)) {
+    appContext.setViewState(Number(key), "selectedItems", []);
+  }
+
   return true;
 }
 
