@@ -3,11 +3,11 @@ import UKIcon from "@onlineworkspace/uikit-solid/src/components/icon/UKIcon.tsx"
 import UKText from "@onlineworkspace/uikit-solid/src/components/text/UKText.tsx";
 import useIsMobile from "@onlineworkspace/uikit-solid/src/core/useIsMobile.ts";
 import browserPath from "path-browserify";
-import {type Component, useContext} from "solid-js";
-import {AppContext} from "../../../appContext.ts";
+import { type Component, useContext } from "solid-js";
+import { AppContext } from "../../../appContext.ts";
+import humanReadableSize from "../../../lib/humanReadableSize.ts";
 import iconForItemType from "../../../pages/dir/iconForItemType.ts";
 import styles from "./PreviewPane.module.scss";
-import humanReadableSize from "../../../lib/humanReadableSize.ts";
 
 const PreviewPane: Component = () => {
   const isMobile = useIsMobile();
@@ -15,7 +15,7 @@ const PreviewPane: Component = () => {
 
   return (
     <div class={styles.root} data-hide={!appContext?.userPreferences.showPreview || isMobile()}>
-      <UKText role={"title"} size={"m"}>
+      {/* <UKText role={"title"} size={"m"}>
         Preview
       </UKText>
       <UKDivider direction={"horizontal"} />
@@ -56,7 +56,7 @@ const PreviewPane: Component = () => {
             Dimensions: ...x...
           </UKText>
         </>
-      ) : null}
+      ) : null} */}
     </div>
   );
 };

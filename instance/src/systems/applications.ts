@@ -90,14 +90,14 @@ export default class ApplicationsSystem extends System {
         await fs.writeFile(
           path.join(this.instance.sys.filesystem.SYSTEM_PATH, "vite", "package.json"),
           `{
-    "name": "workspaces-fs",
-    "author": "Ewsgit",
-    "dependencies": {
-        "@solidjs/router": "^0.15.3",
-        "solid-js": "^1.9.8",
-        "vite": "^7.1.2",
-        "vite-plugin-solid": "^2.11.8"
-    }
+  "name": "workspaces-fs",
+  "author": "Ewsgit",
+  "dependencies": {
+    "@solidjs/router": "^0.16.1",
+    "solid-js": "^1.9.11",
+    "vite": "^8.0.8",
+    "vite-plugin-solid": "^2.11.8"
+  }
 }`,
         );
 

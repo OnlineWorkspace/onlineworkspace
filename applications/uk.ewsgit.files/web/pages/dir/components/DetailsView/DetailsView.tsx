@@ -1,6 +1,5 @@
 import UKIcon from "@onlineworkspace/uikit-solid/src/components/icon/UKIcon.tsx";
 import UKText from "@onlineworkspace/uikit-solid/src/components/text/UKText.tsx";
-import { useSearchParams } from "@solidjs/router";
 import clsx from "clsx";
 import browserPath from "path-browserify";
 import { type Component, For, Show, useContext } from "solid-js";
@@ -13,12 +12,11 @@ import { ViewContext } from "../../viewContext.ts";
 import styles from "./DetailsView.module.scss";
 
 const DetailsView: Component = () => {
-  const [_, setSearchParams] = useSearchParams();
   const appContext = useContext(AppContext);
   const viewContext = useContext(ViewContext);
 
   return (
-    <Show when={(viewContext?.viewState.viewItems.length || 0) > 0}>
+    <Show when={(appContext?.viewState[viewContext!.viewId].viewItems.length || 0) > 0}>
       <table class={styles.root} style={{ "--zoom-percentage": appContext?.userPreferences.zoomPercentage }}>
         <thead>
           <tr class={styles.columns}>
@@ -46,7 +44,7 @@ const DetailsView: Component = () => {
           </tr>
         </thead>
         <tbody>
-          <For each={viewContext?.viewState.viewItems}>
+          <For each={appContext?.viewState[viewContext!.viewId].viewItems}>
             {(item, index) => {
               if (!appContext?.userPreferences.showHidden && item.hidden) return null;
 
@@ -59,18 +57,12 @@ const DetailsView: Component = () => {
 
               return (
                 <tr
+                  tabIndex={0}
                   data-fs-item-path={item.path}
                   class={clsx(styles.item, item.hidden && styles.itemHidden)}
                   onClick={(e) => {
                     e.stopPropagation();
-                    onItemClick(
-                      e as unknown as MouseEvent & { currentTarget: HTMLButtonElement; target: DOMElement },
-                      appContext!,
-                      viewContext!,
-                      index(),
-                      item,
-                      setSearchParams,
-                    );
+                    onItemClick(e as unknown as MouseEvent & { currentTarget: HTMLButtonElement; target: DOMElement }, appContext!, index(), item);
                   }}
                   onMouseDown={(e) => {
                     e.preventDefault();
@@ -80,7 +72,7 @@ const DetailsView: Component = () => {
                     e.preventDefault();
                     e.stopPropagation();
                   }}
-                  data-selected={viewContext?.viewState.selectedItems.includes(item.path)}
+                  data-selected={appContext?.viewState[viewContext!.viewId].selectedItems.includes(item.path)}
                 >
                   <td>
                     {item.thumbnail !== undefined ? (
@@ -90,7 +82,7 @@ const DetailsView: Component = () => {
                     )}
                   </td>
                   <td>
-                    {viewContext?.viewState.isRenaming === item.path ? (
+                    {appContext?.viewState[viewContext!.viewId].isRenaming === item.path ? (
                       <div>Hello Renaming World!</div>
                     ) : (
                       <UKText size="m" role="body">

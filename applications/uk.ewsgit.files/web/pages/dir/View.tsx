@@ -1,6 +1,5 @@
 import ERROR_ICON from "@material-symbols/svg-700/outlined/error.svg";
 import FOLDER_LIMITED_ICON from "@material-symbols/svg-700/outlined/folder_limited.svg";
-import { useSearchParams } from "@solidjs/router";
 import path from "path-browserify";
 import { type Component, createEffect, createSignal, Match, onCleanup, onMount, Suspense, Switch, useContext } from "solid-js";
 import { createStore } from "solid-js/store";
@@ -19,6 +18,7 @@ import { ViewContext } from "./viewContext.ts";
 import type { ViewItem } from "./viewItem.ts";
 
 export interface ViewState {
+  pathUrl: UniformResourceLocator;
   viewItems: ViewItem[];
   selectedItems: string[];
   lastSelectionTime: number;
@@ -28,22 +28,8 @@ export interface ViewState {
   isRenaming: string | undefined;
 }
 
-const View: Component<{ pathOverride?: string; disallowCreation?: boolean }> = (props) => {
-  const [searchParams, setSearchParams] = useSearchParams<{ path?: UniformResourceLocator }>();
+const View: Component<{ pathOverride?: UniformResourceLocator; disallowCreation?: boolean; viewId: number }> = (props) => {
   const appContext = useContext(AppContext);
-  const [viewState, setViewState] = createStore<ViewState>({
-    viewItems: [],
-    selectedItems: [],
-    lastSelectionTime: -1,
-    lastSelectedItem: undefined,
-    viewId: 0,
-    isLoading: true,
-    isRenaming: undefined,
-  });
-  const viewContext = {
-    viewState,
-    setViewState,
-  };
   const [dragSelectRegion, setDragSelectRegion] = createStore<{
     origin?: { x: number; y: number };
     size?: { x: number; y: number };
@@ -54,11 +40,13 @@ const View: Component<{ pathOverride?: string; disallowCreation?: boolean }> = (
   });
   const [errorMessage, setErrorMessage] = createSignal<string | undefined>(undefined);
   const [forceViewItemUpdate, setForceViewItemUpdate] = createSignal<number>(0);
+  const [itemViewRef, setItemViewRef] = createSignal<HTMLDivElement | null>(null);
+  let selectableItems: Element[] = [];
   let navigationCounter = 0;
 
   createEffect(async () => {
-    if (!searchParams.path) {
-      setSearchParams({ path: props.pathOverride || appContext?.userPreferences.homePath });
+    if (!appContext?.viewState[props.viewId].pathUrl) {
+      appContext?.setViewState(props.viewId, "pathUrl", props.pathOverride || appContext?.userPreferences.homePath);
       return;
     }
 
@@ -66,24 +54,24 @@ const View: Component<{ pathOverride?: string; disallowCreation?: boolean }> = (
     appContext?.userPreferences.zoomPercentage;
     forceViewItemUpdate();
 
-    setViewState("isRenaming", undefined);
-    setViewState("selectedItems", []);
+    appContext?.setViewState(props.viewId, "isRenaming", undefined);
+    appContext?.setViewState(props.viewId, "selectedItems", []);
 
     navigationCounter++;
     const currentNavigationCount = navigationCounter;
 
     appContext?.setTasks((tasks) => tasks.filter((t) => t.type !== "view_fetch_items"));
-    setViewState("isLoading", true);
-    const newItems = await filesystemInterface.readDirectory(searchParams.path || "remote:/");
+    appContext?.setViewState(props.viewId, "isLoading", true);
+    const newItems = await filesystemInterface.readDirectory(appContext?.viewState[props.viewId].pathUrl || "remote:/");
 
     if (currentNavigationCount !== navigationCounter) return;
 
     if (newItems.status === "ok") {
       setErrorMessage(undefined);
 
-      setViewState("selectedItems", []);
-      setViewState("lastSelectionTime", -1);
-      setViewState("viewItems", []);
+      appContext?.setViewState(props.viewId, "selectedItems", []);
+      appContext?.setViewState(props.viewId, "lastSelectionTime", -1);
+      appContext?.setViewState(props.viewId, "viewItems", []);
 
       const task: Task = {
         parent: "view0",
@@ -96,7 +84,7 @@ const View: Component<{ pathOverride?: string; disallowCreation?: boolean }> = (
 
       appContext?.setTasks((tasks) => [...tasks, task]);
 
-      const CHUNK_SIZE = filesystemInterface.getViewEntryBatchSize(searchParams.path);
+      const CHUNK_SIZE = filesystemInterface.getViewEntryBatchSize(appContext?.viewState[props.viewId].pathUrl);
 
       for (const itemPathGroup of chunkArray(newItems.items, CHUNK_SIZE)) {
         if (currentNavigationCount !== navigationCounter) {
@@ -124,8 +112,8 @@ const View: Component<{ pathOverride?: string; disallowCreation?: boolean }> = (
             resolve();
             return;
           }
-          setViewState("viewItems", [
-            ...viewState.viewItems,
+          appContext?.setViewState(props.viewId, "viewItems", [
+            ...appContext.viewState[props.viewId].viewItems,
             ...itemGroupResponseResolvedPromises.map((ig) => ig?.data || undefined).filter((ig) => ig !== undefined),
           ]);
 
@@ -149,24 +137,24 @@ const View: Component<{ pathOverride?: string; disallowCreation?: boolean }> = (
         });
       }
 
-      setViewState("isLoading", false);
+      appContext?.setViewState(props.viewId, "isLoading", false);
     } else {
       setErrorMessage(newItems.status);
     }
   });
 
   const onKeyDown = (e: KeyboardEvent) => {
-    e.preventDefault();
+    if (e.key === "Tab" || e.key === " " || appContext?.globalState.disableShortcuts) return;
 
-    if (e.key !== "Escape" && appContext?.globalState.disableShortcuts) return;
+    e.preventDefault();
 
     switch (e.key) {
       case "F2": {
-        setViewState("isRenaming", viewState.lastSelectedItem);
+        appContext?.setViewState(props.viewId, "isRenaming", appContext.viewState[props.viewId].lastSelectedItem);
         break;
       }
       case " ": {
-        if (viewState.lastSelectedItem === undefined) return;
+        if (appContext?.viewState[props.viewId].lastSelectedItem === undefined) return;
 
         if (appContext?.globalState.showPreview === false) {
           appContext?.setGlobalState("showPreview", true);
@@ -177,14 +165,14 @@ const View: Component<{ pathOverride?: string; disallowCreation?: boolean }> = (
       }
       case "Escape": {
         appContext?.setGlobalState("showPreview", false);
-        setViewState("isRenaming", undefined);
-        setViewState("selectedItems", []);
+        appContext?.setViewState(props.viewId, "isRenaming", undefined);
+        appContext?.setViewState(props.viewId, "selectedItems", []);
         appContext?.setGlobalState("disableShortcuts", false);
         break;
       }
       case "Enter": {
-        if (viewState.lastSelectedItem) {
-          const item = viewState.viewItems.find((i) => i.path === viewState.lastSelectedItem);
+        if (appContext?.viewState[props.viewId].lastSelectedItem) {
+          const item = appContext?.viewState[props.viewId].viewItems.find((i) => i.path === appContext?.viewState[props.viewId].lastSelectedItem);
 
           if (!item) return;
 
@@ -193,9 +181,9 @@ const View: Component<{ pathOverride?: string; disallowCreation?: boolean }> = (
             return;
           }
 
-          setSearchParams({ path: item.path });
+          appContext?.setViewState(props.viewId, "pathUrl", item.path as UniformResourceLocator);
         }
-        deselectAllItems(appContext!, viewContext!);
+        deselectAllItems(appContext!, props.viewId);
         break;
       }
       case "ArrowLeft": {
@@ -204,7 +192,7 @@ const View: Component<{ pathOverride?: string; disallowCreation?: boolean }> = (
           return;
         }
 
-        selectPreviousItem(viewContext!);
+        selectPreviousItem(appContext!, props.viewId);
         break;
       }
       case "ArrowRight": {
@@ -213,15 +201,15 @@ const View: Component<{ pathOverride?: string; disallowCreation?: boolean }> = (
           return;
         }
 
-        selectNextItem(viewContext!);
+        selectNextItem(appContext!, props.viewId);
         break;
       }
       case "ArrowUp": {
-        selectPreviousItem(viewContext!);
+        selectPreviousItem(appContext!, props.viewId);
         break;
       }
       case "ArrowDown": {
-        selectNextItem(viewContext!);
+        selectNextItem(appContext!, props.viewId);
         break;
       }
       case "F5": {
@@ -239,19 +227,69 @@ const View: Component<{ pathOverride?: string; disallowCreation?: boolean }> = (
 
   onMount(async () => {
     window.addEventListener("keydown", onKeyDown);
-  });
 
-  onCleanup(() => {
-    window.removeEventListener("keydown", onKeyDown);
+    function mouseMove(e: MouseEvent) {
+      const bounds = itemViewRef()!.getBoundingClientRect();
+
+      const mouseX = Math.min(Math.max(e.clientX, bounds.left), bounds.right);
+      const mouseY = Math.min(Math.max(e.clientY, bounds.top), bounds.bottom);
+
+      const left = Math.min(dragSelectRegion.origin!.x, mouseX);
+      const top = Math.min(dragSelectRegion.origin!.y, mouseY);
+      const width = Math.abs(mouseX - dragSelectRegion.origin!.x);
+      const height = Math.abs(mouseY - dragSelectRegion.origin!.y);
+
+      setDragSelectRegion("transOrigin", { x: left, y: top });
+      setDragSelectRegion("size", { x: width, y: height });
+
+      const boxRight = left + width;
+      const boxBottom = top + height;
+
+      const newlySelected: string[] = [];
+      for (const item of selectableItems) {
+        const itemRect = item.getBoundingClientRect();
+        const path = item.getAttribute("data-fs-item-path");
+
+        const isIntersecting = !(itemRect.left > boxRight || itemRect.right < left || itemRect.top > boxBottom || itemRect.bottom < top);
+
+        if (isIntersecting && path) newlySelected.push(path);
+      }
+
+      appContext?.setViewState(props.viewId, "selectedItems", newlySelected);
+    }
+
+    function mouseUp() {
+      document.body.style.userSelect = "unset";
+      setDragSelectRegion("origin", undefined);
+      setDragSelectRegion("size", undefined);
+      setDragSelectRegion("transOrigin", undefined);
+      document.removeEventListener("mouseup", mouseUp);
+      document.removeEventListener("mousemove", mouseMove);
+    }
+
+    createEffect(() => {
+      function mouseDown() {
+        window.addEventListener("mouseup", mouseUp);
+        window.addEventListener("mousemove", mouseMove);
+      }
+
+      itemViewRef()?.addEventListener("mousedown", mouseDown);
+    });
+
+    onCleanup(() => {
+      window.removeEventListener("keydown", onKeyDown);
+      window.removeEventListener("mouseup", mouseUp);
+      window.removeEventListener("mousemove", mouseMove);
+    });
   });
 
   return (
     <Suspense>
-      <ViewContext.Provider value={{ viewState, setViewState }}>
-        <div class={styles.root}>
+      <ViewContext.Provider value={{ viewId: props.viewId }}>
+        <div class={styles.root} onFocusIn={() => appContext?.setGlobalState("activeViewId", props.viewId)}>
           {errorMessage() ? (
             <ViewMessage icon={ERROR_ICON} title={"An error has occurred"} message={errorMessage() || "Missing Error Message?"}></ViewMessage>
-          ) : viewState.viewItems.length === 0 && !viewState.isLoading ? (
+          ) : appContext!.viewState[props.viewId].viewItems.length === 0 && !appContext!.viewState[props.viewId].isLoading ? (
             <ViewMessage
               icon={FOLDER_LIMITED_ICON}
               title={"Nothing Here."}
@@ -272,7 +310,7 @@ const View: Component<{ pathOverride?: string; disallowCreation?: boolean }> = (
                         color: "filled",
                         label: "Create new Folder",
                         async onClick() {
-                          const resolvedPath = filesystemInterface.urlToPath(searchParams.path || "remote:/");
+                          const resolvedPath = filesystemInterface.urlToPath(appContext?.viewState[props.viewId].pathUrl || "remote:/");
 
                           if (resolvedPath.type === "invalid") throw "Error resolving searchParams path";
 
@@ -290,20 +328,21 @@ const View: Component<{ pathOverride?: string; disallowCreation?: boolean }> = (
               {/** biome-ignore lint/a11y/noStaticElementInteractions: button functionality not required */}
               <div
                 class={styles.itemView}
+                ref={setItemViewRef}
                 onMouseDown={(downEvent) => {
                   if (appContext?.userPreferences.viewType === "gallery") return;
 
                   const target = downEvent.target as HTMLElement;
                   const itemPath = target.closest("[data-fs-item-path]")?.getAttribute("data-fs-item-path");
-                  const currentSelected = viewState.selectedItems || [];
+                  const currentSelected = appContext?.viewState[props.viewId].selectedItems || [];
 
                   if (itemPath) {
                     const isSelected = currentSelected.includes(itemPath);
                     const newSelection = isSelected ? currentSelected.filter((path) => path !== itemPath) : [...currentSelected, itemPath];
 
-                    setViewState("selectedItems", newSelection);
+                    appContext?.setViewState(props.viewId, "selectedItems", newSelection);
                   } else {
-                    deselectAllItems(appContext!, viewContext!);
+                    deselectAllItems(appContext!, props.viewId);
                   }
 
                   const originX = downEvent.clientX;
@@ -313,48 +352,7 @@ const View: Component<{ pathOverride?: string; disallowCreation?: boolean }> = (
                   setDragSelectRegion("origin", { x: originX, y: originY });
 
                   const currentTarget = downEvent.currentTarget as HTMLDivElement;
-                  const bounds = currentTarget.getBoundingClientRect();
-                  const selectableItems = Array.from(currentTarget.querySelectorAll("[data-fs-item-path]"));
-
-                  function mouseMove(e: MouseEvent) {
-                    const mouseX = Math.min(Math.max(e.clientX, bounds.left), bounds.right);
-                    const mouseY = Math.min(Math.max(e.clientY, bounds.top), bounds.bottom);
-
-                    const left = Math.min(originX, mouseX);
-                    const top = Math.min(originY, mouseY);
-                    const width = Math.abs(mouseX - originX);
-                    const height = Math.abs(mouseY - originY);
-
-                    setDragSelectRegion("transOrigin", { x: left, y: top });
-                    setDragSelectRegion("size", { x: width, y: height });
-
-                    const boxRight = left + width;
-                    const boxBottom = top + height;
-
-                    const newlySelected: string[] = [];
-                    for (const item of selectableItems) {
-                      const itemRect = item.getBoundingClientRect();
-                      const path = item.getAttribute("data-fs-item-path");
-
-                      const isIntersecting = !(itemRect.left > boxRight || itemRect.right < left || itemRect.top > boxBottom || itemRect.bottom < top);
-
-                      if (isIntersecting && path) newlySelected.push(path);
-                    }
-
-                    setViewState("selectedItems", newlySelected);
-                  }
-
-                  function mouseUp() {
-                    document.body.style.userSelect = "unset";
-                    setDragSelectRegion("origin", undefined);
-                    setDragSelectRegion("size", undefined);
-                    setDragSelectRegion("transOrigin", undefined);
-                    document.removeEventListener("mouseup", mouseUp);
-                    document.removeEventListener("mousemove", mouseMove);
-                  }
-
-                  document.addEventListener("mouseup", mouseUp);
-                  document.addEventListener("mousemove", mouseMove);
+                  selectableItems = Array.from(currentTarget.querySelectorAll("[data-fs-item-path]"));
                 }}
               >
                 <Switch>
@@ -382,9 +380,7 @@ const View: Component<{ pathOverride?: string; disallowCreation?: boolean }> = (
               </div>
             </>
           )}
-          <div class={styles.statusBar}>
-            <StatusBar />
-          </div>
+          <StatusBar />
         </div>
       </ViewContext.Provider>
     </Suspense>

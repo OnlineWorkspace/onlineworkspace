@@ -1,6 +1,8 @@
 .root {
   display: flex;
   flex-direction: column;
+  height: 100%;
+  overflow: hidden;
 }
 
 .itemView {
@@ -16,5 +18,3 @@
   position: fixed;
   border-radius: var(--uk-sys-shape-corner-small);
 }
-
-.statusBar {}

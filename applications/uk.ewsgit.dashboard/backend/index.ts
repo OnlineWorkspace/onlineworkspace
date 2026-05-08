@@ -38,11 +38,11 @@ const router = t.router({
             return {
               displayName: `${forename} ${surname}`,
               username: username,
-              avatar: `${opt.ctx.instance.sys.configuration.backendUrl}/api/user/me/avatar/m`,
+              avatar: `${opt.ctx.instance.sys.configuration.proxyUrl}/api/user/me/avatar/m`,
             };
           }),
         avatar: procedure.output(z.string()).query(async (opt) => {
-          return `${opt.ctx.instance.sys.configuration.backendUrl}/api/user/me/avatar/2xl`;
+          return `${opt.ctx.instance.sys.configuration.proxyUrl}/api/user/me/avatar/2xl`;
         }),
       },
     },
@@ -201,7 +201,7 @@ const router = t.router({
         );
       }
 
-      return opt.ctx.instance.sys.configuration.backendUrl + (await opt.ctx.instance.sys.image.serveImage(opt.ctx.userId, requiredResizedWallpaperPath));
+      return opt.ctx.instance.sys.configuration.proxyUrl + (await opt.ctx.instance.sys.image.serveImage(opt.ctx.userId, requiredResizedWallpaperPath));
     }),
   },
 });

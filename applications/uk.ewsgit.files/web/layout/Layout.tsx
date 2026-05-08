@@ -94,7 +94,7 @@ const Layout: Component<ParentProps> = (props) => {
             type: "button",
             icon: { type: "icon", value: DELETE_ICON },
             label: "Bin",
-            badgeLabel: appContext?.deletedItemCount || undefined,
+            badgeLabel: appContext?.globalState.deletedItemCount || undefined,
             onClick() {
               navigate("/app/uk.ewsgit.files/bin");
             },
@@ -117,11 +117,11 @@ const Layout: Component<ParentProps> = (props) => {
           <PreviewPane />
         </div>
       </UKSideBar>
-      {/* <Suspense>
+      <Suspense>
         <Show when={appContext?.globalState.showPreview === true && appContext.isDesktopApp === false}>
-          <PreviewDialog pathUrl={appContext!.viewState.lastSelectedItem! as UniformResourceLocator} />
+          <PreviewDialog pathUrl={appContext!.viewState[appContext!.globalState.activeViewId].lastSelectedItem! as UniformResourceLocator} />
         </Show>
-      </Suspense> */}
+      </Suspense>
     </>
   );
 };

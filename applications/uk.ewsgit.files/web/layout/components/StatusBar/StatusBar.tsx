@@ -6,18 +6,20 @@ import UKIconButton from "@onlineworkspace/uikit-solid/src/components/iconButton
 import UKLinearProgressIndicator from "@onlineworkspace/uikit-solid/src/components/linearProgressIndicator/UKLinearProgressIndicator.tsx";
 import UKText from "@onlineworkspace/uikit-solid/src/components/text/UKText.tsx";
 import clsx from "clsx";
-import {type Component, createEffect, createSignal, useContext} from "solid-js";
-import {AppContext} from "../../../appContext.ts";
-import {MAX_ZOOM_VALUE, MIN_ZOOM_VALUE} from "../../../lib/constants.ts";
+import { type Component, createEffect, createSignal, useContext } from "solid-js";
+import { AppContext } from "../../../appContext.ts";
+import { MAX_ZOOM_VALUE, MIN_ZOOM_VALUE } from "../../../lib/constants.ts";
 import humanReadableSize from "../../../lib/humanReadableSize.ts";
+import { ViewContext } from "../../../pages/dir/viewContext.ts";
 import styles from "./StatusBar.module.scss";
 
 const StatusBar: Component = () => {
   const appContext = useContext(AppContext);
-  const [ dirContents, setDirContents ] = createSignal<string>("");
+  const viewContext = useContext(ViewContext);
+  const [dirContents, setDirContents] = createSignal<string>("");
 
   createEffect(() => {
-    const viewItems = appContext?.viewState.viewItems;
+    const viewItems = appContext?.viewState[viewContext!.viewId].viewItems;
 
     let outputString = "";
 
@@ -46,7 +48,7 @@ const StatusBar: Component = () => {
       outputString += ` (${humanReadableSize(totalSize)})`;
     }
 
-    const selectedItems = appContext?.viewState.selectedItems || [];
+    const selectedItems = appContext?.viewState[viewContext!.viewId].selectedItems || [];
 
     if (selectedItems?.length > 0) {
       outputString += ` - Selected ${selectedItems.length} item${selectedItems.length !== 1 ? "s" : ""}`;
@@ -90,10 +92,10 @@ const StatusBar: Component = () => {
         {dirContents()}
       </UKText>
       <div class={styles.margin}></div>
-      <div class={clsx(styles.taskStatus, appContext!.tasks()[ 0 ] && !appContext!.tasks()[ 0 ]?.invalid && styles.visible)}>
-        <UKLinearProgressIndicator class={styles.progressBar} start={0} stop={appContext!.tasks()[ 0 ]?.max || 1} value={appContext!.tasks()[ 0 ]?.current || 0} />
+      <div class={clsx(styles.taskStatus, appContext!.tasks()[0] && !appContext!.tasks()[0]?.invalid && styles.visible)}>
+        <UKLinearProgressIndicator class={styles.progressBar} start={0} stop={appContext!.tasks()[0]?.max || 1} value={appContext!.tasks()[0]?.current || 0} />
         <UKText role={"label"} size={"m"}>
-          {appContext!.tasks()[ 0 ]?.message.replaceAll("%c", appContext!.tasks()[ 0 ].current.toString()).replaceAll("%m", appContext!.tasks()[ 0 ].max.toString())}
+          {appContext!.tasks()[0]?.message.replaceAll("%c", appContext!.tasks()[0].current.toString()).replaceAll("%m", appContext!.tasks()[0].max.toString())}
         </UKText>
       </div>
       <UKDivider direction={"vertical"} class={styles.divider} width="full" />

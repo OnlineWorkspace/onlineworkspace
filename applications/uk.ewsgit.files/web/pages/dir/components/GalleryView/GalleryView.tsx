@@ -6,30 +6,32 @@ import UKIconButton from "@onlineworkspace/uikit-solid/src/components/iconButton
 import UKText from "@onlineworkspace/uikit-solid/src/components/text/UKText.jsx";
 import clsx from "clsx";
 import browserPath from "path-browserify";
-import {type Component, createEffect, createResource, For, useContext} from "solid-js";
-import {AppContext} from "../../../../appContext";
+import { type Component, createEffect, createResource, For, useContext } from "solid-js";
+import { AppContext } from "../../../../appContext";
 import filesystemInterface from "../../../../lib/filesystemInterface";
 import trpc from "../../../../lib/trpc";
 import iconForItemType from "../../iconForItemType";
 import onItemClick from "../../itemClick";
+import { ViewContext } from "../../viewContext";
 import styles from "./GalleryView.module.scss";
 
 const GalleryView: Component = () => {
   const appContext = useContext(AppContext);
-  const [ galleryPreviewMainImage, {refetch: refetchGalleryPreviewMainImage} ] = createResource(() => {
+  const viewContext = useContext(ViewContext);
+  const [galleryPreviewMainImage, { refetch: refetchGalleryPreviewMainImage }] = createResource(() => {
     // @ts-ignore
-    const parsedPath = filesystemInterface.urlToPath(appContext?.viewState.selectedItems?.[ 0 ] || "");
+    const parsedPath = filesystemInterface.urlToPath(appContext?.viewState.selectedItems?.[0] || "");
 
     if (parsedPath.type === "remote") {
-      return trpc.view.getGalleryItem.query({height: 768, path: parsedPath.path || undefined});
+      return trpc.view.getGalleryItem.query({ height: 768, path: parsedPath.path || undefined });
     }
 
     alert("this view is unsupported on this configuration");
-    return {image: "/assets/generic_background.svg", dimensions: {width: 0, height: 0}};
+    return { image: "/assets/generic_background.svg", dimensions: { width: 0, height: 0 } };
   });
 
   createEffect(() => {
-    appContext?.viewState.selectedItems;
+    appContext?.viewState[viewContext!.viewId].selectedItems;
 
     refetchGalleryPreviewMainImage();
   });
@@ -51,7 +53,7 @@ const GalleryView: Component = () => {
           </div>
           <img
             class={styles.galleryPreviewMainImage}
-            style={{"aspect-ratio": `${galleryPreviewMainImage()?.dimensions?.width} / ${galleryPreviewMainImage()?.dimensions?.height}`}}
+            style={{ "aspect-ratio": `${galleryPreviewMainImage()?.dimensions?.width} / ${galleryPreviewMainImage()?.dimensions?.height}` }}
             alt=""
             src={galleryPreviewMainImage()?.image || "/assets/generic_background.svg"}
           />
@@ -62,7 +64,7 @@ const GalleryView: Component = () => {
         </div>
       </div>
       <div class={styles.galleryItemsGrid}>
-        <For each={appContext?.viewState.viewItems}>
+        <For each={appContext?.viewState[viewContext!.viewId].viewItems}>
           {(item, index) => {
             if (!appContext?.userPreferences.showHidden && item.hidden) return null;
 
@@ -70,7 +72,7 @@ const GalleryView: Component = () => {
               <UKCard
                 class={clsx(styles.item, item.hidden && styles.itemHidden)}
                 data-fs-item-path={item.path}
-                onClick={(e) => onItemClick(e, appContext!, index(), item, () => 0)}
+                onClick={(e) => onItemClick(e, appContext!, index(), item)}
                 onMouseDown={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
@@ -79,7 +81,7 @@ const GalleryView: Component = () => {
                   e.preventDefault();
                   e.stopPropagation();
                 }}
-                color={appContext?.viewState.selectedItems.includes(item.path) ? "outlined" : "filled"}
+                color={appContext?.viewState[viewContext!.viewId].selectedItems.includes(item.path) ? "outlined" : "filled"}
               >
                 {item.thumbnail !== undefined ? (
                   <img class={styles.itemThumbnail} alt="" src={item.thumbnail} loading="lazy" />

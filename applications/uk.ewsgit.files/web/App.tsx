@@ -1,5 +1,6 @@
 import { Route } from "@solidjs/router";
 import { type Component, lazy, useContext } from "solid-js";
+import styles from "./App.module.scss";
 import { AppContext } from "./appContext.ts";
 import Core from "./Core.tsx";
 import ActionBar from "./layout/components/ActionBar/ActionBar.tsx";
@@ -38,7 +39,21 @@ const App: Component = () => {
               <div class={layoutStyles.actionBar}>
                 <ActionBar />
               </div>
-              <View />
+              <View viewId={0} />
+            </>
+          )}
+        />
+        <Route
+          path={"/split-dir"}
+          component={() => (
+            <>
+              <div class={layoutStyles.actionBar}>
+                <ActionBar />
+              </div>
+              <div class={styles.splitView}>
+                <View viewId={0} />
+                <View viewId={1} />
+              </div>
             </>
           )}
         />
@@ -55,7 +70,7 @@ const App: Component = () => {
             path={"/bin"}
             component={() => (
               <>
-                <View pathOverride="remote:/users/1/recycle_bin" disallowCreation />
+                <View viewId={0} pathOverride="remote:/users/1/recycle_bin" disallowCreation />
               </>
             )}
           />
