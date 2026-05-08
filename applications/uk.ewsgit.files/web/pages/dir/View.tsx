@@ -144,6 +144,7 @@ const View: Component<{ pathOverride?: UniformResourceLocator; disallowCreation?
   });
 
   const onKeyDown = (e: KeyboardEvent) => {
+    // TODO: fix preview not working, check if the focus is currently on viewItems or deeper in the document domTree
     if (e.key === "Tab" || e.key === " " || appContext?.globalState.disableShortcuts) return;
 
     e.preventDefault();
