@@ -56,37 +56,21 @@ const ActionBar: Component = () => {
       <Show when={appContext?.viewState[appContext.globalState.activeViewId].pathUrl !== undefined}>
         <div class={styles.pathSelector}>
           <div class={styles.pathSegments}>
+            <UKText role="label" size="l">
+              {(appContext?.viewState[appContext.globalState.activeViewId].pathUrl || "").split(browserPath.sep)[0].toUpperCase()}
+            </UKText>
             {(appContext?.viewState[appContext.globalState.activeViewId].pathUrl || "")
               .split(browserPath.sep)
-              .slice(0, 1)
-              .map((segment, index) => {
-                return (
-                  <>
-                    <UKText role="label" size="l">
-                      {segment.slice(0, -1).toUpperCase()}
-                    </UKText>
-                    {(appContext?.viewState[appContext.globalState.activeViewId].pathUrl || "").split(browserPath.sep).length - 1 === index ? (
-                      ""
-                    ) : (
-                      <UKText role="label" size="l">
-                        /
-                      </UKText>
-                    )}
-                  </>
-                );
-              })}
-            {(appContext?.viewState[appContext.globalState.activeViewId].pathUrl || "")
-              .split(browserPath.sep)
-              .slice(1)
+              .slice(0)
               .map((segment, index) => {
                 return (
                   <div>
-                    <UKText role="label" size="l">
-                      {segment}
-                    </UKText>
-                    {(appContext?.viewState[appContext.globalState.activeViewId].pathUrl || "").split(browserPath.sep).length - 1 === index ? (
-                      ""
-                    ) : (
+                    {index !== 0 && (
+                      <UKText role="label" size="l">
+                        {segment}
+                      </UKText>
+                    )}
+                    {(appContext?.viewState[appContext.globalState.activeViewId].pathUrl || "").split(browserPath.sep).length - 1 === index ? null : (
                       <UKText role="label" size="l">
                         /
                       </UKText>

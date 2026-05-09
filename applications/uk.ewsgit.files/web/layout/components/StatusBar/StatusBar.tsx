@@ -63,6 +63,7 @@ const StatusBar: Component = () => {
 
   createEffect(() => {
     for (const task of appContext?.viewState[viewContext!.viewId].tasks || []) {
+      console.log(JSON.stringify(task));
       if (task.current === task.max) {
         setTimeout(() => {
           appContext?.setViewState(viewContext!.viewId, "tasks", (tasks) =>

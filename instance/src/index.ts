@@ -2,6 +2,7 @@ import { promises as fs, existsSync as fsExistsSync } from "node:fs";
 import path from "node:path";
 import type { AnyRouter } from "@trpc/server";
 import { type BunRequest, file } from "bun";
+import nodeCanvas from "canvas";
 import chalk from "chalk";
 // https://github.com/cah4a/trpc-bun-adapter/blob/main/src/createBunHttpHandler.ts TODO: patch this and merge into the instance package
 import type { BunWSClientCtx } from "trpc-bun-adapter";
@@ -300,6 +301,35 @@ class Instance {
               }
 
               return new Response(file(asset.path));
+            },
+          },
+          "/api/asset/fileicon/:filetype": {
+            GET: async (req: BunRequest) => {
+              const CANVAS_PADDING = 8;
+              const CANVAS_WIDTH = 128;
+              const CANVAS_HEIGHT = 128;
+              const canvas = nodeCanvas.createCanvas(CANVAS_WIDTH, CANVAS_HEIGHT);
+              const ctx = canvas.getContext("2d");
+              ctx.drawImage(await nodeCanvas.loadImage(path.join(this.sys.filesystem.SRC_ROOT, "assets/placeholder/file.png")), 0, 0);
+
+              ctx.font = `20px Arial`;
+              ctx.textAlign = "end";
+              ctx.textBaseline = "bottom";
+              const LABEL_PADDING: { x: number; y: number } = { x: 4, y: 0 };
+              const labelBr: { x: number; y: number } = { x: CANVAS_WIDTH - CANVAS_PADDING, y: CANVAS_HEIGHT - CANVAS_PADDING };
+              const textContent = `${req.params.filetype.toUpperCase().slice(0, 3)}`;
+              const textSize = ctx.measureText(textContent);
+              ctx.fillStyle = "#00aa00";
+              ctx.fillRect(
+                labelBr.x - (textSize.width + LABEL_PADDING.x * 2),
+                labelBr.y - (textSize.emHeightAscent + LABEL_PADDING.y * 2),
+                textSize.width + LABEL_PADDING.x * 2,
+                textSize.emHeightAscent + LABEL_PADDING.y * 2,
+              );
+              ctx.fillStyle = "white";
+              ctx.fillText(textContent, labelBr.x - LABEL_PADDING.x, labelBr.y + LABEL_PADDING.y);
+
+              return new Response(canvas.toBuffer());
             },
           },
         },
