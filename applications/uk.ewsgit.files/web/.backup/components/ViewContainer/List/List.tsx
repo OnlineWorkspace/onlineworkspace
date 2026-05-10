@@ -1,9 +1,9 @@
-import UKButton from "@onlineworkspace/uikit-solid/src/components/button/UKButton.tsx";
-import UKButtonGroup from "@onlineworkspace/uikit-solid/src/components/buttonGroup/UKButtonGroup.tsx";
-import { DividerDirection } from "@onlineworkspace/uikit-solid/src/components/divider/lib/direction.ts";
-import UKDivider from "@onlineworkspace/uikit-solid/src/components/divider/UKDivider.tsx";
-import UKIcon from "@onlineworkspace/uikit-solid/src/components/icon/UKIcon.tsx";
-import UKText from "@onlineworkspace/uikit-solid/src/components/text/UKText.tsx";
+import UKButton from "@ewsgit/uikit-solid/src/components/button/UKButton.tsx";
+import UKButtonGroup from "@ewsgit/uikit-solid/src/components/buttonGroup/UKButtonGroup.tsx";
+import { DividerDirection } from "@ewsgit/uikit-solid/src/components/divider/lib/direction.ts";
+import UKDivider from "@ewsgit/uikit-solid/src/components/divider/UKDivider.tsx";
+import UKIcon from "@ewsgit/uikit-solid/src/components/icon/UKIcon.tsx";
+import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.tsx";
 import { createFileUploader } from "@solid-primitives/upload";
 import { useNavigate, useParams } from "@solidjs/router";
 import path from "path-browserify";

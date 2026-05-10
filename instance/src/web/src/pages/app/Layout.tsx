@@ -1,6 +1,6 @@
-import UKCircularProgressIndicator from "@onlineworkspace/uikit-solid/src/components/circularProgressIndicator/UKCircularProgressIndicator.jsx";
-import { baselineTheme } from "@onlineworkspace/uikit-solid/src/core/design/themes/baseline.js";
-import { applyTheme } from "@onlineworkspace/uikit-solid/src/core/design/tokens.js";
+import UKCircularProgressIndicator from "@ewsgit/uikit-solid/src/components/circularProgressIndicator/UKCircularProgressIndicator.jsx";
+import { baselineTheme } from "@ewsgit/uikit-solid/src/core/design/themes/baseline.js";
+import { applyTheme } from "@ewsgit/uikit-solid/src/core/design/tokens.js";
 import { Ref } from "@solid-primitives/refs";
 import type { RouteSectionProps } from "@solidjs/router";
 import { type Component, createEffect, createSignal, lazy, Suspense } from "solid-js";

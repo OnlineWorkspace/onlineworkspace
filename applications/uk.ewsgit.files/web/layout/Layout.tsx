@@ -3,7 +3,7 @@ import FOLDER_ICON from "@material-symbols/svg-700/outlined/folder.svg";
 import HARD_DRIVE_ICON from "@material-symbols/svg-700/outlined/hard_drive.svg";
 import HOUSE_ICON from "@material-symbols/svg-700/outlined/house.svg";
 import PERSON_ICON from "@material-symbols/svg-700/outlined/person.svg";
-import UKSideBar from "@onlineworkspace/uikit-solid/src/components/sideBar/UKSideBar.tsx";
+import UKSideBar from "@ewsgit/uikit-solid/src/components/sideBar/UKSideBar.tsx";
 import { useNavigate } from "@solidjs/router";
 import browserPath from "path-browserify";
 import { type Component, type ParentProps, Show, Suspense, useContext } from "solid-js";
@@ -72,23 +72,23 @@ const Layout: Component<ParentProps> = (props) => {
           }[]),
           ...((appContext?.isDesktopApp
             ? [
-                { type: "divider" },
-                { type: "label", label: "Local" },
-                {
-                  type: "button",
-                  icon: { type: "icon", value: HARD_DRIVE_ICON },
-                  label: "Root (Local)",
-                  onClick() {
-                    navigate(`/app/uk.ewsgit.files/dir?path=local:/`);
-                  },
+              { type: "divider" },
+              { type: "label", label: "Local" },
+              {
+                type: "button",
+                icon: { type: "icon", value: HARD_DRIVE_ICON },
+                label: "Root (Local)",
+                onClick() {
+                  navigate(`/app/uk.ewsgit.files/dir?path=local:/`);
                 },
-              ]
+              },
+            ]
             : []) as {
-            type: "button";
-            icon: { type: "icon"; value: string };
-            label: string;
-            onClick(): void;
-          }[]),
+              type: "button";
+              icon: { type: "icon"; value: string };
+              label: string;
+              onClick(): void;
+            }[]),
           { type: "margin" },
           {
             type: "button",

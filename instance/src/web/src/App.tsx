@@ -1,4 +1,4 @@
-import { UIKitRoot } from "@onlineworkspace/uikit-solid/src/index.tsx";
+import { UIKitRoot } from "@ewsgit/uikit-solid/src/index.tsx";
 // @ts-ignore
 import ApplicationsRouter from "@onlineworkspace/workspaces-applications";
 import { Route, Router } from "@solidjs/router";

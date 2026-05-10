@@ -11,7 +11,7 @@
   "dependencies": {
     "@material-symbols/svg-700": "^0.42.3",
     "@material/material-color-utilities": "^0.3.0",
-    "@onlineworkspace/uikit-solid": "workspace:*",
+    "@ewsgit/uikit-solid": "workspace:*",
     "@simplewebauthn/browser": "^13.3.0",
     "@solid-primitives/media": "^2.3.5",
     "@solid-primitives/refs": "^1.1.3",

@@ -1,8 +1,8 @@
 import ARROW_UPWARD_ICON from "@material-symbols/svg-700/outlined/arrow_upward.svg";
 import GRID_VIEW_ICON from "@material-symbols/svg-700/outlined/grid_view.svg";
-import UKIconButton from "@onlineworkspace/uikit-solid/src/components/iconButton/UKIconButton.tsx";
-import UKText from "@onlineworkspace/uikit-solid/src/components/text/UKText.tsx";
-import UKTextField from "@onlineworkspace/uikit-solid/src/components/textField/UKTextField.tsx";
+import UKIconButton from "@ewsgit/uikit-solid/src/components/iconButton/UKIconButton.tsx";
+import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.tsx";
+import UKTextField from "@ewsgit/uikit-solid/src/components/textField/UKTextField.tsx";
 import { useNavigate, useParams } from "@solidjs/router";
 import path from "path-browserify";
 import { type Component, createSignal, For, useContext } from "solid-js";

@@ -1,10 +1,10 @@
 import VIEW_REAL_SIZE_ICON from "@material-symbols/svg-700/outlined/view_real_size.svg";
 import ZOOM_IN_ICON from "@material-symbols/svg-700/outlined/zoom_in.svg";
 import ZOOM_OUT_ICON from "@material-symbols/svg-700/outlined/zoom_out.svg";
-import UKDivider from "@onlineworkspace/uikit-solid/src/components/divider/UKDivider.jsx";
-import UKIconButton from "@onlineworkspace/uikit-solid/src/components/iconButton/UKIconButton.jsx";
-import UKLinearProgressIndicator from "@onlineworkspace/uikit-solid/src/components/linearProgressIndicator/UKLinearProgressIndicator.tsx";
-import UKText from "@onlineworkspace/uikit-solid/src/components/text/UKText.tsx";
+import UKDivider from "@ewsgit/uikit-solid/src/components/divider/UKDivider.jsx";
+import UKIconButton from "@ewsgit/uikit-solid/src/components/iconButton/UKIconButton.jsx";
+import UKLinearProgressIndicator from "@ewsgit/uikit-solid/src/components/linearProgressIndicator/UKLinearProgressIndicator.tsx";
+import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.tsx";
 import clsx from "clsx";
 import { type Component, createEffect, createSignal, useContext } from "solid-js";
 import { AppContext } from "../../../appContext.ts";

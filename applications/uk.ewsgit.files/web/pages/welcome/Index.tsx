@@ -1,7 +1,7 @@
-import UKButton from "@onlineworkspace/uikit-solid/src/components/button/UKButton.tsx";
-import UKButtonGroup from "@onlineworkspace/uikit-solid/src/components/buttonGroup/UKButtonGroup.tsx";
-import UKCard from "@onlineworkspace/uikit-solid/src/components/card/UKCard.tsx";
-import UKText from "@onlineworkspace/uikit-solid/src/components/text/UKText.tsx";
+import UKButton from "@ewsgit/uikit-solid/src/components/button/UKButton.tsx";
+import UKButtonGroup from "@ewsgit/uikit-solid/src/components/buttonGroup/UKButtonGroup.tsx";
+import UKCard from "@ewsgit/uikit-solid/src/components/card/UKCard.tsx";
+import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.tsx";
 import { useNavigate } from "@solidjs/router";
 import type { Component } from "solid-js";
 import styles from "./Index.module.scss";

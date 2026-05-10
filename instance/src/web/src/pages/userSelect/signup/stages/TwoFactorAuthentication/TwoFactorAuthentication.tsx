@@ -1,8 +1,8 @@
-import UKButton from "@onlineworkspace/uikit-solid/src/components/button/UKButton.jsx";
-import UKCard from "@onlineworkspace/uikit-solid/src/components/card/UKCard.jsx";
-import UKDivider from "@onlineworkspace/uikit-solid/src/components/divider/UKDivider.jsx";
-import UKText from "@onlineworkspace/uikit-solid/src/components/text/UKText.jsx";
-import UKTextField from "@onlineworkspace/uikit-solid/src/components/textField/UKTextField.jsx";
+import UKButton from "@ewsgit/uikit-solid/src/components/button/UKButton.jsx";
+import UKCard from "@ewsgit/uikit-solid/src/components/card/UKCard.jsx";
+import UKDivider from "@ewsgit/uikit-solid/src/components/divider/UKDivider.jsx";
+import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.jsx";
+import UKTextField from "@ewsgit/uikit-solid/src/components/textField/UKTextField.jsx";
 import clsx from "clsx";
 import QRCode from "qrcode";
 import { type Accessor, type Component, createEffect, createResource, createSignal, type Resource } from "solid-js";

@@ -1,5 +1,5 @@
-import UKStack from "@onlineworkspace/uikit-solid/src/components/stack/UKStack.jsx";
-import UKStackLabel from "@onlineworkspace/uikit-solid/src/components/stack/UKStackLabel.tsx";
+import UKStack from "@ewsgit/uikit-solid/src/components/stack/UKStack.jsx";
+import UKStackLabel from "@ewsgit/uikit-solid/src/components/stack/UKStackLabel.tsx";
 import { type Component, createResource, For } from "solid-js";
 import trpc from "../../../../lib/trpc";
 import CreateUser from "./components/CreateUser/CreateUser";

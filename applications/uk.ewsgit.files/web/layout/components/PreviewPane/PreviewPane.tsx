@@ -1,7 +1,7 @@
-import UKDivider from "@onlineworkspace/uikit-solid/src/components/divider/UKDivider.tsx";
-import UKIcon from "@onlineworkspace/uikit-solid/src/components/icon/UKIcon.tsx";
-import UKText from "@onlineworkspace/uikit-solid/src/components/text/UKText.tsx";
-import useIsMobile from "@onlineworkspace/uikit-solid/src/core/useIsMobile.ts";
+import UKDivider from "@ewsgit/uikit-solid/src/components/divider/UKDivider.tsx";
+import UKIcon from "@ewsgit/uikit-solid/src/components/icon/UKIcon.tsx";
+import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.tsx";
+import useIsMobile from "@ewsgit/uikit-solid/src/core/useIsMobile.ts";
 import browserPath from "path-browserify";
 import { type Component, useContext } from "solid-js";
 import { AppContext } from "../../../appContext.ts";

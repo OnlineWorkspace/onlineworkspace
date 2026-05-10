@@ -1,9 +1,9 @@
 import ICON_CHEVRON_LEFT from "@material-symbols/svg-700/outlined/chevron_left.svg";
 import ICON_CHEVRON_RIGHT from "@material-symbols/svg-700/outlined/chevron_right.svg";
-import UKCard from "@onlineworkspace/uikit-solid/src/components/card/UKCard.jsx";
-import UKIcon from "@onlineworkspace/uikit-solid/src/components/icon/UKIcon.jsx";
-import UKIconButton from "@onlineworkspace/uikit-solid/src/components/iconButton/UKIconButton.jsx";
-import UKText from "@onlineworkspace/uikit-solid/src/components/text/UKText.jsx";
+import UKCard from "@ewsgit/uikit-solid/src/components/card/UKCard.jsx";
+import UKIcon from "@ewsgit/uikit-solid/src/components/icon/UKIcon.jsx";
+import UKIconButton from "@ewsgit/uikit-solid/src/components/iconButton/UKIconButton.jsx";
+import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.jsx";
 import clsx from "clsx";
 import browserPath from "path-browserify";
 import { type Component, createEffect, createResource, For, useContext } from "solid-js";

@@ -1,9 +1,9 @@
-import UKButton from "@onlineworkspace/uikit-solid/src/components/button/UKButton.tsx";
-import UKCard from "@onlineworkspace/uikit-solid/src/components/card/UKCard.tsx";
-import { DividerDirection } from "@onlineworkspace/uikit-solid/src/components/divider/lib/direction.ts";
-import UKDivider from "@onlineworkspace/uikit-solid/src/components/divider/UKDivider.tsx";
-import UKCircularProgressIndicator from "@onlineworkspace/uikit-solid/src/components/circularProgressIndicator/UKCircularProgressIndicator.tsx";
-import UKText from "@onlineworkspace/uikit-solid/src/components/text/UKText.tsx";
+import UKButton from "@ewsgit/uikit-solid/src/components/button/UKButton.tsx";
+import UKCard from "@ewsgit/uikit-solid/src/components/card/UKCard.tsx";
+import { DividerDirection } from "@ewsgit/uikit-solid/src/components/divider/lib/direction.ts";
+import UKDivider from "@ewsgit/uikit-solid/src/components/divider/UKDivider.tsx";
+import UKCircularProgressIndicator from "@ewsgit/uikit-solid/src/components/circularProgressIndicator/UKCircularProgressIndicator.tsx";
+import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.tsx";
 import { useNavigate } from "@solidjs/router";
 import { type Component, createResource, type ParentProps } from "solid-js";
 import trpc from "../../lib/trpc.ts";

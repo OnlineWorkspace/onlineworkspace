@@ -1,4 +1,4 @@
-import UKTopAppBar from "@onlineworkspace/uikit-solid/src/components/topAppBar/UKTopAppBar.jsx";
+import UKTopAppBar from "@ewsgit/uikit-solid/src/components/topAppBar/UKTopAppBar.jsx";
 import type { Component } from "solid-js";
 import MediaGrid from "../../components/mediaGrid/MediaGrid";
 

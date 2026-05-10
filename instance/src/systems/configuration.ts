@@ -68,9 +68,7 @@ export default class ConfigurationSystem extends System {
         database: "onlineworkspace_workspace",
       },
     };
-
     if (process.env.POSTGRES_DATABASE_HOST) this.databases.postgres.host = process.env.POSTGRES_DATABASE_HOST;
-
     this.proxyUrl = "https://localhost";
     this.signupRequirements = {
       email: false,
@@ -114,9 +112,7 @@ export default class ConfigurationSystem extends System {
     - These terms may change. If we make significant updates, we will post a notification within the app or send an email.`,
       lastUpdated: Date.now(),
     };
-
     this.defaultQuickShortcuts = ["uk.ewsgit.dashboard", "uk.ewsgit.store", "uk.ewsgit.settings", "uk.ewsgit.photos", "uk.ewsgit.files"];
-
     this.defaultApplications = [
       { id: "uk.ewsgit.dashboard", uri: "local:uk.ewsgit.dashboard" },
       { id: "uk.ewsgit.store", uri: "local:uk.ewsgit.store" },
@@ -124,9 +120,7 @@ export default class ConfigurationSystem extends System {
       { id: "uk.ewsgit.photos", uri: "local:uk.ewsgit.photos" },
       { id: "uk.ewsgit.files", uri: "local:uk.ewsgit.files" },
     ];
-
     this.caddyfile = "../Caddyfile";
-
     if (fsExistsSync(path.join(this.instance.sys.filesystem.AUTOINSTALL_PATH, "configuration.json"))) {
       this.log.info("Auto-install configuration detected. Loading configuration from auto-install.");
 

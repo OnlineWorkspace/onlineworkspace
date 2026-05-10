@@ -1,5 +1,5 @@
-import UKDivider from "@onlineworkspace/uikit-solid/src/components/divider/UKDivider.jsx";
-import UKText from "@onlineworkspace/uikit-solid/src/components/text/UKText.jsx";
+import UKDivider from "@ewsgit/uikit-solid/src/components/divider/UKDivider.jsx";
+import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.jsx";
 import { type Component, createEffect, createResource, For, Show, Suspense } from "solid-js";
 import trpc from "../../../../../../lib/trpc";
 import Passkey from "./components/Passkey/Passkey";

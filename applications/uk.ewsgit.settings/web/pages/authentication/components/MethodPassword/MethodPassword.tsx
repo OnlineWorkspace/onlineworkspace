@@ -1,10 +1,10 @@
 import CHECK_ICON from "@material-symbols/svg-700/outlined/check.svg";
 import PASSWORD_ICON from "@material-symbols/svg-700/outlined/password.svg";
-import UKButton from "@onlineworkspace/uikit-solid/src/components/button/UKButton.jsx";
-import UKDialog from "@onlineworkspace/uikit-solid/src/components/dialog/UKDialog.tsx";
-import UKIcon from "@onlineworkspace/uikit-solid/src/components/icon/UKIcon.jsx";
-import UKStackItem from "@onlineworkspace/uikit-solid/src/components/stack/UKStackItem.jsx";
-import UKText from "@onlineworkspace/uikit-solid/src/components/text/UKText.jsx";
+import UKButton from "@ewsgit/uikit-solid/src/components/button/UKButton.jsx";
+import UKDialog from "@ewsgit/uikit-solid/src/components/dialog/UKDialog.tsx";
+import UKIcon from "@ewsgit/uikit-solid/src/components/icon/UKIcon.jsx";
+import UKStackItem from "@ewsgit/uikit-solid/src/components/stack/UKStackItem.jsx";
+import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.jsx";
 import { useSearchParams } from "@solidjs/router";
 import { type Component, createResource, createSignal, Suspense } from "solid-js";
 import trpc from "../../../../lib/trpc";

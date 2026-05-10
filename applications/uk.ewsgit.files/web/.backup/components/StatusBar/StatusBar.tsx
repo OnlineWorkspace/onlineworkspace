@@ -1,4 +1,4 @@
-import UKText from "@onlineworkspace/uikit-solid/src/components/text/UKText.tsx";
+import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.tsx";
 import { type Component, useContext } from "solid-js";
 import { ViewContext } from "../ViewContainer/ViewContext.ts";
 import styles from "./StatusBar.module.scss";

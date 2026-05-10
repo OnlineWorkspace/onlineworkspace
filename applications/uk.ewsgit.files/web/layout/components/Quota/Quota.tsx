@@ -1,5 +1,5 @@
-import UKLinearProgressIndicator from "@onlineworkspace/uikit-solid/src/components/linearProgressIndicator/UKLinearProgressIndicator.tsx";
-import UKText from "@onlineworkspace/uikit-solid/src/components/text/UKText.tsx";
+import UKLinearProgressIndicator from "@ewsgit/uikit-solid/src/components/linearProgressIndicator/UKLinearProgressIndicator.tsx";
+import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.tsx";
 import clsx from "clsx";
 import { type Component, createSignal, onMount } from "solid-js";
 import filesystemInterface from "../../../lib/filesystemInterface";

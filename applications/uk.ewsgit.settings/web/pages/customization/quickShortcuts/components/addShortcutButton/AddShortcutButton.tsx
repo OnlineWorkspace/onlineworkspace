@@ -1,11 +1,11 @@
 import ADD_ICON from "@material-symbols/svg-700/outlined/add.svg";
-import UKButton from "@onlineworkspace/uikit-solid/src/components/button/UKButton.tsx";
-import UKCircularProgressIndicator from "@onlineworkspace/uikit-solid/src/components/circularProgressIndicator/UKCircularProgressIndicator.jsx";
-import UKCard from "@onlineworkspace/uikit-solid/src/components/card/UKCard.tsx";
-import UKDialog from "@onlineworkspace/uikit-solid/src/components/dialog/UKDialog.tsx";
-import UKDivider from "@onlineworkspace/uikit-solid/src/components/divider/UKDivider.jsx";
-import UKIcon from "@onlineworkspace/uikit-solid/src/components/icon/UKIcon.tsx";
-import UKText from "@onlineworkspace/uikit-solid/src/components/text/UKText.tsx";
+import UKButton from "@ewsgit/uikit-solid/src/components/button/UKButton.tsx";
+import UKCircularProgressIndicator from "@ewsgit/uikit-solid/src/components/circularProgressIndicator/UKCircularProgressIndicator.jsx";
+import UKCard from "@ewsgit/uikit-solid/src/components/card/UKCard.tsx";
+import UKDialog from "@ewsgit/uikit-solid/src/components/dialog/UKDialog.tsx";
+import UKDivider from "@ewsgit/uikit-solid/src/components/divider/UKDivider.jsx";
+import UKIcon from "@ewsgit/uikit-solid/src/components/icon/UKIcon.tsx";
+import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.tsx";
 import { type Component, createSignal, For, Suspense } from "solid-js";
 import styles from "./AddShortcutButton.module.scss";
 

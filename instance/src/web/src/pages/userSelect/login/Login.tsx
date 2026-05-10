@@ -1,10 +1,10 @@
 import KEY_ICON from "@material-symbols/svg-700/outlined/key.svg";
-import UKButton, { AffirmativeButtonState } from "@onlineworkspace/uikit-solid/src/components/button/UKButton.tsx";
-import UKCard from "@onlineworkspace/uikit-solid/src/components/card/UKCard.tsx";
-import { DividerDirection } from "@onlineworkspace/uikit-solid/src/components/divider/lib/direction.ts";
-import UKDivider from "@onlineworkspace/uikit-solid/src/components/divider/UKDivider.tsx";
-import UKText from "@onlineworkspace/uikit-solid/src/components/text/UKText.tsx";
-import UKTextField from "@onlineworkspace/uikit-solid/src/components/textField/UKTextField.tsx";
+import UKButton, { AffirmativeButtonState } from "@ewsgit/uikit-solid/src/components/button/UKButton.tsx";
+import UKCard from "@ewsgit/uikit-solid/src/components/card/UKCard.tsx";
+import { DividerDirection } from "@ewsgit/uikit-solid/src/components/divider/lib/direction.ts";
+import UKDivider from "@ewsgit/uikit-solid/src/components/divider/UKDivider.tsx";
+import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.tsx";
+import UKTextField from "@ewsgit/uikit-solid/src/components/textField/UKTextField.tsx";
 import { startAuthentication } from "@simplewebauthn/browser";
 import { useNavigate, usePreloadRoute, useSearchParams } from "@solidjs/router";
 import { type Component, createEffect, createResource, createSignal, onMount } from "solid-js";
@@ -139,7 +139,7 @@ const UserSelectPage: Component = () => {
                   console.error("Failed to login");
                   return { state: AffirmativeButtonState.Error };
                 }}
-                onSuccess={() => {}}
+                onSuccess={() => { }}
                 color={"filled"}
               >
                 Login

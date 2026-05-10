@@ -1,5 +1,5 @@
-import UKIcon from "@onlineworkspace/uikit-solid/src/components/icon/UKIcon.tsx";
-import UKText from "@onlineworkspace/uikit-solid/src/components/text/UKText.tsx";
+import UKIcon from "@ewsgit/uikit-solid/src/components/icon/UKIcon.tsx";
+import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.tsx";
 import clsx from "clsx";
 import browserPath from "path-browserify";
 import { type Component, For, Show, useContext } from "solid-js";

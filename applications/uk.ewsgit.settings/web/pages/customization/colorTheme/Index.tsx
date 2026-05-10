@@ -1,8 +1,8 @@
 import { CorePalette, sourceColorFromImage } from "@material/material-color-utilities";
 import CHEVRON_LEFT_ICON from "@material-symbols/svg-700/outlined/chevron_left.svg";
-import UKDivider from "@onlineworkspace/uikit-solid/src/components/divider/UKDivider.jsx";
-import UKText from "@onlineworkspace/uikit-solid/src/components/text/UKText.jsx";
-import UKTopAppBar from "@onlineworkspace/uikit-solid/src/components/topAppBar/UKTopAppBar.jsx";
+import UKDivider from "@ewsgit/uikit-solid/src/components/divider/UKDivider.jsx";
+import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.jsx";
+import UKTopAppBar from "@ewsgit/uikit-solid/src/components/topAppBar/UKTopAppBar.jsx";
 import { useNavigate } from "@solidjs/router";
 import { type Component, createEffect, createSignal, For, Show } from "solid-js";
 import trpc from "../../../lib/trpc.ts";

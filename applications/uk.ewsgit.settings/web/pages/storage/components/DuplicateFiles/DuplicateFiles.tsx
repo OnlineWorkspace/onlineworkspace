@@ -1,5 +1,5 @@
-import UKStack from "@onlineworkspace/uikit-solid/src/components/stack/UKStack.jsx";
-import UKStackItem from "@onlineworkspace/uikit-solid/src/components/stack/UKStackItem.jsx";
+import UKStack from "@ewsgit/uikit-solid/src/components/stack/UKStack.jsx";
+import UKStackItem from "@ewsgit/uikit-solid/src/components/stack/UKStackItem.jsx";
 import type { Component } from "solid-js";
 
 const DuplicateFiles: Component = () => {

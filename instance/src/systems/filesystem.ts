@@ -18,7 +18,9 @@ export default class FilesystemSystem extends System {
   constructor(instance: Instance) {
     super("filesystem", instance);
 
-    fs.mkdirSync(this.FS_ROOT, { recursive: true });
+    if (!fs.existsSync(this.FS_ROOT)) {
+      fs.mkdirSync(this.FS_ROOT, { recursive: true });
+    }
 
     if (!fs.existsSync(this.SYSTEM_PATH)) {
       fs.mkdirSync(this.SYSTEM_PATH, {

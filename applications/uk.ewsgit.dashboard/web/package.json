@@ -6,7 +6,7 @@
   "dependencies": {
     "@material-symbols/svg-700": "^0.42.3",
     "@solidjs/router": "^0.15.3",
-    "@onlineworkspace/uikit-solid": "workspace:*",
+    "@ewsgit/uikit-solid": "workspace:*",
     "@onlineworkspace/workspace-instance-web": "workspace:*",
     "@thisbeyond/solid-dnd": "^0.7.5",
     "@trpc/client": "^11.6.0",

@@ -1,6 +1,6 @@
-import { DividerDirection } from "@onlineworkspace/uikit-solid/src/components/divider/lib/direction.js";
-import UKDivider from "@onlineworkspace/uikit-solid/src/components/divider/UKDivider.jsx";
-import UKText from "@onlineworkspace/uikit-solid/src/components/text/UKText.jsx";
+import { DividerDirection } from "@ewsgit/uikit-solid/src/components/divider/lib/direction.js";
+import UKDivider from "@ewsgit/uikit-solid/src/components/divider/UKDivider.jsx";
+import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.jsx";
 import type { Component } from "solid-js";
 import styles from "./Index.module.scss";
 

@@ -1,8 +1,8 @@
 import ADD_ICON from "@material-symbols/svg-700/outlined/add.svg";
 import UPLOAD_ICON from "@material-symbols/svg-700/outlined/upload.svg";
-import UKButton from "@onlineworkspace/uikit-solid/src/components/button/UKButton.tsx";
-import { DividerDirection } from "@onlineworkspace/uikit-solid/src/components/divider/lib/direction.ts";
-import UKDivider from "@onlineworkspace/uikit-solid/src/components/divider/UKDivider.tsx";
+import UKButton from "@ewsgit/uikit-solid/src/components/button/UKButton.tsx";
+import { DividerDirection } from "@ewsgit/uikit-solid/src/components/divider/lib/direction.ts";
+import UKDivider from "@ewsgit/uikit-solid/src/components/divider/UKDivider.tsx";
 import backend from "@onlineworkspace/workspace-instance-web/src/lib/backend";
 import { createFileUploader } from "@solid-primitives/upload";
 import { useNavigate, useParams } from "@solidjs/router";

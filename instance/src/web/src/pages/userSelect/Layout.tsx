@@ -1,6 +1,6 @@
-import UKCard from "@onlineworkspace/uikit-solid/src/components/card/UKCard.jsx";
-import UKCircularProgressIndicator from "@onlineworkspace/uikit-solid/src/components/circularProgressIndicator/UKCircularProgressIndicator.jsx";
-import UKText from "@onlineworkspace/uikit-solid/src/components/text/UKText.jsx";
+import UKCard from "@ewsgit/uikit-solid/src/components/card/UKCard.jsx";
+import UKCircularProgressIndicator from "@ewsgit/uikit-solid/src/components/circularProgressIndicator/UKCircularProgressIndicator.jsx";
+import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.jsx";
 import type { RouteSectionProps } from "@solidjs/router";
 import { type Component, Suspense } from "solid-js";
 import backend from "../../lib/backend";

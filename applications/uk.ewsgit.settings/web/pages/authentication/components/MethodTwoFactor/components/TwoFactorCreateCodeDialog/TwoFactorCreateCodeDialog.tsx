@@ -1,6 +1,6 @@
-import UKDivider from "@onlineworkspace/uikit-solid/src/components/divider/UKDivider.jsx";
-import UKText from "@onlineworkspace/uikit-solid/src/components/text/UKText.jsx";
-import UKTextField from "@onlineworkspace/uikit-solid/src/components/textField/UKTextField.jsx";
+import UKDivider from "@ewsgit/uikit-solid/src/components/divider/UKDivider.jsx";
+import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.jsx";
+import UKTextField from "@ewsgit/uikit-solid/src/components/textField/UKTextField.jsx";
 import trpc from "@onlineworkspace/workspace-instance-web/src/lib/trpc";
 import QRCode from "qrcode";
 import { type Component, createEffect, createResource, createSignal } from "solid-js";

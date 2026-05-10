@@ -1,5 +1,5 @@
-import UKStackItem from "@onlineworkspace/uikit-solid/src/components/stack/UKStackItem.jsx";
-import UKSwitch from "@onlineworkspace/uikit-solid/src/components/switch/UKSwitch.jsx";
+import UKStackItem from "@ewsgit/uikit-solid/src/components/stack/UKStackItem.jsx";
+import UKSwitch from "@ewsgit/uikit-solid/src/components/switch/UKSwitch.jsx";
 import { useParams } from "@solidjs/router";
 import { type Component, createEffect, createSignal } from "solid-js";
 import trpc from "../../../../../lib/trpc.ts";

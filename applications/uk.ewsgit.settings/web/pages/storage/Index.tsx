@@ -1,6 +1,6 @@
 import CHEVRON_LEFT_ICON from "@material-symbols/svg-700/outlined/chevron_left.svg";
-import UKStackLabel from "@onlineworkspace/uikit-solid/src/components/stack/UKStackLabel.tsx";
-import UKTopAppBar from "@onlineworkspace/uikit-solid/src/components/topAppBar/UKTopAppBar.jsx";
+import UKStackLabel from "@ewsgit/uikit-solid/src/components/stack/UKStackLabel.tsx";
+import UKTopAppBar from "@ewsgit/uikit-solid/src/components/topAppBar/UKTopAppBar.jsx";
 import { useNavigate } from "@solidjs/router";
 import type { Component } from "solid-js";
 import DuplicateFiles from "./components/DuplicateFiles/DuplicateFiles";

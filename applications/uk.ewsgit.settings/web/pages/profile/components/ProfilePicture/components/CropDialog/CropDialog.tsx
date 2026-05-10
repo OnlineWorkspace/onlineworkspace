@@ -1,4 +1,4 @@
-import UKDialog from "@onlineworkspace/uikit-solid/src/components/dialog/UKDialog.tsx";
+import UKDialog from "@ewsgit/uikit-solid/src/components/dialog/UKDialog.tsx";
 import type { Component } from "solid-js";
 import CropImage from "../CropImage/CropImage.tsx";
 

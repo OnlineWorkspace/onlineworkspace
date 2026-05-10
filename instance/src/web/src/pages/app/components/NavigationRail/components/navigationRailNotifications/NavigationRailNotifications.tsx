@@ -1,9 +1,9 @@
 import NOTIFICATIONS_ICON from "@material-symbols/svg-700/outlined/notifications.svg";
 import NOTIFICATIONS_UNREAD_ICON from "@material-symbols/svg-700/outlined/notifications_unread.svg";
-import { DividerDirection } from "@onlineworkspace/uikit-solid/src/components/divider/lib/direction.js";
-import UKDivider from "@onlineworkspace/uikit-solid/src/components/divider/UKDivider.jsx";
-import UKIconButton from "@onlineworkspace/uikit-solid/src/components/iconButton/UKIconButton.jsx";
-import UKText from "@onlineworkspace/uikit-solid/src/components/text/UKText.jsx";
+import { DividerDirection } from "@ewsgit/uikit-solid/src/components/divider/lib/direction.js";
+import UKDivider from "@ewsgit/uikit-solid/src/components/divider/UKDivider.jsx";
+import UKIconButton from "@ewsgit/uikit-solid/src/components/iconButton/UKIconButton.jsx";
+import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.jsx";
 import { useNavigate } from "@solidjs/router";
 import { type Component, createSignal, For } from "solid-js";
 import type { WorkspacesNotification } from "../../../../../../../../systems/notifications";

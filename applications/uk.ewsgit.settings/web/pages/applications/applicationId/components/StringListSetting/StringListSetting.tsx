@@ -1,10 +1,10 @@
 import REMOVE_ICON from "@material-symbols/svg-700/outlined/remove.svg";
 import RESET_WRENCH_ICON from "@material-symbols/svg-700/outlined/reset_wrench.svg";
-import UKButton from "@onlineworkspace/uikit-solid/src/components/button/UKButton.jsx";
-import UKIconButton from "@onlineworkspace/uikit-solid/src/components/iconButton/UKIconButton.jsx";
-import UKStackItem from "@onlineworkspace/uikit-solid/src/components/stack/UKStackItem.jsx";
-import UKText from "@onlineworkspace/uikit-solid/src/components/text/UKText.jsx";
-import UKTextField from "@onlineworkspace/uikit-solid/src/components/textField/UKTextField.tsx";
+import UKButton from "@ewsgit/uikit-solid/src/components/button/UKButton.jsx";
+import UKIconButton from "@ewsgit/uikit-solid/src/components/iconButton/UKIconButton.jsx";
+import UKStackItem from "@ewsgit/uikit-solid/src/components/stack/UKStackItem.jsx";
+import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.jsx";
+import UKTextField from "@ewsgit/uikit-solid/src/components/textField/UKTextField.tsx";
 import { useParams } from "@solidjs/router";
 import { type Component, createEffect, createSignal, For } from "solid-js";
 import trpc from "../../../../../lib/trpc.ts";
@@ -38,13 +38,13 @@ const StringListSetting: Component<{
       leading={
         items() !== props.defaultValue
           ? {
-              type: "iconButton",
-              alt: "Reset settings to the default value",
-              value: RESET_WRENCH_ICON,
-              onClick() {
-                setItems(props.defaultValue);
-              },
-            }
+            type: "iconButton",
+            alt: "Reset settings to the default value",
+            value: RESET_WRENCH_ICON,
+            onClick() {
+              setItems(props.defaultValue);
+            },
+          }
           : undefined
       }
       expandedComponent={

@@ -1,5 +1,5 @@
-import UKButton from "@onlineworkspace/uikit-solid/src/components/button/UKButton.jsx";
-import UKText from "@onlineworkspace/uikit-solid/src/components/text/UKText.jsx";
+import UKButton from "@ewsgit/uikit-solid/src/components/button/UKButton.jsx";
+import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.jsx";
 import { useNavigate, useParams } from "@solidjs/router";
 import type { Component } from "solid-js";
 import styles from "./MissingApp.module.scss";

@@ -1,9 +1,9 @@
 import CHEVRON_LEFT_ICON from "@material-symbols/svg-700/outlined/chevron_left.svg";
-import UKCircularProgressIndicator from "@onlineworkspace/uikit-solid/src/components/circularProgressIndicator/UKCircularProgressIndicator.jsx";
-import UKStack from "@onlineworkspace/uikit-solid/src/components/stack/UKStack.tsx";
-import UKStackItem from "@onlineworkspace/uikit-solid/src/components/stack/UKStackItem.tsx";
-import UKStackLabel from "@onlineworkspace/uikit-solid/src/components/stack/UKStackLabel.tsx";
-import UKTopAppBar from "@onlineworkspace/uikit-solid/src/components/topAppBar/UKTopAppBar.jsx";
+import UKCircularProgressIndicator from "@ewsgit/uikit-solid/src/components/circularProgressIndicator/UKCircularProgressIndicator.jsx";
+import UKStack from "@ewsgit/uikit-solid/src/components/stack/UKStack.tsx";
+import UKStackItem from "@ewsgit/uikit-solid/src/components/stack/UKStackItem.tsx";
+import UKStackLabel from "@ewsgit/uikit-solid/src/components/stack/UKStackLabel.tsx";
+import UKTopAppBar from "@ewsgit/uikit-solid/src/components/topAppBar/UKTopAppBar.jsx";
 import { useNavigate } from "@solidjs/router";
 import { type Component, createResource, For, Suspense } from "solid-js";
 import trpc from "../../lib/trpc.ts";

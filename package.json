@@ -17,7 +17,8 @@
   "scripts": {
     "dev": "bun --watch --no-clear-screen instance/src/index.ts",
     "build-web": "bun run --cwd instance/src/web build",
-    "uikit": "bun run --cwd uikit-solid dev"
+    "uikit": "bun run --cwd uikit-solid dev",
+    "preinstall": "git pull --recurse-submodules"
   },
   "private": true,
   "dependencies": {

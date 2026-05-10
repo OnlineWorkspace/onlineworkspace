@@ -1,6 +1,6 @@
 import ARROW_CIRCLE_RIGHT_ICON from "@material-symbols/svg-700/outlined/arrow_circle_right.svg";
 import MENU_ICON from "@material-symbols/svg-700/outlined/menu.svg";
-import UKIcon from "@onlineworkspace/uikit-solid/src/components/icon/UKIcon.tsx";
+import UKIcon from "@ewsgit/uikit-solid/src/components/icon/UKIcon.tsx";
 import clsx from "clsx";
 import { type Component, createResource, For, Suspense } from "solid-js";
 import PLACEHOLDER_WALLPAPER from "./../../../../assets/placeholder_wallpaper.png";

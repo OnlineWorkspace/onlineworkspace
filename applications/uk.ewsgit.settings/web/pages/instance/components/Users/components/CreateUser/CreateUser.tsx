@@ -1,9 +1,9 @@
-import UKButton from "@onlineworkspace/uikit-solid/src/components/button/UKButton.jsx";
-import UKButtonGroup from "@onlineworkspace/uikit-solid/src/components/buttonGroup/UKButtonGroup.jsx";
-import UKDialog from "@onlineworkspace/uikit-solid/src/components/dialog/UKDialog.jsx";
-import UKDivider from "@onlineworkspace/uikit-solid/src/components/divider/UKDivider.jsx";
-import UKText from "@onlineworkspace/uikit-solid/src/components/text/UKText.jsx";
-import UKTextField from "@onlineworkspace/uikit-solid/src/components/textField/UKTextField.jsx";
+import UKButton from "@ewsgit/uikit-solid/src/components/button/UKButton.jsx";
+import UKButtonGroup from "@ewsgit/uikit-solid/src/components/buttonGroup/UKButtonGroup.jsx";
+import UKDialog from "@ewsgit/uikit-solid/src/components/dialog/UKDialog.jsx";
+import UKDivider from "@ewsgit/uikit-solid/src/components/divider/UKDivider.jsx";
+import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.jsx";
+import UKTextField from "@ewsgit/uikit-solid/src/components/textField/UKTextField.jsx";
 import { type Component, createSignal } from "solid-js";
 import trpc from "../../../../../../lib/trpc";
 import styles from "./CreateUser.module.scss";

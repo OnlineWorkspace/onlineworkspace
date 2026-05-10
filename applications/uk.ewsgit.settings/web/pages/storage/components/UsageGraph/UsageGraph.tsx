@@ -1,5 +1,5 @@
-import UKCard from "@onlineworkspace/uikit-solid/src/components/card/UKCard.jsx";
-import UKText from "@onlineworkspace/uikit-solid/src/components/text/UKText.jsx";
+import UKCard from "@ewsgit/uikit-solid/src/components/card/UKCard.jsx";
+import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.jsx";
 import { type Component, createResource, For } from "solid-js";
 import trpc from "../../../../lib/trpc";
 import styles from "./UsageGraph.module.scss";

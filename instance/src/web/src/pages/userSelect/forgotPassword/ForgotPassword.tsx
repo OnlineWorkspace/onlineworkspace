@@ -1,6 +1,6 @@
 import CHEVRON_LEFT_ICON from "@material-symbols/svg-700/outlined/chevron_left.svg";
-import UKButton, { AffirmativeButtonState } from "@onlineworkspace/uikit-solid/src/components/button/UKButton.jsx";
-import UKCard from "@onlineworkspace/uikit-solid/src/components/card/UKCard.jsx";
+import UKButton, { AffirmativeButtonState } from "@ewsgit/uikit-solid/src/components/button/UKButton.jsx";
+import UKCard from "@ewsgit/uikit-solid/src/components/card/UKCard.jsx";
 import { useNavigate, useSearchParams } from "@solidjs/router";
 import type { Component } from "solid-js";
 import styles from "./ForgotPassword.module.scss";

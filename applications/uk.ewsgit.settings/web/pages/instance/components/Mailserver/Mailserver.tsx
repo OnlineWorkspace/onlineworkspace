@@ -1,7 +1,7 @@
-import UKButton, { AffirmativeButtonState } from "@onlineworkspace/uikit-solid/src/components/button/UKButton.jsx";
-import UKCard from "@onlineworkspace/uikit-solid/src/components/card/UKCard.jsx";
-import UKStackLabel from "@onlineworkspace/uikit-solid/src/components/stack/UKStackLabel.tsx";
-import UKTextField from "@onlineworkspace/uikit-solid/src/components/textField/UKTextField.tsx";
+import UKButton, { AffirmativeButtonState } from "@ewsgit/uikit-solid/src/components/button/UKButton.jsx";
+import UKCard from "@ewsgit/uikit-solid/src/components/card/UKCard.jsx";
+import UKStackLabel from "@ewsgit/uikit-solid/src/components/stack/UKStackLabel.tsx";
+import UKTextField from "@ewsgit/uikit-solid/src/components/textField/UKTextField.tsx";
 import type { Component } from "solid-js";
 import { createSignal } from "solid-js";
 import styles from "./Mailserver.module.scss";

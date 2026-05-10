@@ -1,6 +1,6 @@
 import REFRESH_ICON from "@material-symbols/svg-700/outlined/refresh.svg";
-import UKButton from "@onlineworkspace/uikit-solid/src/components/button/UKButton.tsx";
-import UKNoPointOfReturnDialog from "@onlineworkspace/uikit-solid/src/components/dialog/prefabs/noPointOfReturn/UKNoPointOfReturnDialog.tsx";
+import UKButton from "@ewsgit/uikit-solid/src/components/button/UKButton.tsx";
+import UKNoPointOfReturnDialog from "@ewsgit/uikit-solid/src/components/dialog/prefabs/noPointOfReturn/UKNoPointOfReturnDialog.tsx";
 import { type Component, createSignal } from "solid-js";
 
 const ResetToDefaultsButton: Component<{ onReset: () => Promise<void> }> = (props) => {

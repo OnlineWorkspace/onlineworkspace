@@ -1,6 +1,6 @@
-import UKCard from "@onlineworkspace/uikit-solid/src/components/card/UKCard.tsx";
-import UKDivider from "@onlineworkspace/uikit-solid/src/components/divider/UKDivider.tsx";
-import UKText from "@onlineworkspace/uikit-solid/src/components/text/UKText.tsx";
+import UKCard from "@ewsgit/uikit-solid/src/components/card/UKCard.tsx";
+import UKDivider from "@ewsgit/uikit-solid/src/components/divider/UKDivider.tsx";
+import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.tsx";
 import type { Component } from "solid-js";
 import styles from "./Widget.module.scss";
 

@@ -1,5 +1,5 @@
-import UKContextMenu from "@onlineworkspace/uikit-solid/src/components/contextMenu/UKContextMenu.jsx";
-import UKMenu from "@onlineworkspace/uikit-solid/src/components/menu/UKMenu.jsx";
+import UKContextMenu from "@ewsgit/uikit-solid/src/components/contextMenu/UKContextMenu.jsx";
+import UKMenu from "@ewsgit/uikit-solid/src/components/menu/UKMenu.jsx";
 import { Ref } from "@solid-primitives/refs";
 import { useParams } from "@solidjs/router";
 import path from "path-browserify";
@@ -16,19 +16,19 @@ const ViewContainer: Component = () => {
   const viewCtx = useContext(ViewContext);
   const [dragRegion, setDragRegion] = createSignal<
     | {
-        initialPosition: { x: number; y: number };
-        region: {
-          start: {
-            x: number;
-            y: number;
-          };
-          end: {
-            x: number;
-            y: number;
-          };
+      initialPosition: { x: number; y: number };
+      region: {
+        start: {
+          x: number;
+          y: number;
         };
-        currentPosition: { x: number; y: number };
-      }
+        end: {
+          x: number;
+          y: number;
+        };
+      };
+      currentPosition: { x: number; y: number };
+    }
     | undefined
   >(undefined);
   const [mouseDownAt, setMouseDownAt] = createSignal<number>(0);

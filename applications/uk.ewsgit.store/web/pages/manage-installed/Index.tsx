@@ -1,12 +1,12 @@
-import UKButton from "@onlineworkspace/uikit-solid/src/components/button/UKButton.jsx";
-import UKCard from "@onlineworkspace/uikit-solid/src/components/card/UKCard.jsx";
-import UKIcon from "@onlineworkspace/uikit-solid/src/components/icon/UKIcon.jsx";
-import UKIconButton from "@onlineworkspace/uikit-solid/src/components/iconButton/UKIconButton.jsx";
-import UKStack from "@onlineworkspace/uikit-solid/src/components/stack/UKStack.jsx";
-import UKStackItem from "@onlineworkspace/uikit-solid/src/components/stack/UKStackItem.jsx";
-import UKSwitch from "@onlineworkspace/uikit-solid/src/components/switch/UKSwitch.jsx";
-import UKText from "@onlineworkspace/uikit-solid/src/components/text/UKText.jsx";
-import UKTopAppBar from "@onlineworkspace/uikit-solid/src/components/topAppBar/UKTopAppBar.jsx";
+import UKButton from "@ewsgit/uikit-solid/src/components/button/UKButton.jsx";
+import UKCard from "@ewsgit/uikit-solid/src/components/card/UKCard.jsx";
+import UKIcon from "@ewsgit/uikit-solid/src/components/icon/UKIcon.jsx";
+import UKIconButton from "@ewsgit/uikit-solid/src/components/iconButton/UKIconButton.jsx";
+import UKStack from "@ewsgit/uikit-solid/src/components/stack/UKStack.jsx";
+import UKStackItem from "@ewsgit/uikit-solid/src/components/stack/UKStackItem.jsx";
+import UKSwitch from "@ewsgit/uikit-solid/src/components/switch/UKSwitch.jsx";
+import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.jsx";
+import UKTopAppBar from "@ewsgit/uikit-solid/src/components/topAppBar/UKTopAppBar.jsx";
 import { useNavigate } from "@solidjs/router";
 import { type Component, createEffect, createResource, createSignal, For, Suspense } from "solid-js";
 import trpc from "../../lib/trpc";
@@ -86,10 +86,10 @@ const ManageInstalledPage: Component = () => {
                       app.icon.type === "icon"
                         ? { type: "icon" as const, value: app.icon.value, alt: "" }
                         : {
-                            type: "image" as const,
-                            value: app.icon.value,
-                            alt: "",
-                          }
+                          type: "image" as const,
+                          value: app.icon.value,
+                          alt: "",
+                        }
                     }
                     supportingText={`(${app.id}) - ${app.description}`}
                     labelText={app.displayName}
@@ -131,12 +131,12 @@ const ManageInstalledPage: Component = () => {
                         ? installedApplications()?.cannotDisable.includes(app.id)
                           ? undefined
                           : async () => {
-                              if (!selectedApplicationIds().includes(app.id)) {
-                                setSelectedApplicationIds((prev) => [...prev, app.id]);
-                              } else {
-                                setSelectedApplicationIds((prev) => prev.filter((i) => i !== app.id));
-                              }
+                            if (!selectedApplicationIds().includes(app.id)) {
+                              setSelectedApplicationIds((prev) => [...prev, app.id]);
+                            } else {
+                              setSelectedApplicationIds((prev) => prev.filter((i) => i !== app.id));
                             }
+                          }
                         : undefined
                     }
                   />

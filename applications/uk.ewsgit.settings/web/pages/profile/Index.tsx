@@ -1,11 +1,11 @@
 import CHEVRON_LEFT_ICON from "@material-symbols/svg-700/outlined/chevron_left.svg";
 import LOGOUT_ICON from "@material-symbols/svg-700/outlined/logout.svg";
-import UKAvatar from "@onlineworkspace/uikit-solid/src/components/avatar/UKAvatar.tsx";
-import UKStack from "@onlineworkspace/uikit-solid/src/components/stack/UKStack.tsx";
-import UKStackItem from "@onlineworkspace/uikit-solid/src/components/stack/UKStackItem.tsx";
-import UKText from "@onlineworkspace/uikit-solid/src/components/text/UKText.tsx";
-import UKTopAppBar from "@onlineworkspace/uikit-solid/src/components/topAppBar/UKTopAppBar.jsx";
-import useIsMobile from "@onlineworkspace/uikit-solid/src/core/useIsMobile.js";
+import UKAvatar from "@ewsgit/uikit-solid/src/components/avatar/UKAvatar.tsx";
+import UKStack from "@ewsgit/uikit-solid/src/components/stack/UKStack.tsx";
+import UKStackItem from "@ewsgit/uikit-solid/src/components/stack/UKStackItem.tsx";
+import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.tsx";
+import UKTopAppBar from "@ewsgit/uikit-solid/src/components/topAppBar/UKTopAppBar.jsx";
+import useIsMobile from "@ewsgit/uikit-solid/src/core/useIsMobile.js";
 import webInstanceTRPC from "@onlineworkspace/workspace-instance-web/src/lib/trpc.ts";
 import { useNavigate } from "@solidjs/router";
 import clsx from "clsx";

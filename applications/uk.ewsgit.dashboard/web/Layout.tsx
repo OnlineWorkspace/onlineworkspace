@@ -1,4 +1,4 @@
-import UKCircularProgressIndicator from "@onlineworkspace/uikit-solid/src/components/circularProgressIndicator/UKCircularProgressIndicator.jsx";
+import UKCircularProgressIndicator from "@ewsgit/uikit-solid/src/components/circularProgressIndicator/UKCircularProgressIndicator.jsx";
 import clsx from "clsx";
 import { type Component, createResource, type ParentProps, Suspense } from "solid-js";
 import PLACEHOLDER_WALLPAPER from "./assets/placeholder_wallpaper.png";
