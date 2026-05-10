@@ -1,0 +1,3 @@
+[submodule "uikit-solid"]
+	path = uikit-solid
+	url = git@knot.ewsgit.uk:ewsgit.uk/uikit-solid
