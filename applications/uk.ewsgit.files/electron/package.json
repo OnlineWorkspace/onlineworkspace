@@ -16,7 +16,6 @@
     "electron": "^41.3.0"
   },
   "trustedDependencies": [
-    // "node-fuse-bindings"
     "fast-folder-size",
     "electron"
   ],
@@ -30,7 +29,6 @@
     "publish": "electron-forge publish"
   },
   "dependencies": {
-    // "node-fuse-bindings": "git+https://github.com/asivery/node-fuse-bindings.git",
     "sharp": "^0.34.5",
     "fast-folder-size": "^2.4.0"
   }

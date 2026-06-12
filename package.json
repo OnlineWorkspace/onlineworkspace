@@ -2,29 +2,20 @@
   "name": "@onlineworkspace/workspaces",
   "type": "module",
   "version": "0.0.1",
-  "workspaces": [
-    "instance/",
-    "instance/src/web/",
-    "applications/*/web/",
-    "applications/*/backend/",
-    "applications/*/electron/",
-    "uikit-solid/"
-  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/onlineworkspace/workspace"
   },
   "scripts": {
-    "dev": "bun --watch --no-clear-screen instance/src/index.ts",
-    "build-web": "bun run --cwd instance/src/web build",
-    "uikit": "bun run --cwd uikit-solid dev",
+    "dev": "deno --no-clear-screen instance/src/index.ts",
+    "build-web": "deno --cwd instance/src/web build",
+    "uikit": "deno --cwd uikit-solid dev",
     "preinstall": "git pull --recurse-submodules"
   },
   "private": true,
   "dependencies": {
-    "@typescript/native-preview": "^7.0.0-dev.20260502.1",
     "prettier": "^3.8.3",
-    "typescript": "^6.0.0-dev.20260416"
+    "typescript": "^6.0.0"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.4.14"

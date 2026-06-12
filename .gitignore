@@ -1,4 +1,4 @@
-# dependencies (bun install)
+# deno dependencies
 remake/node_modules
 
 # output

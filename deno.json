@@ -1,0 +1,3 @@
+{
+  "workspace": ["instance/", "instance/src/web/", "applications/*/web/", "applications/*/backend/", "applications/*/electron/", "uikit-solid"]
+}
