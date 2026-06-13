@@ -1,20 +1,21 @@
-import type { Instance } from "./index.js";
-import type { Logger } from "./log.js";
-import type ApplicationsSubsystem from "./systems/applications.js";
-import type AuthorizationSubsystem from "./systems/authorization.js";
-import type ConfigurationSubsystem from "./systems/configuration.js";
-import type ConsoleCommandsSubsystem from "./systems/consoleCommands.js";
-import type DatabaseSubsystem from "./systems/database.js";
-import type EmailSystem from "./systems/email.js";
-import type EventSystem from "./systems/events.js";
-import type FilesystemSubsystem from "./systems/filesystem.js";
-import type ImageSubsystem from "./systems/image.js";
-import type NotificationsSubsystem from "./systems/notifications.js";
-import type ReverseProxySystem from "./systems/reverseProxy.js";
-import type SettingsSubsystem from "./systems/settings.js";
-import type TRPCSubsystem from "./systems/trpc.js";
-import type UsersSubsystem from "./systems/users.js";
-import type WebFrontendSubsystem from "./systems/webFrontend.js";
+import type { Instance } from "./index.ts";
+import type { Logger } from "./log.ts";
+import type ApplicationsSubsystem from "./systems/applications.ts";
+import type AuthorizationSubsystem from "./systems/authorization.ts";
+import type ConfigurationSubsystem from "./systems/configuration.ts";
+import type ConsoleCommandsSubsystem from "./systems/consoleCommands.ts";
+import type DatabaseSubsystem from "./systems/database.ts";
+import type EmailSystem from "./systems/email.ts";
+import type EventSystem from "./systems/events.ts";
+import type FilesystemSubsystem from "./systems/filesystem.ts";
+import type ImageSubsystem from "./systems/image.ts";
+import type NotificationsSubsystem from "./systems/notifications.ts";
+import type ReverseProxySystem from "./systems/reverseProxy.ts";
+import type SettingsSubsystem from "./systems/settings.ts";
+import type TerminalUISystem from "./systems/terminalUI.ts";
+import type TRPCSubsystem from "./systems/trpc.ts";
+import type UsersSubsystem from "./systems/users.ts";
+import type WebFrontendSubsystem from "./systems/webFrontend.ts";
 
 export type Sys = {
   users: UsersSubsystem;
@@ -32,6 +33,7 @@ export type Sys = {
   email: EmailSystem;
   event: EventSystem;
   reverseProxy: ReverseProxySystem;
+  terminalUI: TerminalUISystem;
 } & { [key: string]: System };
 
 export default abstract class System {

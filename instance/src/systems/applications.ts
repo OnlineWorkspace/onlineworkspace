@@ -1,10 +1,10 @@
 import { promises as fs, existsSync as fsExistsSync } from "node:fs";
 import path from "node:path";
-import type { Instance } from "../index.js";
-import System from "../system.js";
-import type { WorkspacesApplication } from "./applications/application.js";
-import type { WorkspacesApplicationServiceStatus } from "./applications/serviceStatus.js";
-import { WorkspacesNotificationPriority } from "./notifications.js";
+import type { Instance } from "../index.ts";
+import System from "../system.ts";
+import type { WorkspacesApplication } from "./applications/application.ts";
+import type { WorkspacesApplicationServiceStatus } from "./applications/serviceStatus.ts";
+import { WorkspacesNotificationPriority } from "./notifications.ts";
 
 const APPLICATIONS_CONFIG_FILE_PATH = (subsystem: System) => path.join(subsystem.instance.sys.filesystem.SYSTEM_PATH, "applications.json");
 const APPLICATIONS_TSX_FILE_PATH = (subsystem: System) => path.join(subsystem.instance.sys.filesystem.SYSTEM_PATH, "vite", "Applications.tsx");
@@ -58,7 +58,7 @@ export default class ApplicationsSystem extends System {
     return true;
   }
 
-  async startup(): Promise<boolean> {
+  override async startup(): Promise<boolean> {
     try {
       if (!fsExistsSync(APPLICATIONS_CONFIG_FILE_PATH(this))) await fs.writeFile(APPLICATIONS_CONFIG_FILE_PATH(this), JSON.stringify([]));
 

@@ -1,7 +1,7 @@
 import util from "node:util";
 import chalk from "chalk";
-import type { Instance } from "./index.js";
-import { WorkspacesFeatureFlags } from "./systems/configuration.js";
+import type { Instance } from "./index.ts";
+import { WorkspacesFeatureFlags } from "./systems/configuration.ts";
 
 export enum LogType {
   INFO,
@@ -21,13 +21,15 @@ class Logger {
   }[] = [];
   private log: Log;
   private level: string;
+  private isRootLogger: boolean;
 
-  constructor(level: string, log: Log) {
+  constructor(level: string, log: Log, isRootLogger: boolean = false) {
     this.level = level;
     this.log = log;
+    this.isRootLogger = isRootLogger;
 
     // biome-ignore lint/suspicious/noExplicitAny: data could be of any type
-    global.global.console.log = (...data: any[]): void => {
+    global.console.log = (...data: any[]): void => {
       if (process.stdout.cursorTo) {
         process.stdout.cursorTo(0, this._internal_getWindowSize()[1], () => {
           process.stdout.clearLine(1, () => {
@@ -211,44 +213,38 @@ class Logger {
   }
 
   _internal_writePrompt() {
-    if (!this.log.instance?.sys.configuration?.hasFeature(WorkspacesFeatureFlags.SlashCommands) || !process.stdout.cursorTo) return this;
-
-    process.stdout.cursorTo(0, this._internal_getWindowSize()[1], () => {
-      process.stdout.write(`Workspaces Alpha ${this.log.instance.sys.configuration?.isDevMode ? `[${this.emphasis("Dev Mode")}] ` : ""}`, () => {
-        // move the cursor to the metaLen+6th column of the 2nd from the bottom row
-        process.stdout.cursorTo(this.log.META_LENGTH + 6, this._internal_getWindowSize()[1], () => {
-          // write the prompt indicator to the stdout
-          process.stdout.write(`> ${this.log.instance.sys.consoleCommands?.rlInterface?.line || ""}`);
-        });
-      });
-    });
+    // if (!this.log.instance?.sys.configuration?.hasFeature(WorkspacesFeatureFlags.SlashCommands) || !process.stdout.cursorTo) return this;
+    // process.stdout.cursorTo(0, this._internal_getWindowSize()[1], () => {
+    //   process.stdout.write(`Workspaces Alpha ${this.log.instance.sys.configuration?.isDevMode ? `[${this.emphasis("Dev Mode")}] ` : ""}`, () => {
+    //     // move the cursor to the metaLen+6th column of the 2nd from the bottom row
+    //     process.stdout.cursorTo(this.log.META_LENGTH + 6, this._internal_getWindowSize()[1], () => {
+    //       // write the prompt indicator to the stdout
+    //       process.stdout.write(`> ${this.log.instance.sys.consoleCommands?.rlInterface?.line || ""}`);
+    //     });
+    //   });
+    // });
   }
 
   private writeMessage(logType: LogType, typeString: string, ...message: any[]) {
-    if (logType === LogType.RAW) {
-      process.stdout.write(
-        chalk.bold(`${typeString}${chalk.yellow(this.level.toUpperCase().slice(0, this.log.META_LENGTH).padEnd(this.log.META_LENGTH))}  `) + message.join(" "),
-      );
-
-      return this;
-    }
-
-    if (logType === LogType.PROMPT) {
-      process.stdout.cursorTo(0, this._internal_getWindowSize()[1], () => {
-        process.stdout.clearLine(1, () => {
-          process.stdout.write(
-            chalk.bold(`${typeString}${chalk.yellow(this.level.toUpperCase().slice(0, this.log.META_LENGTH).padEnd(this.log.META_LENGTH))}  `) +
-              message.join(" "),
-          );
-        });
-      });
-
-      return this;
-    }
-
-    console.log(typeString, chalk.bold(`${chalk.yellow(this.level.toUpperCase().slice(0, this.log.META_LENGTH).padEnd(this.log.META_LENGTH))} `), ...message);
-
-    return this;
+    //   if (logType === LogType.RAW) {
+    //     process.stdout.write(
+    //       chalk.bold(`${typeString}${chalk.yellow(this.level.toUpperCase().slice(0, this.log.META_LENGTH).padEnd(this.log.META_LENGTH))}  `) + message.join(" "),
+    //     );
+    //     return this;
+    //   }
+    //   if (logType === LogType.PROMPT) {
+    //     process.stdout.cursorTo(0, this._internal_getWindowSize()[1], () => {
+    //       process.stdout.clearLine(1, () => {
+    //         process.stdout.write(
+    //           chalk.bold(`${typeString}${chalk.yellow(this.level.toUpperCase().slice(0, this.log.META_LENGTH).padEnd(this.log.META_LENGTH))}  `) +
+    //             message.join(" "),
+    //         );
+    //       });
+    //     });
+    //     return this;
+    //   }
+    //   console.log(typeString, chalk.bold(`${chalk.yellow(this.level.toUpperCase().slice(0, this.log.META_LENGTH).padEnd(this.log.META_LENGTH))} `), ...message);
+    //   return this;
   }
 }
 

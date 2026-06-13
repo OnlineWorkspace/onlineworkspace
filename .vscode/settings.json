@@ -1,20 +1,21 @@
 {
-  "cSpell.words": [
-    "booped",
-    "Electrobun",
-    "ewsgit",
-    "ghostty",
-    "Landmarker",
-    "onlineworkspace",
-    "solidjs",
-    "unmaximize"
-  ],
-  "js/ts.tsdk.path": "node_modules/typescript/lib",
-  "[typescript]": {
-    "editor.defaultFormatter": "biomejs.biome"
-  },
-  "[typescriptreact]": {
-    "editor.defaultFormatter": "biomejs.biome"
-  },
-  "deno.enable": true
+    "cSpell.words": [
+        "booped",
+        "Electrobun",
+        "ewsgit",
+        "ghostty",
+        "Landmarker",
+        "onlineworkspace",
+        "onnotice",
+        "solidjs",
+        "unmaximize"
+    ],
+    "js/ts.tsdk.path": "node_modules/typescript/lib",
+    "[typescript]": {
+        "editor.defaultFormatter": "biomejs.biome"
+    },
+    "[typescriptreact]": {
+        "editor.defaultFormatter": "biomejs.biome"
+    },
+    "deno.enable": true
 }

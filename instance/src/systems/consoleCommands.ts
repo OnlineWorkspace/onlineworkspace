@@ -1,10 +1,10 @@
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import * as readline from "node:readline";
-import type { Instance } from "../index.js";
-import System from "../system.js";
-import type Command from "./consoleCommands/command.js";
-import type { ICommandRuntimeParameters } from "./consoleCommands/command.js";
+import type { Instance } from "../index.ts";
+import System from "../system.ts";
+import type Command from "./consoleCommands/command.ts";
+import type { ICommandRuntimeParameters } from "./consoleCommands/command.ts";
 
 export default class ConsoleCommandsSystem extends System {
   rlInterface!: readline.Interface;
@@ -39,7 +39,7 @@ export default class ConsoleCommandsSystem extends System {
       minCursorPositionOffset: 0,
     };
 
-    await (async () => {
+    /* await (async () => {
       readline.emitKeypressEvents(process.stdin);
       this.rlInterface = readline.createInterface({
         input: process.stdin,
@@ -157,7 +157,7 @@ export default class ConsoleCommandsSystem extends System {
           renderLine();
         }
       });
-    })();
+    })(); */
 
     return true;
   }

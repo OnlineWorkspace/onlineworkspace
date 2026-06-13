@@ -1,6 +1,6 @@
 import EventEmitter from "node:events";
-import type { Instance } from "../index.js";
-import System from "../system.js";
+import type { Instance } from "../index.ts";
+import System from "../system.ts";
 
 export enum WorkspacesNoticeType {
   Login,
@@ -71,7 +71,7 @@ export default class NotificationsSystem extends System {
       sourceId,
       priority,
       content,
-      uuid: Bun.randomUUIDv7(),
+      uuid: crypto.randomUUID(),
       options: {
         buttons: options?.buttons || [],
       },
@@ -79,5 +79,10 @@ export default class NotificationsSystem extends System {
     } satisfies WorkspacesNotification);
 
     return this;
+  }
+
+  override async startup(): Promise<boolean> {
+    this.log.info("Starting up...");
+    return true;
   }
 }

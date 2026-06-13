@@ -1,4 +1,4 @@
-import { ApplicationSetting, GlobalApplicationSetting } from "./applicationSetting.js";
+import { ApplicationSetting, GlobalApplicationSetting } from "./applicationSetting.ts";
 
 export class StringApplicationSetting extends ApplicationSetting<string> {
   constructor(applicationId: string, id: string, defaultValue: string) {

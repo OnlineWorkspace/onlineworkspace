@@ -1,4 +1,4 @@
-import { ApplicationSetting, GlobalApplicationSetting } from "./applicationSetting.js";
+import { ApplicationSetting, GlobalApplicationSetting } from "./applicationSetting.ts";
 
 export class StringListApplicationSetting extends ApplicationSetting<string[]> {
   allowedValues?: string[];

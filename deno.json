@@ -1,3 +1,30 @@
 {
-  "workspace": ["instance/", "instance/src/web/", "applications/*/web/", "applications/*/backend/", "applications/*/electron/", "uikit-solid"]
+  "workspace": ["instance/", "instance/src/web/", "applications/*/web/", "applications/*/backend/", "applications/*/electron/", "uikit-solid"],
+  "tasks": {
+    "dev": "deno -A --watch instance/src/index.ts",
+    "dev-debug": "deno -A --inspect instance/src/index.ts",
+    "build-web": "deno --cwd instance/src/web build",
+    "uikit": "deno --cwd uikit-solid dev",
+    "preinstall": "git pull --recurse-submodules"
+  },
+  "permissions": {
+    "default": {
+      "all": true
+    }
+  },
+  "allowScripts": {
+    "allow": [
+      "npm:canvas@3.2.3",
+      "npm:core-js@2.6.12",
+      "npm:cpu-features@0.0.10",
+      "npm:esbuild@0.27.7",
+      "npm:fast-folder-size@2.4.0",
+      "npm:protobufjs@7.6.4",
+      "npm:sharp@0.34.5"
+    ],
+    "deny": ["npm:ssh2@1.17.0"]
+  },
+  "lint": {
+    "exclude": ["**"]
+  }
 }

@@ -1,8 +1,7 @@
 import * as nodePath from "node:path";
-import { randomUUIDv7 } from "bun";
 import sharp from "sharp";
-import type { Instance } from "../index.js";
-import System from "../system.js";
+import type { Instance } from "../index.ts";
+import System from "../system.ts";
 
 export default class ImageSystem extends System {
   _internalImages: Map<
@@ -113,7 +112,7 @@ export default class ImageSystem extends System {
       }
     }
 
-    const imageId = randomUUIDv7();
+    const imageId = crypto.randomUUID();
 
     this._internalImages.set(imageId, {
       [requestResolution]: {

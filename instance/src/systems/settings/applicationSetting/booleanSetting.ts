@@ -1,4 +1,4 @@
-import { ApplicationSetting, GlobalApplicationSetting } from "./applicationSetting.js";
+import { ApplicationSetting, GlobalApplicationSetting } from "./applicationSetting.ts";
 
 export class BooleanApplicationSetting extends ApplicationSetting<boolean> {
   constructor(applicationId: string, id: string, defaultValue: boolean) {

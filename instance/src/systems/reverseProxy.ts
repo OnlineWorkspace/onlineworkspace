@@ -1,7 +1,7 @@
 import { promises as fs } from "node:fs";
 import path from "node:path";
-import type { Instance } from "../index.js";
-import System from "../system.js";
+import type { Instance } from "../index.ts";
+import System from "../system.ts";
 
 export default class ReverseProxySystem extends System {
   proxies: { from: string; to: string; alternateDomain?: string }[] = [];
@@ -16,7 +16,7 @@ export default class ReverseProxySystem extends System {
     return this;
   }
 
-  async generateCaddyfile() {
+  async generateCaddyFile() {
     const OUTPUT_PATH = path.join(this.instance.sys.filesystem.SYSTEM_PATH, "Caddyfile");
 
     let outputString = "";
@@ -53,13 +53,13 @@ ${outputString}## End OnlineWorkspace -----`,
     return this;
   }
 
-  async startup(): Promise<boolean> {
+  override async startup(): Promise<boolean> {
     // the default backend
     this.addNewProxy("/api/*", "http://localhost:3563");
     // web ui
     this.addNewProxy("", "http://localhost:5173");
 
-    await this.generateCaddyfile();
+    await this.generateCaddyFile();
 
     return true;
   }

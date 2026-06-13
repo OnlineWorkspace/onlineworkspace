@@ -1,12 +1,11 @@
 /// <reference path="./global.d.ts" />
 
-import { FaceLandmarker } from "@mediapipe/tasks-vision";
-import { WorkspacesEvent } from "@onlineworkspace/workspace-instance/src/systems/events.js";
-import { BooleanApplicationSetting } from "@onlineworkspace/workspace-instance/src/systems/settings/applicationSetting/booleanSetting.js";
-import { createTRPCContext, procedure } from "@onlineworkspace/workspace-instance/src/systems/trpcRouter.js";
+import { WorkspacesEvent } from "@onlineworkspace/workspace-instance/src/systems/events.ts";
+import { BooleanApplicationSetting } from "@onlineworkspace/workspace-instance/src/systems/settings/applicationSetting/booleanSetting.ts";
+import { createTRPCContext, procedure } from "@onlineworkspace/workspace-instance/src/systems/trpcRouter.ts";
 import { initTRPC } from "@trpc/server";
-import { promises as fs } from "fs";
-import path from "path";
+import { promises as fs } from "node:fs";
+import path from "node:path";
 import sharp from "sharp";
 import z from "zod";
 

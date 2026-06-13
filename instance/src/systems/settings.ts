@@ -1,6 +1,6 @@
-import type { Instance } from "../index.js";
-import System from "../system.js";
-import { ApplicationSetting, type GlobalApplicationSetting } from "./settings/applicationSetting/applicationSetting.js";
+import type { Instance } from "../index.ts";
+import System from "../system.ts";
+import { ApplicationSetting, type GlobalApplicationSetting } from "./settings/applicationSetting/applicationSetting.ts";
 
 export default class SettingsSystem extends System {
   applicationSettings: {
@@ -83,7 +83,7 @@ export default class SettingsSystem extends System {
     return this;
   }
 
-  async startup(): Promise<boolean> {
+  override async startup(): Promise<boolean> {
     await super.startup();
 
     const db = this.instance.sys.database.postgres();

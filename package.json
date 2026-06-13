@@ -6,12 +6,6 @@
     "type": "git",
     "url": "https://github.com/onlineworkspace/workspace"
   },
-  "scripts": {
-    "dev": "deno --no-clear-screen instance/src/index.ts",
-    "build-web": "deno --cwd instance/src/web build",
-    "uikit": "deno --cwd uikit-solid dev",
-    "preinstall": "git pull --recurse-submodules"
-  },
   "private": true,
   "dependencies": {
     "prettier": "^3.8.3",

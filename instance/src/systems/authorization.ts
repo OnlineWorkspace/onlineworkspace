@@ -9,9 +9,9 @@ import {
   verifyRegistrationResponse,
 } from "@simplewebauthn/server";
 import * as OTPAuth from "otpauth";
-import type { Instance } from "../index.js";
-import System from "../system.js";
-import { WorkspacesNotificationPriority } from "./notifications.js";
+import type { Instance } from "../index.ts";
+import System from "../system.ts";
+import { WorkspacesNotificationPriority } from "./notifications.ts";
 
 export enum AuthorizedDeviceType {
   Desktop,
@@ -388,7 +388,7 @@ export default class AuthorizationSystem extends System {
     return db`DELETE FROM public.passkeys WHERE user_id = ${userId} AND passkey_id = ${passkeyId}`;
   }
 
-  async startup() {
+  override async startup() {
     // loop through all users, check for any session tokens which are expired and remove them from the user's valid sessions pool
 
     const db = this.instance.sys.database.postgres();

@@ -2,11 +2,11 @@
 
 import fs from "node:fs/promises";
 import path from "node:path";
-import { WorkspacesEvent } from "@onlineworkspace/workspace-instance/src/systems/events.js";
-import { BooleanApplicationSetting } from "@onlineworkspace/workspace-instance/src/systems/settings/applicationSetting/booleanSetting.js";
-import { StringListApplicationSetting } from "@onlineworkspace/workspace-instance/src/systems/settings/applicationSetting/stringListSetting.js";
-import { StringApplicationSetting } from "@onlineworkspace/workspace-instance/src/systems/settings/applicationSetting/stringSetting.js";
-import { createTRPCContext, procedure } from "@onlineworkspace/workspace-instance/src/systems/trpcRouter.js";
+import { WorkspacesEvent } from "@onlineworkspace/workspace-instance/src/systems/events.ts";
+import { BooleanApplicationSetting } from "@onlineworkspace/workspace-instance/src/systems/settings/applicationSetting/booleanSetting.ts";
+import { StringListApplicationSetting } from "@onlineworkspace/workspace-instance/src/systems/settings/applicationSetting/stringListSetting.ts";
+import { StringApplicationSetting } from "@onlineworkspace/workspace-instance/src/systems/settings/applicationSetting/stringSetting.ts";
+import { createTRPCContext, procedure } from "@onlineworkspace/workspace-instance/src/systems/trpcRouter.ts";
 import { initTRPC } from "@trpc/server";
 import z from "zod";
 

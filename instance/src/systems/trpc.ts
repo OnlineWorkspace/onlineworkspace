@@ -1,18 +1,15 @@
 import type { TRPCBuiltRouter } from "@trpc/server";
 import { type FetchCreateContextFnOptions, fetchRequestHandler } from "@trpc/server/adapters/fetch";
 import type { BunRequest, Server } from "bun";
-import type { Instance } from "../index.js";
-import System from "../system.js";
-import type { createTRPCContext } from "./trpcRouter.js";
+import type { Instance } from "../index.ts";
+import System from "../system.ts";
+import type { createTRPCContext } from "./trpcRouter.ts";
 
 export default class TRPCSystem extends System {
   registeredRouters: {
     basePath: string;
     router: TRPCBuiltRouter<any, any>;
-    createContext: (
-      opts: FetchCreateContextFnOptions,
-      server: Server<ReturnType<typeof createTRPCContext>>,
-    ) => object;
+    createContext: (opts: FetchCreateContextFnOptions, server: Server<ReturnType<typeof createTRPCContext>>) => object;
   }[];
 
   constructor(instance: Instance) {
@@ -21,14 +18,12 @@ export default class TRPCSystem extends System {
     this.registeredRouters = [];
   }
 
-  async startup(): Promise<boolean> {
+  override async startup(): Promise<boolean> {
+    this.log.info("Starting up...");
     return true;
   }
 
-  private attemptTRPCRequest(
-    req: BunRequest,
-    server: Server<ReturnType<typeof createTRPCContext>>,
-  ) {
+  private attemptTRPCRequest(req: BunRequest, server: Server<ReturnType<typeof createTRPCContext>>) {
     const url = new URL(req.url);
 
     for (const router of this.registeredRouters) {

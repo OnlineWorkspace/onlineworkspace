@@ -1,6 +1,6 @@
 import fs from "node:fs/promises";
 import path from "node:path";
-import ApplicationRepository, { type RepositoryApplication, type RepositoryApplicationSummary } from "./applicationRepository.js";
+import ApplicationRepository, { type RepositoryApplication, type RepositoryApplicationSummary } from "./applicationRepository.ts";
 
 export default class LocalApplicationRepository extends ApplicationRepository {
   id = "local";

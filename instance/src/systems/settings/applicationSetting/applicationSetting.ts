@@ -1,4 +1,4 @@
-import type { Instance } from "../../../index.js";
+import type { Instance } from "../../../index.ts";
 
 export abstract class ApplicationSetting<T> {
   applicationId!: string;

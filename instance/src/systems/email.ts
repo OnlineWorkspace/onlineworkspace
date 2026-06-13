@@ -1,6 +1,6 @@
 import * as nm from "nodemailer";
-import type { Instance } from "../index.js";
-import System from "../system.js";
+import type { Instance } from "../index.ts";
+import System from "../system.ts";
 
 export default class EmailSystem extends System {
   transporter!: nm.Transporter;
@@ -9,7 +9,7 @@ export default class EmailSystem extends System {
     super("email", instance);
   }
 
-  async startup(): Promise<boolean> {
+  override async startup(): Promise<boolean> {
     this.transporter = nm.createTransport(this.instance.sys.configuration.mailServer);
 
     try {

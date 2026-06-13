@@ -1,5 +1,5 @@
-import type { Instance } from "../index.js";
-import System from "../system.js";
+import type { Instance } from "../index.ts";
+import System from "../system.ts";
 
 export enum WorkspacesEvent {
   BeforeStartupComplete,
@@ -95,7 +95,7 @@ export default class EventSystem extends System {
     return this;
   }
 
-  async startup(): Promise<boolean> {
+  override async startup(): Promise<boolean> {
     return true;
   }
 }

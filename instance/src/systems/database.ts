@@ -1,10 +1,9 @@
-import path from "node:path";
-import { SQL } from "bun";
-import type { Instance } from "../index.js";
-import System from "../system.js";
+import postgres from "postgres";
+import type { Instance } from "../index.ts";
+import System from "../system.ts";
 
 export default class DatabaseSystem extends System {
-  databaseConnections: { [connectionId: string]: SQL };
+  databaseConnections: { [connectionId: string]: postgres.Sql };
 
   constructor(instance: Instance) {
     super("database", instance);
@@ -12,32 +11,55 @@ export default class DatabaseSystem extends System {
     this.databaseConnections = {};
   }
 
-  private sqlite(connectionId: string) {
-    if (this.databaseConnections[connectionId]) return this.databaseConnections[connectionId];
+  // private sqlite(connectionId: string) {
+  //   if (this.databaseConnections[connectionId]) return this.databaseConnections[connectionId];
 
-    const conPath = `sqlite://${path.join(this.instance.sys.filesystem.FS_ROOT, connectionId)}.sqlite`;
+  //   const conPath = `sqlite://${path.join(this.instance.sys.filesystem.FS_ROOT, connectionId)}.sqlite`;
 
-    const con = new SQL({
-      adapter: "sqlite",
-      readwrite: true,
-      create: true,
-      filename: conPath,
-    });
+  //   const con = new SQL({
+  //     adapter: "sqlite",
+  //     readwrite: true,
+  //     create: true,
+  //     filename: conPath,
+  //   });
 
-    this.databaseConnections[connectionId] = con;
+  //   this.databaseConnections[connectionId] = con;
 
-    return con;
-  }
+  //   return con;
+  // }
 
   postgres() {
     if (this.databaseConnections.postgres) return this.databaseConnections.postgres;
 
-    const connectionString = `postgres://${this.instance.sys.configuration.databases.postgres.user}:${this.instance.sys.configuration.databases.postgres.password}@${this.instance.sys.configuration.databases.postgres.host}:${this.instance.sys.configuration.databases.postgres.port}/${this.instance.sys.configuration.databases.postgres.database}`;
-    this.log.info(`Connecting to database @ '${this.instance.sys.configuration.databases.postgres.host}' named '${this.instance.sys.configuration.databases.postgres.database}'`)
-    const con = new SQL(connectionString);
+    this.log.info(
+      `Connecting to database @ '${this.instance.sys.configuration.databases.postgres.host}' named '${this.instance.sys.configuration.databases.postgres.database}'`,
+    );
+
+    const con = postgres({
+      db: this.instance.sys.configuration.databases.postgres.database,
+      hostname: this.instance.sys.configuration.databases.postgres.host,
+      port: this.instance.sys.configuration.databases.postgres.port,
+      user: this.instance.sys.configuration.databases.postgres.user,
+      password: this.instance.sys.configuration.databases.postgres.password,
+
+      onnotice: (message) => {
+        if (message.severity === "NOTICE") return;
+
+        console.log(message);
+      },
+    });
 
     this.databaseConnections.postgres = con;
 
+    this.log.info(
+      `Established connection to database @ '${this.instance.sys.configuration.databases.postgres.host}' named '${this.instance.sys.configuration.databases.postgres.database}'`,
+    );
+
     return con;
+  }
+
+  override async startup(): Promise<boolean> {
+    this.log.info("Starting up...");
+    return true;
   }
 }

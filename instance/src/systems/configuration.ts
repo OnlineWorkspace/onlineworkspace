@@ -1,7 +1,7 @@
 import { promises as fs, existsSync as fsExistsSync, readFileSync as fsReadFileSync } from "node:fs";
 import path from "node:path";
-import type { Instance } from "../index.js";
-import System from "../system.js";
+import type { Instance } from "../index.ts";
+import System from "../system.ts";
 
 export enum WorkspacesFeatureFlags {
   SlashCommands = "slash_commands",
@@ -174,7 +174,7 @@ export default class ConfigurationSystem extends System {
     return true;
   }
 
-  async startup(): Promise<boolean> {
+  override async startup(): Promise<boolean> {
     const CONFIGURATION_FILE_PATH = path.join(this.instance.sys.filesystem.FS_ROOT, "configuration.json");
 
     if (!fsExistsSync(CONFIGURATION_FILE_PATH)) {

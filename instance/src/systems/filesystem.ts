@@ -1,9 +1,8 @@
 import fs from "node:fs";
 import path from "node:path";
-import { randomUUIDv7 } from "bun";
-import type { Instance } from "../index.js";
-import System from "../system.js";
-import { WorkspacesEvent } from "./events.js";
+import type { Instance } from "../index.ts";
+import System from "../system.ts";
+import { WorkspacesEvent } from "./events.ts";
 
 export default class FilesystemSystem extends System {
   readonly SRC_ROOT = path.resolve("./instance/src/");
@@ -141,7 +140,7 @@ export default class FilesystemSystem extends System {
       }
     }
 
-    const assetId = randomUUIDv7();
+    const assetId = crypto.randomUUID();
 
     this._internalAssets.set(assetId, {
       path: fsPath,
@@ -156,7 +155,7 @@ export default class FilesystemSystem extends System {
     return `/api/asset/raw/${assetId}`;
   }
 
-  // TODO: properly implement this instead of this stop-gap solution.
+  // TODO: properly implement this instead of this hack.
   async getUserPermissions(userId: number, fsPath: string): Promise<{ read: boolean; write: boolean }> {
     const user = (await this.instance.sys.users.getUserById(userId))!;
 
@@ -211,7 +210,9 @@ export default class FilesystemSystem extends System {
     return path.join(this.FS_ROOT, `/users/${userId}`);
   }
 
-  async startup(): Promise<boolean> {
+  override async startup(): Promise<boolean> {
+    await super.startup();
+
     this.instance.sys.event.on(WorkspacesEvent.BeforeStartupComplete, async () => {
       const db = this.instance.sys.database.postgres();
 

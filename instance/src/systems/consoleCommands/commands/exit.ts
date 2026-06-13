@@ -1,15 +1,15 @@
-import Command, { type ICommandRuntimeParameters } from "../command.js";
+import Command, { type ICommandRuntimeParameters } from "../command.ts";
 
 export default class ExitCommand extends Command {
-    commandId = "exit";
-    flags = {};
-    aliases = [];
-    shortDescription = "Terminate the Workspaces instance";
+  override commandId = "exit";
+  flags = {};
+  aliases = [];
+  override shortDescription = "Terminate the Workspaces instance";
 
-    async run(parameters: ICommandRuntimeParameters) {
-        await this.instance.shutdown();
+  async run(parameters: ICommandRuntimeParameters) {
+    await this.instance.shutdown();
 
-        // Note: do not remove this line of code or Typescript will complain
-        return this.finishRun();
-    }
+    // Note: do not remove this line of code or Typescript will complain
+    return this.finishRun();
+  }
 }

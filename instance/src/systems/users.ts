@@ -1,9 +1,8 @@
 import { promises as fs, existsSync as fsExistsSync } from "node:fs";
 import path from "node:path";
-import { sql } from "bun";
 import sharp from "sharp";
-import type { Instance } from "../index.js";
-import System from "../system.js";
+import type { Instance } from "../index.ts";
+import System from "../system.ts";
 
 export interface IUserDatabaseUser {
   id: number;
@@ -458,7 +457,7 @@ export default class UsersSystem extends System {
     super("users", instance);
   }
 
-  async startup(): Promise<boolean> {
+  override async startup(): Promise<boolean> {
     await super.startup();
 
     const db = this.instance.sys.database.postgres();
@@ -554,7 +553,7 @@ export default class UsersSystem extends System {
       surname: "Doe",
     };
 
-    const id = (await db`INSERT INTO public.users ${sql(user)} RETURNING id`)?.[0]?.id;
+    const id = (await db`INSERT INTO public.users ${db(user)} RETURNING id`)?.[0]?.id;
 
     const ubi = await this.getUserById(id);
 
@@ -591,6 +590,7 @@ export default class UsersSystem extends System {
     const db = this.instance.sys.database.postgres();
 
     try {
+      // @ts-ignore this is valid
       return (await db`SELECT id FROM public.users`).map((u: { id: number }) => new WorkspacesUser(this.instance, u.id));
     } catch (err) {
       this.log.error("Failed to getAllUsers()", err);

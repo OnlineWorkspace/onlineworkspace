@@ -3,11 +3,11 @@
 import { existsSync as fsExistsSync } from "node:fs";
 import fs from "node:fs/promises";
 import path from "node:path";
-import { AuthorizedDeviceType, SESSION_VALID_TERM_MS } from "@onlineworkspace/workspace-instance/src/systems/authorization.js";
-import { FEATURE_FLAG_DESCRIPTIONS, WorkspacesFeatureFlags } from "@onlineworkspace/workspace-instance/src/systems/configuration.js";
-import { WorkspacesNotificationPriority } from "@onlineworkspace/workspace-instance/src/systems/notifications.js";
-import { GlobalApplicationSetting } from "@onlineworkspace/workspace-instance/src/systems/settings/applicationSetting/applicationSetting.js";
-import { adminProcedure, createTRPCContext, procedure } from "@onlineworkspace/workspace-instance/src/systems/trpcRouter.js";
+import { AuthorizedDeviceType, SESSION_VALID_TERM_MS } from "@onlineworkspace/workspace-instance/src/systems/authorization.ts";
+import { FEATURE_FLAG_DESCRIPTIONS, WorkspacesFeatureFlags } from "@onlineworkspace/workspace-instance/src/systems/configuration.ts";
+import { WorkspacesNotificationPriority } from "@onlineworkspace/workspace-instance/src/systems/notifications.ts";
+import { GlobalApplicationSetting } from "@onlineworkspace/workspace-instance/src/systems/settings/applicationSetting/applicationSetting.ts";
+import { adminProcedure, createTRPCContext, procedure } from "@onlineworkspace/workspace-instance/src/systems/trpcRouter.ts";
 import { initTRPC, TRPCError } from "@trpc/server";
 import { octetInputParser } from "@trpc/server/http";
 import sharp from "sharp";

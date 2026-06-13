@@ -1,13 +1,12 @@
 /// <reference path="./global.d.ts" />
 
-import { WorkspacesFeatureFlags } from "@onlineworkspace/workspace-instance/src/systems/configuration.js";
-import { adminProcedure, createTRPCContext, procedure } from "@onlineworkspace/workspace-instance/src/systems/trpcRouter.js";
+import { WorkspacesFeatureFlags } from "@onlineworkspace/workspace-instance/src/systems/configuration.ts";
+import { adminProcedure, createTRPCContext, procedure } from "@onlineworkspace/workspace-instance/src/systems/trpcRouter.ts";
 import { initTRPC } from "@trpc/server";
 import fastFolderSizeSync from "fast-folder-size/sync.js";
-import fs from "fs/promises";
 import z from "zod";
-import type ApplicationRepository from "./repository/applicationRepository.js";
-import LocalApplicationRepository from "./repository/localRepository.js";
+import type ApplicationRepository from "./repository/applicationRepository.ts";
+import LocalApplicationRepository from "./repository/localRepository.ts";
 
 const log = instance.log.createLogger("uk.ewsgit.store");
 

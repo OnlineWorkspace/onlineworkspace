@@ -3,14 +3,14 @@ import { on } from "node:events";
 import { initTRPC, TRPCError } from "@trpc/server";
 import type { FetchCreateContextFnOptions } from "@trpc/server/adapters/fetch";
 import type { Server } from "bun";
-import { encode as hiBase32Encode } from "hi-base32";
+import * as hiBase32 from "hi-base32";
 import * as OTPAuth from "otpauth";
 import z from "zod";
-import type { Instance } from "../index.js";
-import { AuthorizedDeviceType } from "./authorization.js";
-import { WorkspacesFeatureFlags } from "./configuration.js";
-import { type WorkspacesNotification, WorkspacesNotificationEventEmitterEvent } from "./notifications.js";
-import type { WorkspacesUser } from "./users.js";
+import type { Instance } from "../index.ts";
+import { AuthorizedDeviceType } from "./authorization.ts";
+import { WorkspacesFeatureFlags } from "./configuration.ts";
+import { type WorkspacesNotification, WorkspacesNotificationEventEmitterEvent } from "./notifications.ts";
+import type { WorkspacesUser } from "./users.ts";
 
 export const createTRPCContext = (instance: Instance) => (opt: FetchCreateContextFnOptions, server: Server<object>) => {
   return {
@@ -312,7 +312,7 @@ export const workspacesRouter = t.router({
       .mutation(async (opt) => {
         const generateSecretString = () => {
           const buffer = nodeCrypto.randomBytes(15);
-          const base32 = hiBase32Encode(buffer).replace(/=/g, "").substring(0, 24);
+          const base32 = hiBase32.encode(buffer).replace(/=/g, "").substring(0, 24);
           return base32;
         };
 
