@@ -15,11 +15,11 @@ import NotificationsSystem from "./systems/notifications.ts";
 import ReverseProxySystem from "./systems/reverseProxy.ts";
 import { StringListApplicationSetting } from "./systems/settings/applicationSetting/stringListSetting.ts";
 import SettingsSystem from "./systems/settings.ts";
+import TerminalUISystem from "./systems/terminalUI.ts";
 import TRPCSystem from "./systems/trpc.ts";
 import { createTRPCContext as createWorkspacesTRPCContext, workspacesRouter } from "./systems/trpcRouter.ts";
 import UsersSystem from "./systems/users.ts";
 import WebFrontendSystem from "./systems/webFrontend.ts";
-import TerminalUISystem from "./systems/terminalUI.ts";
 
 export enum InstanceStatus {
   Online,

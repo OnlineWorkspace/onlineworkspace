@@ -2,6 +2,7 @@
   "workspace": ["instance/", "instance/src/web/", "applications/*/web/", "applications/*/backend/", "applications/*/electron/", "uikit-solid"],
   "tasks": {
     "dev": "deno -A --watch instance/src/index.ts",
+    "start": "deno -A instance/src/index.ts",
     "dev-debug": "deno -A --inspect instance/src/index.ts",
     "build-web": "deno --cwd instance/src/web build",
     "uikit": "deno --cwd uikit-solid dev",

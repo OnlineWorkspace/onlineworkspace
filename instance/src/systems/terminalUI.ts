@@ -1,10 +1,10 @@
 import type { Instance } from "../index.ts";
 import System from "../system.ts";
-import TerminalPane from "./terminalUI/pane.ts";
-import { cursorTo } from "./terminalUI/stdout.ts";
 import Terminal from "./terminalUI/terminal.ts";
 import TerminalBorderView from "./terminalUI/views/borderView.ts";
+import TerminalContainerView from "./terminalUI/views/container.ts";
 import TerminalCrossView from "./terminalUI/views/crossView.ts";
+import TerminalTextInputView from "./terminalUI/views/textInput.ts";
 
 export default class TerminalUISystem extends System {
   constructor(instance: Instance) {
@@ -17,25 +17,33 @@ export default class TerminalUISystem extends System {
     await super.startup();
 
     const terminal = new Terminal();
-    const testPane = new TerminalPane(terminal.activeScreen, { width: { unit: "%", value: 100 }, height: { unit: "%", value: 100 } });
 
-    const borderView = new TerminalBorderView();
-    borderView.childViews.push(new TerminalCrossView());
-    // borderView.childViews.push(new TerminalCrossView());
-    // borderView.childViews.push(new TerminalCrossView());
-    // borderView.childViews.push(new TerminalCrossView());
-    // borderView.childViews.push(new TerminalCrossView());
-    // borderView.childViews.push(new TerminalCrossView());
+    // biome-ignore format: TUI description
+    terminal.screen.childView.addChild(
+      new TerminalContainerView().setFlowDirection("y")
+        .addChild(
+          new TerminalBorderView()
+            .addChild(new TerminalContainerView().setFlowDirection("y")
+              .addChild(
+                new TerminalTextInputView()
+                .setPlaceholder("Placeholder Text")
+              )
+              .addChild(
+                new TerminalContainerView().setFlowDirection("x")
+                  .addChild(new TerminalCrossView())
+                  .addChild(new TerminalCrossView())
+              )
+            )
+        )
+        .addChild(
+          new TerminalBorderView()
+            .setDimensions({width: { unit: "%", value: 100 }, height: { unit: "px", value: 5 } })
+        )
+    );
 
-    testPane.childViews.push(borderView);
-
-    terminal.activeScreen.visiblePanes.push(testPane);
-
-    await terminal.draw();
     setInterval(async () => {
       await terminal.draw();
-      await cursorTo(terminal.width, terminal.height);
-    }, 50);
+    }, 20);
 
     return true;
   }

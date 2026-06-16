@@ -1,30 +1,29 @@
 import TerminalScreen from "./screen.ts";
-import { write } from "./stdout.ts";
 
 export default class Terminal {
-  width: number;
-  height: number;
-  activeScreen: TerminalScreen;
+  screen: TerminalScreen;
 
   constructor() {
-    const windowSize = process.stdout.getWindowSize() || [80, 20];
-    this.width = windowSize[0];
-    this.height = windowSize[1];
-    this.activeScreen = new TerminalScreen(this);
+    this.screen = new TerminalScreen(this);
+    this.screen.onResize();
 
-    process.stdout.on("resize", () => {
-      const windowSize = process.stdout.getWindowSize() || [80, 20];
-      this.width = windowSize[0];
-      this.height = windowSize[1];
+    process.stdout.on("resize", async () => {
+      await this.screen.onResize();
+    });
+
+    // process.stdin.setRawMode(true);
+
+    globalThis.addEventListener("unload", () => {
+      this.end();
     });
   }
 
   async draw() {
-    await write("\x1b[?7l");
-    await this.activeScreen.draw();
+    await this.screen.draw();
   }
 
-  async end() {
-    await write("\x1b[?7h");
+  end() {
+    this.screen._rawWrite(`\x1b[?47l`);
+    // process.stdin.setRawMode(false);
   }
 }
