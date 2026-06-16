@@ -1,3 +1,4 @@
+import RenderError from "./renderError.ts";
 import type TerminalScreen from "./screen.ts";
 import TerminalSizableElement from "./sizableElement.ts";
 import { type TerminalEventListener, TerminalEventType } from "./terminalEvent.ts";
@@ -77,12 +78,16 @@ export default abstract class TerminalView extends TerminalSizableElement {
       if (this.childViewFlowDirection === "y") currentContentTotalChildSize.height += childView.absoluteDimensions.height;
 
       if (currentContentTotalChildSize.width > this.contentAbsoluteDimensions.width) {
-        screen.write(`Warning! Content Width Exceeds Remaining Space, ${currentContentTotalChildSize.width} > ${this.contentAbsoluteDimensions.width}`);
+        screen.parentTerminal.renderError = new RenderError(
+          `Warning! Content Width Exceeds Remaining Space, ${currentContentTotalChildSize.width} > ${this.contentAbsoluteDimensions.width}`,
+        );
         break;
       }
 
       if (currentContentTotalChildSize.height > this.contentAbsoluteDimensions.height) {
-        screen.write(` [Warning! Content Height Exceeds Remaining Space, ${currentContentTotalChildSize.height} > ${this.contentAbsoluteDimensions.height}] `);
+        screen.parentTerminal.renderError = new RenderError(
+          ` [Warning! Content Height Exceeds Remaining Space, ${currentContentTotalChildSize.height} > ${this.contentAbsoluteDimensions.height}] `,
+        );
         break;
       }
 

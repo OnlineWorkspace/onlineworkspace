@@ -1,7 +1,9 @@
+import type RenderError from "./renderError.ts";
 import TerminalScreen from "./screen.ts";
 
 export default class Terminal {
   screen: TerminalScreen;
+  renderError?: RenderError;
 
   constructor() {
     this.screen = new TerminalScreen(this);
@@ -20,6 +22,7 @@ export default class Terminal {
 
   async draw() {
     await this.screen.draw();
+    await this.renderError?.draw(this.screen);
   }
 
   end() {

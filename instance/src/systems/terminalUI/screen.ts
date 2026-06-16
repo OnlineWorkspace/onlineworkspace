@@ -112,12 +112,12 @@ export default class TerminalScreen {
       for (const char of curBuf) {
         if (drawBuffer[drawBuffer.length - 1]) {
           if (drawBuffer[drawBuffer.length - 1]?.[1] === char?.[1]) {
-            drawBuffer[drawBuffer.length - 1][0] += char[0];
+            drawBuffer[drawBuffer.length - 1][0] += char?.[0];
           } else {
-            drawBuffer.push([char?.[0], await char[1]?._internal_apply()]);
+            drawBuffer.push([char?.[0], await char?.[1]?._internal_apply()]);
           }
         } else {
-          drawBuffer.push([char?.[0], await char[1]?._internal_apply()]);
+          drawBuffer.push([char?.[0], await char?.[1]?._internal_apply()]);
         }
       }
 
