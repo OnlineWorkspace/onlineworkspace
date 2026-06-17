@@ -1,12 +1,12 @@
 import type TerminalScreen from "../screen.ts";
-import TerminalView from "../view.ts";
+import TerminalView, { type TerminalViewContext } from "../view.ts";
 
 export default class TerminalContainerView extends TerminalView {
-  constructor() {
-    super();
+  constructor(viewContext: TerminalViewContext) {
+    super(viewContext);
 
-    this.dimensions.width = { unit: "rem%", value: 100 };
-    this.dimensions.height = { unit: "rem%", value: 100 };
+    this.dimensions.width = { unit: "%", value: 100 };
+    this.dimensions.height = { unit: "%", value: 100 };
     this.contentDimensions.width = { unit: "%", value: 100 };
     this.contentDimensions.height = { unit: "%", value: 100 };
     this.contentOffset.width = { unit: "px", value: 0 };

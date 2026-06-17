@@ -23,7 +23,7 @@ export default class TerminalScreen {
     this._internal_isDrawingFrame = false;
     this.width = process.stdout.columns;
     this.height = process.stdout.rows;
-    this.childView = new TerminalContainerView();
+    this.childView = new TerminalContainerView({ screen: this });
   }
 
   cursorTo(x: number, y?: number) {

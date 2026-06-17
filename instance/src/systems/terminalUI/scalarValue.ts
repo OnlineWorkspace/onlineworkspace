@@ -1,6 +1,7 @@
-import type TerminalSizableElement from "./sizableElement.ts";
+import type TerminalView from "./view.ts";
 
 enum TerminalScalarValueOperation {
+  Set,
   Add,
   Subtract,
   Multiply,
@@ -11,7 +12,7 @@ enum TerminalScalarValueOperation {
 
 export enum TerminalScalarValueUnit {
   Pixel,
-  PercentageOfOriginalValue,
+  Percentage,
 }
 
 export default class TerminalScalarValue {
@@ -21,44 +22,68 @@ export default class TerminalScalarValue {
     this.operationChain = [];
   }
 
+  set(value: number, unit: TerminalScalarValueUnit) {
+    this.operationChain.push([TerminalScalarValueOperation.Set, value, unit]);
+    return this;
+  }
+
   add(value: number, unit: TerminalScalarValueUnit) {
     this.operationChain.push([TerminalScalarValueOperation.Add, value, unit]);
     return this;
   }
+
   subtract(value: number, unit: TerminalScalarValueUnit) {
     this.operationChain.push([TerminalScalarValueOperation.Subtract, value, unit]);
     return this;
   }
+
   multiply(value: number) {
     this.operationChain.push([TerminalScalarValueOperation.Multiply, value]);
     return this;
   }
+
   divide(value: number) {
     this.operationChain.push([TerminalScalarValueOperation.Divide, value]);
     return this;
   }
+
   floor() {
     this.operationChain.push([TerminalScalarValueOperation.Floor]);
     return this;
   }
+
   ceil() {
     this.operationChain.push([TerminalScalarValueOperation.Ceil]);
     return this;
   }
 
-  _internal_calculateFromSizableElement(sizableElement: TerminalSizableElement, valueType: "width" | "height"): number {
-    let val = sizableElement.absoluteDimensions[valueType];
+  _internal_calculateFromView(view: TerminalView, valueType: "width" | "height"): number {
+    let maxSize = 0;
+    let val = 0;
 
     for (const operation of this.operationChain) {
       switch (operation[0]) {
+        case TerminalScalarValueOperation.Set: {
+          switch (operation[2]) {
+            case TerminalScalarValueUnit.Pixel: {
+              val = operation[1]!;
+              break;
+            }
+            case TerminalScalarValueUnit.Percentage: {
+              val = (maxSize / 100) * operation[1]!;
+              break;
+            }
+          }
+          break;
+        }
         case TerminalScalarValueOperation.Add: {
           switch (operation[2]) {
             case TerminalScalarValueUnit.Pixel: {
               val += operation[1]!;
               break;
             }
-            case TerminalScalarValueUnit.PercentageOfOriginalValue: {
-              val += (val / 100) * operation[1]!;
+            case TerminalScalarValueUnit.Percentage: {
+              val += (maxSize / 100) * operation[1]!;
               break;
             }
           }
@@ -70,8 +95,8 @@ export default class TerminalScalarValue {
               val -= operation[1]!;
               break;
             }
-            case TerminalScalarValueUnit.PercentageOfOriginalValue: {
-              val -= (val / 100) * operation[1]!;
+            case TerminalScalarValueUnit.Percentage: {
+              val -= (maxSize / 100) * operation[1]!;
               break;
             }
           }

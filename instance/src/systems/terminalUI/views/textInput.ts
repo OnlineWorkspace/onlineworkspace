@@ -1,13 +1,13 @@
 import TerminalEffect from "../effect.ts";
 import type TerminalScreen from "../screen.ts";
-import TerminalView from "../view.ts";
+import TerminalView, { type TerminalViewContext } from "../view.ts";
 
 export default class TerminalTextInputView extends TerminalView {
   value: string;
   private placeholder: string | undefined;
 
-  constructor() {
-    super();
+  constructor(viewContext: TerminalViewContext) {
+    super(viewContext);
 
     this.dimensions.width = { unit: "%", value: 100 };
     this.dimensions.height = { unit: "px", value: 1 };

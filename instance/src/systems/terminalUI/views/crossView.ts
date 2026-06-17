@@ -1,10 +1,10 @@
 import TerminalEffect, { TerminalColor } from "../effect.ts";
 import type TerminalScreen from "../screen.ts";
-import TerminalView from "../view.ts";
+import TerminalView, { type TerminalViewContext } from "../view.ts";
 
 export default class TerminalCrossView extends TerminalView {
-  constructor() {
-    super();
+  constructor(viewContext: TerminalViewContext) {
+    super(viewContext);
 
     this.dimensions.width = { unit: "%", value: 100 };
     this.dimensions.height = { unit: "%", value: 100 };

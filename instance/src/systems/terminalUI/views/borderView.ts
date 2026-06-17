@@ -1,17 +1,17 @@
 import TerminalEffect, { TerminalColor } from "../effect.ts";
 import type TerminalScreen from "../screen.ts";
-import TerminalView from "../view.ts";
+import TerminalView, { type TerminalViewContext } from "../view.ts";
 
 export default class TerminalBorderView extends TerminalView {
-  constructor() {
-    super();
+  constructor(viewContext: TerminalViewContext) {
+    super(viewContext);
 
-    this.dimensions.width = { unit: "rem%", value: 100 };
-    this.dimensions.height = { unit: "rem%", value: 100 };
-    this.contentDimensions.width = { unit: "%", value: 100 };
-    this.contentDimensions.height = { unit: "%", value: 100 };
-    this.contentOffset.width = { unit: "px", value: 1 };
-    this.contentOffset.height = { unit: "px", value: 1 };
+    this.definitions.dimensions.width = { unit: "%", value: 100 };
+    this.definitions.dimensions.height = { unit: "%", value: 100 };
+    this.definitions.contentDimensions.width = { unit: "%", value: 100 };
+    this.definitions.contentDimensions.height = { unit: "%", value: 100 };
+    this.definitions.contentOffset.width = { unit: "px", value: 1 };
+    this.definitions.contentOffset.height = { unit: "px", value: 1 };
   }
 
   override async draw(screen: TerminalScreen, drawOrigin: { x: number; y: number }): Promise<void> {

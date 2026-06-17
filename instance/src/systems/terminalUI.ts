@@ -20,30 +20,30 @@ export default class TerminalUISystem extends System {
 
     // biome-ignore format: TUI description
     terminal.screen.childView.addChild(
-      new TerminalContainerView().setFlowDirection("y")
+      TerminalContainerView, v => v.setFlowDirection("y")
         .addChild(
-          new TerminalBorderView()
-            .addChild(new TerminalContainerView().setFlowDirection("y")
+          TerminalBorderView, v => v
+            .addChild(TerminalContainerView, v => v.setFlowDirection("y")
               .addChild(
-                new TerminalTextInputView()
+                TerminalTextInputView, v => v
                 .setPlaceholder("Placeholder Text")
               )
               .addChild(
-                new TerminalContainerView().setFlowDirection("x")
-                  .addChild(new TerminalCrossView())
-                  .addChild(new TerminalCrossView())
+                TerminalContainerView, v => v.setFlowDirection("x")
+                  .addChild(TerminalCrossView)
+                  .addChild(TerminalCrossView)
               )
             )
         )
-        .addChild(
-          new TerminalBorderView()
-            .setDimensions({width: { unit: "%", value: 100 }, height: { unit: "px", value: 5 } })
-        )
+        // .addChild(
+        //   TerminalBorderView, v=>v
+        //     .setDimensions({width: { unit: "%", value: 100 }, height: { unit: "px", value: 5 } })
+        // )
     );
 
     setInterval(async () => {
       await terminal.draw();
-    }, 20);
+    }, 100);
 
     return true;
   }
