@@ -1,12 +1,11 @@
 import RenderError from "./renderError.ts";
-import TerminalScalarValue from "./scalarValue.ts";
+import TerminalScalarValue, { TerminalScalarValueUnit } from "./scalarValue.ts";
 import type TerminalScreen from "./screen.ts";
-import TerminalSizableElement from "./sizableElement.ts";
 import type { TerminalEventListener, TerminalEventType } from "./terminalEvent.ts";
 
 export type TerminalViewContext = TerminalView["viewContext"];
 
-export default abstract class TerminalView extends TerminalSizableElement {
+export default abstract class TerminalView {
   private viewContext!: { screen: TerminalScreen };
 
   definitions: {
@@ -30,48 +29,49 @@ export default abstract class TerminalView extends TerminalSizableElement {
     };
     absolute: {
       dimensions: {
-        width: number,
-        height: number
-      }
+        width: number;
+        height: number;
+      };
       content: {
-      offset: {
-        width: number;
-        height: number;
+        offset: {
+          width: number;
+          height: number;
+        };
+        dimensions: {
+          width: number;
+          height: number;
+        };
       };
-      dimensions: {
-        width: number;
-        height: number;
-      };
-      }
-    }
+    };
   } = {
     dimensions: {
-      width: new TerminalScalarValue().absolute(),
-      height: {
-        unit: "px",
-        value: -1,
-      },
+      width: new TerminalScalarValue().set(0, TerminalScalarValueUnit.Pixel),
+      height: new TerminalScalarValue().set(0, TerminalScalarValueUnit.Pixel),
     },
     content: {
       offset: {
-        width: {
-          unit: "px",
-          value: 0,
+        width: new TerminalScalarValue().set(0, TerminalScalarValueUnit.Pixel),
+        height: new TerminalScalarValue().set(0, TerminalScalarValueUnit.Pixel),
+      },
+      dimensions: {
+        width: new TerminalScalarValue().set(0, TerminalScalarValueUnit.Pixel),
+        height: new TerminalScalarValue().set(0, TerminalScalarValueUnit.Pixel),
+      },
+    },
+    absolute: {
+      content: {
+        dimensions: {
+          width: 0,
+          height: 0,
         },
-        height: {
-          unit: "px",
-          value: 0,
+        offset: {
+          width: 0,
+          height: 0,
         },
       },
       dimensions: {
-        width: {
-          unit: "px",
-          value: 0,
-        },
-        height: {
-          unit: "px",
-          value: 0,
-        },
+        width: 0,
+        height: 0,
       },
     },
   };
@@ -103,8 +103,6 @@ export default abstract class TerminalView extends TerminalSizableElement {
   childViewFlowDirection: "x" | "y" = "x";
 
   constructor(viewContext: TerminalViewContext) {
-    super();
-
     this.viewContext = viewContext;
 
     if (!this.viewContext.screen) throw new Error(`This TerminalView -> ${this.constructor.name} was not initialized correctly!`);
@@ -123,19 +121,19 @@ export default abstract class TerminalView extends TerminalSizableElement {
 
     // Dimensions
     // px
-    if (this._dimensions.width.unit === "px") {
-      this._absoluteDimensions.width = this._dimensions.width.value;
+    if (this.definitions.dimensions.width.unit === "px") {
+      this._absoluteDimensions.width = this.definitions.dimensions.width.value;
     }
-    if (this._dimensions.height.unit === "px") {
-      this._absoluteDimensions.height = this._dimensions.height.value;
+    if (this.definitions.dimensions.height.unit === "px") {
+      this._absoluteDimensions.height = this.definitions.dimensions.height.value;
     }
 
     // %
-    if (this._dimensions.width.unit === "%") {
-      this._absoluteDimensions.width = Math.floor((this._dimensions.width.value / 100) * parentContentAbsoluteDimensions.width);
+    if (this.definitions.dimensions.width.unit === "%") {
+      this._absoluteDimensions.width = Math.floor((this.definitions.dimensions.width.value / 100) * parentContentAbsoluteDimensions.width);
     }
-    if (this._dimensions.height.unit === "%") {
-      this._absoluteDimensions.height = Math.floor((this._dimensions.height.value / 100) * parentContentAbsoluteDimensions.height);
+    if (this.definitions.dimensions.height.unit === "%") {
+      this._absoluteDimensions.height = Math.floor((this.definitions.dimensions.height.value / 100) * parentContentAbsoluteDimensions.height);
     }
 
     if (this._absoluteDimensions.width > parentContentAbsoluteDimensions.width) {
