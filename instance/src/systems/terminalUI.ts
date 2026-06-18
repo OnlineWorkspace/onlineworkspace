@@ -1,10 +1,7 @@
 import type { Instance } from "../index.ts";
 import System from "../system.ts";
-import Terminal from "./terminalUI/terminal.ts";
-import TerminalBorderView from "./terminalUI/views/borderView.ts";
-import TerminalContainerView from "./terminalUI/views/container.ts";
-import TerminalCrossView from "./terminalUI/views/crossView.ts";
-import TerminalTextInputView from "./terminalUI/views/textInput.ts";
+import { createCliRenderer, Text } from "@opentui/core";
+import ffi from "node:ffi";
 
 export default class TerminalUISystem extends System {
   constructor(instance: Instance) {
@@ -16,34 +13,20 @@ export default class TerminalUISystem extends System {
 
     await super.startup();
 
-    const terminal = new Terminal();
+    try {
+      const renderer = await createCliRenderer({
+        exitOnCtrlC: true,
+      });
 
-    // biome-ignore format: TUI description
-    terminal.screen.childView.addChild(
-      TerminalContainerView, v => v.setFlowDirection("y")
-        .addChild(
-          TerminalBorderView, v => v
-            .addChild(TerminalContainerView, v => v.setFlowDirection("y")
-              .addChild(
-                TerminalTextInputView, v => v
-                .setPlaceholder("Placeholder Text")
-              )
-              .addChild(
-                TerminalContainerView, v => v.setFlowDirection("x")
-                  .addChild(TerminalCrossView)
-                  .addChild(TerminalCrossView)
-              )
-            )
-        )
-        // .addChild(
-        //   TerminalBorderView, v=>v
-        //     .setDimensions({width: { unit: "%", value: 100 }, height: { unit: "px", value: 5 } })
-        // )
-    );
-
-    setInterval(async () => {
-      await terminal.draw();
-    }, 100);
+      renderer.root.add(
+        Text({
+          content: "Hello, OpenTUI!",
+          fg: "#00FF00",
+        }),
+      );
+    } catch (err) {
+      console.error(err);
+    }
 
     return true;
   }
