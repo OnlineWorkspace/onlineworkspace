@@ -1,16 +1,16 @@
-import type TerminalScreen from "../screen.ts";
+import TerminalScalarValue, { TerminalScalarValueUnit } from "../scalarValue.ts";
 import TerminalView, { type TerminalViewContext } from "../view.ts";
 
 export default class TerminalContainerView extends TerminalView {
   constructor(viewContext: TerminalViewContext) {
     super(viewContext);
 
-    this.dimensions.width = { unit: "%", value: 100 };
-    this.dimensions.height = { unit: "%", value: 100 };
-    this.contentDimensions.width = { unit: "%", value: 100 };
-    this.contentDimensions.height = { unit: "%", value: 100 };
-    this.contentOffset.width = { unit: "px", value: 0 };
-    this.contentOffset.height = { unit: "px", value: 0 };
+    this.viewProperties.width = new TerminalScalarValue(100, TerminalScalarValueUnit.Percentage);
+    this.viewProperties.height = new TerminalScalarValue(100, TerminalScalarValueUnit.Percentage);
+    this.viewProperties.contentWidth = new TerminalScalarValue(100, TerminalScalarValueUnit.Percentage);
+    this.viewProperties.contentHeight = new TerminalScalarValue(100, TerminalScalarValueUnit.Percentage);
+    this.viewProperties.contentOffsetX = new TerminalScalarValue(0, TerminalScalarValueUnit.Cell);
+    this.viewProperties.contentOffsetY = new TerminalScalarValue(0, TerminalScalarValueUnit.Cell);
   }
 
   setFlowDirection(flowDirection: "x" | "y") {
@@ -19,7 +19,7 @@ export default class TerminalContainerView extends TerminalView {
     return this;
   }
 
-  override async draw(screen: TerminalScreen, drawOrigin: { x: number; y: number }): Promise<void> {
-    await super.draw(screen, { x: drawOrigin.x + this.contentAbsoluteOffset.width, y: drawOrigin.y + this.contentAbsoluteOffset.height });
+  override async draw(drawProperties: TerminalView["viewProperties"]["_absolute"]): Promise<void> {
+    await super.draw(drawProperties);
   }
 }

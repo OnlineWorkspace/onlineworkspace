@@ -44,7 +44,7 @@ export default abstract class Command {
           this.log._internal_promptMessage(message);
         }
       };
-      this.log._internal_promptMessage(message + " -> ");
+      this.log._internal_promptMessage(`${message} -> `);
     });
   }
 

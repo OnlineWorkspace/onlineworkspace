@@ -6,96 +6,44 @@ import type { TerminalEventListener, TerminalEventType } from "./terminalEvent.t
 export type TerminalViewContext = TerminalView["viewContext"];
 
 export default abstract class TerminalView {
-  private viewContext!: { screen: TerminalScreen };
+  viewContext!: { screen: TerminalScreen; parentView?: TerminalView };
 
-  definitions: {
-    dimensions: {
-      width: TerminalScalarValue;
-      height: TerminalScalarValue;
-      minWidth?: TerminalScalarValue;
-      minHeight?: TerminalScalarValue;
-      maxWidth?: TerminalScalarValue;
-      maxHeight?: TerminalScalarValue;
-    };
-    content: {
-      offset: {
-        width: TerminalScalarValue;
-        height: TerminalScalarValue;
-      };
-      dimensions: {
-        width: TerminalScalarValue;
-        height: TerminalScalarValue;
-      };
-    };
-    absolute: {
-      dimensions: {
-        width: number;
-        height: number;
-      };
-      content: {
-        offset: {
-          width: number;
-          height: number;
-        };
-        dimensions: {
-          width: number;
-          height: number;
-        };
-      };
+  viewProperties: {
+    width: TerminalScalarValue;
+    height: TerminalScalarValue;
+    contentHeight: TerminalScalarValue;
+    contentWidth: TerminalScalarValue;
+    contentOffsetX: TerminalScalarValue;
+    contentOffsetY: TerminalScalarValue;
+    // managed by calculateAbsoluteProperties (DO NOT EDIT)
+    _absolute: {
+      drawOriginX: number;
+      drawOriginY: number;
+      width: number;
+      height: number;
+      contentWidth: number;
+      contentHeight: number;
+      contentOffsetX: number;
+      contentOffsetY: number;
     };
   } = {
-    dimensions: {
-      width: new TerminalScalarValue().set(0, TerminalScalarValueUnit.Pixel),
-      height: new TerminalScalarValue().set(0, TerminalScalarValueUnit.Pixel),
+    width: new TerminalScalarValue().set(0, TerminalScalarValueUnit.Cell),
+    height: new TerminalScalarValue().set(0, TerminalScalarValueUnit.Cell),
+    contentHeight: new TerminalScalarValue().set(0, TerminalScalarValueUnit.Cell),
+    contentWidth: new TerminalScalarValue().set(0, TerminalScalarValueUnit.Cell),
+    contentOffsetX: new TerminalScalarValue().set(0, TerminalScalarValueUnit.Cell),
+    contentOffsetY: new TerminalScalarValue().set(0, TerminalScalarValueUnit.Cell),
+    // managed by calculateAbsoluteProperties (DO NOT EDIT)
+    _absolute: {
+      drawOriginX: 0,
+      drawOriginY: 0,
+      width: 0,
+      height: 0,
+      contentWidth: 0,
+      contentHeight: 0,
+      contentOffsetX: 0,
+      contentOffsetY: 0,
     },
-    content: {
-      offset: {
-        width: new TerminalScalarValue().set(0, TerminalScalarValueUnit.Pixel),
-        height: new TerminalScalarValue().set(0, TerminalScalarValueUnit.Pixel),
-      },
-      dimensions: {
-        width: new TerminalScalarValue().set(0, TerminalScalarValueUnit.Pixel),
-        height: new TerminalScalarValue().set(0, TerminalScalarValueUnit.Pixel),
-      },
-    },
-    absolute: {
-      content: {
-        dimensions: {
-          width: 0,
-          height: 0,
-        },
-        offset: {
-          width: 0,
-          height: 0,
-        },
-      },
-      dimensions: {
-        width: 0,
-        height: 0,
-      },
-    },
-  };
-
-  _contentAbsoluteDimensions: {
-    width: number;
-    height: number;
-  } = {
-    width: 1,
-    height: 1,
-  };
-  _contentAbsoluteOffset: {
-    width: number;
-    height: number;
-  } = {
-    width: 1,
-    height: 1,
-  };
-  _absoluteDimensions: {
-    width: number;
-    height: number;
-  } = {
-    width: 1,
-    height: 1,
   };
 
   eventListeners: TerminalEventListener<TerminalEventType>[];
@@ -111,29 +59,22 @@ export default abstract class TerminalView {
     this.eventListeners = [];
   }
 
-  _calculateSize(availableSpace: { width: number; height: number }) {
-    this._absoluteDimensions.width = 16;
-    this._absoluteDimensions.height = 8;
-    this._contentAbsoluteDimensions.width = 16;
-    this._contentAbsoluteDimensions.height = 8;
-    this._contentAbsoluteOffset.width = 0;
-    this._contentAbsoluteOffset.height = 0;
-
-    // Dimensions
+  calculateAbsoluteProperties() {
+    /* // Dimensions
     // px
-    if (this.definitions.dimensions.width.unit === "px") {
-      this._absoluteDimensions.width = this.definitions.dimensions.width.value;
+    if (this.viewProperties.dimensions.width.unit === "px") {
+      this._absoluteDimensions.width = this.viewProperties.dimensions.width.value;
     }
-    if (this.definitions.dimensions.height.unit === "px") {
-      this._absoluteDimensions.height = this.definitions.dimensions.height.value;
+    if (this.viewProperties.dimensions.height.unit === "px") {
+      this._absoluteDimensions.height = this.viewProperties.dimensions.height.value;
     }
 
     // %
-    if (this.definitions.dimensions.width.unit === "%") {
-      this._absoluteDimensions.width = Math.floor((this.definitions.dimensions.width.value / 100) * parentContentAbsoluteDimensions.width);
+    if (this.viewProperties.dimensions.width.unit === "%") {
+      this._absoluteDimensions.width = Math.floor((this.viewProperties.dimensions.width.value / 100) * parentContentAbsoluteDimensions.width);
     }
-    if (this.definitions.dimensions.height.unit === "%") {
-      this._absoluteDimensions.height = Math.floor((this.definitions.dimensions.height.value / 100) * parentContentAbsoluteDimensions.height);
+    if (this.viewProperties.dimensions.height.unit === "%") {
+      this._absoluteDimensions.height = Math.floor((this.viewProperties.dimensions.height.value / 100) * parentContentAbsoluteDimensions.height);
     }
 
     if (this._absoluteDimensions.width > parentContentAbsoluteDimensions.width) {
@@ -226,11 +167,17 @@ export default abstract class TerminalView {
         );
         break;
       }
+    } */
+
+    if (this.childViewFlowDirection === "x") {
+      let xWidthPercentageTotal = 0;
+      for (const childView of this.childViews) {
+      }
     }
   }
 
   addChild<TV extends TerminalView>(view: new (viewContext: TerminalViewContext) => TV, cb?: (view: TV) => void) {
-    const av = new view(this.viewContext);
+    const av = new view({ ...this.viewContext, parentView: this });
 
     this.childViews.push(av);
 
@@ -239,14 +186,9 @@ export default abstract class TerminalView {
     return this;
   }
 
-  async draw(screen: TerminalScreen, parentDrawOrigin: { x: number; y: number }) {
-    const previousViewOrigin = { x: parentDrawOrigin.x, y: parentDrawOrigin.y };
-
+  async draw(drawProperties: TerminalView["viewProperties"]["_absolute"]) {
     for (const childView of this.childViews) {
-      await childView.draw(screen, previousViewOrigin);
-      if (this.childViewFlowDirection === "x") previousViewOrigin.x += childView._absoluteDimensions.width;
-      if (this.childViewFlowDirection === "y") previousViewOrigin.y += childView._absoluteDimensions.height;
-      // screen.write(JSON.stringify({ parentDrawOrigin, type: childView.constructor.name }));
+      await childView.draw(drawProperties);
     }
   }
 }

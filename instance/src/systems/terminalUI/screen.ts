@@ -1,3 +1,4 @@
+import { timeStamp } from "node:console";
 import type TerminalEffect from "./effect.ts";
 import type Terminal from "./terminal.ts";
 import type TerminalView from "./view.ts";
@@ -23,7 +24,7 @@ export default class TerminalScreen {
     this._internal_isDrawingFrame = false;
     this.width = process.stdout.columns;
     this.height = process.stdout.rows;
-    this.childView = new TerminalContainerView({ screen: this });
+    this.childView = new TerminalContainerView({ screen: this, parentView: undefined });
   }
 
   cursorTo(x: number, y?: number) {
@@ -85,8 +86,17 @@ export default class TerminalScreen {
     if (this._internal_isDrawingFrame) return;
     this._internal_isDrawingFrame = true;
 
-    this.childView.calculateSize({ width: this.width, height: this.height }, { width: this.width, height: this.height });
-    await this.childView.draw(this, { x: 0, y: 0 });
+    this.childView.calculateAbsoluteProperties();
+    await this.childView.draw({
+      drawOriginX: 0,
+      drawOriginY: 0,
+      width: this.width,
+      height: this.height,
+      contentWidth: this.width,
+      contentHeight: this.height,
+      contentOffsetX: 0,
+      contentOffsetY: 0,
+    });
 
     let remBuf = this.contentBuffer;
 

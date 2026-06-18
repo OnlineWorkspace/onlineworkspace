@@ -1,4 +1,5 @@
 import TerminalEffect from "../effect.ts";
+import TerminalScalarValue, { TerminalScalarValueUnit } from "../scalarValue.ts";
 import type TerminalScreen from "../screen.ts";
 import TerminalView, { type TerminalViewContext } from "../view.ts";
 
@@ -9,12 +10,12 @@ export default class TerminalTextInputView extends TerminalView {
   constructor(viewContext: TerminalViewContext) {
     super(viewContext);
 
-    this.dimensions.width = { unit: "%", value: 100 };
-    this.dimensions.height = { unit: "px", value: 1 };
-    this.contentDimensions.width = { unit: "%", value: 100 };
-    this.contentDimensions.height = { unit: "%", value: 100 };
-    this.contentOffset.width = { unit: "px", value: 0 };
-    this.contentOffset.height = { unit: "px", value: 0 };
+    this.viewProperties.width = new TerminalScalarValue(100, TerminalScalarValueUnit.Percentage);
+    this.viewProperties.height = new TerminalScalarValue(1, TerminalScalarValueUnit.Cell);
+    this.viewProperties.contentWidth = new TerminalScalarValue(100, TerminalScalarValueUnit.Percentage);
+    this.viewProperties.contentHeight = new TerminalScalarValue(100, TerminalScalarValueUnit.Percentage);
+    this.viewProperties.contentOffsetX = new TerminalScalarValue(0, TerminalScalarValueUnit.Cell);
+    this.viewProperties.contentOffsetY = new TerminalScalarValue(0, TerminalScalarValueUnit.Cell);
 
     this.value = "";
     this.placeholder = undefined;
@@ -26,12 +27,14 @@ export default class TerminalTextInputView extends TerminalView {
     return this;
   }
 
-  override async draw(screen: TerminalScreen, drawOrigin: { x: number; y: number }): Promise<void> {
-    screen.cursorTo(drawOrigin.x, drawOrigin.y);
-    screen.write(`${" ".repeat(this.absoluteDimensions.width)}`, new TerminalEffect().setUnderline());
-    screen.cursorTo(drawOrigin.x, drawOrigin.y);
+  override async draw(drawProperties: TerminalView["viewProperties"]["_absolute"]): Promise<void> {
+    const screen = this.viewContext.screen;
+
+    screen.cursorTo(drawProperties.drawOriginX, drawProperties.drawOriginY);
+    screen.write(`${" ".repeat(drawProperties.width)}`, new TerminalEffect().setUnderline());
+    screen.cursorTo(drawProperties.drawOriginX, drawProperties.drawOriginY);
     if (this.value === "" && this.placeholder !== undefined) screen.write(`${this.placeholder}`, new TerminalEffect().setUnderline());
 
-    await super.draw(screen, { x: drawOrigin.x + this.contentAbsoluteOffset.width, y: drawOrigin.y + this.contentAbsoluteOffset.height });
+    await super.draw(drawProperties);
   }
 }

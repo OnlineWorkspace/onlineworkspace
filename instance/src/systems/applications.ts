@@ -5,6 +5,7 @@ import System from "../system.ts";
 import type { WorkspacesApplication } from "./applications/application.ts";
 import type { WorkspacesApplicationServiceStatus } from "./applications/serviceStatus.ts";
 import { WorkspacesNotificationPriority } from "./notifications.ts";
+import { Buffer } from "node:buffer";
 
 const APPLICATIONS_CONFIG_FILE_PATH = (subsystem: System) => path.join(subsystem.instance.sys.filesystem.SYSTEM_PATH, "applications.json");
 const APPLICATIONS_TSX_FILE_PATH = (subsystem: System) => path.join(subsystem.instance.sys.filesystem.SYSTEM_PATH, "vite", "Applications.tsx");
@@ -302,7 +303,7 @@ export default class ApplicationsSystem extends System {
       try {
         // @ts-ignore
         globalThis.instance = this.instance;
-        await import(path.join(app.path, app.manifest.modules.internal.path));
+        await import(`file://${path.join(app.path, app.manifest.modules.internal.path)}`);
       } catch (err) {
         console.error("problem with application's bun module ->", err);
       }

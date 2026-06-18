@@ -1,6 +1,6 @@
 import { promises as fs } from "node:fs";
 import path from "node:path";
-import * as readline from "node:readline";
+import type * as readline from "node:readline";
 import type { Instance } from "../index.ts";
 import System from "../system.ts";
 import type Command from "./consoleCommands/command.ts";
@@ -28,7 +28,7 @@ export default class ConsoleCommandsSystem extends System {
 
     const commands = await fs.readdir(path.join(this.instance.sys.filesystem.SRC_ROOT, "/systems/consoleCommands/commands/"));
     for (const cmd of commands) {
-      const importedCommand = await import(path.join(this.instance.sys.filesystem.SRC_ROOT, "/systems/consoleCommands/commands/", cmd));
+      const importedCommand = await import(`file://${path.join(this.instance.sys.filesystem.SRC_ROOT, "/systems/consoleCommands/commands/", cmd)}`);
       this.commands.push(new importedCommand.default(cmd, this.instance));
       this.log.info(`Registered command ${cmd}`);
     }

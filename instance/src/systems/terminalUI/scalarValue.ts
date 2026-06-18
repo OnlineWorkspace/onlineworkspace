@@ -11,15 +11,21 @@ enum TerminalScalarValueOperation {
 }
 
 export enum TerminalScalarValueUnit {
-  Pixel,
+  Cell,
   Percentage,
 }
 
 export default class TerminalScalarValue {
   operationChain: [TerminalScalarValueOperation, number?, TerminalScalarValueUnit?][];
 
-  constructor() {
+  constructor();
+  constructor(value: number, unit: TerminalScalarValueUnit);
+  constructor(value?: number, unit?: TerminalScalarValueUnit) {
     this.operationChain = [];
+
+    if (value !== undefined && unit !== undefined) {
+      this.set(value, unit);
+    }
   }
 
   set(value: number, unit: TerminalScalarValueUnit) {
@@ -59,13 +65,21 @@ export default class TerminalScalarValue {
 
   _internal_calculateFromView(view: TerminalView, valueType: "width" | "height"): number {
     let maxSize = 0;
+
+    if (valueType === "height") {
+      maxSize = view.viewProperties._absolute.contentHeight;
+    }
+    if (valueType === "width") {
+      maxSize = view.viewProperties._absolute.contentWidth;
+    }
+
     let val = 0;
 
     for (const operation of this.operationChain) {
       switch (operation[0]) {
         case TerminalScalarValueOperation.Set: {
           switch (operation[2]) {
-            case TerminalScalarValueUnit.Pixel: {
+            case TerminalScalarValueUnit.Cell: {
               val = operation[1]!;
               break;
             }
@@ -78,7 +92,7 @@ export default class TerminalScalarValue {
         }
         case TerminalScalarValueOperation.Add: {
           switch (operation[2]) {
-            case TerminalScalarValueUnit.Pixel: {
+            case TerminalScalarValueUnit.Cell: {
               val += operation[1]!;
               break;
             }
@@ -91,7 +105,7 @@ export default class TerminalScalarValue {
         }
         case TerminalScalarValueOperation.Subtract: {
           switch (operation[2]) {
-            case TerminalScalarValueUnit.Pixel: {
+            case TerminalScalarValueUnit.Cell: {
               val -= operation[1]!;
               break;
             }
