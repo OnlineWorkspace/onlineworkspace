@@ -15,7 +15,7 @@ import NotificationsSystem from "./systems/notifications.ts";
 import ReverseProxySystem from "./systems/reverseProxy.ts";
 import { StringListApplicationSetting } from "./systems/settings/applicationSetting/stringListSetting.ts";
 import SettingsSystem from "./systems/settings.ts";
-import TerminalUISystem from "./systems/terminalUI.ts";
+import TerminalUISystem from "./systems/terminal.ts";
 import TRPCSystem from "./systems/trpc.ts";
 import { createTRPCContext as createWorkspacesTRPCContext, workspacesRouter } from "./systems/trpcRouter.ts";
 import UsersSystem from "./systems/users.ts";
@@ -33,6 +33,8 @@ class Instance {
   log: Log;
   webServer!: Deno.HttpServer<Deno.NetAddr>;
   status: InstanceStatus;
+
+  versionString: string = "Pre-Alpha 0.1.0";
 
   constructor() {
     this.log = new Log(this);
@@ -55,7 +57,7 @@ class Instance {
     this.sys.webFrontend = new WebFrontendSystem(this);
     this.sys.email = new EmailSystem(this);
     this.sys.reverseProxy = new ReverseProxySystem(this);
-    this.sys.terminalUI = new TerminalUISystem(this);
+    this.sys.terminal = new TerminalUISystem(this);
 
     this.status = InstanceStatus.Offline;
   }
@@ -134,13 +136,7 @@ class Instance {
     this.sys.event.invoke(WorkspacesEvent.BeforeShutdown);
     this.status = InstanceStatus.Offline;
 
-    if (process.stdout.cursorTo) {
-      process.stdout.cursorTo(0, 0);
-      process.stdout.clearScreenDown();
-      process.stdout.cursorTo(0, 0);
-    }
-
-    process.stdout.write("Shutdown complete!\n");
+    this.log.system.info("Shutdown complete!\n");
     process.exit(0);
   }
 }

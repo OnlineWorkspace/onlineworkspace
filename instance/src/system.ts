@@ -12,7 +12,7 @@ import type ImageSubsystem from "./systems/image.ts";
 import type NotificationsSubsystem from "./systems/notifications.ts";
 import type ReverseProxySystem from "./systems/reverseProxy.ts";
 import type SettingsSubsystem from "./systems/settings.ts";
-import type TerminalUISystem from "./systems/terminalUI.ts";
+import type TerminalSystem from "./systems/terminal.ts";
 import type TRPCSubsystem from "./systems/trpc.ts";
 import type UsersSubsystem from "./systems/users.ts";
 import type WebFrontendSubsystem from "./systems/webFrontend.ts";
@@ -33,7 +33,7 @@ export type Sys = {
   email: EmailSystem;
   event: EventSystem;
   reverseProxy: ReverseProxySystem;
-  terminalUI: TerminalUISystem;
+  terminal: TerminalSystem;
 } & { [key: string]: System };
 
 export default abstract class System {
