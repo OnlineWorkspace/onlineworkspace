@@ -1,7 +1,6 @@
+import { createCliRenderer, Text } from "@opentui/core";
 import type { Instance } from "../index.ts";
 import System from "../system.ts";
-import { createCliRenderer, Text } from "@opentui/core";
-import ffi from "node:ffi";
 
 export default class TerminalUISystem extends System {
   constructor(instance: Instance) {

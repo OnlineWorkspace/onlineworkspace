@@ -27,5 +27,6 @@
   },
   "lint": {
     "exclude": ["**"]
-  }
+  },
+  "links": [".patches/@opentui/core"]
 }

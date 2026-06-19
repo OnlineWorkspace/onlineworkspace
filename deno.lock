@@ -1027,7 +1027,6 @@
       "cpu": ["x64"]
     },
     "@opentui/core@0.4.1_web-tree-sitter@0.25.10_typescript@6.0.3": {
-      "integrity": "sha512-ejlunoFCGLcghYGdfamI/DlWHsgCTLbuoL2JeOmFuLsN+DM5phje3CQbGR4tpl24cadCgHJQFomjoQ9Htvin+Q==",
       "dependencies": [
         "bun-ffi-structs",
         "diff",
@@ -5139,6 +5138,30 @@
             "npm:vite@^8.0.1"
           ]
         }
+      }
+    },
+    "links": {
+      "npm:@opentui/core@0.4.1": {
+        "dependencies": [
+          "npm:bun-ffi-structs@0.2.3",
+          "npm:diff@9.0.0",
+          "npm:marked@17.0.1",
+          "npm:string-width@7.2.0",
+          "npm:strip-ansi@7.1.2"
+        ],
+        "optionalDependencies": [
+          "npm:@opentui/core-darwin-arm64@0.4.1",
+          "npm:@opentui/core-darwin-x64@0.4.1",
+          "npm:@opentui/core-linux-arm64-musl@0.4.1",
+          "npm:@opentui/core-linux-arm64@0.4.1",
+          "npm:@opentui/core-linux-x64-musl@0.4.1",
+          "npm:@opentui/core-linux-x64@0.4.1",
+          "npm:@opentui/core-win32-arm64@0.4.1",
+          "npm:@opentui/core-win32-x64@0.4.1"
+        ],
+        "peerDependencies": [
+          "npm:web-tree-sitter@0.25.10"
+        ]
       }
     }
   }
