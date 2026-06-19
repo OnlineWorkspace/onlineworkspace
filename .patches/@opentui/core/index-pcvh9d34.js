@@ -156,18 +156,15 @@ import { fileURLToPath } from "node:url";
 export function createDenoBackend() {
   const DenoGlobal = globalThis.Deno;
 
-  // Helper helper to safely unwrap any incoming pointer type to a bigint address
   function unwrapToBigInt(arg) {
     if (arg == null) return 0n;
     if (typeof arg === "bigint") return arg;
     if (typeof arg === "number") return toSafeBigIntPointer(arg);
 
-    // Handle Deno PointerObject
     if (typeof arg === "object" && "pointer" in arg) {
       return BigInt(DenoGlobal.UnsafePointer.value(arg));
     }
 
-    // Fallback if it's already an OpenTUI branded pointer or random object wrapper
     try {
       return BigInt(DenoGlobal.UnsafePointer.value(DenoGlobal.UnsafePointer.of(arg)));
     } catch {
@@ -203,13 +200,11 @@ export function createDenoBackend() {
               const normalizedArgs = args.map((arg, idx) => {
                 const type = definition.args?.[idx];
 
-                // 1. Handle Pointers
                 if (type && isPointerLikeType(type)) {
                   if (arg == null) return null;
                   return DenoGlobal.UnsafePointer.create(unwrapToBigInt(arg));
                 }
 
-                // 2. Handle Booleans (Convert 0/1 or truthy/falsy values safely for Deno)
                 if (type === FFIType.bool) {
                   return Boolean(arg);
                 }
@@ -220,8 +215,6 @@ export function createDenoBackend() {
               const result = symbolFn(...normalizedArgs);
 
               if (definition.returns && isPointerLikeType(definition.returns)) {
-                // If the result is null, return 0n.
-                // If it's a Deno.PointerObject, extract its numeric address value as a BigInt.
                 return result === null ? 0n : BigInt(DenoGlobal.UnsafePointer.value(result));
               }
               return result;
@@ -254,7 +247,7 @@ export function createDenoBackend() {
           });
 
           const raw = {
-            ptr: denoCallback, // Deno's UnsafeCallback can act as a pointer object directly
+            ptr: denoCallback,
             threadsafe: definition.threadsafe ?? false,
             close() {
               denoCallback.close();
@@ -10884,13 +10877,16 @@ class TextBuffer {
 }
 
 // ../../node_modules/.bun/bun-ffi-structs@0.2.3+1fb4c65d43e298b9/node_modules/bun-ffi-structs/dist/index.js
-var FFI_LOAD_ERROR = "bun-ffi-structs requires Bun or Node.js with node:ffi enabled (--experimental-ffi --allow-ffi).";
+var FFI_LOAD_ERROR =
+  "bun-ffi-structs requires Bun, Node.js with node:ffi enabled (--experimental-ffi --allow-ffi), or Deno with FFI permissions (--allow-ffi).";
 var backend2 = await loadBackend2();
+
 function unavailable2(cause) {
   throw new Error(FFI_LOAD_ERROR, {
     cause: cause instanceof Error ? cause : undefined,
   });
 }
+
 function createUnsupportedBackend2(cause) {
   return {
     ptr() {
@@ -10901,7 +10897,11 @@ function createUnsupportedBackend2(cause) {
     },
   };
 }
+
 async function loadBackend2() {
+  if (typeof Deno !== "undefined") {
+    return createDenoBackend2(Deno);
+  }
   if (typeof process !== "undefined" && "bun" in process.versions) {
     return createBunBackend2(await importModule("bun:ffi"));
   }
@@ -10911,9 +10911,11 @@ async function loadBackend2() {
     return createUnsupportedBackend2(error);
   }
 }
+
 function importModule(specifier) {
   return import(specifier).then((module) => module.default ?? module);
 }
+
 function createBunBackend2(bun2) {
   return {
     ptr: bun2.ptr,
@@ -10922,6 +10924,7 @@ function createBunBackend2(bun2) {
     },
   };
 }
+
 function createNodeBackend2(nodeFfi) {
   return {
     ptr(value) {
@@ -10938,21 +10941,45 @@ function createNodeBackend2(nodeFfi) {
     },
   };
 }
+
+function createDenoBackend2(deno) {
+  return {
+    ptr(value) {
+      if (ArrayBuffer.isView(value) || value instanceof ArrayBuffer) {
+        const p = deno.UnsafePointer.of(value);
+        return p === null ? 0n : BigInt(deno.UnsafePointer.value(p));
+      }
+      throw new TypeError("Deno FFI ptr() only supports ArrayBuffer and ArrayBufferView values.");
+    },
+    toArrayBuffer(pointer, offset, length) {
+      const basePtr = deno.UnsafePointer.create(toBigIntPointer2(pointer));
+      return deno.UnsafePointerView.getArrayBuffer(basePtr, length, offset ?? 0);
+    },
+  };
+}
+
 function toBigIntPointer2(pointer) {
   return typeof pointer === "bigint" ? pointer : BigInt(pointer);
 }
+
 function toBunPointer2(pointer) {
   return typeof pointer === "bigint" ? Number(pointer) : pointer;
 }
+
 var ptr2 = backend2.ptr;
 var toArrayBuffer2 = backend2.toArrayBuffer;
+
 function fatalError(...args) {
   const message = args.join(" ");
   console.error("FATAL ERROR:", message);
   throw new Error(message);
 }
-var pointerSize = process.arch === "x64" || process.arch === "arm64" ? 8 : 4;
+
+var currentArch = typeof process !== "undefined" ? process.arch : typeof Deno !== "undefined" ? Deno.build.arch : "x64";
+var pointerSize = currentArch === "x64" || currentArch === "arm64" ? 8 : 4;
 var isBun2 = typeof process !== "undefined" && "bun" in process.versions;
+var isDeno2 = typeof Deno !== "undefined";
+
 var typeSizes = {
   u8: 1,
   bool_u8: 1,
@@ -10968,9 +10995,11 @@ var typeSizes = {
   i64: 8,
 };
 var primitiveKeys = Object.keys(typeSizes);
+
 function isPrimitiveType(type) {
   return typeof type === "string" && primitiveKeys.includes(type);
 }
+
 var typeAlignments = { ...typeSizes };
 var typeGetters = {
   u8: (view, offset) => view.getUint8(offset),
@@ -10986,15 +11015,19 @@ var typeGetters = {
   i64: (view, offset) => view.getBigInt64(offset, true),
   pointer: (view, offset) => (pointerSize === 8 ? view.getBigUint64(offset, true) : BigInt(view.getUint32(offset, true))),
 };
+
 function isObjectPointerDef(type) {
   return typeof type === "object" && type !== null && type.__type === "objectPointer";
 }
+
 function alignOffset(offset, align) {
   return (offset + (align - 1)) & ~(align - 1);
 }
+
 function enumTypeError(value) {
   throw new TypeError(`Invalid enum value: ${value}`);
 }
+
 function defineEnum(mapping, base = "u32") {
   const reverse2 = Object.fromEntries(Object.entries(mapping).map(([k, v]) => [v, k]));
   return {
@@ -11009,6 +11042,7 @@ function defineEnum(mapping, base = "u32") {
     enum: mapping,
   };
 }
+
 function isEnum(type) {
   return typeof type === "object" && type.__type === "enum";
 }
