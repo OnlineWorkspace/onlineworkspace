@@ -7,6 +7,7 @@ export enum WorkspacesFeatureFlags {
   SlashCommands = "slash_commands",
   ShootYourselfInTheFoot = "shoot_yourself_in_the_foot",
   AllowUserSignups = "allow_user_signups",
+  TerminalGui = "terminal_gui",
 }
 
 export const FEATURE_FLAG_DESCRIPTIONS = {

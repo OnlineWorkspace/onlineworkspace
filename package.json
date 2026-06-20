@@ -13,5 +13,13 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^2.4.14"
-  }
+  },
+  "workspaces": [
+    "instance/",
+    "instance/src/web/",
+    "applications/*/web/",
+    "applications/*/backend/",
+    "applications/*/electron/",
+    "uikit-solid"
+  ]
 }

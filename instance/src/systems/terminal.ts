@@ -1,24 +1,24 @@
-import { BoxRenderable, CliRenderer, createCliRenderer, InputRenderable, RGBA, ScrollBoxRenderable, TextRenderable } from "@opentui/core";
+import { BoxRenderable, CliRenderer, ConsolePosition, createCliRenderer, InputRenderable, RGBA, ScrollBoxRenderable, TextRenderable } from "@opentui/core";
+import chalk from "chalk";
 import type { Instance } from "../index.ts";
 import { LogMessageStyle, LogType } from "../log.ts";
 import System from "../system.ts";
-import yargs from "yargs";
+import { WorkspacesFeatureFlags } from "./configuration.ts";
 
 const COMPACT_LOG_TYPE = false;
 
-const BACKGROUND_COLOR = RGBA.fromInts(15, 15, 20, 255);
-const BORDER_COLOR = RGBA.fromInts(60, 60, 75, 255);
-const TEXT_COLOR = RGBA.fromInts(220, 220, 225, 255);
-const EMPHASIZED_TEXT_COLOR = RGBA.fromInts(242, 106, 141, 255);
-const MESSAGE_TYPE_COLORS: { [type in LogType]: RGBA } = {
-  [LogType.INFO]: RGBA.fromInts(58, 134, 255, 255),
-  [LogType.WARNING]: RGBA.fromInts(247, 184, 1, 255),
-  [LogType.ERROR]: RGBA.fromInts(240, 80, 80, 255),
-  [LogType.SUCCESS]: RGBA.fromInts(6, 214, 160, 255),
-  [LogType.DEBUG]: RGBA.fromInts(131, 56, 236, 255),
-  [LogType.RAW]: RGBA.fromInts(240, 80, 80, 255),
+const BACKGROUND_COLOR: [number, number, number] = [15, 15, 20];
+const BORDER_COLOR: [number, number, number] = [60, 60, 75];
+const TEXT_COLOR: [number, number, number] = [220, 220, 225];
+const EMPHASIZED_TEXT_COLOR: [number, number, number] = [242, 106, 141];
+const MESSAGE_TYPE_COLORS: { [type in LogType]: [number, number, number] } = {
+  [LogType.INFO]: [58, 134, 255],
+  [LogType.WARNING]: [247, 184, 1],
+  [LogType.ERROR]: [240, 80, 80],
+  [LogType.SUCCESS]: [6, 214, 160],
+  [LogType.DEBUG]: [131, 56, 236],
 };
-const MESSAGE_LEVEL_COLOR = RGBA.fromInts(250, 163, 7, 255);
+const MESSAGE_LEVEL_COLOR: [number, number, number] = [250, 163, 7];
 
 export default class TerminalUISystem extends System {
   private renderer!: CliRenderer;
@@ -32,25 +32,129 @@ export default class TerminalUISystem extends System {
 
     await super.startup();
 
+    if (!this.instance.sys.configuration.hasFeature(WorkspacesFeatureFlags.TerminalGui)) {
+      function addLogMessage(log: { type: LogType; level: string; message: string }) {
+        let consoleLogOutput: string = "";
+        const currentTypeColor = MESSAGE_TYPE_COLORS[log.type];
+
+        if (COMPACT_LOG_TYPE) {
+          consoleLogOutput += chalk.rgb(...currentTypeColor)("▌");
+        } else {
+          let typeString = "";
+
+          switch (log.type) {
+            case LogType.INFO:
+              typeString = `${"INF"}`;
+              break;
+            case LogType.WARNING:
+              typeString = `${"WAR"}`;
+              break;
+            case LogType.ERROR:
+              typeString = `${"ERR"}`;
+              break;
+            case LogType.SUCCESS:
+              typeString = `${"SUC"}`;
+              break;
+            case LogType.DEBUG:
+              typeString = `${"DBG"}`;
+              break;
+          }
+
+          consoleLogOutput += chalk.rgb(...currentTypeColor)(`${typeString} `);
+        }
+
+        consoleLogOutput += chalk.rgb(...MESSAGE_LEVEL_COLOR)(`${log.level.padEnd(16)} `);
+
+        const styledSegments = log.message.split("%");
+        let currentMessageStyle: LogMessageStyle = LogMessageStyle.NORMAL;
+        let customColorDef: [number, number, number] | undefined;
+        for (let segmentIdx = 0; segmentIdx < styledSegments.length; segmentIdx++) {
+          const segmentContent = styledSegments[segmentIdx];
+
+          if (segmentContent === "") continue;
+
+          switch (`%${segmentContent}%`) {
+            case LogMessageStyle.EMPHASIZED: {
+              currentMessageStyle = LogMessageStyle.EMPHASIZED;
+              continue;
+            }
+            case LogMessageStyle.NORMAL: {
+              currentMessageStyle = LogMessageStyle.NORMAL;
+              continue;
+            }
+            case LogMessageStyle.CUSTOM: {
+              currentMessageStyle = LogMessageStyle.CUSTOM;
+              continue;
+            }
+            case LogMessageStyle.END_CUSTOM: {
+              currentMessageStyle = LogMessageStyle.END_CUSTOM;
+              const colorValSegments = styledSegments[segmentIdx - 1].split(",").map((val) => Number(val));
+
+              if (colorValSegments.length === 4) {
+                customColorDef = [colorValSegments[0], colorValSegments[1], colorValSegments[2]];
+              }
+
+              continue;
+            }
+            case LogMessageStyle.RESET:
+              currentMessageStyle = LogMessageStyle.RESET;
+              continue;
+          }
+
+          switch (currentMessageStyle) {
+            case LogMessageStyle.RESET:
+            case LogMessageStyle.NORMAL:
+              consoleLogOutput += chalk.rgb(...TEXT_COLOR)(segmentContent);
+              break;
+            case LogMessageStyle.EMPHASIZED:
+              consoleLogOutput += chalk.rgb(...EMPHASIZED_TEXT_COLOR)(segmentContent);
+              break;
+            case LogMessageStyle.END_CUSTOM:
+              if (!customColorDef) {
+                consoleLogOutput += chalk.bold.red(`UNABLE TO PARSE CUSTOM COLOR '${customColorDef}'`);
+              } else {
+                consoleLogOutput += chalk.rgb(...customColorDef)(segmentContent);
+              }
+              break;
+          }
+
+          global.backup.console.log(consoleLogOutput.split(""));
+        }
+      }
+
+      for (const message of this.instance.log.allLogHistory) {
+        addLogMessage(message);
+      }
+
+      this.instance.log._internal_onNewMessageListeners.push((message) => {
+        addLogMessage(message);
+      });
+
+      return true;
+    }
+
     const self = this;
+    function toRGBA(colorArray: [number, number, number]): RGBA {
+      return RGBA.fromInts(...colorArray, 255);
+    }
 
     this.renderer = await createCliRenderer({
       exitOnCtrlC: true,
       consoleOptions: {
-        colorDefault: TEXT_COLOR,
-        backgroundColor: BACKGROUND_COLOR,
-        colorInfo: MESSAGE_TYPE_COLORS[LogType.INFO],
-        colorWarn: MESSAGE_TYPE_COLORS[LogType.WARNING],
-        colorError: MESSAGE_TYPE_COLORS[LogType.ERROR],
-        colorDebug: MESSAGE_TYPE_COLORS[LogType.DEBUG],
+        colorDefault: toRGBA(TEXT_COLOR),
+        colorInfo: toRGBA(MESSAGE_TYPE_COLORS[LogType.INFO]),
+        colorWarn: toRGBA(MESSAGE_TYPE_COLORS[LogType.WARNING]),
+        colorError: toRGBA(MESSAGE_TYPE_COLORS[LogType.ERROR]),
+        colorDebug: toRGBA(MESSAGE_TYPE_COLORS[LogType.DEBUG]),
+        position: ConsolePosition.TOP,
       },
-      consoleMode: "console-overlay",
+      consoleMode: "disabled",
       onDestroy: async () => {
         await this.instance.shutdown();
       },
     });
 
-    self.renderer.setBackgroundColor(BACKGROUND_COLOR);
+    self.renderer.setBackgroundColor(toRGBA(BACKGROUND_COLOR));
 
     const logContainer = new ScrollBoxRenderable(self.renderer, {
       height: "100%",
@@ -60,8 +164,8 @@ export default class TerminalUISystem extends System {
       contentOptions: {
         flexDirection: "column",
       },
-      focusedBorderColor: BORDER_COLOR,
-      borderColor: BORDER_COLOR,
+      focusedBorderColor: toRGBA(BORDER_COLOR),
+      borderColor: toRGBA(BORDER_COLOR),
       stickyScroll: true,
       stickyStart: "bottom",
     });
@@ -76,7 +180,7 @@ export default class TerminalUISystem extends System {
       const currentTypeColor = MESSAGE_TYPE_COLORS[log.type];
 
       if (COMPACT_LOG_TYPE) {
-        logEntry.add(new TextRenderable(self.renderer, { content: "▌", fg: currentTypeColor }));
+        logEntry.add(new TextRenderable(self.renderer, { content: "▌", fg: toRGBA(currentTypeColor) }));
       } else {
         let typeString = "";
 
@@ -96,15 +200,12 @@ export default class TerminalUISystem extends System {
           case LogType.DEBUG:
             typeString = `${"DBG"}`;
             break;
-          case LogType.RAW:
-            typeString = `     `;
-            break;
         }
 
-        logEntry.add(new TextRenderable(self.renderer, { content: `${typeString}`, fg: currentTypeColor, paddingRight: 1, flexShrink: 0 }));
+        logEntry.add(new TextRenderable(self.renderer, { content: `${typeString}`, fg: toRGBA(currentTypeColor), paddingRight: 1, flexShrink: 0 }));
       }
 
-      logEntry.add(new TextRenderable(self.renderer, { content: log.level.padEnd(16), fg: MESSAGE_LEVEL_COLOR, paddingRight: 1, flexShrink: 0 }));
+      logEntry.add(new TextRenderable(self.renderer, { content: log.level.padEnd(16), fg: toRGBA(MESSAGE_LEVEL_COLOR), paddingRight: 1, flexShrink: 0 }));
 
       const logMessageContainer = new BoxRenderable(self.renderer, { flexDirection: "row", flexWrap: "wrap" });
       logEntry.add(logMessageContainer);
@@ -148,13 +249,15 @@ export default class TerminalUISystem extends System {
         switch (currentMessageStyle) {
           case LogMessageStyle.RESET:
           case LogMessageStyle.NORMAL:
-            logMessageContainer.add(new TextRenderable(self.renderer, { content: segmentContent, fg: TEXT_COLOR, bg: BACKGROUND_COLOR }));
+            logMessageContainer.add(new TextRenderable(self.renderer, { content: segmentContent, fg: toRGBA(TEXT_COLOR), bg: toRGBA(BACKGROUND_COLOR) }));
             break;
           case LogMessageStyle.EMPHASIZED:
-            logMessageContainer.add(new TextRenderable(self.renderer, { content: segmentContent, fg: EMPHASIZED_TEXT_COLOR, bg: BACKGROUND_COLOR }));
+            logMessageContainer.add(
+              new TextRenderable(self.renderer, { content: segmentContent, fg: toRGBA(EMPHASIZED_TEXT_COLOR), bg: toRGBA(BACKGROUND_COLOR) }),
+            );
             break;
           case LogMessageStyle.END_CUSTOM:
-            logMessageContainer.add(new TextRenderable(self.renderer, { content: segmentContent, fg: customColorDef, bg: BACKGROUND_COLOR }));
+            logMessageContainer.add(new TextRenderable(self.renderer, { content: segmentContent, fg: customColorDef, bg: toRGBA(BACKGROUND_COLOR) }));
             break;
         }
       }
@@ -171,11 +274,8 @@ export default class TerminalUISystem extends System {
     self.renderer.root.add(logContainer);
 
     const commandInputContainer = new BoxRenderable(self.renderer, {
-      border: true,
-      borderStyle: "rounded",
-      height: 3,
+      height: 1,
       width: "100%",
-      borderColor: BORDER_COLOR,
       flexDirection: "row",
       gap: 1,
     });
@@ -187,6 +287,7 @@ export default class TerminalUISystem extends System {
     const promptMessage = new TextRenderable(self.renderer, {
       content: PROMPT_STRING,
       fg: RGBA.fromInts(242, 106, 141, 255),
+      marginLeft: 1,
       width: PROMPT_STRING.length,
     });
 
@@ -194,15 +295,15 @@ export default class TerminalUISystem extends System {
 
     const commandInput = new InputRenderable(self.renderer, {
       placeholder: "Click to start typing...",
-      width: "100%",
-      focusedBackgroundColor: BORDER_COLOR,
+      buffered: true,
+      flexGrow: 1,
 
       onKeyDown(e) {
         if (e.name === "return") {
           const trimmedContent = commandInput.plainText.trim();
           if (!trimmedContent) return;
           self.instance.sys.consoleCommands.executeCommandFromString(trimmedContent);
-          commandInput.clear();
+          commandInput.value = "";
         }
         commandInput.requestRender();
       },
@@ -214,7 +315,7 @@ export default class TerminalUISystem extends System {
   }
 
   override stop(): this {
-    this.renderer.destroy();
+    this.renderer?.destroy?.();
 
     return this;
   }

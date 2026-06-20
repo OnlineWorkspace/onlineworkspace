@@ -7,7 +7,6 @@ export enum LogType {
   ERROR,
   SUCCESS,
   DEBUG,
-  RAW,
 }
 
 export enum LogMessageStyle {
@@ -31,56 +30,20 @@ class Logger {
     return `${LogMessageStyle.EMPHASIZED}${message}${LogMessageStyle.RESET}`;
   }
 
-  rawLog(...message: (string | Uint8Array)[]) {
-    if (message.length === 0) {
-      throw new Error("log message is empty");
-    }
-
-    return this.logMessage(LogType.RAW, ...message);
-  }
-
   info(...message: (string | Uint8Array)[]) {
-    if (this.level.length === 0) {
-      throw new Error("log level is empty");
-    }
-
-    if (message.length === 0) {
-      throw new Error("log message is empty");
-    }
-
     return this.logMessage(LogType.INFO, ...message);
   }
 
   success(...message: (string | Uint8Array)[]) {
-    if (this.level.length === 0) {
-      throw new Error("log level is empty");
-    }
-
-    if (message.length === 0) {
-      throw new Error("log message is empty");
-    }
-
     return this.logMessage(LogType.SUCCESS, ...message);
   }
 
   warning(...message: (string | Uint8Array)[]) {
-    if (this.level.length === 0) {
-      throw new Error("log level is empty");
-    }
-
-    if (message.length === 0) {
-      throw new Error("log message is empty");
-    }
-
     return this.logMessage(LogType.WARNING, ...message);
   }
 
   // biome-ignore lint/suspicious/noExplicitAny: can be of any type
   error(...message: any[]) {
-    if (message.length === 0) {
-      this.logMessage(LogType.ERROR, "log", new Error("log message is empty").stack);
-    }
-
     this.logMessage(LogType.ERROR, ...message);
 
     return this;
@@ -91,20 +54,19 @@ class Logger {
     //     return this;
     // }
 
-    if (this.level.length === 0) {
-      throw new Error("log level is empty");
-    }
-
-    if (message.length === 0) {
-      throw new Error("log message is empty");
-    }
-
     return this.logMessage(LogType.DEBUG, ...message);
   }
 
   // biome-ignore lint/suspicious/noExplicitAny: the message can be of any type
   private logMessage(type: LogType, ...message: any[]): this {
-    this.writeMessage(type, message.length === 1 ? (typeof message[0] === "string" ? message[0] : util.inspect(message)) : util.inspect(message));
+    this.writeMessage(
+      type,
+      message.length === 1
+        ? typeof message[0] === "string"
+          ? message[0]
+          : util.inspect(message, { colors: false, compact: false })
+        : util.inspect(message, { colors: false, compact: false }),
+    );
 
     return this;
   }
