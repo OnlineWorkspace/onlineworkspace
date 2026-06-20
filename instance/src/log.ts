@@ -1,6 +1,5 @@
-import util from "node:util";
-import chalk from "chalk";
 import type { Instance } from "./index.ts";
+import util from "node:util";
 
 export enum LogType {
   INFO,
@@ -9,7 +8,14 @@ export enum LogType {
   SUCCESS,
   DEBUG,
   RAW,
-  PROMPT,
+}
+
+export enum LogMessageStyle {
+  EMPHASIZED = "%em%",
+  NORMAL = "%no%",
+  RESET = "%re%",
+  CUSTOM = "%cu%",
+  END_CUSTOM = "%ec%",
 }
 
 class Logger {
@@ -22,7 +28,7 @@ class Logger {
   }
 
   emphasis(...message: (string | Uint8Array)[]) {
-    return chalk.bold.magenta(message);
+    return `${LogMessageStyle.EMPHASIZED}${message}${LogMessageStyle.RESET}`;
   }
 
   rawLog(...message: (string | Uint8Array)[]) {
@@ -69,7 +75,7 @@ class Logger {
     return this.logMessage(LogType.WARNING, ...message);
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // biome-ignore lint/suspicious/noExplicitAny: can be of any type
   error(...message: any[]) {
     if (message.length === 0) {
       this.logMessage(LogType.ERROR, "log", new Error("log message is empty").stack);
@@ -98,17 +104,23 @@ class Logger {
 
   // biome-ignore lint/suspicious/noExplicitAny: the message can be of any type
   private logMessage(type: LogType, ...message: any[]): this {
-    this.writeMessage(type, ...message);
+    this.writeMessage(type, message.length === 1 ? (typeof message[0] === "string" ? message[0] : util.inspect(message)) : util.inspect(message));
 
     return this;
   }
 
-  private writeMessage(logType: LogType, ...message: any[]) {
-    this.log.allLogHistory.push({
+  private writeMessage(logType: LogType, message: string) {
+    const messageContent = {
       type: logType,
       level: this.level,
-      message: `${message}`,
-    });
+      message: message,
+    };
+
+    this.log.allLogHistory.push(messageContent);
+
+    for (const listener of this.log._internal_onNewMessageListeners) {
+      listener(messageContent);
+    }
 
     return this;
   }
@@ -125,14 +137,39 @@ export default class Log {
   system: Logger;
   instance: Instance;
   readonly META_LENGTH = 28;
+  _internal_onNewMessageListeners: ((message: { type: LogType; level: string; message: string }) => void)[];
 
   constructor(instance: Instance) {
     this.instance = instance;
     this.system = this.createLogger("system");
+    this._internal_onNewMessageListeners = [];
+
+    global.backup = {};
+    global.backup.console = {};
+    global.backup.console.log = global.console.log;
+    global.backup.console.info = global.console.info;
+    global.backup.console.warn = global.console.warn;
+    global.backup.console.error = global.console.error;
+    global.backup.console.debug = global.console.debug;
 
     // biome-ignore lint/suspicious/noExplicitAny: data could be of any type
     global.console.log = (...data: any[]): void => {
       this.system.info(...data);
+    };
+    // biome-ignore lint/suspicious/noExplicitAny: data could be of any type
+    global.console.info = (...data: any[]): void => {
+      this.system.info(...data);
+    };
+    // biome-ignore lint/suspicious/noExplicitAny: data could be of any type
+    global.console.warn = (...data: any[]): void => {
+      this.system.warning(...data);
+    };
+    // biome-ignore lint/suspicious/noExplicitAny: data could be of any type
+    global.console.error = (...data: any[]): void => {
+      this.system.error(...data);
+    }; // biome-ignore lint/suspicious/noExplicitAny: data could be of any type
+    global.console.debug = (...data: any[]): void => {
+      this.system.debug(...data);
     };
   }
 

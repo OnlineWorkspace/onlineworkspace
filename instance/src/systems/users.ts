@@ -429,7 +429,7 @@ export class WorkspacesUser {
       this.instance.sys.users.log.warning(`user (${this.userId})${username} has no password set! Without a password, this account cannot be accessed.`);
     }
 
-    this.instance.sys.users.log.success(`Verified user (${this.userId})${username}`);
+    this.instance.sys.users.log.success(`Verified user (${this.userId}) ${this.instance.sys.users.log.emphasis(`${username}`)}`);
 
     return true;
   }

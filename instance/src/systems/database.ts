@@ -28,11 +28,15 @@ export default class DatabaseSystem extends System {
   //   return con;
   // }
 
+  /**
+   * Create or get an already active postgresql database connection
+   * @returns postgres.Sql<{}>
+   */
   postgres() {
     if (this.databaseConnections.postgres) return this.databaseConnections.postgres;
 
     this.log.info(
-      `Connecting to database @ '${this.instance.sys.configuration.databases.postgres.host}' named '${this.instance.sys.configuration.databases.postgres.database}'`,
+      `Connecting to database @ '${this.log.emphasis(this.instance.sys.configuration.databases.postgres.host)}' named '${this.log.emphasis(this.instance.sys.configuration.databases.postgres.database)}'`,
     );
 
     const con = postgres({
@@ -52,7 +56,7 @@ export default class DatabaseSystem extends System {
     this.databaseConnections.postgres = con;
 
     this.log.info(
-      `Established connection to database @ '${this.instance.sys.configuration.databases.postgres.host}' named '${this.instance.sys.configuration.databases.postgres.database}'`,
+      `Established connection to database @ '${this.log.emphasis(this.instance.sys.configuration.databases.postgres.host)}' named '${this.log.emphasis(this.instance.sys.configuration.databases.postgres.database)}'`,
     );
 
     return con;

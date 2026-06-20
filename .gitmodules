@@ -1,3 +1,6 @@
 [submodule "uikit-solid"]
 	path = uikit-solid
 	url = git@knot.ewsgit.uk:ewsgit.uk/uikit-solid
+[submodule ".patches/opentui-core-deno-support-patch"]
+	path = .patches/opentui-core-deno-support-patch
+	url = git@github.com:ewsgit/opentui-core-deno-support-patch.git

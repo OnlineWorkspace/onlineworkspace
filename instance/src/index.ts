@@ -1,6 +1,5 @@
-import chalk from "chalk";
 // https://github.com/cah4a/trpc-bun-adapter/blob/main/src/createBunHttpHandler.ts TODO: patch this and merge into the instance package
-import Log from "./log.ts";
+import Log, { LogMessageStyle } from "./log.ts";
 import type { Sys } from "./system.ts";
 import ApplicationsSystem from "./systems/applications.ts";
 import AuthorizationSystem from "./systems/authorization.ts";
@@ -63,13 +62,10 @@ class Instance {
   }
 
   async startup() {
-    this.log.system.info(`=======================================================================`);
-    this.log.system.info(`   ${chalk.hex("FF002E")("/XXX/")}${chalk.hex("70FF00")("/XXX/")}${chalk.hex("0066FF")("/XXX/")}`);
-    this.log.system.info(
-      `  ${chalk.hex("FF002E")("/XXX/")}${chalk.hex("70FF00")("/XXX/")}${chalk.hex("0066FF")("/XXX/")}  Online Workspace © 2026 Ewsgit -> https://ewsgit.uk`,
-    );
-    this.log.system.info(` ${chalk.hex("FF002E")("/XXX/")}${chalk.hex("70FF00")("/XXX/")}${chalk.hex("0066FF")("/XXX/")}`);
-    this.log.system.info(`=======================================================================`);
+    const BRANDING_MESSAGE = `Online Workspace © 2026 Ewsgit <https://ewsgit.uk>`;
+    this.log.system.info(`${LogMessageStyle.CUSTOM}242,106,141,255${LogMessageStyle.END_CUSTOM}${"─".repeat(BRANDING_MESSAGE.length + 2)}`);
+    this.log.system.info(` ${BRANDING_MESSAGE}`);
+    this.log.system.info(`${LogMessageStyle.CUSTOM}242,106,141,255${LogMessageStyle.END_CUSTOM}${"─".repeat(BRANDING_MESSAGE.length + 2)}`);
     this.log.system.info(`Starting up...`);
 
     if (this.status !== InstanceStatus.Offline) {
@@ -129,8 +125,6 @@ class Instance {
 
   async shutdown() {
     this.status = InstanceStatus.Stopping;
-    this.sys.consoleCommands.currentCommandInterface.active = true;
-    this.sys.consoleCommands.currentCommandInterface.cb = () => 0;
     this.log.system.info("Shutting down...");
 
     this.sys.event.invoke(WorkspacesEvent.BeforeShutdown);
@@ -144,6 +138,7 @@ class Instance {
 export type { Instance };
 
 const INSTANCE = new Instance();
+global.INSTANCE = INSTANCE;
 export default INSTANCE;
 
 await INSTANCE.startup();

@@ -1,9 +1,28 @@
-import { CliRenderer, createCliRenderer, FrameBufferRenderable, type KeyEvent, OptimizedBuffer, RGBA } from "@opentui/core";
+import { BoxRenderable, CliRenderer, createCliRenderer, InputRenderable, RGBA, ScrollBoxRenderable, TextRenderable } from "@opentui/core";
 import type { Instance } from "../index.ts";
+import { LogMessageStyle, LogType } from "../log.ts";
 import System from "../system.ts";
-import { LogType } from "../log.ts";
+import yargs from "yargs";
+
+const COMPACT_LOG_TYPE = false;
+
+const BACKGROUND_COLOR = RGBA.fromInts(15, 15, 20, 255);
+const BORDER_COLOR = RGBA.fromInts(60, 60, 75, 255);
+const TEXT_COLOR = RGBA.fromInts(220, 220, 225, 255);
+const EMPHASIZED_TEXT_COLOR = RGBA.fromInts(242, 106, 141, 255);
+const MESSAGE_TYPE_COLORS: { [type in LogType]: RGBA } = {
+  [LogType.INFO]: RGBA.fromInts(58, 134, 255, 255),
+  [LogType.WARNING]: RGBA.fromInts(247, 184, 1, 255),
+  [LogType.ERROR]: RGBA.fromInts(240, 80, 80, 255),
+  [LogType.SUCCESS]: RGBA.fromInts(6, 214, 160, 255),
+  [LogType.DEBUG]: RGBA.fromInts(131, 56, 236, 255),
+  [LogType.RAW]: RGBA.fromInts(240, 80, 80, 255),
+};
+const MESSAGE_LEVEL_COLOR = RGBA.fromInts(250, 163, 7, 255);
 
 export default class TerminalUISystem extends System {
+  private renderer!: CliRenderer;
+
   constructor(instance: Instance) {
     super("terminal_ui", instance);
   }
@@ -14,211 +33,189 @@ export default class TerminalUISystem extends System {
     await super.startup();
 
     const self = this;
-    let framebuffer: OptimizedBuffer | null = null;
-    let keyListener: ((key: KeyEvent) => void) | null = null;
-    let resizeListener: ((width: number, height: number) => void) | null = null;
 
-    let currentInput = "";
+    this.renderer = await createCliRenderer({
+      exitOnCtrlC: true,
+      consoleOptions: {
+        colorDefault: TEXT_COLOR,
+        backgroundColor: BACKGROUND_COLOR,
+        colorInfo: MESSAGE_TYPE_COLORS[LogType.INFO],
+        colorWarn: MESSAGE_TYPE_COLORS[LogType.WARNING],
+        colorError: MESSAGE_TYPE_COLORS[LogType.ERROR],
+        colorDebug: MESSAGE_TYPE_COLORS[LogType.DEBUG],
+      },
+      consoleMode: "console-overlay",
+      onDestroy: async () => {
+        await this.instance.shutdown();
+      },
+    });
 
-    let cursorVisible = true;
-    let lastCursorToggle = Date.now();
+    self.renderer.setBackgroundColor(BACKGROUND_COLOR);
 
-    function todo(textContent: string) {
-      if (!textContent.trim()) return;
+    const logContainer = new ScrollBoxRenderable(self.renderer, {
+      height: "100%",
+      width: "100%",
+      border: true,
+      borderStyle: "rounded",
+      contentOptions: {
+        flexDirection: "column",
+      },
+      focusedBorderColor: BORDER_COLOR,
+      borderColor: BORDER_COLOR,
+      stickyScroll: true,
+      stickyStart: "bottom",
+    });
 
-      // do nothing right now
-
-      self.instance.log.system.info(textContent);
-    }
-
-    async function run(renderer: CliRenderer): Promise<void> {
-      renderer.start();
-
-      let WIDTH = renderer.terminalWidth;
-      let HEIGHT = renderer.terminalHeight;
-
-      const framebufferRenderable = new FrameBufferRenderable(renderer, {
-        id: "tui-container",
-        width: WIDTH,
-        height: HEIGHT,
-        zIndex: 0,
+    function addLogMessage(log: { type: LogType; level: string; message: string }) {
+      const logEntry = new BoxRenderable(self.renderer, {
+        flexDirection: "row",
+        flexWrap: "no-wrap",
+        flexShrink: 0,
       });
-      renderer.root.add(framebufferRenderable);
-      framebuffer = framebufferRenderable.frameBuffer;
+      logContainer.add(logEntry);
+      const currentTypeColor = MESSAGE_TYPE_COLORS[log.type];
 
-      function renderUI(): void {
-        if (!framebuffer) return;
+      if (COMPACT_LOG_TYPE) {
+        logEntry.add(new TextRenderable(self.renderer, { content: "▌", fg: currentTypeColor }));
+      } else {
+        let typeString = "";
 
-        const fb = framebuffer;
-        const w = fb.width;
-        const h = fb.height;
+        switch (log.type) {
+          case LogType.INFO:
+            typeString = `${"INF"}`;
+            break;
+          case LogType.WARNING:
+            typeString = `${"WAR"}`;
+            break;
+          case LogType.ERROR:
+            typeString = `${"ERR"}`;
+            break;
+          case LogType.SUCCESS:
+            typeString = `${"SUC"}`;
+            break;
+          case LogType.DEBUG:
+            typeString = `${"DBG"}`;
+            break;
+          case LogType.RAW:
+            typeString = `     `;
+            break;
+        }
 
-        const bg = RGBA.fromInts(15, 15, 20, 255);
-        const borderMuted = RGBA.fromInts(60, 60, 75, 255);
-        const borderActive = RGBA.fromInts(100, 150, 240, 255);
-        const textMain = RGBA.fromInts(220, 220, 225, 255);
+        logEntry.add(new TextRenderable(self.renderer, { content: `${typeString}`, fg: currentTypeColor, paddingRight: 1, flexShrink: 0 }));
+      }
 
-        const messageTypeColors: { [type in LogType]: RGBA } = {
-          [LogType.INFO]: RGBA.fromInts(50, 180, 255, 255),
-          [LogType.WARNING]: RGBA.fromInts(240, 190, 60, 255),
-          [LogType.ERROR]: RGBA.fromInts(240, 80, 80, 255),
-          [LogType.SUCCESS]: RGBA.fromInts(240, 80, 80, 255),
-          [LogType.DEBUG]: RGBA.fromInts(240, 80, 80, 255),
-          [LogType.RAW]: RGBA.fromInts(240, 80, 80, 255),
-          [LogType.PROMPT]: RGBA.fromInts(240, 80, 80, 255),
-        };
+      logEntry.add(new TextRenderable(self.renderer, { content: log.level.padEnd(16), fg: MESSAGE_LEVEL_COLOR, paddingRight: 1, flexShrink: 0 }));
 
-        const messageLevel = RGBA.fromInts(250, 163, 7, 255);
+      const logMessageContainer = new BoxRenderable(self.renderer, { flexDirection: "row", flexWrap: "wrap" });
+      logEntry.add(logMessageContainer);
 
-        fb.fillRect(0, 0, w, h, bg);
+      const styledSegments = log.message.split("%");
+      let currentMessageStyle: LogMessageStyle = LogMessageStyle.NORMAL;
+      let customColorDef: RGBA | undefined;
+      for (let segmentIdx = 0; segmentIdx < styledSegments.length; segmentIdx++) {
+        const segmentContent = styledSegments[segmentIdx];
 
-        const inputAreaHeight = 3;
-        const inputY = h - inputAreaHeight;
-        const logAreaHeight = inputY - 1;
+        if (segmentContent === "") continue;
 
-        const maxVisibleLogs = Math.max(1, logAreaHeight);
-        const startingLogIndex = Math.max(0, self.instance.log.allLogHistory.length - maxVisibleLogs);
-        const visibleLogs = self.instance.log.allLogHistory.slice(startingLogIndex);
-
-        const COMPACT_LOG_TYPE = false;
-
-        for (let i = 0; i < visibleLogs.length; i++) {
-          const log = visibleLogs[i];
-          const currentTypeColor = messageTypeColors[log.type];
-
-          if (COMPACT_LOG_TYPE) fb.setCell(1, i, "▌", currentTypeColor, bg);
-
-          let typeString = "";
-
-          switch (log.type) {
-            case LogType.INFO:
-              typeString = `${"INF"}`;
-              break;
-            case LogType.WARNING:
-              typeString = `${"WAR"}`;
-              break;
-            case LogType.ERROR:
-              typeString = `${"ERR"}`;
-              break;
-            case LogType.SUCCESS:
-              typeString = `${"SUC"}`;
-              break;
-            case LogType.DEBUG:
-              typeString = `${"DBG"}`;
-              break;
-            case LogType.PROMPT:
-              typeString = `${"PRM"} `;
-              break;
-            case LogType.RAW:
-              typeString = `     `;
-              break;
+        switch (`%${segmentContent}%`) {
+          case LogMessageStyle.EMPHASIZED: {
+            currentMessageStyle = LogMessageStyle.EMPHASIZED;
+            continue;
           }
+          case LogMessageStyle.NORMAL: {
+            currentMessageStyle = LogMessageStyle.NORMAL;
+            continue;
+          }
+          case LogMessageStyle.CUSTOM: {
+            currentMessageStyle = LogMessageStyle.CUSTOM;
+            continue;
+          }
+          case LogMessageStyle.END_CUSTOM: {
+            currentMessageStyle = LogMessageStyle.END_CUSTOM;
+            const colorValSegments = styledSegments[segmentIdx - 1].split(",").map((val) => Number(val));
 
-          if (!COMPACT_LOG_TYPE)
-            for (let charIdx = 0; charIdx < typeString.length; charIdx++) {
-              fb.setCell(1 + charIdx, i, typeString[charIdx], messageTypeColors[log.type], bg);
+            if (colorValSegments.length === 4) {
+              customColorDef = RGBA.fromInts(colorValSegments[0], colorValSegments[1], colorValSegments[2], colorValSegments[3]);
             }
 
-          for (let charIdx = 0; charIdx < log.level.length; charIdx++) {
-            fb.setCell(COMPACT_LOG_TYPE ? 2 + charIdx : 1 + typeString.length + 1 + charIdx, i, log.level[charIdx], messageLevel, bg);
+            continue;
           }
-
-          for (let charIdx = 0; charIdx < log.message.length; charIdx++) {
-            fb.setCell(COMPACT_LOG_TYPE ? 2 + 16 + charIdx : 1 + typeString.length + 1 + 16 + charIdx, i, log.message[charIdx], textMain, bg);
-          }
+          case LogMessageStyle.RESET:
+            currentMessageStyle = LogMessageStyle.RESET;
+            continue;
         }
 
-        for (let x = 0; x < w; x++) {
-          fb.setCell(x, inputY, "─", borderMuted, bg);
-          fb.setCell(x, h - 1, "─", borderMuted, bg);
-        }
-        for (let y = inputY; y < h; y++) {
-          fb.setCell(0, y, "│", borderMuted, bg);
-          fb.setCell(w - 1, y, "│", borderMuted, bg);
-        }
-        fb.setCell(0, inputY, "╭", borderMuted, bg);
-        fb.setCell(w - 1, inputY, "╮", borderMuted, bg);
-        fb.setCell(0, h - 1, "╰", borderMuted, bg);
-        fb.setCell(w - 1, h - 1, "╯", borderMuted, bg);
-
-        const textY = inputY + 1;
-        const prompt = `OnlineWorkspace ${self.instance.versionString} > `;
-
-        for (let i = 0; i < prompt.length; i++) {
-          fb.setCell(1 + i, textY, prompt[i], borderActive, bg);
-        }
-
-        const maxInputDisplayWidth = w - prompt.length - 4;
-        const viewInput = currentInput.substring(Math.max(0, currentInput.length - maxInputDisplayWidth));
-
-        for (let i = 0; i < viewInput.length; i++) {
-          fb.setCell(1 + prompt.length + i, textY, viewInput[i], textMain, bg);
-        }
-
-        if (Date.now() - lastCursorToggle > 500) {
-          cursorVisible = !cursorVisible;
-          lastCursorToggle = Date.now();
-        }
-
-        if (cursorVisible) {
-          const cursorX = 1 + prompt.length + viewInput.length;
-          if (cursorX < w - 1) {
-            fb.setCell(cursorX, textY, "█", borderActive, bg);
-          }
+        switch (currentMessageStyle) {
+          case LogMessageStyle.RESET:
+          case LogMessageStyle.NORMAL:
+            logMessageContainer.add(new TextRenderable(self.renderer, { content: segmentContent, fg: TEXT_COLOR, bg: BACKGROUND_COLOR }));
+            break;
+          case LogMessageStyle.EMPHASIZED:
+            logMessageContainer.add(new TextRenderable(self.renderer, { content: segmentContent, fg: EMPHASIZED_TEXT_COLOR, bg: BACKGROUND_COLOR }));
+            break;
+          case LogMessageStyle.END_CUSTOM:
+            logMessageContainer.add(new TextRenderable(self.renderer, { content: segmentContent, fg: customColorDef, bg: BACKGROUND_COLOR }));
+            break;
         }
       }
-
-      keyListener = (key: KeyEvent) => {
-        if (key.name === "return" || key.name === "enter") {
-          todo(currentInput);
-          currentInput = "";
-          cursorVisible = true;
-        } else if (key.name === "backspace") {
-          currentInput = currentInput.slice(0, -1);
-          cursorVisible = true;
-        } else if (key.sequence && key.sequence.length === 1) {
-          currentInput += key.sequence;
-          cursorVisible = true;
-        }
-      };
-      renderer.keyInput.on("keypress", keyListener);
-
-      resizeListener = (width: number, height: number) => {
-        WIDTH = width;
-        HEIGHT = height;
-        if (framebuffer) {
-          framebuffer.resize(width, height);
-        }
-      };
-      renderer.on("resize", resizeListener);
-
-      renderer.setFrameCallback(async () => {
-        renderUI();
-      });
     }
 
-    function destroy(renderer: CliRenderer): void {
-      renderer.clearFrameCallbacks();
-
-      if (resizeListener) {
-        renderer.off("resize", resizeListener);
-        resizeListener = null;
-      }
-
-      if (keyListener) {
-        renderer.keyInput.off("keypress", keyListener);
-        keyListener = null;
-      }
-
-      renderer.root.remove("tui-container");
-      framebuffer = null;
+    for (const message of self.instance.log.allLogHistory) {
+      addLogMessage(message);
     }
 
-    const renderer = await createCliRenderer({
-      exitOnCtrlC: true,
+    self.instance.log._internal_onNewMessageListeners.push((message) => {
+      addLogMessage(message);
     });
-    await run(renderer);
+
+    self.renderer.root.add(logContainer);
+
+    const commandInputContainer = new BoxRenderable(self.renderer, {
+      border: true,
+      borderStyle: "rounded",
+      height: 3,
+      width: "100%",
+      borderColor: BORDER_COLOR,
+      flexDirection: "row",
+      gap: 1,
+    });
+
+    self.renderer.root.add(commandInputContainer);
+
+    const PROMPT_STRING = `Online Workspace ${self.instance.versionString} >`;
+
+    const promptMessage = new TextRenderable(self.renderer, {
+      content: PROMPT_STRING,
+      fg: RGBA.fromInts(242, 106, 141, 255),
+      width: PROMPT_STRING.length,
+    });
+
+    commandInputContainer.add(promptMessage);
+
+    const commandInput = new InputRenderable(self.renderer, {
+      placeholder: "Click to start typing...",
+      width: "100%",
+      focusedBackgroundColor: BORDER_COLOR,
+
+      onKeyDown(e) {
+        if (e.name === "return") {
+          const trimmedContent = commandInput.plainText.trim();
+          if (!trimmedContent) return;
+          self.instance.sys.consoleCommands.executeCommandFromString(trimmedContent);
+          commandInput.clear();
+        }
+        commandInput.requestRender();
+      },
+    });
+    commandInput.focus();
+    commandInputContainer.add(commandInput);
 
     return true;
+  }
+
+  override stop(): this {
+    this.renderer.destroy();
+
+    return this;
   }
 }
