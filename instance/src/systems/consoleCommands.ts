@@ -19,17 +19,30 @@ export default class ConsoleCommandsSystem extends System {
     const commands = await fs.readdir(path.join(this.instance.sys.filesystem.SRC_ROOT, "/systems/consoleCommands/"));
 
     for (const cmd of commands) {
-      const importedCommand = await import(`file://${path.join(this.instance.sys.filesystem.SRC_ROOT, "/systems/consoleCommands/", cmd)}`);
+      const importedCommand = (await import(`file://${path.join(this.instance.sys.filesystem.SRC_ROOT, "/systems/consoleCommands/", cmd)}`)).default;
       this.commands.push(importedCommand);
-      this.log.info(`Registered command ${cmd}`);
+      this.log.info(`Registered command ${this.log.emphasis(importedCommand.command)}`);
     }
 
     return true;
   }
 
   async executeCommandFromString(command: string) {
-    this.log.debug(`Calling yargs with "${command}"`);
-    await yargs(command).strict().parseAsync();
+    this.log.debug(`Calling command "${command}"`);
+    const yar = yargs(command)
+      .scriptName("")
+      .fail(() => 0)
+      .exitProcess(false);
+
+    for (const cmd of this.commands) {
+      yar.command(cmd);
+    }
+
+    try {
+      await yar.parseAsync();
+    } catch (_) {
+      // do nothing
+    }
   }
 
   async executeCommand(commandId: string, parameters: string[]) {

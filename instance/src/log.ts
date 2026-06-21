@@ -1,5 +1,5 @@
-import type { Instance } from "./index.ts";
 import util from "node:util";
+import type { Instance } from "./index.ts";
 
 export enum LogType {
   INFO,

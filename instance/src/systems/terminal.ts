@@ -1,4 +1,14 @@
-import { BoxRenderable, CliRenderer, ConsolePosition, createCliRenderer, InputRenderable, RGBA, ScrollBoxRenderable, TextRenderable } from "@opentui/core";
+import readline from "node:readline/promises";
+import {
+  BoxRenderable,
+  type CliRenderer,
+  ConsolePosition,
+  createCliRenderer,
+  InputRenderable,
+  RGBA,
+  ScrollBoxRenderable,
+  TextRenderable,
+} from "@opentui/core";
 import chalk from "chalk";
 import type { Instance } from "../index.ts";
 import { LogMessageStyle, LogType } from "../log.ts";
@@ -117,9 +127,8 @@ export default class TerminalUISystem extends System {
               }
               break;
           }
-
-          global.backup.console.log(consoleLogOutput.split(""));
         }
+        global.backup.console.log(consoleLogOutput);
       }
 
       for (const message of this.instance.log.allLogHistory) {
@@ -128,6 +137,22 @@ export default class TerminalUISystem extends System {
 
       this.instance.log._internal_onNewMessageListeners.push((message) => {
         addLogMessage(message);
+      });
+
+      const rlInterface = readline.createInterface(process.stdin, process.stdout);
+
+      rlInterface.addListener("line", (data) => {
+        this.instance.sys.consoleCommands.executeCommandFromString(data);
+      });
+
+      rlInterface.on("SIGINT", () => {
+        rlInterface.close();
+        this.instance.shutdown();
+      });
+
+      rlInterface.on("SIGTERM", () => {
+        rlInterface.close();
+        this.instance.shutdown();
       });
 
       return true;
