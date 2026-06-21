@@ -5,4 +5,4 @@ cd /var/www/workspaces/ || {
     exit 1
 }
 
-bun ./instance/src/index.ts
+bun ./backend/src/index.ts

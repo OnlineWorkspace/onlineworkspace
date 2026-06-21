@@ -71,7 +71,7 @@ A self-hosted web platform for applications & services with design based on Goog
 11. run `systemctl enable workspaces-backend --now` to start the backend
 12. change into the project root `/var/www/workspaces`
 13. run `deno build-web`
-14. choose a webserver of your choice to serve `/var/www/workspaces/instance/web/dist` (caddy is fast & easy to use)
+14. choose a webserver of your choice to serve `/var/www/workspaces/web/dist` (caddy is fast & easy to use)
 15. open your browser and head to `https://[server-ip]` and login as the user `admin` with password `password` to finish setup.
 -->
 

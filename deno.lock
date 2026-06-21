@@ -16,6 +16,7 @@
     "npm:@material-symbols/svg-700@~0.42.3": "0.42.3",
     "npm:@material/material-color-utilities@0.3": "0.3.0",
     "npm:@mediapipe/tasks-vision@~0.10.32": "0.10.35",
+    "npm:@napi-rs/canvas@1": "1.0.0",
     "npm:@opentui/core@~0.4.1": "0.4.1_web-tree-sitter@0.25.10_typescript@6.0.3",
     "npm:@simplewebauthn/browser@^13.3.0": "13.3.0",
     "npm:@simplewebauthn/server@^13.3.0": "13.3.1",
@@ -48,7 +49,6 @@
     "npm:ansi-escapes@^7.2.0": "7.3.0",
     "npm:biome@~0.3.3": "0.3.3",
     "npm:canvas@^3.2.1": "3.2.3",
-    "npm:canvas@^3.2.3": "3.2.3",
     "npm:chalk@^5.5.0": "5.6.2",
     "npm:clsx@^2.1.1": "2.1.1",
     "npm:cookies@~0.9.1": "0.9.1",
@@ -973,6 +973,77 @@
     },
     "@mediapipe/tasks-vision@0.10.35": {
       "integrity": "sha512-HOvadwVRE6JC+45nyYhmnywnr5h/J8KZvOeUNVOG9q/0875pZgItznFB9bRTvLc264YSJqiZ1NsIpCStJw/egg=="
+    },
+    "@napi-rs/canvas-android-arm64@1.0.0": {
+      "integrity": "sha512-3hNKJObUK7JsCF9aJlVCs1J0/KE/gGfZNeK8MO1ge6bB3aicr5walGme9t9No1f/oyk9GgvdAT/rjSdsx3gbIw==",
+      "os": ["android"],
+      "cpu": ["arm64"]
+    },
+    "@napi-rs/canvas-darwin-arm64@1.0.0": {
+      "integrity": "sha512-ZIja19/BiGz2puhki+WUYSRriwFeFJ8Mi9eK3hZdSS85w4Y60cuEAJVhMCfKwswQkKkUtrnzdKMBuO7TupvexA==",
+      "os": ["darwin"],
+      "cpu": ["arm64"]
+    },
+    "@napi-rs/canvas-darwin-x64@1.0.0": {
+      "integrity": "sha512-hImggWc82jqZVpEsFR9S7PE9OQYjq/H/D7vwCGB6X1jRH+UVBP1+1niJTPBOat1B154T6GKK7/kcFtoWgjgFzQ==",
+      "os": ["darwin"],
+      "cpu": ["x64"]
+    },
+    "@napi-rs/canvas-linux-arm-gnueabihf@1.0.0": {
+      "integrity": "sha512-hlJRy6d+kWLKVOG/+1rEvNQVURZ0DxxRPJsLmEWwhwiXZUJc0BF5o9esALHSEP4CoJK4wChRtj3hnyBgVx2oWA==",
+      "os": ["linux"],
+      "cpu": ["arm"]
+    },
+    "@napi-rs/canvas-linux-arm64-gnu@1.0.0": {
+      "integrity": "sha512-5Hru4T3RXkosRQafcjelv7AUzw9mXqmGYsxnzeDDOWveFCJyEPMSJltvGCM+jfH98seOCbfwm9KyFg6Jm5FhAA==",
+      "os": ["linux"],
+      "cpu": ["arm64"]
+    },
+    "@napi-rs/canvas-linux-arm64-musl@1.0.0": {
+      "integrity": "sha512-LTUl9jS8WsLSUGaxQZKQkxfluOJRpgvBuxxdM4pYcjib+di8AU4OzQc6+L6SzGMLcKc9H0RAjojRatBhTMqYdg==",
+      "os": ["linux"],
+      "cpu": ["arm64"]
+    },
+    "@napi-rs/canvas-linux-riscv64-gnu@1.0.0": {
+      "integrity": "sha512-Iz931SAZf+WVDzpjk52Q3ffW3zw0YflFwEZMgs036Wfu1kX/LrwT9wGjsuSqyduqefUkl91/vTdAjn8hQu5ezA==",
+      "os": ["linux"],
+      "cpu": ["riscv64"]
+    },
+    "@napi-rs/canvas-linux-x64-gnu@1.0.0": {
+      "integrity": "sha512-pFEQ5eFK4JusgN1K6KkO9DKP/Hi1WMJOkF8Ch03/khTc4bFbCKkCCsJG4YcOMOW9bI4XbT2/eMAWxhO0xaWgPA==",
+      "os": ["linux"],
+      "cpu": ["x64"]
+    },
+    "@napi-rs/canvas-linux-x64-musl@1.0.0": {
+      "integrity": "sha512-jnvr8NrLHiZ3NCiOKWqDbkI4Ah+QDrqtZ+sddPZBltEb1mQ2coSvCSJYfict+oAwcm0c970oTmVySpjKP/lnaA==",
+      "os": ["linux"],
+      "cpu": ["x64"]
+    },
+    "@napi-rs/canvas-win32-arm64-msvc@1.0.0": {
+      "integrity": "sha512-y2j9/Gfd5joqiqxdP/L1smqjQ+uAx3C4N0EC7bDHrnZEEH8ToM/OC5p3uHvtj4Lq591aHj+ArL01UDLNwT5HgQ==",
+      "os": ["win32"],
+      "cpu": ["arm64"]
+    },
+    "@napi-rs/canvas-win32-x64-msvc@1.0.0": {
+      "integrity": "sha512-qwdhh9N6Gge/hC4pL9S1tQp0iKwhSl/dYjg7+RGp9k26iRGRi5MqqUyKGOXIWli0zOcuy5Y2wIH/jk2ry6i/jA==",
+      "os": ["win32"],
+      "cpu": ["x64"]
+    },
+    "@napi-rs/canvas@1.0.0": {
+      "integrity": "sha512-Jqxcy1XOIqj+lH9sl1GT+il6GR3uQv13vI2mrwubP3uT8Olak2ClDrK2RnxlQKjwv8BRr4b3ug0YR7c6hBX8wg==",
+      "optionalDependencies": [
+        "@napi-rs/canvas-android-arm64",
+        "@napi-rs/canvas-darwin-arm64",
+        "@napi-rs/canvas-darwin-x64",
+        "@napi-rs/canvas-linux-arm-gnueabihf",
+        "@napi-rs/canvas-linux-arm64-gnu",
+        "@napi-rs/canvas-linux-arm64-musl",
+        "@napi-rs/canvas-linux-riscv64-gnu",
+        "@napi-rs/canvas-linux-x64-gnu",
+        "@napi-rs/canvas-linux-x64-musl",
+        "@napi-rs/canvas-win32-arm64-msvc",
+        "@napi-rs/canvas-win32-x64-msvc"
+      ]
     },
     "@napi-rs/wasm-runtime@1.1.5_@emnapi+core@1.10.0_@emnapi+runtime@1.10.0": {
       "integrity": "sha512-AWPoBRJ9tsnVhor4sjO7rkni+7p+2IAEFj6cx06UgP10jkQHqay/36uRV/bFkgrh18D9vb4cr8Q0Pthskgzy+Q==",
@@ -5100,11 +5171,12 @@
           ]
         }
       },
-      "instance": {
+      "backend": {
         "dependencies": [
           "jsr:@std/fs@^1.0.24",
           "jsr:@std/http@^1.1.1",
           "jsr:@std/path@^1.1.5",
+          "npm:@napi-rs/canvas@1",
           "npm:@opentui/core@~0.4.1"
         ],
         "packageJson": {
@@ -5118,7 +5190,6 @@
             "npm:@types/ws@^8.18.1",
             "npm:@types/yargs@17.0.35",
             "npm:ansi-escapes@^7.2.0",
-            "npm:canvas@^3.2.3",
             "npm:chalk@^5.5.0",
             "npm:cookies@~0.9.1",
             "npm:cors@^2.8.5",
@@ -5140,7 +5211,27 @@
           ]
         }
       },
-      "instance/src/web": {
+      "uikit-solid": {
+        "packageJson": {
+          "dependencies": [
+            "npm:@material-symbols/svg-700@~0.42.3",
+            "npm:@solid-primitives/media@^2.3.3",
+            "npm:@solid-primitives/refs@^1.1.3",
+            "npm:@solid-primitives/upload@~0.1.3",
+            "npm:clsx@^2.1.1",
+            "npm:esbuild-plugin-solid@0.6",
+            "npm:prettier@^3.6.2",
+            "npm:sass-embedded@^1.90.0",
+            "npm:solid-js@^1.9.9",
+            "npm:solid-styled-components@~0.28.5",
+            "npm:tsup@^8.5.0",
+            "npm:typescript@^5.9.2",
+            "npm:vite-plugin-solid@^2.11.8",
+            "npm:vite@^8.0.1"
+          ]
+        }
+      },
+      "web": {
         "packageJson": {
           "dependencies": [
             "npm:@material-symbols/svg-700@~0.42.3",
@@ -5162,26 +5253,6 @@
             "npm:vite-plugin-compression2@^2.5.3",
             "npm:vite-plugin-solid@^2.11.11",
             "npm:vite@^8.0.8"
-          ]
-        }
-      },
-      "uikit-solid": {
-        "packageJson": {
-          "dependencies": [
-            "npm:@material-symbols/svg-700@~0.42.3",
-            "npm:@solid-primitives/media@^2.3.3",
-            "npm:@solid-primitives/refs@^1.1.3",
-            "npm:@solid-primitives/upload@~0.1.3",
-            "npm:clsx@^2.1.1",
-            "npm:esbuild-plugin-solid@0.6",
-            "npm:prettier@^3.6.2",
-            "npm:sass-embedded@^1.90.0",
-            "npm:solid-js@^1.9.9",
-            "npm:solid-styled-components@~0.28.5",
-            "npm:tsup@^8.5.0",
-            "npm:typescript@^5.9.2",
-            "npm:vite-plugin-solid@^2.11.8",
-            "npm:vite@^8.0.1"
           ]
         }
       }

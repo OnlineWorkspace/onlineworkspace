@@ -27,6 +27,14 @@ export default class ConfigurationSystem extends System {
       port: number;
       database: string;
     };
+  } = {
+    postgres: {
+      user: "postgres",
+      password: "postgres",
+      host: "localhost",
+      port: 5432,
+      database: "onlineworkspace_workspace",
+    },
   };
   proxyUrl: string;
   enabledFeatures: (WorkspacesFeatureFlags | string)[];
@@ -40,6 +48,16 @@ export default class ConfigurationSystem extends System {
       minimumNumbers?: number;
       minimumSymbols?: number;
     };
+  } = {
+    email: false,
+    twoFactorAuthentication: false,
+    passwordMinimumLength: 5,
+    passwordContains: {
+      minimumLowercase: 1,
+      minimumNumbers: 1,
+      minimumSymbols: 1,
+      minimumUppercase: 1,
+    },
   };
   displayName: string;
   mailServer: {
@@ -52,36 +70,26 @@ export default class ConfigurationSystem extends System {
     };
   };
   termsOfUse: { message: string; lastUpdated: number };
-  defaultQuickShortcuts: string[];
+  defaultQuickShortcuts: string[] = ["uk.ewsgit.dashboard", "uk.ewsgit.store", "uk.ewsgit.settings", "uk.ewsgit.photos", "uk.ewsgit.files"];
   defaultApplications: { id: string; uri: string }[];
+  userDefault: {
+    homeDirectories: string[];
+    quotaSize: number;
+    displayNameFormat: string;
+  } = {
+    homeDirectories: ["Documents", "Photos", "Videos", "Projects"],
+    quotaSize: 1024 * 1024 * 10,
+    displayNameFormat: "New User %num%",
+  };
   caddyfile: string | undefined;
+  apiPort: number = 3563;
 
   constructor(instance: Instance) {
     super("configuration", instance);
 
     this.enabledFeatures = [WorkspacesFeatureFlags.SlashCommands];
-    this.databases = {
-      postgres: {
-        user: "postgres",
-        password: "postgres",
-        host: "localhost",
-        port: 5432,
-        database: "onlineworkspace_workspace",
-      },
-    };
     if (process.env.POSTGRES_DATABASE_HOST) this.databases.postgres.host = process.env.POSTGRES_DATABASE_HOST;
     this.proxyUrl = "https://localhost";
-    this.signupRequirements = {
-      email: false,
-      twoFactorAuthentication: false,
-      passwordMinimumLength: 5,
-      passwordContains: {
-        minimumLowercase: 1,
-        minimumNumbers: 1,
-        minimumSymbols: 1,
-        minimumUppercase: 1,
-      },
-    };
     this.displayName = "Workspace";
     this.mailServer = {
       host: "smtp.example.com",
@@ -113,7 +121,6 @@ export default class ConfigurationSystem extends System {
     - These terms may change. If we make significant updates, we will post a notification within the app or send an email.`,
       lastUpdated: Date.now(),
     };
-    this.defaultQuickShortcuts = ["uk.ewsgit.dashboard", "uk.ewsgit.store", "uk.ewsgit.settings", "uk.ewsgit.photos", "uk.ewsgit.files"];
     this.defaultApplications = [
       { id: "uk.ewsgit.dashboard", uri: "local:uk.ewsgit.dashboard" },
       { id: "uk.ewsgit.store", uri: "local:uk.ewsgit.store" },

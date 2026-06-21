@@ -19,6 +19,8 @@ import TRPCSystem from "./systems/trpc.ts";
 import { createTRPCContext as createWorkspacesTRPCContext, workspacesRouter } from "./systems/trpcRouter.ts";
 import UsersSystem from "./systems/users.ts";
 import WebFrontendSystem from "./systems/webFrontend.ts";
+import { routeRadix } from "@std/http/unstable-route";
+import ApiSystem from "./systems/api.ts";
 
 export enum InstanceStatus {
   Online,
@@ -57,6 +59,7 @@ class Instance {
     this.sys.email = new EmailSystem(this);
     this.sys.reverseProxy = new ReverseProxySystem(this);
     this.sys.terminal = new TerminalUISystem(this);
+    this.sys.api = new ApiSystem(this);
 
     this.status = InstanceStatus.Offline;
   }
@@ -91,18 +94,10 @@ class Instance {
 
     this.sys.event.invoke(WorkspacesEvent.BeforeStartupComplete);
 
-    // this.webServer = Deno.serve(route(, () => {})
-    //   // this.sys.tRPC.serve({
-    //   //   routes: {
-
-    //   //   },
-    //   //   fetch() {
-    //   //     // will be executed if it's not a TRPC request
-    //   //     return new Response("Unknown path");
-    //   //   },
-    //   //   development: this.sys.configuration.isDevMode,
-    //   // }),
-    // );
+    this.webServer = Deno.serve(
+      { port: this.sys.configuration.apiPort },
+      routeRadix(this.sys.api.routes, () => Response.json({ failed: true })),
+    );
 
     this.sys.tRPC.registeredRouters.push({
       basePath: "/api/trpc",

@@ -1,15 +1,13 @@
 import type { TRPCBuiltRouter } from "@trpc/server";
 import { type FetchCreateContextFnOptions, fetchRequestHandler } from "@trpc/server/adapters/fetch";
-import type { BunRequest, Server } from "bun";
 import type { Instance } from "../index.ts";
 import System from "../system.ts";
-import type { createTRPCContext } from "./trpcRouter.ts";
 
 export default class TRPCSystem extends System {
   registeredRouters: {
     basePath: string;
     router: TRPCBuiltRouter<any, any>;
-    createContext: (opts: FetchCreateContextFnOptions, server: Server<ReturnType<typeof createTRPCContext>>) => object;
+    createContext: (opts: FetchCreateContextFnOptions, server: Deno.HttpServer<Deno.NetAddr>) => object;
   }[];
 
   constructor(instance: Instance) {
@@ -23,7 +21,7 @@ export default class TRPCSystem extends System {
     return true;
   }
 
-  private attemptTRPCRequest(req: BunRequest, server: Server<ReturnType<typeof createTRPCContext>>) {
+  private attemptTRPCRequest(req: Request, server: Deno.HttpServer<Deno.NetAddr>) {
     const url = new URL(req.url);
 
     for (const router of this.registeredRouters) {
@@ -47,10 +45,10 @@ export default class TRPCSystem extends System {
   serve(options: {
     routes: {
       [path: string]: {
-        GET?: (req: BunRequest) => Promise<Response>;
-        POST?: (req: BunRequest) => Promise<Response>;
-        DELETE?: (req: BunRequest) => Promise<Response>;
-        PUT?: (req: BunRequest) => Promise<Response>;
+        GET?: (req: Request) => Promise<Response>;
+        POST?: (req: Request) => Promise<Response>;
+        DELETE?: (req: Request) => Promise<Response>;
+        PUT?: (req: Request) => Promise<Response>;
       };
     };
     fetch(request: any, server: any): Response;
@@ -62,7 +60,7 @@ export default class TRPCSystem extends System {
       ...options,
       port: 3563,
       hostname: "0.0.0.0",
-      async fetch(req: BunRequest, server: Server<ReturnType<typeof createTRPCContext>>) {
+      async fetch(req: Request, server: Deno.HttpServer<Deno.NetAddr>) {
         try {
           const trpcResponse = await self.attemptTRPCRequest(req, server);
           if (trpcResponse) {

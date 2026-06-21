@@ -1,5 +1,6 @@
 import type { Instance } from "./index.ts";
 import type { Logger } from "./log.ts";
+import ApiSystem from "./systems/api.ts";
 import type ApplicationsSubsystem from "./systems/applications.ts";
 import type AuthorizationSubsystem from "./systems/authorization.ts";
 import type ConfigurationSubsystem from "./systems/configuration.ts";
@@ -34,6 +35,7 @@ export type Sys = {
   event: EventSystem;
   reverseProxy: ReverseProxySystem;
   terminal: TerminalSystem;
+  api: ApiSystem;
 } & { [key: string]: System };
 
 export default abstract class System {
@@ -48,7 +50,6 @@ export default abstract class System {
   }
 
   async startup(): Promise<boolean> {
-    this.log.info("Starting up...");
     return true;
   }
 

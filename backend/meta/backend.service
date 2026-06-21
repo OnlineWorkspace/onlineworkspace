@@ -6,7 +6,7 @@ StartLimitIntervalSec=60
 
 [Service]
 Type=simple
-ExecStart=/var/www/workspaces/instance/meta/backend.sh
+ExecStart=/var/www/workspaces/backend/meta/backend.sh
 Restart=on-failure
 RestartSec=5
 User=root
