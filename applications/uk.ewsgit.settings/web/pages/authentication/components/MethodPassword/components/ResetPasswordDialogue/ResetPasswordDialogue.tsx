@@ -1,10 +1,10 @@
 import CHECK_ICON from "@material-symbols/svg-700/outlined/check.svg";
-import UKButton, { AffirmativeButtonState } from "@ewsgit/uikit-solid/src/components/button/UKButton.jsx";
+import UKButton, { AffirmativeButtonState } from "@ewsgit/uikit-solid/src/components/button/UKButton.tsx";
 import UKButtonGroup from "@ewsgit/uikit-solid/src/components/buttonGroup/UKButtonGroup.tsx";
-import { DividerDirection } from "@ewsgit/uikit-solid/src/components/divider/lib/direction.js";
-import UKDivider from "@ewsgit/uikit-solid/src/components/divider/UKDivider.jsx";
-import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.jsx";
-import UKTextField from "@ewsgit/uikit-solid/src/components/textField/UKTextField.jsx";
+import { DividerDirection } from "@ewsgit/uikit-solid/src/components/divider/lib/direction.ts";
+import UKDivider from "@ewsgit/uikit-solid/src/components/divider/UKDivider.tsx";
+import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.tsx";
+import UKTextField from "@ewsgit/uikit-solid/src/components/textField/UKTextField.tsx";
 import { type Component, createSignal } from "solid-js";
 import trpc from "../../../../../../lib/trpc";
 import styles from "./ResetPasswordDialogue.module.scss";

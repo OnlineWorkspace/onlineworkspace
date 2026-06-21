@@ -1,9 +1,9 @@
 import CHEVRON_LEFT_ICON from "@material-symbols/svg-700/outlined/chevron_left.svg";
-import { DividerDirection } from "@ewsgit/uikit-solid/src/components/divider/lib/direction.js";
-import UKDivider from "@ewsgit/uikit-solid/src/components/divider/UKDivider.jsx";
+import { DividerDirection } from "@ewsgit/uikit-solid/src/components/divider/lib/direction.ts";
+import UKDivider from "@ewsgit/uikit-solid/src/components/divider/UKDivider.tsx";
 import UKStack from "@ewsgit/uikit-solid/src/components/stack/UKStack.tsx";
 import UKStackItem from "@ewsgit/uikit-solid/src/components/stack/UKStackItem.tsx";
-import UKTopAppBar from "@ewsgit/uikit-solid/src/components/topAppBar/UKTopAppBar.jsx";
+import UKTopAppBar from "@ewsgit/uikit-solid/src/components/topAppBar/UKTopAppBar.tsx";
 import { useNavigate } from "@solidjs/router";
 import type { Component } from "solid-js";
 import ThemePreview from "./components/ThemePreview/ThemePreview.tsx";

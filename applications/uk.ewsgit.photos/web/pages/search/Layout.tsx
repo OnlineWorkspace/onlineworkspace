@@ -1,8 +1,8 @@
-import { DividerDirection } from "@ewsgit/uikit-solid/src/components/divider/lib/direction.js";
-import UKDivider from "@ewsgit/uikit-solid/src/components/divider/UKDivider.jsx";
-import UKStack from "@ewsgit/uikit-solid/src/components/stack/UKStack.jsx";
-import UKStackItem from "@ewsgit/uikit-solid/src/components/stack/UKStackItem.jsx";
-import UKTopAppBar from "@ewsgit/uikit-solid/src/components/topAppBar/UKTopAppBar.jsx";
+import { DividerDirection } from "@ewsgit/uikit-solid/src/components/divider/lib/direction.ts";
+import UKDivider from "@ewsgit/uikit-solid/src/components/divider/UKDivider.tsx";
+import UKStack from "@ewsgit/uikit-solid/src/components/stack/UKStack.tsx";
+import UKStackItem from "@ewsgit/uikit-solid/src/components/stack/UKStackItem.tsx";
+import UKTopAppBar from "@ewsgit/uikit-solid/src/components/topAppBar/UKTopAppBar.tsx";
 import { useNavigate } from "@solidjs/router";
 import { type Component, createSignal, For, type ParentProps } from "solid-js";
 import styles from "./Layout.module.scss";
