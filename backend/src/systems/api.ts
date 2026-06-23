@@ -21,6 +21,13 @@ export default class ApiSystem extends System {
     this.routes = [
       {
         method: ["GET"],
+        pattern: new URLPattern({ pathname: "/api/teapot" }),
+        handler(req) {
+          return Response.json({ teapot: true, message: "This OnlineWorkspace (Teapot?) sadly does not support the Hyper Text Coffee Pot Control Protocol (HTCPCP) 😢"}, { status: 418 })
+        },
+      },
+      {
+        method: ["GET"],
         pattern: new URLPattern({ pathname: "/api/instance/login/banner" }),
         handler(req) {
           return serveFile(
@@ -48,11 +55,10 @@ export default class ApiSystem extends System {
       {
         method: ["GET"],
         pattern: new URLPattern({ pathname: "/api/user/me/avatar/:size" }),
-        async handler(req, _, rawParams) {
-          // @ts-ignore this does exist
+        async handler(req, rawParams, _info) {
           const params = rawParams?.pathname.groups;
 
-          const size = params.size;
+          const size = params.size!;
 
           const cookies = getCookies(req.headers);
 

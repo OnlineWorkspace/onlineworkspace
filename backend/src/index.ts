@@ -60,8 +60,8 @@ class Instance {
 
     this.status = InstanceStatus.Offline;
 
-    Deno.addSignalListener("SIGINT", () => {
-      this.shutdown();
+    Deno.addSignalListener("SIGINT", async () => {
+      await this.shutdown("Console Admin Ctrl+C");
     });
   }
 
@@ -108,18 +108,19 @@ class Instance {
     return this;
   }
 
-  async shutdown() {
+  async shutdown(cause?: string) {
+    this.log.system.info(`Shutting down... ${cause !== undefined ? `(Caused by: ${cause})` : ""}`);
     this.status = InstanceStatus.Stopping;
-    this.log.system.info("Shutting down...");
 
     this.sys.event.invoke(WorkspacesEvent.BeforeShutdown);
+
     this.status = InstanceStatus.Offline;
 
     for (const sys of Object.values(this.sys)) {
       const subSystemState = await sys.stop();
 
       if (subSystemState) {
-        this.log.system.success(`System '${sys.id}' shutdown failed!`);
+        this.log.system.success(`System '${sys.id}' shutdown successfully!`);
       } else {
         this.log.system.error(`System '${sys.id}' shutdown failed! (Shutdown will still continue)`);
       }

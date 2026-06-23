@@ -298,6 +298,7 @@ export const coreOnlineWorkspaceRouter = t.router({
           value: session,
           secure: true,
           expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 14),
+          domain: opt.ctx.instance.sys.configuration.proxy.hostname
         });
 
         return {
@@ -463,6 +464,7 @@ export const coreOnlineWorkspaceRouter = t.router({
           value: session,
           secure: true,
           expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 14),
+          domain: opt.ctx.instance.sys.configuration.proxy.hostname
         });
 
         return {
@@ -529,6 +531,7 @@ export const coreOnlineWorkspaceRouter = t.router({
           value: session,
           secure: true,
           expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 14),
+          domain: opt.ctx.instance.sys.configuration.proxy.hostname
         });
 
         return {

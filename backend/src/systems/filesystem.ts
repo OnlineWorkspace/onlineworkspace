@@ -10,6 +10,7 @@ export enum FileMediaType {
   ThreeDimensionalModel,
   Audio,
   Text,
+  Unknown
 }
 
 export default class FilesystemSystem extends System {
@@ -70,45 +71,15 @@ export default class FilesystemSystem extends System {
     return true;
   }
 
-  getFileType(path: string) {
-    const extension = path.split(".").pop();
+  getFileType(path: string): FileMediaType {
+    const extension = "." + path.split(".").pop();
 
-    switch (extension) {
-      case "avif":
-      case "webp":
-      case "jpg":
-      case "jpeg":
-      case "png":
-      case "gif":
-        return "image";
-      case "txt":
-      case "json":
-      case "js":
-      case "ts":
-      case "tsx":
-      case "scss":
-      case "sass":
-      case "yml":
-      case "yaml":
-      case "xml":
-      case "py":
-      case "toml":
-      case "rs":
-      case "html":
-      case "htm":
-      case "css":
-      case "jsm":
-      case "tsm":
-      case "tsc":
-      case "jsc":
-      case "sql":
-      case "lock":
-        return "plaintext";
-    }
+    const mediaType = this._internalFileExtensions.get(extension)?.type;
 
-    this.log.warning(`Unknown file format: '${path}' ext: '${extension}'`);
+    if (!mediaType)
+      this.log.warning(`Unknown file format: '${path}' ext: '${extension}'`);
 
-    return undefined;
+    return FileMediaType.Unknown;
   }
 
   // returns an endpoint where the asset located at the provided path can be loaded from on the client
@@ -277,6 +248,7 @@ export default class FilesystemSystem extends System {
       fs.copySync(
         path.join(this.SRC_ROOT, "assets/fs_template_files/"),
         path.join(this.SYSTEM_PATH, "fs_template_files"),
+        { overwrite: true }
       );
     }else this.log.debug(
       `FS_ROOT/assets/fs_template_files exists, (${

@@ -29,7 +29,6 @@ export default class WebFrontendSystem extends System {
             host: this.instance.sys.configuration.proxy.hostname,
           },
         },
-        forceOptimizeDeps: true,
         logger: {
           info(msg: string, options?: { clear?: boolean; timestamp?: boolean; environment?: string }) {
             self.log.info(msg, options);

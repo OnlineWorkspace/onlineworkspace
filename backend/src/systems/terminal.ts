@@ -144,11 +144,11 @@ export default class TerminalUISystem extends System {
       });
 
       this.readlineInterface.on("SIGINT", () => {
-        this.instance.shutdown();
+        this.instance.shutdown("Console Admin Ctrl+C");
       });
 
       this.readlineInterface.on("SIGTERM", () => {
-        this.instance.shutdown();
+        this.instance.shutdown("SIGTERM");
       });
 
       return true;
@@ -337,10 +337,10 @@ export default class TerminalUISystem extends System {
     return true;
   }
 
-  override stop(): this {
+  override stop(): boolean {
     this.renderer?.destroy?.();
     this.readlineInterface?.close?.();
 
-    return this;
+    return true;
   }
 }
