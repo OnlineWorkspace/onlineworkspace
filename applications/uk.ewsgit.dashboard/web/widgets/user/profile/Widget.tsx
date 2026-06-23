@@ -1,6 +1,6 @@
-import UKAvatar from "@ewsgit/uikit-solid/src/components/avatar/UKAvatar.jsx";
-import UKCard from "@ewsgit/uikit-solid/src/components/card/UKCard.jsx";
-import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.jsx";
+import UKAvatar from "@ewsgit/uikit-solid/src/components/avatar/UKAvatar.tsx";
+import UKCard from "@ewsgit/uikit-solid/src/components/card/UKCard.tsx";
+import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.tsx";
 import { type Component, createResource } from "solid-js";
 import trpc from "../../../lib/trpc";
 import styles from "./Widget.module.scss";

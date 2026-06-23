@@ -3,6 +3,7 @@ import System from "../system.ts";
 
 export enum WorkspacesEvent {
   BeforeStartupComplete,
+  StartupComplete,
   BeforeShutdown,
   Weekly,
   Daily,
@@ -17,7 +18,7 @@ export enum WorkspacesEvent {
 }
 
 export default class EventSystem extends System {
-  __internal_eventListeners: { [key in WorkspacesEvent]?: (() => void)[] } = {};
+  __internalEventListeners: { [key in WorkspacesEvent]?: (() => void)[] } = {};
 
   constructor(instance: Instance) {
     super("event", instance);
@@ -72,17 +73,17 @@ export default class EventSystem extends System {
   }
 
   on(eventType: WorkspacesEvent, cb: () => void) {
-    if (!this.__internal_eventListeners[eventType]) {
-      this.__internal_eventListeners[eventType] = [];
+    if (!this.__internalEventListeners[eventType]) {
+      this.__internalEventListeners[eventType] = [];
     }
 
-    this.__internal_eventListeners[eventType].push(cb);
+    this.__internalEventListeners[eventType].push(cb);
 
     return this;
   }
 
   invoke(eventType: WorkspacesEvent) {
-    const events = this.__internal_eventListeners[eventType];
+    const events = this.__internalEventListeners[eventType];
 
     if (!events) {
       return this;

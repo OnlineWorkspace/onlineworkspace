@@ -12,6 +12,7 @@ import * as OTPAuth from "otpauth";
 import type { Instance } from "../index.ts";
 import System from "../system.ts";
 import { WorkspacesNotificationPriority } from "./notifications.ts";
+import { timingSafeEqual } from "@std/crypto";
 
 export enum AuthorizedDeviceType {
   Desktop,
@@ -21,10 +22,17 @@ export enum AuthorizedDeviceType {
 
 // the number of ms that a login session is valid for
 export const SESSION_VALID_TERM_MS = 7 * 24 * 60 * 60 * 1000;
+const PASSWORD_HASH_ITERATIONS = 600_000;
 
 export default class AuthorizationSystem extends System {
-  private temporaryPasskeyCreationChallenges: Map<number, PublicKeyCredentialCreationOptionsJSON>;
-  private temporaryPasskeyAuthenticationChallenges: Map<number, PublicKeyCredentialRequestOptionsJSON>;
+  private temporaryPasskeyCreationChallenges: Map<
+    number,
+    PublicKeyCredentialCreationOptionsJSON
+  >;
+  private temporaryPasskeyAuthenticationChallenges: Map<
+    number,
+    PublicKeyCredentialRequestOptionsJSON
+  >;
 
   constructor(instance: Instance) {
     super("authorization", instance);
@@ -33,8 +41,45 @@ export default class AuthorizationSystem extends System {
     this.temporaryPasskeyAuthenticationChallenges = new Map();
   }
 
-  // Creates a new session for a user
-  // @returns {string} the new session's sessionToken
+  private async _internalHashPassword(password: string) {
+    const salt = crypto.getRandomValues(new Uint8Array(16));
+    const hash = await this._internalDeriveBits(password, salt);
+    return `${salt.toBase64()}:${hash.toBase64()}`;
+  }
+
+  private async _internalVerifyPassword(
+    password: string,
+    hashedPassword: string,
+  ): Promise<boolean> {
+    const [salt, expected] = hashedPassword.split(":")
+      .map((part) => Uint8Array.fromBase64(part));
+    const actual = await this._internalDeriveBits(password, salt);
+    return timingSafeEqual(actual, expected);
+  }
+
+  private async _internalDeriveBits(
+    password: string,
+    salt: Uint8Array<ArrayBuffer>,
+  ): Promise<Uint8Array> {
+    const key = await crypto.subtle.importKey(
+      "raw",
+      new TextEncoder().encode(password),
+      "PBKDF2",
+      false,
+      ["deriveBits"],
+    );
+    const bits = await crypto.subtle.deriveBits(
+      { name: "PBKDF2", hash: "SHA-256", salt, iterations: PASSWORD_HASH_ITERATIONS },
+      key,
+      256,
+    );
+    return new Uint8Array(bits);
+  }
+
+  /**
+   Creates a new session for a user
+   @returns {string} the new session's sessionToken
+  */
   async createPasswordSession(
     userId: number,
     password: string,
@@ -45,22 +90,34 @@ export default class AuthorizationSystem extends System {
     try {
       const db = this.instance.sys.database.postgres();
 
-      if (!(await Bun.password.verify(password, (await db`SELECT hashed_password FROM public.users WHERE id = ${userId}`)?.[0]?.hashed_password))) {
+      if (
+        !(await this._internalVerifyPassword(
+          password,
+          (await db`SELECT hashed_password FROM public.users WHERE id = ${userId}`)
+            ?.[0]?.hashed_password,
+        ))
+      ) {
         return undefined;
       }
 
-      if (await this.instance.sys.authorization.hasTwoFactorAuthenticationSecret(userId)) {
+      if (
+        await this.instance.sys.authorization.hasTwoFactorAuthenticationSecret(
+          userId,
+        )
+      ) {
         if (!otpCode) {
           console.log("no otp code provided when creating session?");
           return undefined;
         }
 
         const totp = new OTPAuth.TOTP({
-          issuer: this.instance.sys.configuration.proxyUrl,
+          issuer: this.instance.sys.configuration.proxy.hostname,
           label: `${this.instance.sys.configuration.displayName} (Workspace)`,
           algorithm: "SHA1",
           digits: 6,
-          secret: (await db`SELECT two_factor_secret FROM public.users WHERE id = ${userId}`)?.[0]?.two_factor_secret,
+          secret:
+            (await db`SELECT two_factor_secret FROM public.users WHERE id = ${userId}`)
+              ?.[0]?.two_factor_secret,
         });
 
         if (totp.validate({ token: otpCode }) === null) {
@@ -70,13 +127,18 @@ export default class AuthorizationSystem extends System {
 
       const sessionToken = crypto.getRandomValues(new Uint32Array(16)).join("");
 
-      await db`INSERT INTO public.sessions (user_id, session_token, device_type, valid_until, ip_address, login_method) VALUES (${userId}, ${sessionToken}, ${deviceId}, ${Date.now() + SESSION_VALID_TERM_MS}, ${ipAddress || "Anonymous"}, 'password authentication')`;
+      await db`INSERT INTO public.sessions (user_id, session_token, device_type, valid_until, ip_address, login_method) VALUES (${userId}, ${sessionToken}, ${deviceId}, ${
+        Date.now() + SESSION_VALID_TERM_MS
+      }, ${ipAddress || "Anonymous"}, 'password authentication')`;
 
       const user = await this.instance.sys.users.getUserById(userId);
 
       if (await user?.isAdministrator()) {
         if (password === "password") {
-          this.log.warning(`User (${userId})${await user?.getUsername()} has the default password! Please tell them to change it!`);
+          this.log.warning(
+            `User (${userId})${await user
+              ?.getUsername()} has the default password! Please tell them to change it!`,
+          );
 
           setTimeout(() => {
             this.instance.sys.notifications.send(
@@ -102,7 +164,8 @@ export default class AuthorizationSystem extends System {
                   return {
                     action: {
                       type: "navigate",
-                      value: "/app/uk.ewsgit.settings/authentication/reset-password",
+                      value:
+                        "/app/uk.ewsgit.settings/authentication/reset-password",
                     },
                   };
                 },
@@ -114,7 +177,12 @@ export default class AuthorizationSystem extends System {
 
       return `workspaces_session:${userId}:${sessionToken}`;
     } catch (err) {
-      this.log.warning(`Failed to create session. -> ${userId} @ ${AuthorizedDeviceType[deviceId]}`, utils.inspect(err));
+      this.log.warning(
+        `Failed to create session. -> ${userId} @ ${
+          AuthorizedDeviceType[deviceId]
+        }`,
+        utils.inspect(err),
+      );
 
       return undefined;
     }
@@ -130,7 +198,9 @@ export default class AuthorizationSystem extends System {
 
     const sessionsDb = this.instance.sys.database.postgres();
 
-    const session = (await sessionsDb`SELECT session_id, valid_until FROM public.sessions WHERE user_id = ${userId} AND session_token = ${token}`)?.[0];
+    const session =
+      (await sessionsDb`SELECT session_id, valid_until FROM public.sessions WHERE user_id = ${userId} AND session_token = ${token}`)
+        ?.[0];
 
     if (Number(session?.valid_until) < Date.now()) {
       await sessionsDb`DELETE FROM public.sessions WHERE user_id = ${userId} AND session_token = ${token}`;
@@ -142,9 +212,11 @@ export default class AuthorizationSystem extends System {
     return undefined;
   }
 
-  // Removes a user's session and invalidates it's token
-  // @returns {true} the session is removed, and it's token is invalidated
-  // @returns {undefined} the sessionToken is invalid
+  /**
+    Removes a user's session and invalidates it's token
+    @returns {true} the session is removed, and it's token is invalidated
+    @returns {undefined} the sessionToken is invalid
+  */
   async endSessionByToken(sessionToken: string): Promise<boolean | undefined> {
     const [_, userId, token] = sessionToken.split(":");
 
@@ -155,10 +227,15 @@ export default class AuthorizationSystem extends System {
     return true;
   }
 
-  // Removes a user's session and invalidates it's token
-  // @returns {true} the session is removed, and it's token is invalidated
-  // @returns {undefined} the sessionToken is invalid
-  async endSessionById(userId: number, sessionId: number): Promise<boolean | undefined> {
+  /**
+    Removes a user's session and invalidates it's token
+    @returns {true} the session is removed, and it's token is invalidated
+    @returns {undefined} the sessionToken is invalid
+  */
+  async endSessionById(
+    userId: number,
+    sessionId: number,
+  ): Promise<boolean | undefined> {
     const sessionsDb = this.instance.sys.database.postgres();
 
     await sessionsDb`DELETE FROM public.sessions WHERE user_id = ${userId} AND session_id = ${sessionId}`;
@@ -166,9 +243,11 @@ export default class AuthorizationSystem extends System {
     return true;
   }
 
-  // Sets a user's password to password
-  // @returns {true} successful
-  // @returns {false} failed
+  /**
+    Sets a user's password to password
+    @returns {true} successful
+    @returns {false} failed
+  */
   async setPassword(userId: number, password: string): Promise<boolean> {
     const db = this.instance.sys.database.postgres();
 
@@ -176,16 +255,18 @@ export default class AuthorizationSystem extends System {
       return false;
     }
 
-    const hashedPassword = await Bun.password.hash(password);
+    const hashedPassword = await this._internalHashPassword(password);
 
     await db`UPDATE public.users SET hashed_password = ${hashedPassword} WHERE id = ${userId}`;
 
     return true;
   }
 
-  // Returns whether a user has a password set or not
-  // @returns {true} if they have a password
-  // @returns {false} if they lack a password
+  /**
+    Returns whether a user has a password set or not
+    @returns {true} if they have a password
+    @returns {false} if they lack a password
+  */
   async hasPassword(userId: number) {
     const db = this.instance.sys.database.postgres();
 
@@ -202,9 +283,11 @@ export default class AuthorizationSystem extends System {
     return !!exists;
   }
 
-  // Sets a user's two-factor authentication secret
-  // @returns {true} successful
-  // @returns {false} failed
+  /**
+    Sets a user's two-factor authentication secret
+    @returns {true} successful
+    @returns {false} failed
+  */
   async setTwoFactorAuthenticationSecret(userId: number, secret: string) {
     const db = this.instance.sys.database.postgres();
 
@@ -221,9 +304,11 @@ export default class AuthorizationSystem extends System {
     return true;
   }
 
-  // Returns whether a user has a two-factor authentication secret or not
-  // @returns {true} if they have a factor authentication secret
-  // @returns {false} if they lack a factor authentication secret
+  /**
+    Returns whether a user has a two-factor authentication secret or not
+    @returns {true} if they have a factor authentication secret
+    @returns {false} if they lack a factor authentication secret
+  */
   async hasTwoFactorAuthenticationSecret(userId: number) {
     const db = this.instance.sys.database.postgres();
 
@@ -240,9 +325,11 @@ export default class AuthorizationSystem extends System {
     return !!exists;
   }
 
-  // Returns whether a user has a passkey or not
-  // @returns {true} if they have a passkey
-  // @returns {false} if they lack a passkey
+  /**
+    Returns whether a user has a passkey or not
+    @returns {true} if they have a passkey
+    @returns {false} if they lack a passkey
+  */
   async hasPasskey(userId: number) {
     const db = this.instance.sys.database.postgres();
 
@@ -250,42 +337,63 @@ export default class AuthorizationSystem extends System {
       return false;
     }
 
-    const userPasskeys = await db`SELECT COUNT(*) FROM public.passkeys WHERE user_id = ${userId}`;
+    const userPasskeys =
+      await db`SELECT COUNT(*) FROM public.passkeys WHERE user_id = ${userId}`;
 
     return Number(userPasskeys[0].count) > 0;
   }
 
+  /**
+    Issues a new Passkey challenge for the provided userId.
+    @param {number} userId target userId for the passkey
+  */
   async requestNewPasskey(userId: number) {
     const db = this.instance.sys.database.postgres();
 
-    const userPasskeys = await db`SELECT * FROM public.passkeys WHERE user_id = ${userId}`;
+    const userPasskeys =
+      await db`SELECT * FROM public.passkeys WHERE user_id = ${userId}` as {
+        passkey_id: string;
+        transports: string;
+      }[];
 
-    const passkeyCreationOptions: PublicKeyCredentialCreationOptionsJSON = await generateRegistrationOptions({
-      rpName: this.instance.sys.configuration.displayName,
-      rpID: this.instance.sys.configuration.proxyUrl.replace("https://", ""),
-      userName: (await (await this.instance.sys.users.getUserById(userId))?.getUsername()) || `${userId}`,
-      excludeCredentials: userPasskeys.map((passkey: { passkey_id: string; transports: string }) => {
-        return {
-          id: passkey.passkey_id,
-          transports: passkey.transports.split(",") as AuthenticatorTransportFuture[],
-        };
-      }),
-      authenticatorSelection: {
-        residentKey: "preferred",
-        userVerification: "preferred",
-        authenticatorAttachment: "platform",
-      },
-    });
+    const passkeyCreationOptions: PublicKeyCredentialCreationOptionsJSON =
+      await generateRegistrationOptions({
+        rpName: this.instance.sys.configuration.displayName,
+        rpID: this.instance.sys.configuration.proxy.hostname,
+        userName: (await (await this.instance.sys.users.getUserById(userId))
+          ?.getUsername()) || `${userId}`,
+        excludeCredentials: userPasskeys.map((passkey) => {
+          return {
+            id: passkey.passkey_id,
+            transports: passkey.transports.split(
+              ",",
+            ) as AuthenticatorTransportFuture[],
+          };
+        }),
+        authenticatorSelection: {
+          residentKey: "preferred",
+          userVerification: "preferred",
+          authenticatorAttachment: "platform",
+        },
+      });
 
     this.temporaryPasskeyCreationChallenges.set(userId, passkeyCreationOptions);
 
     return passkeyCreationOptions;
   }
 
-  // biome-ignore lint/suspicious/noExplicitAny: the input is a webauthn response which is very complex and would require a lot of work to type, so we'll just use any here as it is handled by a library and we don't need to worry about the types
+  /**
+    Register a new passkey for the provided userId,
+    the user's temporary Passkey response is required as the input param
+  */
+  // biome-ignore lint/suspicious/noExplicitAny: the input is a webauthn response
+  // which is very complex and would require a lot of work to type, so we'll just
+  // use any here as it is handled by a library and we don't need to worry about the types
   async registerPasskey(userId: number, input: any) {
     const db = this.instance.sys.database.postgres();
-    const expectedChallenge = this.temporaryPasskeyCreationChallenges.get(userId);
+    const expectedChallenge = this.temporaryPasskeyCreationChallenges.get(
+      userId,
+    );
     if (!expectedChallenge) {
       return false;
     }
@@ -293,12 +401,14 @@ export default class AuthorizationSystem extends System {
     const verification = await verifyRegistrationResponse({
       response: input,
       expectedChallenge: expectedChallenge.challenge,
-      expectedOrigin: this.instance.sys.configuration.proxyUrl,
-      expectedRPID: this.instance.sys.configuration.proxyUrl.replace("https://", ""),
+      expectedOrigin: `${
+        this.instance.sys.configuration.proxy.secure ? "https://" : "http://"
+      }${this.instance.sys.configuration.proxy.hostname}`,
+      expectedRPID: this.instance.sys.configuration.proxy.hostname,
     });
 
     const registrationInfo = verification.registrationInfo!;
-    const credential = registrationInfo?.credential;
+    const credential = registrationInfo.credential;
 
     await db`INSERT INTO public.passkeys (
       passkey_id,
@@ -317,7 +427,7 @@ export default class AuthorizationSystem extends System {
       ${credential.counter},
       ${registrationInfo.credentialDeviceType},
       ${registrationInfo.credentialBackedUp},
-      ${credential.transports}
+      ${credential.transports || []}
     )`;
 
     this.temporaryPasskeyCreationChallenges.delete(userId);
@@ -327,17 +437,24 @@ export default class AuthorizationSystem extends System {
 
   async requestPasskeySession(userId: number) {
     const db = this.instance.sys.database.postgres();
-    const userPasskeys = await db`SELECT * FROM public.passkeys WHERE user_id = ${userId}`;
+    const userPasskeys =
+      await db`SELECT * FROM public.passkeys WHERE user_id = ${userId}` as {
+        passkey_id: string;
+        transports: string;
+      }[];
 
-    const passkeyOptions: PublicKeyCredentialRequestOptionsJSON = await generateAuthenticationOptions({
-      rpID: this.instance.sys.configuration.proxyUrl.replace("https://", ""),
-      allowCredentials: userPasskeys.map((passkey: { passkey_id: string; transports: string }) => {
-        return {
-          id: passkey.passkey_id,
-          transports: passkey.transports.split(",") as AuthenticatorTransportFuture[],
-        };
-      }),
-    });
+    const passkeyOptions: PublicKeyCredentialRequestOptionsJSON =
+      await generateAuthenticationOptions({
+        rpID: this.instance.sys.configuration.proxy.hostname,
+        allowCredentials: userPasskeys.map((passkey) => {
+          return {
+            id: passkey.passkey_id,
+            transports: passkey.transports.split(
+              ",",
+            ) as AuthenticatorTransportFuture[],
+          };
+        }),
+      });
 
     this.temporaryPasskeyAuthenticationChallenges.set(userId, passkeyOptions);
 
@@ -345,14 +462,23 @@ export default class AuthorizationSystem extends System {
   }
 
   // biome-ignore lint/suspicious/noExplicitAny: the input is a webauthn response which is very complex and would require a lot of work to type, so we'll just use any here as it is handled by a library and we don't need to worry about the types
-  async createPasskeySession(userId: number, deviceId: AuthorizedDeviceType, input: any, ipAddress?: string) {
+  async createPasskeySession(
+    userId: number,
+    deviceId: AuthorizedDeviceType,
+    input: any,
+    ipAddress?: string,
+  ) {
     const db = this.instance.sys.database.postgres();
-    const expectedChallenge = this.temporaryPasskeyAuthenticationChallenges.get(userId);
+    const expectedChallenge = this.temporaryPasskeyAuthenticationChallenges.get(
+      userId,
+    );
     if (!expectedChallenge) {
       return undefined;
     }
 
-    const passkey = (await db`SELECT * FROM public.passkeys WHERE user_id = ${userId} AND passkey_id = ${input.id}`)?.[0];
+    const passkey =
+      (await db`SELECT * FROM public.passkeys WHERE user_id = ${userId} AND passkey_id = ${input.id}`)
+        ?.[0];
     if (!passkey) {
       return undefined;
     }
@@ -360,21 +486,29 @@ export default class AuthorizationSystem extends System {
     const verification = await verifyAuthenticationResponse({
       response: input,
       expectedChallenge: expectedChallenge.challenge,
-      expectedOrigin: this.instance.sys.configuration.proxyUrl,
-      expectedRPID: this.instance.sys.configuration.proxyUrl.replace("https://", ""),
+      expectedOrigin: `${
+        this.instance.sys.configuration.proxy.secure ? "https://" : "http://"
+      }${this.instance.sys.configuration.proxy.hostname}`,
+      expectedRPID: this.instance.sys.configuration.proxy.hostname,
       credential: {
         id: passkey.id,
         publicKey: passkey.public_key,
         counter: passkey.counter,
-        transports: passkey.transports.split(",") as AuthenticatorTransportFuture[],
+        transports: passkey.transports.split(
+          ",",
+        ) as AuthenticatorTransportFuture[],
       },
     });
 
     if (verification.verified) {
       const sessionToken = crypto.getRandomValues(new Uint32Array(16)).join("");
 
-      await db`INSERT INTO public.sessions (user_id, session_token, device_type, valid_until, ip_address, login_method) VALUES (${userId}, ${sessionToken}, ${deviceId}, ${Date.now() + SESSION_VALID_TERM_MS}, ${ipAddress || "Anonymous"}, 'passkey')`;
-      await db`UPDATE public.passkeys SET last_used_timestamp = NOW(), counter = ${passkey.counter + 1} WHERE passkey_id = ${passkey.passkey_id}`;
+      await db`INSERT INTO public.sessions (user_id, session_token, device_type, valid_until, ip_address, login_method) VALUES (${userId}, ${sessionToken}, ${deviceId}, ${
+        Date.now() + SESSION_VALID_TERM_MS
+      }, ${ipAddress || "Anonymous"}, 'passkey')`;
+      await db`UPDATE public.passkeys SET last_used_timestamp = NOW(), counter = ${
+        passkey.counter + 1
+      } WHERE passkey_id = ${passkey.passkey_id}`;
 
       return `workspaces_session:${userId}:${sessionToken}`;
     }

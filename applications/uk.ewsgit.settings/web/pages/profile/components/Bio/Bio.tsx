@@ -1,7 +1,7 @@
 import DESCRIPTION_ICON from "@material-symbols/svg-700/outlined/description.svg";
-import UKButton from "@ewsgit/uikit-solid/src/components/button/UKButton.jsx";
-import UKStackItem from "@ewsgit/uikit-solid/src/components/stack/UKStackItem.jsx";
-import UKTextField from "@ewsgit/uikit-solid/src/components/textField/UKTextField.jsx";
+import UKButton from "@ewsgit/uikit-solid/src/components/button/UKButton.tsx";
+import UKStackItem from "@ewsgit/uikit-solid/src/components/stack/UKStackItem.tsx";
+import UKTextField from "@ewsgit/uikit-solid/src/components/textField/UKTextField.tsx";
 import { type Component, createResource } from "solid-js";
 import trpc from "../../../../lib/trpc";
 import styles from "./Bio.module.scss";

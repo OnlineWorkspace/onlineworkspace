@@ -1,4 +1,4 @@
-import UKMenu from "@ewsgit/uikit-solid/src/components/menu/UKMenu.jsx";
+import UKMenu from "@ewsgit/uikit-solid/src/components/menu/UKMenu.tsx";
 import { useNavigate } from "@solidjs/router";
 import { type Component, type ParentProps, useContext } from "solid-js";
 import trpc from "../../lib/trpc.ts";
@@ -13,25 +13,25 @@ const ItemMenu: Component<ParentProps> = (props) => {
       items={[
         viewCtx!.selectedItems().length === 1
           ? {
-            type: "category",
-            label: "Open",
-            supportingText:
-              viewCtx!.viewItems().find((i) => i.path === viewCtx!.selectedItems()?.[0])?.type === "file" ? "Default: New Tab" : "Default: Current Tab",
-            async onClick() {
-              const selectedItems = viewCtx!.selectedItems();
-              const viewItem = viewCtx!.viewItems().find((i) => i.path === selectedItems[0]);
+              type: "category",
+              label: "Open",
+              supportingText:
+                viewCtx!.viewItems().find((i) => i.path === viewCtx!.selectedItems()?.[0])?.type === "file" ? "Default: New Tab" : "Default: Current Tab",
+              async onClick() {
+                const selectedItems = viewCtx!.selectedItems();
+                const viewItem = viewCtx!.viewItems().find((i) => i.path === selectedItems[0]);
 
-              if (!viewItem) return;
+                if (!viewItem) return;
 
-              switch (viewItem.type) {
-                case "file":
-                  window.open(await trpc.getRawFile.query(viewItem.path), "_blank");
-                  break;
-                default:
-                  navigate(`/app/uk.ewsgit.files/dir/${viewItem.path}`);
-              }
-            },
-          }
+                switch (viewItem.type) {
+                  case "file":
+                    window.open(await trpc.getRawFile.query(viewItem.path), "_blank");
+                    break;
+                  default:
+                    navigate(`/app/uk.ewsgit.files/dir/${viewItem.path}`);
+                }
+              },
+            }
           : undefined,
         {
           type: "spacer",

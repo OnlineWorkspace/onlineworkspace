@@ -1,7 +1,7 @@
-import UKButton, { AffirmativeButtonState } from "@ewsgit/uikit-solid/src/components/button/UKButton.jsx";
-import UKButtonGroup from "@ewsgit/uikit-solid/src/components/buttonGroup/UKButtonGroup.jsx";
-import UKCircularProgressIndicator from "@ewsgit/uikit-solid/src/components/circularProgressIndicator/UKCircularProgressIndicator.jsx";
-import UKStack from "@ewsgit/uikit-solid/src/components/stack/UKStack.jsx";
+import UKButton, { AffirmativeButtonState } from "@ewsgit/uikit-solid/src/components/button/UKButton.tsx";
+import UKButtonGroup from "@ewsgit/uikit-solid/src/components/buttonGroup/UKButtonGroup.tsx";
+import UKCircularProgressIndicator from "@ewsgit/uikit-solid/src/components/circularProgressIndicator/UKCircularProgressIndicator.tsx";
+import UKStack from "@ewsgit/uikit-solid/src/components/stack/UKStack.tsx";
 import { type Component, createResource, For, Suspense } from "solid-js";
 import trpc from "../../../../lib/trpc";
 import Session from "./components/Session/Session";

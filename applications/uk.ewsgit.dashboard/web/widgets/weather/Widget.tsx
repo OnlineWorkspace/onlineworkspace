@@ -2,7 +2,7 @@ import CLOUD_ICON from "@material-symbols/svg-700/outlined/cloud.svg";
 import RAINY_ICON from "@material-symbols/svg-700/outlined/rainy.svg";
 import SUNNY_ICON from "@material-symbols/svg-700/outlined/sunny.svg";
 import UKCard from "@ewsgit/uikit-solid/src/components/card/UKCard.tsx";
-import UKIcon from "@ewsgit/uikit-solid/src/components/icon/UKIcon.jsx";
+import UKIcon from "@ewsgit/uikit-solid/src/components/icon/UKIcon.tsx";
 import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.tsx";
 import type { Component } from "solid-js";
 

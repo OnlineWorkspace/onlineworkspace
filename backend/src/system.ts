@@ -53,7 +53,7 @@ export default abstract class System {
     return true;
   }
 
-  stop() {
+  stop(): this | Promise<this> {
     this.log.info(`Stopping System ${this.id}`);
     return this;
   }

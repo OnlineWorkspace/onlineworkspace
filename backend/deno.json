@@ -1,14 +1,10 @@
 {
-  "imports": {
-    "@std/fs": "jsr:@std/fs@^1.0.24",
-    "@std/http": "jsr:@std/http@^1.1.1",
-    "@std/path": "jsr:@std/path@^1.1.5",
-    "@opentui/core": "npm:@opentui/core@^0.4.1",
-    "@napi-rs/canvas": "npm:@napi-rs/canvas@^1.0.0"
-  },
   "permissions": {
     "default": {
       "all": true
     }
+  },
+  "imports": {
+    "@std/crypto": "jsr:@std/crypto@^1.1.0"
   }
 }

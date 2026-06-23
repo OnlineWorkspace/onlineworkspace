@@ -1,7 +1,7 @@
 import LOGOUT_ICON from "@material-symbols/svg-700/outlined/logout.svg";
-import UKAvatar from "@ewsgit/uikit-solid/src/components/avatar/UKAvatar.jsx";
+import UKAvatar from "@ewsgit/uikit-solid/src/components/avatar/UKAvatar.tsx";
 import UKIconButton from "@ewsgit/uikit-solid/src/components/iconButton/UKIconButton.tsx";
-import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.jsx";
+import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.tsx";
 import useIsMobile from "@ewsgit/uikit-solid/src/core/useIsMobile.ts";
 import { useNavigate } from "@solidjs/router";
 import { type Component, createResource, Show } from "solid-js";

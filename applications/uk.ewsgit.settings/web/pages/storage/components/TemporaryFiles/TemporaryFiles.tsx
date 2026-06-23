@@ -1,5 +1,5 @@
-import UKStack from "@ewsgit/uikit-solid/src/components/stack/UKStack.jsx";
-import UKStackItem from "@ewsgit/uikit-solid/src/components/stack/UKStackItem.jsx";
+import UKStack from "@ewsgit/uikit-solid/src/components/stack/UKStack.tsx";
+import UKStackItem from "@ewsgit/uikit-solid/src/components/stack/UKStackItem.tsx";
 import type { Component } from "solid-js";
 
 const TemporaryFiles: Component = () => {

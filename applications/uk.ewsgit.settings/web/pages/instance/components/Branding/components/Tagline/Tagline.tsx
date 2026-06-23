@@ -1,8 +1,8 @@
-import UKStackItem from "@ewsgit/uikit-solid/src/components/stack/UKStackItem.jsx";
+import UKStackItem from "@ewsgit/uikit-solid/src/components/stack/UKStackItem.tsx";
 import type { Component } from "solid-js";
-import UKTextField from "@ewsgit/uikit-solid/src/components/textField/UKTextField.jsx";
+import UKTextField from "@ewsgit/uikit-solid/src/components/textField/UKTextField.tsx";
 import brandingStyles from "../../Branding.module.scss";
-import UKButton, { AffirmativeButtonState } from "@ewsgit/uikit-solid/src/components/button/UKButton.jsx";
+import UKButton, { AffirmativeButtonState } from "@ewsgit/uikit-solid/src/components/button/UKButton.tsx";
 
 const Tagline: Component = () => {
   return (

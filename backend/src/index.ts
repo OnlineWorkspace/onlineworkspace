@@ -1,6 +1,7 @@
 // https://github.com/cah4a/trpc-bun-adapter/blob/main/src/createBunHttpHandler.ts TODO: patch this and merge into the instance package
 import Log, { LogMessageStyle } from "./log.ts";
 import type { Sys } from "./system.ts";
+import ApiSystem from "./systems/api.ts";
 import ApplicationsSystem from "./systems/applications.ts";
 import AuthorizationSystem from "./systems/authorization.ts";
 import ConfigurationSystem from "./systems/configuration.ts";
@@ -16,11 +17,8 @@ import { StringListApplicationSetting } from "./systems/settings/applicationSett
 import SettingsSystem from "./systems/settings.ts";
 import TerminalUISystem from "./systems/terminal.ts";
 import TRPCSystem from "./systems/trpc.ts";
-import { createTRPCContext as createWorkspacesTRPCContext, workspacesRouter } from "./systems/trpcRouter.ts";
 import UsersSystem from "./systems/users.ts";
 import WebFrontendSystem from "./systems/webFrontend.ts";
-import { routeRadix } from "@std/http/unstable-route";
-import ApiSystem from "./systems/api.ts";
 
 export enum InstanceStatus {
   Online,
@@ -32,7 +30,6 @@ export enum InstanceStatus {
 class Instance {
   sys: Sys;
   log: Log;
-  webServer!: Deno.HttpServer<Deno.NetAddr>;
   status: InstanceStatus;
 
   versionString: string = "Pre-Alpha 0.1.0";
@@ -62,6 +59,10 @@ class Instance {
     this.sys.api = new ApiSystem(this);
 
     this.status = InstanceStatus.Offline;
+
+    Deno.addSignalListener("SIGINT", () => {
+      this.shutdown();
+    });
   }
 
   async startup() {
@@ -80,9 +81,9 @@ class Instance {
       const subSystemState = await sys.startup();
 
       if (subSystemState) {
-        this.log.system.success(`System '${sys.id}' Startup Complete!`);
+        this.log.system.success(`System '${sys.id}' startup complete!`);
       } else {
-        this.log.system.error(`System '${sys.id}' Startup Failed!`);
+        this.log.system.error(`System '${sys.id}' startup failed!`);
       }
     }
 
@@ -94,21 +95,10 @@ class Instance {
 
     this.sys.event.invoke(WorkspacesEvent.BeforeStartupComplete);
 
-    this.webServer = Deno.serve(
-      { port: this.sys.configuration.apiPort },
-      routeRadix(this.sys.api.routes, () => Response.json({ failed: true })),
-    );
-
-    this.sys.tRPC.registeredRouters.push({
-      basePath: "/api/trpc",
-      router: workspacesRouter,
-      createContext: createWorkspacesTRPCContext(this),
-    });
-
-    // this.log.system.success(`Listening for http requests on port ${this.webServer.port}`);
-
     this.log.system.info("Startup complete");
     this.status = InstanceStatus.Online;
+
+    this.sys.event.invoke(WorkspacesEvent.StartupComplete)
 
     return this;
   }
@@ -124,6 +114,16 @@ class Instance {
 
     this.sys.event.invoke(WorkspacesEvent.BeforeShutdown);
     this.status = InstanceStatus.Offline;
+
+    for (const sys of Object.values(this.sys)) {
+      const subSystemState = await sys.stop();
+
+      if (subSystemState) {
+        this.log.system.success(`System '${sys.id}' shutdown failed!`);
+      } else {
+        this.log.system.error(`System '${sys.id}' shutdown failed! (Shutdown will still continue)`);
+      }
+    }
 
     this.log.system.info("Shutdown complete!\n");
     process.exit(0);

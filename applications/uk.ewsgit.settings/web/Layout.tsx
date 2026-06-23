@@ -5,7 +5,7 @@ import PERSON_ICON from "@material-symbols/svg-700/outlined/person.svg";
 import SETTINGS_APPLICATIONS_ICON from "@material-symbols/svg-700/outlined/settings_applications.svg";
 import STORAGE_ICON from "@material-symbols/svg-700/outlined/storage.svg";
 import WALLPAPER_ICON from "@material-symbols/svg-700/outlined/wallpaper.svg";
-import UKCircularProgressIndicator from "@ewsgit/uikit-solid/src/components/circularProgressIndicator/UKCircularProgressIndicator.jsx";
+import UKCircularProgressIndicator from "@ewsgit/uikit-solid/src/components/circularProgressIndicator/UKCircularProgressIndicator.tsx";
 import UKSideBar from "@ewsgit/uikit-solid/src/components/sideBar/UKSideBar.tsx";
 import { useLocation, useNavigate, useSearchParams } from "@solidjs/router";
 import { type Component, createEffect, createSignal, type ParentProps, Suspense } from "solid-js";
@@ -101,14 +101,14 @@ const Layout: Component<ParentProps> = (props) => {
             },
             isAdministrator()
               ? {
-                type: "button",
-                icon: { type: "icon", value: SETTINGS_APPLICATIONS_ICON },
-                label: "Configure Instance",
-                onClick() {
-                  navigate("/app/uk.ewsgit.settings/instance");
-                },
-                active: location.pathname.startsWith("/app/uk.ewsgit.settings/instance"),
-              }
+                  type: "button",
+                  icon: { type: "icon", value: SETTINGS_APPLICATIONS_ICON },
+                  label: "Configure Instance",
+                  onClick() {
+                    navigate("/app/uk.ewsgit.settings/instance");
+                  },
+                  active: location.pathname.startsWith("/app/uk.ewsgit.settings/instance"),
+                }
               : undefined,
           ]}
         >

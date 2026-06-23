@@ -1,9 +1,9 @@
 import INDETERMINATE_QUESTION_BOX_ICON from "@material-symbols/svg-700/outlined/indeterminate_question_box.svg";
-import UKButton from "@ewsgit/uikit-solid/src/components/button/UKButton.jsx";
-import UKIcon from "@ewsgit/uikit-solid/src/components/icon/UKIcon.jsx";
-import UKCircularProgressIndicator from "@ewsgit/uikit-solid/src/components/circularProgressIndicator/UKCircularProgressIndicator.jsx";
-import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.jsx";
-import UKTopAppBar from "@ewsgit/uikit-solid/src/components/topAppBar/UKTopAppBar.jsx";
+import UKButton from "@ewsgit/uikit-solid/src/components/button/UKButton.tsx";
+import UKIcon from "@ewsgit/uikit-solid/src/components/icon/UKIcon.tsx";
+import UKCircularProgressIndicator from "@ewsgit/uikit-solid/src/components/circularProgressIndicator/UKCircularProgressIndicator.tsx";
+import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.tsx";
+import UKTopAppBar from "@ewsgit/uikit-solid/src/components/topAppBar/UKTopAppBar.tsx";
 import { type Component, createResource, createSignal, For, Suspense } from "solid-js";
 import trpc from "../../lib/trpc";
 import SearchResult from "./components/SearchResult/SearchResult";

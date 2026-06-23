@@ -4,7 +4,7 @@ import UKAvatar from "@ewsgit/uikit-solid/src/components/avatar/UKAvatar.tsx";
 import UKStack from "@ewsgit/uikit-solid/src/components/stack/UKStack.tsx";
 import UKStackItem from "@ewsgit/uikit-solid/src/components/stack/UKStackItem.tsx";
 import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.tsx";
-import UKTopAppBar from "@ewsgit/uikit-solid/src/components/topAppBar/UKTopAppBar.jsx";
+import UKTopAppBar from "@ewsgit/uikit-solid/src/components/topAppBar/UKTopAppBar.tsx";
 import useIsMobile from "@ewsgit/uikit-solid/src/core/useIsMobile.js";
 import webInstanceTRPC from "@onlineworkspace/workspace-instance-web/src/lib/trpc.ts";
 import { useNavigate } from "@solidjs/router";

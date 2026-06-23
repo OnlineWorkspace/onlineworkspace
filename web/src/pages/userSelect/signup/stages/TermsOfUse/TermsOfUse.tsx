@@ -1,7 +1,7 @@
-import UKButton, { type AffirmativeButtonState } from "@ewsgit/uikit-solid/src/components/button/UKButton.jsx";
-import UKCard from "@ewsgit/uikit-solid/src/components/card/UKCard.jsx";
-import UKDivider from "@ewsgit/uikit-solid/src/components/divider/UKDivider.jsx";
-import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.jsx";
+import UKButton, { type AffirmativeButtonState } from "@ewsgit/uikit-solid/src/components/button/UKButton.tsx";
+import UKCard from "@ewsgit/uikit-solid/src/components/card/UKCard.tsx";
+import UKDivider from "@ewsgit/uikit-solid/src/components/divider/UKDivider.tsx";
+import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.tsx";
 import { useNavigate } from "@solidjs/router";
 import clsx from "clsx";
 import { type Component, createResource } from "solid-js";

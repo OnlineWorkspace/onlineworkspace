@@ -1,6 +1,6 @@
 import DELETE_ICON from "@material-symbols/svg-700/outlined/delete.svg";
-import UKIconButton from "@ewsgit/uikit-solid/src/components/iconButton/UKIconButton.jsx";
-import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.jsx";
+import UKIconButton from "@ewsgit/uikit-solid/src/components/iconButton/UKIconButton.tsx";
+import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.tsx";
 import type { Component } from "solid-js";
 import trpc from "../../../../../../../../lib/trpc";
 import styles from "./Passkey.module.scss";

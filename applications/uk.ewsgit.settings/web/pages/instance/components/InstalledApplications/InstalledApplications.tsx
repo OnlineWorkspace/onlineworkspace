@@ -1,4 +1,4 @@
-import UKButton from "@ewsgit/uikit-solid/src/components/button/UKButton.jsx";
+import UKButton from "@ewsgit/uikit-solid/src/components/button/UKButton.tsx";
 import UKStackLabel from "@ewsgit/uikit-solid/src/components/stack/UKStackLabel.tsx";
 import { useNavigate } from "@solidjs/router";
 import type { Component } from "solid-js";

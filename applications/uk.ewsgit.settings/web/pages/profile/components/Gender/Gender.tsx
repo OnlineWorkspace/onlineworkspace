@@ -1,7 +1,7 @@
 import PERSON_ICON from "@material-symbols/svg-700/outlined/person.svg";
-import UKButton from "@ewsgit/uikit-solid/src/components/button/UKButton.jsx";
-import UKSearchableDropdownMenu from "@ewsgit/uikit-solid/src/components/searchableDropdownMenu/UKSearchableDropdownMenu.jsx";
-import UKStackItem from "@ewsgit/uikit-solid/src/components/stack/UKStackItem.jsx";
+import UKButton from "@ewsgit/uikit-solid/src/components/button/UKButton.tsx";
+import UKSearchableDropdownMenu from "@ewsgit/uikit-solid/src/components/searchableDropdownMenu/UKSearchableDropdownMenu.tsx";
+import UKStackItem from "@ewsgit/uikit-solid/src/components/stack/UKStackItem.tsx";
 import { type Component, createResource } from "solid-js";
 import trpc from "../../../../lib/trpc";
 import styles from "./Gender.module.scss";

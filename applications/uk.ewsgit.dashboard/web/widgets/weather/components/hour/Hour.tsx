@@ -1,5 +1,5 @@
-import UKIcon from "@ewsgit/uikit-solid/src/components/icon/UKIcon.jsx";
-import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.jsx";
+import UKIcon from "@ewsgit/uikit-solid/src/components/icon/UKIcon.tsx";
+import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.tsx";
 import type { Component } from "solid-js";
 import styles from "./Hour.module.scss";
 

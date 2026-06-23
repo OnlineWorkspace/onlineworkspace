@@ -1,4 +1,4 @@
-import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.jsx";
+import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.tsx";
 import type { RouteSectionProps } from "@solidjs/router";
 import type { Component } from "solid-js";
 

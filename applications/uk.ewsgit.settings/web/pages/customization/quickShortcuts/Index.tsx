@@ -1,13 +1,13 @@
 import CHEVRON_LEFT_ICON from "@material-symbols/svg-700/outlined/chevron_left.svg";
 import REFRESH_ICON from "@material-symbols/svg-700/outlined/refresh.svg";
-import UKButton from "@ewsgit/uikit-solid/src/components/button/UKButton.jsx";
-import UKButtonGroup from "@ewsgit/uikit-solid/src/components/buttonGroup/UKButtonGroup.jsx";
-import UKCard from "@ewsgit/uikit-solid/src/components/card/UKCard.jsx";
+import UKButton from "@ewsgit/uikit-solid/src/components/button/UKButton.tsx";
+import UKButtonGroup from "@ewsgit/uikit-solid/src/components/buttonGroup/UKButtonGroup.tsx";
+import UKCard from "@ewsgit/uikit-solid/src/components/card/UKCard.tsx";
 import UKDivider from "@ewsgit/uikit-solid/src/components/divider/UKDivider.tsx";
 import UKIcon from "@ewsgit/uikit-solid/src/components/icon/UKIcon.tsx";
 import UKStack from "@ewsgit/uikit-solid/src/components/stack/UKStack.tsx";
 import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.tsx";
-import UKTopAppBar from "@ewsgit/uikit-solid/src/components/topAppBar/UKTopAppBar.jsx";
+import UKTopAppBar from "@ewsgit/uikit-solid/src/components/topAppBar/UKTopAppBar.tsx";
 import { useNavigate } from "@solidjs/router";
 import { type Component, createResource, createSignal } from "solid-js";
 import trpc from "../../../lib/trpc";

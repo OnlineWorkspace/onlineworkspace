@@ -1,14 +1,14 @@
 import CHEVRON_LEFT_ICON from "@material-symbols/svg-700/outlined/chevron_left.svg";
 import ERROR_ICON from "@material-symbols/svg-700/outlined/error.svg";
-import UKButton from "@ewsgit/uikit-solid/src/components/button/UKButton.jsx";
+import UKButton from "@ewsgit/uikit-solid/src/components/button/UKButton.tsx";
 import UKButtonGroup from "@ewsgit/uikit-solid/src/components/buttonGroup/UKButtonGroup.tsx";
 import UKDivider from "@ewsgit/uikit-solid/src/components/divider/UKDivider.tsx";
 import UKIcon from "@ewsgit/uikit-solid/src/components/icon/UKIcon.tsx";
 import UKStack from "@ewsgit/uikit-solid/src/components/stack/UKStack.tsx";
 import UKStackItem from "@ewsgit/uikit-solid/src/components/stack/UKStackItem.tsx";
-import UKStackLabel from "@ewsgit/uikit-solid/src/components/stack/UKStackLabel.jsx";
-import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.jsx";
-import UKTopAppBar from "@ewsgit/uikit-solid/src/components/topAppBar/UKTopAppBar.jsx";
+import UKStackLabel from "@ewsgit/uikit-solid/src/components/stack/UKStackLabel.tsx";
+import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.tsx";
+import UKTopAppBar from "@ewsgit/uikit-solid/src/components/topAppBar/UKTopAppBar.tsx";
 import { useNavigate, useParams, useSearchParams } from "@solidjs/router";
 import { type Component, createResource, For } from "solid-js";
 import trpc from "../../../lib/trpc.ts";

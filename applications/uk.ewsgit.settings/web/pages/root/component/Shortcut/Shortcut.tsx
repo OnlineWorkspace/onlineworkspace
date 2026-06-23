@@ -1,5 +1,5 @@
 import ARROW_RIGHT_ICON from "@material-symbols/svg-700/outlined/arrow_right.svg";
-import UKIcon from "@ewsgit/uikit-solid/src/components/icon/UKIcon.jsx";
+import UKIcon from "@ewsgit/uikit-solid/src/components/icon/UKIcon.tsx";
 import UKStackItem from "@ewsgit/uikit-solid/src/components/stack/UKStackItem.tsx";
 import { useNavigate } from "@solidjs/router";
 import type { Component } from "solid-js";

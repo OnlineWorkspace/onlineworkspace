@@ -1,6 +1,6 @@
-import UKCard from "@ewsgit/uikit-solid/src/components/card/UKCard.jsx";
-import UKIcon from "@ewsgit/uikit-solid/src/components/icon/UKIcon.jsx";
-import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.jsx";
+import UKCard from "@ewsgit/uikit-solid/src/components/card/UKCard.tsx";
+import UKIcon from "@ewsgit/uikit-solid/src/components/icon/UKIcon.tsx";
+import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.tsx";
 import { useNavigate } from "@solidjs/router";
 import { type Component, createResource } from "solid-js";
 import trpc from "../../../../lib/trpc";

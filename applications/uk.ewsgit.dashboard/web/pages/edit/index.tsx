@@ -1,7 +1,7 @@
 import CHEVRON_LEFT from "@material-symbols/svg-700/outlined/chevron_left.svg";
-import UKButton from "@ewsgit/uikit-solid/src/components/button/UKButton.jsx";
-import UKCard from "@ewsgit/uikit-solid/src/components/card/UKCard.jsx";
-import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.jsx";
+import UKButton from "@ewsgit/uikit-solid/src/components/button/UKButton.tsx";
+import UKCard from "@ewsgit/uikit-solid/src/components/card/UKCard.tsx";
+import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.tsx";
 import { useNavigate } from "@solidjs/router";
 import { closestCenter, createSortable, DragDropProvider, DragDropSensors, SortableProvider } from "@thisbeyond/solid-dnd";
 import { type Component, createSignal, For, Show, Suspense } from "solid-js";

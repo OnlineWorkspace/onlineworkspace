@@ -1,5 +1,5 @@
-import UKButton, { AffirmativeButtonState } from "@ewsgit/uikit-solid/src/components/button/UKButton.jsx";
-import UKCard from "@ewsgit/uikit-solid/src/components/card/UKCard.jsx";
+import UKButton, { AffirmativeButtonState } from "@ewsgit/uikit-solid/src/components/button/UKButton.tsx";
+import UKCard from "@ewsgit/uikit-solid/src/components/card/UKCard.tsx";
 import UKStackLabel from "@ewsgit/uikit-solid/src/components/stack/UKStackLabel.tsx";
 import UKTextField from "@ewsgit/uikit-solid/src/components/textField/UKTextField.tsx";
 import type { Component } from "solid-js";

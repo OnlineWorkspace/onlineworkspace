@@ -1,7 +1,7 @@
 import MENU_ICON from "@material-symbols/svg-700/outlined/menu.svg";
 import PHOTO_ICON from "@material-symbols/svg-700/outlined/photo.svg";
 import SEARCH_ICON from "@material-symbols/svg-700/outlined/search.svg";
-import UKSideBar from "@ewsgit/uikit-solid/src/components/sideBar/UKSideBar.jsx";
+import UKSideBar from "@ewsgit/uikit-solid/src/components/sideBar/UKSideBar.tsx";
 import { useLocation, useNavigate } from "@solidjs/router";
 import type { Component, ParentProps } from "solid-js";
 

@@ -118,7 +118,7 @@ const router = t.router({
 
 export type TRPCRouter = typeof router;
 
-instance.sys.tRPC.registeredRouters.push({
+instance.sys.tRPC.routers.push({
   basePath: "/api/app/uk.ewsgit.photos",
   router: router,
   createContext: createTRPCContext(instance),

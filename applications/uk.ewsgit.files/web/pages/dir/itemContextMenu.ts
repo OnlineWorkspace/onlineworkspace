@@ -1,4 +1,4 @@
-import type { MenuItem } from "@ewsgit/uikit-solid/src/components/menu/UKMenu.jsx";
+import type { MenuItem } from "@ewsgit/uikit-solid/src/components/menu/UKMenu.tsx";
 import type { AppContextType } from "../../appContext";
 import type { ViewItem } from "./viewItem";
 

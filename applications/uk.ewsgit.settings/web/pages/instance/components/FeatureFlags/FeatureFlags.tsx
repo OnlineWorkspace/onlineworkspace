@@ -1,7 +1,7 @@
-import UKStack from "@ewsgit/uikit-solid/src/components/stack/UKStack.jsx";
-import UKStackItem from "@ewsgit/uikit-solid/src/components/stack/UKStackItem.jsx";
+import UKStack from "@ewsgit/uikit-solid/src/components/stack/UKStack.tsx";
+import UKStackItem from "@ewsgit/uikit-solid/src/components/stack/UKStackItem.tsx";
 import UKStackLabel from "@ewsgit/uikit-solid/src/components/stack/UKStackLabel.tsx";
-import UKSwitch from "@ewsgit/uikit-solid/src/components/switch/UKSwitch.jsx";
+import UKSwitch from "@ewsgit/uikit-solid/src/components/switch/UKSwitch.tsx";
 import { type Component, createResource, For, Suspense } from "solid-js";
 import trpc from "../../../../lib/trpc";
 import styles from "./FeatureFlags.module.scss";
@@ -32,14 +32,14 @@ const FeatureFlags: Component = () => {
                         mutateFeatures((feats) =>
                           feats !== undefined
                             ? feats.map((f) => {
-                              if (f.id === feature.id)
-                                return {
-                                  ...f,
-                                  enabled: val,
-                                };
+                                if (f.id === feature.id)
+                                  return {
+                                    ...f,
+                                    enabled: val,
+                                  };
 
-                              return f;
-                            })
+                                return f;
+                              })
                             : undefined,
                         );
                       }}

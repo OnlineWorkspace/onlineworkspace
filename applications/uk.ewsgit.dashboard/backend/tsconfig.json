@@ -3,11 +3,16 @@
     "target": "ESNext",
     "module": "nodenext",
     "moduleResolution": "nodenext",
-    "lib": ["ESNext", "Decorators"],
+    "lib": [
+      "ESNext",
+      "Decorators",
+      "Deno.ns"
+    ],
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "strict": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "allowImportingTsExtensions": true
   },
   "include": ["."]
 }

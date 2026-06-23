@@ -36,7 +36,7 @@ export default class ReverseProxySystem extends System {
       let actualDomain = domain;
 
       if (actualDomain === "default") {
-        actualDomain = this.instance.sys.configuration.proxyUrl;
+        actualDomain = this.instance.sys.configuration.proxy;
       }
 
       outputString += `${actualDomain} {

@@ -1,5 +1,5 @@
 import RESET_WRENCH_ICON from "@material-symbols/svg-700/outlined/reset_wrench.svg";
-import UKStackItem from "@ewsgit/uikit-solid/src/components/stack/UKStackItem.jsx";
+import UKStackItem from "@ewsgit/uikit-solid/src/components/stack/UKStackItem.tsx";
 import UKTextField from "@ewsgit/uikit-solid/src/components/textField/UKTextField.tsx";
 import { useParams } from "@solidjs/router";
 import { type Component, createEffect, createSignal } from "solid-js";
@@ -33,13 +33,13 @@ const StringSetting: Component<{
       leading={
         value() !== props.defaultValue
           ? {
-            type: "iconButton",
-            alt: "Reset settings to the default value",
-            value: RESET_WRENCH_ICON,
-            onClick() {
-              setValue(props.defaultValue);
-            },
-          }
+              type: "iconButton",
+              alt: "Reset settings to the default value",
+              value: RESET_WRENCH_ICON,
+              onClick() {
+                setValue(props.defaultValue);
+              },
+            }
           : undefined
       }
       inlineComponent={

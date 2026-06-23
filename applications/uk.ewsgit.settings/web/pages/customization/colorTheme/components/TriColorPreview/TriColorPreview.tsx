@@ -1,4 +1,4 @@
-import UKCard from "@ewsgit/uikit-solid/src/components/card/UKCard.jsx";
+import UKCard from "@ewsgit/uikit-solid/src/components/card/UKCard.tsx";
 import type { Component } from "solid-js";
 import styles from "./TriColorPreview.module.scss";
 

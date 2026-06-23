@@ -1,9 +1,9 @@
 import EDIT_ICON from "@material-symbols/svg-700/outlined/edit.svg";
 import SEARCH_ICON from "@material-symbols/svg-700/outlined/search.svg";
 import SETTINGS_ICON from "@material-symbols/svg-700/outlined/settings.svg";
-import UKButton from "@ewsgit/uikit-solid/src/components/button/UKButton.jsx";
-import UKIconButton from "@ewsgit/uikit-solid/src/components/iconButton/UKIconButton.jsx";
-import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.jsx";
+import UKButton from "@ewsgit/uikit-solid/src/components/button/UKButton.tsx";
+import UKIconButton from "@ewsgit/uikit-solid/src/components/iconButton/UKIconButton.tsx";
+import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.tsx";
 import { useNavigate } from "@solidjs/router";
 import { type Component, createResource, createSignal, For } from "solid-js";
 import trpc from "../../lib/trpc";

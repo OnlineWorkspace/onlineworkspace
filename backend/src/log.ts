@@ -1,5 +1,6 @@
 import util from "node:util";
 import type { Instance } from "./index.ts";
+import { WorkspacesFeatureFlags } from "./systems/configuration.ts";
 
 export enum LogType {
   INFO,
@@ -30,15 +31,18 @@ class Logger {
     return `${LogMessageStyle.EMPHASIZED}${message}${LogMessageStyle.RESET}`;
   }
 
-  info(...message: (string | Uint8Array)[]) {
+  // biome-ignore lint/suspicious/noExplicitAny: can be of any type
+  info(...message: any[]) {
     return this.logMessage(LogType.INFO, ...message);
   }
 
-  success(...message: (string | Uint8Array)[]) {
+  // biome-ignore lint/suspicious/noExplicitAny: can be of any type
+  success(...message: any[]) {
     return this.logMessage(LogType.SUCCESS, ...message);
   }
 
-  warning(...message: (string | Uint8Array)[]) {
+  // biome-ignore lint/suspicious/noExplicitAny: can be of any type
+  warning(...message: any[]) {
     return this.logMessage(LogType.WARNING, ...message);
   }
 
@@ -49,7 +53,8 @@ class Logger {
     return this;
   }
 
-  debug(...message: (string | Uint8Array)[]) {
+  // biome-ignore lint/suspicious/noExplicitAny: can be of any type
+  debug(...message: any[]) {
     // if (!this.log.instance.configurationManager.config.isDevMode) {
     //     return this;
     // }
@@ -59,13 +64,15 @@ class Logger {
 
   // biome-ignore lint/suspicious/noExplicitAny: the message can be of any type
   private logMessage(type: LogType, ...message: any[]): this {
+    const useColor = !(globalThis as unknown as { INSTANCE: Instance })?.INSTANCE?.sys?.configuration?.hasFeature?.(WorkspacesFeatureFlags.ExperimentalTerminalGui)
+
     this.writeMessage(
       type,
       message.length === 1
         ? typeof message[0] === "string"
           ? message[0]
-          : util.inspect(message, { colors: false, compact: false })
-        : util.inspect(message, { colors: false, compact: false }),
+          : util.inspect(message, { colors: useColor, compact: false })
+        : util.inspect(message, { colors: useColor, compact: false }),
     );
 
     return this;

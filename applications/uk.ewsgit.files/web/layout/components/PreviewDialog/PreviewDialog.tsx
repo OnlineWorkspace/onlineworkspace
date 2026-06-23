@@ -3,12 +3,12 @@ import COLLAPSE_CONTENT_ICON from "@material-symbols/svg-700/outlined/collapse_c
 import EXPAND_CONTENT_ICON from "@material-symbols/svg-700/outlined/expand_content.svg";
 import ROTATE_90_DEGREES_CW_ICON from "@material-symbols/svg-700/outlined/rotate_90_degrees_cw.svg";
 import SHARE_ICON from "@material-symbols/svg-700/outlined/share.svg";
-import UKButton from "@ewsgit/uikit-solid/src/components/button/UKButton.jsx";
-import UKCard from "@ewsgit/uikit-solid/src/components/card/UKCard.jsx";
-import UKDivider from "@ewsgit/uikit-solid/src/components/divider/UKDivider.jsx";
-import UKIcon from "@ewsgit/uikit-solid/src/components/icon/UKIcon.jsx";
-import UKIconButton from "@ewsgit/uikit-solid/src/components/iconButton/UKIconButton.jsx";
-import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.jsx";
+import UKButton from "@ewsgit/uikit-solid/src/components/button/UKButton.tsx";
+import UKCard from "@ewsgit/uikit-solid/src/components/card/UKCard.tsx";
+import UKDivider from "@ewsgit/uikit-solid/src/components/divider/UKDivider.tsx";
+import UKIcon from "@ewsgit/uikit-solid/src/components/icon/UKIcon.tsx";
+import UKIconButton from "@ewsgit/uikit-solid/src/components/iconButton/UKIconButton.tsx";
+import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.tsx";
 import clsx from "clsx";
 import path from "path-browserify";
 import { type Component, createResource, createSignal, Show, Suspense, useContext } from "solid-js";
@@ -65,9 +65,9 @@ const PreviewDialog: Component<{ pathUrl: UniformResourceLocator }> = (props) =>
               Preview for {path.basename(props.pathUrl)}
             </UKText>
           </Suspense>
-          <UKIconButton size="xxs" width="wide" color={"outlined"} alt={"Rotate content by 90 degrees"} onClick={() => { }} icon={ROTATE_90_DEGREES_CW_ICON} />
-          <UKIconButton size="xxs" width="wide" color={"outlined"} alt={"Share content"} onClick={() => { }} icon={SHARE_ICON} />
-          <UKButton size="xxs" color={"outlined"} onClick={() => { }}>
+          <UKIconButton size="xxs" width="wide" color={"outlined"} alt={"Rotate content by 90 degrees"} onClick={() => {}} icon={ROTATE_90_DEGREES_CW_ICON} />
+          <UKIconButton size="xxs" width="wide" color={"outlined"} alt={"Share content"} onClick={() => {}} icon={SHARE_ICON} />
+          <UKButton size="xxs" color={"outlined"} onClick={() => {}}>
             Open in [DEFAULT APPLICATION]
           </UKButton>
         </div>

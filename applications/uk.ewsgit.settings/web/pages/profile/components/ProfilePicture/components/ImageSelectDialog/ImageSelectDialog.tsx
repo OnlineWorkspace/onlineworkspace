@@ -1,8 +1,8 @@
 import UKButton from "@ewsgit/uikit-solid/src/components/button/UKButton.tsx";
 import UKButtonGroup from "@ewsgit/uikit-solid/src/components/buttonGroup/UKButtonGroup.tsx";
 import UKDialog from "@ewsgit/uikit-solid/src/components/dialog/UKDialog.tsx";
-import UKDivider from "@ewsgit/uikit-solid/src/components/divider/UKDivider.jsx";
-import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.jsx";
+import UKDivider from "@ewsgit/uikit-solid/src/components/divider/UKDivider.tsx";
+import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.tsx";
 import type { Component } from "solid-js";
 import styles from "./ImageSelectDialog.module.scss";
 

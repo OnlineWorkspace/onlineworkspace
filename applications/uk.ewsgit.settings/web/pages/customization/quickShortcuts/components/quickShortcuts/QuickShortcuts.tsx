@@ -1,7 +1,7 @@
 import DRAG_INDICATOR_ICON from "@material-symbols/svg-700/outlined/drag_indicator.svg";
 import REMOVE_ICON from "@material-symbols/svg-700/outlined/remove.svg";
-import UKIconButton from "@ewsgit/uikit-solid/src/components/iconButton/UKIconButton.jsx";
-import UKStackItem from "@ewsgit/uikit-solid/src/components/stack/UKStackItem.jsx";
+import UKIconButton from "@ewsgit/uikit-solid/src/components/iconButton/UKIconButton.tsx";
+import UKStackItem from "@ewsgit/uikit-solid/src/components/stack/UKStackItem.tsx";
 import { closestCenter, createSortable, DragDropProvider, DragDropSensors, SortableProvider } from "@thisbeyond/solid-dnd";
 import { type Component, createEffect, createSignal, For } from "solid-js";
 import styles from "./QuickShortcuts.module.scss";

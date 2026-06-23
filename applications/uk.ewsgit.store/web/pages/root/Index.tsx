@@ -1,4 +1,4 @@
-import UKTopAppBar from "@ewsgit/uikit-solid/src/components/topAppBar/UKTopAppBar.jsx";
+import UKTopAppBar from "@ewsgit/uikit-solid/src/components/topAppBar/UKTopAppBar.tsx";
 import { type Component, createResource, For } from "solid-js";
 import trpc from "../../lib/trpc";
 import PromotedApplication from "./components/PromotedApplication/PromotedApplication";

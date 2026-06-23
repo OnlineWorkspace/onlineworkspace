@@ -1,5 +1,5 @@
 import UKIcon from "@ewsgit/uikit-solid/src/components/icon/UKIcon.tsx";
-import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.jsx";
+import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.tsx";
 import { useNavigate } from "@solidjs/router";
 import { type Component, useContext } from "solid-js";
 import trpc from "../../../lib/trpc.ts";

@@ -1,4 +1,4 @@
-import UKCircularProgressIndicator from "@ewsgit/uikit-solid/src/components/circularProgressIndicator/UKCircularProgressIndicator.jsx";
+import UKCircularProgressIndicator from "@ewsgit/uikit-solid/src/components/circularProgressIndicator/UKCircularProgressIndicator.tsx";
 import { baselineTheme } from "@ewsgit/uikit-solid/src/core/design/themes/baseline.js";
 import { applyTheme } from "@ewsgit/uikit-solid/src/core/design/tokens.js";
 import { Ref } from "@solid-primitives/refs";

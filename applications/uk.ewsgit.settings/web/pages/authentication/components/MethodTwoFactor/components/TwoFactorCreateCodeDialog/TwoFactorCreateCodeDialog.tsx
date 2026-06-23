@@ -1,6 +1,6 @@
-import UKDivider from "@ewsgit/uikit-solid/src/components/divider/UKDivider.jsx";
-import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.jsx";
-import UKTextField from "@ewsgit/uikit-solid/src/components/textField/UKTextField.jsx";
+import UKDivider from "@ewsgit/uikit-solid/src/components/divider/UKDivider.tsx";
+import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.tsx";
+import UKTextField from "@ewsgit/uikit-solid/src/components/textField/UKTextField.tsx";
 import trpc from "@onlineworkspace/workspace-instance-web/src/lib/trpc";
 import QRCode from "qrcode";
 import { type Component, createEffect, createResource, createSignal } from "solid-js";
@@ -8,7 +8,7 @@ import styles from "./TwoFactorCreateCodeDialog.module.scss";
 
 const TwoFactorCreateCodeDialog: Component = () => {
   const [twoFactorSecret] = createResource(() => trpc.authorization.enableTwoFactor.mutate());
-  const [twoFactorTestCode, setTwoFactorTestCode] = createSignal("");
+  const [twoFactorTestCode, _setTwoFactorTestCode] = createSignal("");
   let canvasElement!: HTMLCanvasElement;
 
   createEffect(() => {

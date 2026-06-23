@@ -13,7 +13,7 @@ import UPLOAD_ICON from "@material-symbols/svg-700/outlined/upload.svg";
 import VIEW_MODULE_ICON from "@material-symbols/svg-700/outlined/view_module.svg";
 import UKCard from "@ewsgit/uikit-solid/src/components/card/UKCard.tsx";
 import UKIconButton from "@ewsgit/uikit-solid/src/components/iconButton/UKIconButton.tsx";
-import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.jsx";
+import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.tsx";
 import useIsMobile from "@ewsgit/uikit-solid/src/core/useIsMobile.ts";
 import clsx from "clsx";
 import browserPath from "path-browserify";

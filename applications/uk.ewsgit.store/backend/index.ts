@@ -40,7 +40,7 @@ const router = t.router({
       if (!app) return undefined;
 
       if (app.bannerImage) {
-        app.bannerImage = `${opt.ctx.instance.sys.configuration.proxyUrl}${await instance.sys.image.serveImage(opt.ctx.userId, app.bannerImage)}`;
+        app.bannerImage = `${opt.ctx.instance.sys.configuration.proxy}${await instance.sys.image.serveImage(opt.ctx.userId, app.bannerImage)}`;
       }
 
       return app;
@@ -82,12 +82,12 @@ const router = t.router({
                 if (app.manifest.icon.type === "image") {
                   icon = {
                     type: "image",
-                    value: `${opt.ctx.instance.sys.configuration.proxyUrl}/api/application/${app.manifest.id}/icon/`,
+                    value: `${opt.ctx.instance.sys.configuration.proxy}/api/application/${app.manifest.id}/icon/`,
                   };
                 } else {
                   icon = {
                     type: "icon",
-                    value: `${opt.ctx.instance.sys.configuration.proxyUrl}/api/application/${app.manifest.id}/icon/`,
+                    value: `${opt.ctx.instance.sys.configuration.proxy}/api/application/${app.manifest.id}/icon/`,
                   };
                 }
               }
@@ -167,11 +167,11 @@ const router = t.router({
       if (!app) return undefined;
 
       if (app.bannerImage) {
-        app.bannerImage = `${opt.ctx.instance.sys.configuration.proxyUrl}${await instance.sys.image.serveImage(opt.ctx.userId, app.bannerImage)}`;
+        app.bannerImage = `${opt.ctx.instance.sys.configuration.proxy}${await instance.sys.image.serveImage(opt.ctx.userId, app.bannerImage)}`;
       }
 
       if (app.icon) {
-        app.icon.value = `${opt.ctx.instance.sys.configuration.proxyUrl}${await instance.sys.image.serveImage(opt.ctx.userId, app.icon.value)}`;
+        app.icon.value = `${opt.ctx.instance.sys.configuration.proxy}${await instance.sys.image.serveImage(opt.ctx.userId, app.icon.value)}`;
       }
 
       return { ...app, isInstalled: instance.sys.applications.availableApplications.find((aid) => aid.manifest!.id === app.id) };
@@ -187,10 +187,10 @@ const router = t.router({
 
       if (!app) return undefined;
 
-      app.icon.value = `${opt.ctx.instance.sys.configuration.proxyUrl}${await instance.sys.image.serveImage(opt.ctx.userId, app.icon.value)}`;
+      app.icon.value = `${opt.ctx.instance.sys.configuration.proxy}${await instance.sys.image.serveImage(opt.ctx.userId, app.icon.value)}`;
 
       if (app.bannerImage) {
-        app.bannerImage = `${opt.ctx.instance.sys.configuration.proxyUrl}${await instance.sys.image.serveImage(opt.ctx.userId, app.bannerImage)}`;
+        app.bannerImage = `${opt.ctx.instance.sys.configuration.proxy}${await instance.sys.image.serveImage(opt.ctx.userId, app.bannerImage)}`;
       }
 
       return {
@@ -241,7 +241,7 @@ const router = t.router({
 
 export type TRPCRouter = typeof router;
 
-instance.sys.tRPC.registeredRouters.push({
+instance.sys.tRPC.routers.push({
   basePath: "/api/app/uk.ewsgit.store",
   router: router,
   createContext: createTRPCContext(instance),

@@ -1,3 +1,4 @@
+import { Buffer } from "node:buffer";
 import { promises as fs, existsSync as fsExistsSync } from "node:fs";
 import path from "node:path";
 import type { Instance } from "../index.ts";
@@ -5,7 +6,6 @@ import System from "../system.ts";
 import type { WorkspacesApplication } from "./applications/application.ts";
 import type { WorkspacesApplicationServiceStatus } from "./applications/serviceStatus.ts";
 import { WorkspacesNotificationPriority } from "./notifications.ts";
-import { Buffer } from "node:buffer";
 
 const APPLICATIONS_CONFIG_FILE_PATH = (subsystem: System) => path.join(subsystem.instance.sys.filesystem.SYSTEM_PATH, "applications.json");
 const APPLICATIONS_TSX_FILE_PATH = (subsystem: System) => path.join(subsystem.instance.sys.filesystem.SYSTEM_PATH, "vite", "Applications.tsx");
@@ -444,5 +444,15 @@ export default class ApplicationsSystem extends System {
       );
 
     return false;
+  }
+
+  async getApplicationStatus(applicationId: string) {
+    const app = this.availableApplications.find((a) => a.manifest?.id === applicationId);
+
+    if (app) {
+      return { installed: true, enabled: app.enabled };
+    } else {
+      return { installed: false };
+    }
   }
 }

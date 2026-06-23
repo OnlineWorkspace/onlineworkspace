@@ -1,71 +1,58 @@
-import fs from "node:fs";
+import * as fs from "@std/fs";
 import path from "node:path";
 import type { Instance } from "../index.ts";
 import System from "../system.ts";
 import { WorkspacesEvent } from "./events.ts";
 
+export enum FileMediaType {
+  Image,
+  Video,
+  ThreeDimensionalModel,
+  Audio,
+  Text,
+}
+
 export default class FilesystemSystem extends System {
   readonly SRC_ROOT = path.resolve("./backend/src/");
+  readonly WEB_ROOT = path.join(this.SRC_ROOT, "../../web/");
   readonly FS_ROOT = path.resolve("./fs/");
   readonly CACHE_PATH = path.join(this.FS_ROOT, "cache");
   readonly SYSTEM_PATH = path.join(this.FS_ROOT, "system");
-  readonly AUTOINSTALL_PATH = path.join(process.cwd(), "autoinstall");
+  readonly AUTO_INSTALL_PATH = path.join(process.cwd(), "auto_install");
 
-  _internalAssets: Map<string, { userId: number; path: string; validUntil: number; public?: boolean }>;
+  _internalAssets: Map<
+    string,
+    { userId: number; path: string; validUntil: number; public?: boolean }
+  >;
   _internalAssetPaths: Map<string, string>;
+  _internalFileExtensions: Map<string, { displayName: string, type: FileMediaType}>;
 
   constructor(instance: Instance) {
     super("filesystem", instance);
 
-    if (!fs.existsSync(this.FS_ROOT)) {
-      fs.mkdirSync(this.FS_ROOT, { recursive: true });
-    }
-
-    if (!fs.existsSync(this.SYSTEM_PATH)) {
-      fs.mkdirSync(this.SYSTEM_PATH, {
-        recursive: true,
-      });
-    }
-
-    if (!fs.existsSync(this.CACHE_PATH)) {
-      fs.mkdirSync(this.CACHE_PATH, { recursive: true });
-    }
-
-    if (!fs.existsSync(path.join(this.FS_ROOT, "assets/login"))) {
-      fs.mkdirSync(path.join(this.FS_ROOT, "assets/login"), {
-        recursive: true,
-      });
-    }
-
-    if (!fs.existsSync(path.join(this.FS_ROOT, "assets/login/banner.png"))) {
-      if (!fs.existsSync(path.join(this.AUTOINSTALL_PATH, "assets/login/banner.png"))) {
-        fs.cpSync(path.join(this.SRC_ROOT, "assets/placeholder/banner.png"), path.join(this.FS_ROOT, "assets/login/banner.png"));
-      } else {
-        fs.cpSync(path.join(this.AUTOINSTALL_PATH, "assets/login/banner.png"), path.join(this.FS_ROOT, "assets/login/banner.png"));
-      }
-    }
-
-    if (!fs.existsSync(path.join(this.FS_ROOT, "assets/login/background.png"))) {
-      fs.cpSync(path.join(this.SRC_ROOT, "assets/wallpapers/pexels-steve-29708303.jpg"), path.join(this.FS_ROOT, "assets/login/background.png"));
-    }
-
-    if (!fs.existsSync(path.join(this.SYSTEM_PATH, "fs_template_files"))) {
-      fs.mkdirSync(path.join(this.SYSTEM_PATH, "fs_template_files"));
-      fs.cpSync(path.join(this.SRC_ROOT, "assets/fs_template_files/"), path.join(this.SYSTEM_PATH, "fs_template_files"), { recursive: true });
-    }
-
-    if (!fs.existsSync(path.join(this.SYSTEM_PATH, "vite"))) {
-      fs.mkdirSync(path.join(this.SYSTEM_PATH, "vite"));
-    }
-
     this._internalAssets = new Map();
     this._internalAssetPaths = new Map();
+    this._internalFileExtensions = new Map();
+
+
+  }
+
+  registerFileExtension(extension: `.${string}`, displayName: string, type: FileMediaType) {
+    this._internalFileExtensions.set(extension, { displayName, type })
+
+    return this
   }
 
   getApplicationSrc(applicationId: string) {
-    console.log(this.instance.sys.applications.availableApplications.find((a) => a.manifest?.id === applicationId)?.path);
+    console.log(
+      this.instance.sys.applications.availableApplications.find((a) =>
+        a.manifest?.id === applicationId
+      )?.path,
+    );
 
-    return this.instance.sys.applications.availableApplications.find((a) => a.manifest?.id === applicationId)?.path;
+    return this.instance.sys.applications.availableApplications.find((a) =>
+      a.manifest?.id === applicationId
+    )?.path;
   }
 
   // Create a directory if it does not already exist
@@ -73,15 +60,12 @@ export default class FilesystemSystem extends System {
   // @returns {false} if already exists
   async createDirectoryIfNotExists(path: string): Promise<boolean> {
     if (
-      await fs.promises
-        .access(path)
-        .then(() => true)
-        .catch(() => false)
+      await fs.exists(path)
     ) {
       return false;
     }
 
-    await fs.promises.mkdir(path, { recursive: true });
+    await Deno.mkdir(path, { recursive: true });
 
     return true;
   }
@@ -129,12 +113,19 @@ export default class FilesystemSystem extends System {
 
   // returns an endpoint where the asset located at the provided path can be loaded from on the client
   // defaults to 3hrs validity
-  serveFile(userId: number, fsPath: string, isPublic: boolean = false, dontCachePath = false, validMs: number = 21600000): string {
+  serveFile(
+    userId: number,
+    fsPath: string,
+    isPublic: boolean = false,
+    dontCachePath = false,
+    validMs: number = 21600000,
+  ): string {
     if (!dontCachePath) {
       const existingAsset = this._internalAssetPaths.get(fsPath);
 
       if (existingAsset) {
-        this._internalAssets.get(existingAsset)!.validUntil = Date.now() + validMs;
+        this._internalAssets.get(existingAsset)!.validUntil = Date.now() +
+          validMs;
 
         return `/api/asset/raw/${existingAsset}`;
       }
@@ -156,20 +147,25 @@ export default class FilesystemSystem extends System {
   }
 
   // TODO: properly implement this instead of this hack.
-  async getUserPermissions(userId: number, fsPath: string): Promise<{ read: boolean; write: boolean }> {
+  async getUserPermissions(
+    userId: number,
+    fsPath: string,
+  ): Promise<{ read: boolean; write: boolean }> {
     const user = (await this.instance.sys.users.getUserById(userId))!;
 
-    if (await user.isAdministrator())
+    if (await user.isAdministrator()) {
       return {
         read: true,
         write: true,
       };
+    }
 
-    if (fsPath.startsWith(path.join(this.FS_ROOT, `/users/${userId}`)))
+    if (fsPath.startsWith(path.join(this.FS_ROOT, `/users/${userId}`))) {
       return {
         read: true,
         write: true,
       };
+    }
 
     const db = this.instance.sys.database.postgres();
 
@@ -213,10 +209,100 @@ export default class FilesystemSystem extends System {
   override async startup(): Promise<boolean> {
     await super.startup();
 
-    this.instance.sys.event.on(WorkspacesEvent.BeforeStartupComplete, async () => {
-      const db = this.instance.sys.database.postgres();
+    if (!fs.existsSync(this.AUTO_INSTALL_PATH)) {
+      // do nothing
+    } else {this.log.info(
+        `Auto install directory detected. (${this.AUTO_INSTALL_PATH})`,
+      );}
 
-      await db`CREATE TABLE IF NOT EXISTS filesystem_permission_overrides (
+    if (!fs.existsSync(this.FS_ROOT)) {
+      Deno.mkdirSync(this.FS_ROOT, { recursive: true });
+    } else this.log.debug(`FS_ROOT exists, (${this.FS_ROOT})`);
+
+    if (!fs.existsSync(this.SYSTEM_PATH)) {
+      Deno.mkdirSync(this.SYSTEM_PATH, {
+        recursive: true,
+      });
+    } else this.log.debug(`SYSTEM_PATH exists, (${this.SYSTEM_PATH})`);
+
+    if (!fs.existsSync(this.CACHE_PATH)) {
+      Deno.mkdirSync(this.CACHE_PATH, { recursive: true });
+    } else this.log.debug(`CACHE_PATH exists, (${this.CACHE_PATH})`);
+
+    if (!fs.existsSync(path.join(this.FS_ROOT, "assets/login"))) {
+      Deno.mkdirSync(path.join(this.FS_ROOT, "assets/login"), {
+        recursive: true,
+      });
+    } else {
+      this.log.debug(
+        `FS_ROOT/assets/login exists, (${
+          path.join(this.FS_ROOT, "assets/login")
+        })`,
+      );
+    }
+
+    if (!fs.existsSync(path.join(this.FS_ROOT, "assets/login/banner.png"))) {
+      if (
+        !fs.existsSync(
+          path.join(this.AUTO_INSTALL_PATH, "assets/login/banner.png"),
+        )
+      ) {
+        Deno.copyFileSync(
+          path.join(this.SRC_ROOT, "assets/placeholder/banner.png"),
+          path.join(this.FS_ROOT, "assets/login/banner.png"),
+        );
+      } else {
+        Deno.copyFileSync(
+          path.join(this.AUTO_INSTALL_PATH, "assets/login/banner.png"),
+          path.join(this.FS_ROOT, "assets/login/banner.png"),
+        );
+      }
+    }
+
+    if (
+      !fs.existsSync(path.join(this.FS_ROOT, "assets/login/background.png"))
+    ) {
+      Deno.copyFileSync(
+        path.join(this.SRC_ROOT, "assets/wallpapers/pexels-steve-29708303.jpg"),
+        path.join(this.FS_ROOT, "assets/login/background.png"),
+      );
+    } else this.log.debug(
+      `FS_ROOT/assets/login/background.png exists, (${
+        path.join(this.FS_ROOT, "assets/login/background.png")
+      })`,
+    );
+
+    if (!fs.existsSync(path.join(this.SYSTEM_PATH, "fs_template_files"))) {
+      Deno.mkdirSync(path.join(this.SYSTEM_PATH, "fs_template_files"));
+      fs.copySync(
+        path.join(this.SRC_ROOT, "assets/fs_template_files/"),
+        path.join(this.SYSTEM_PATH, "fs_template_files"),
+      );
+    }else this.log.debug(
+      `FS_ROOT/assets/fs_template_files exists, (${
+        path.join(this.FS_ROOT, "assets/fs_template_files")
+      })`,
+    );
+
+    if (!fs.existsSync(path.join(this.SYSTEM_PATH, "vite"))) {
+      Deno.mkdirSync(path.join(this.SYSTEM_PATH, "vite"));
+    }
+
+    if (!this.instance.sys.configuration.isDevMode) {
+      if (fs.existsSync(this.CACHE_PATH)) {
+        Deno.removeSync(this.CACHE_PATH, { recursive: true });
+        Deno.mkdirSync(this.CACHE_PATH, { recursive: true });
+      }
+    } else {
+      this.log.warning("Cache was not cleared as we are running in devMode");
+    }
+
+    this.instance.sys.event.on(
+      WorkspacesEvent.BeforeStartupComplete,
+      async () => {
+        const db = this.instance.sys.database.postgres();
+
+        await db`CREATE TABLE IF NOT EXISTS filesystem_permission_overrides (
   file_path TEXT,
   recursive BOOL,
   read_permission_groups TEXT[],
@@ -225,16 +311,8 @@ export default class FilesystemSystem extends System {
   write_permission_users TEXT[],
   owner TEXT[]
 )`;
-
-      if (!this.instance.sys.configuration.isDevMode) {
-        if (fs.existsSync(this.CACHE_PATH)) {
-          fs.rmSync(this.CACHE_PATH, { recursive: true });
-          fs.mkdirSync(this.CACHE_PATH, { recursive: true });
-        }
-      } else {
-        this.log.warning("Cache was not cleared as we are running in devMode");
-      }
-    });
+      },
+    );
 
     return true;
   }

@@ -1,5 +1,5 @@
-import UKNavigationRail from "@ewsgit/uikit-solid/src/components/navigationRail/UKNavigationRail.jsx";
-import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.jsx";
+import UKNavigationRail from "@ewsgit/uikit-solid/src/components/navigationRail/UKNavigationRail.tsx";
+import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.tsx";
 import useIsMobile from "@ewsgit/uikit-solid/src/core/useIsMobile.js";
 import { useLocation, useNavigate } from "@solidjs/router";
 import { type Component, createMemo, createResource, createSignal, type ParentProps, Show } from "solid-js";
@@ -45,8 +45,8 @@ const AppNavigation: Component<ParentProps> = (props) => {
           },
         };
       })
-      .slice(0, isMobile() ? 3 : undefined)
-  })
+      .slice(0, isMobile() ? 3 : undefined);
+  });
 
   return (
     <UKNavigationRail

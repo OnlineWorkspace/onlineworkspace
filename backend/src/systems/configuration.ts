@@ -1,4 +1,8 @@
-import { promises as fs, existsSync as fsExistsSync, readFileSync as fsReadFileSync } from "node:fs";
+import {
+  existsSync as fsExistsSync,
+  promises as fs,
+  readFileSync as fsReadFileSync,
+} from "node:fs";
 import path from "node:path";
 import type { Instance } from "../index.ts";
 import System from "../system.ts";
@@ -7,14 +11,17 @@ export enum WorkspacesFeatureFlags {
   SlashCommands = "slash_commands",
   ShootYourselfInTheFoot = "shoot_yourself_in_the_foot",
   AllowUserSignups = "allow_user_signups",
-  TerminalGui = "terminal_gui",
+  ExperimentalTerminalGui = "experimental_terminal_gui",
+  DisplayProfilesAtLogon = "display_profiles_at_logon"
 }
 
 export const FEATURE_FLAG_DESCRIPTIONS = {
-  [WorkspacesFeatureFlags.SlashCommands]: "Enable the ability to use slash commands in the instance's console",
+  [WorkspacesFeatureFlags.SlashCommands]:
+    "Enable the ability to use slash commands in the instance's console",
   [WorkspacesFeatureFlags.ShootYourselfInTheFoot]:
     "Allow administrators to alter settings / configuration options which may cause the instance to malfunction. (Only enable this if you are sure you know what you are doing!)",
-  [WorkspacesFeatureFlags.AllowUserSignups]: "Allow new users to create accounts from the instance user login page",
+  [WorkspacesFeatureFlags.AllowUserSignups]:
+    "Allow new users to create accounts from the instance user login page",
 };
 
 export default class ConfigurationSystem extends System {
@@ -36,8 +43,13 @@ export default class ConfigurationSystem extends System {
       database: "onlineworkspace_workspace",
     },
   };
-  proxyUrl: string;
-  enabledFeatures: (WorkspacesFeatureFlags | string)[];
+  proxy: { secure: boolean; hostname: string } = {
+    secure: true,
+    hostname: "localhost",
+  };
+  enabledFeatures: (WorkspacesFeatureFlags | string)[] = [
+    WorkspacesFeatureFlags.SlashCommands,
+  ];
   signupRequirements: {
     email: boolean;
     twoFactorAuthentication: boolean;
@@ -70,8 +82,20 @@ export default class ConfigurationSystem extends System {
     };
   };
   termsOfUse: { message: string; lastUpdated: number };
-  defaultQuickShortcuts: string[] = ["uk.ewsgit.dashboard", "uk.ewsgit.store", "uk.ewsgit.settings", "uk.ewsgit.photos", "uk.ewsgit.files"];
-  defaultApplications: { id: string; uri: string }[];
+  defaultQuickShortcuts: string[] = [
+    "uk.ewsgit.dashboard",
+    "uk.ewsgit.store",
+    "uk.ewsgit.settings",
+    "uk.ewsgit.photos",
+    "uk.ewsgit.files",
+  ];
+  defaultApplications: { id: string; uri: string }[] = [
+    { id: "uk.ewsgit.dashboard", uri: "local:uk.ewsgit.dashboard" },
+    { id: "uk.ewsgit.store", uri: "local:uk.ewsgit.store" },
+    { id: "uk.ewsgit.settings", uri: "local:uk.ewsgit.settings" },
+    { id: "uk.ewsgit.photos", uri: "local:uk.ewsgit.photos" },
+    { id: "uk.ewsgit.files", uri: "local:uk.ewsgit.files" },
+  ];
   userDefault: {
     homeDirectories: string[];
     quotaSize: number;
@@ -81,15 +105,15 @@ export default class ConfigurationSystem extends System {
     quotaSize: 1024 * 1024 * 10,
     displayNameFormat: "New User %num%",
   };
-  caddyfile: string | undefined;
+  caddyfile: string | undefined = "../Caddyfile";
   apiPort: number = 3563;
 
   constructor(instance: Instance) {
     super("configuration", instance);
 
-    this.enabledFeatures = [WorkspacesFeatureFlags.SlashCommands];
-    if (process.env.POSTGRES_DATABASE_HOST) this.databases.postgres.host = process.env.POSTGRES_DATABASE_HOST;
-    this.proxyUrl = "https://localhost";
+    if (process.env.POSTGRES_DATABASE_HOST) {
+      this.databases.postgres.host = process.env.POSTGRES_DATABASE_HOST;
+    }
     this.displayName = "Workspace";
     this.mailServer = {
       host: "smtp.example.com",
@@ -121,18 +145,26 @@ export default class ConfigurationSystem extends System {
     - These terms may change. If we make significant updates, we will post a notification within the app or send an email.`,
       lastUpdated: Date.now(),
     };
-    this.defaultApplications = [
-      { id: "uk.ewsgit.dashboard", uri: "local:uk.ewsgit.dashboard" },
-      { id: "uk.ewsgit.store", uri: "local:uk.ewsgit.store" },
-      { id: "uk.ewsgit.settings", uri: "local:uk.ewsgit.settings" },
-      { id: "uk.ewsgit.photos", uri: "local:uk.ewsgit.photos" },
-      { id: "uk.ewsgit.files", uri: "local:uk.ewsgit.files" },
-    ];
-    this.caddyfile = "../Caddyfile";
-    if (fsExistsSync(path.join(this.instance.sys.filesystem.AUTOINSTALL_PATH, "configuration.json"))) {
-      this.log.info("Auto-install configuration detected. Loading configuration from auto-install.");
+    if (
+      fsExistsSync(
+        path.join(
+          this.instance.sys.filesystem.AUTO_INSTALL_PATH,
+          "configuration.json",
+        ),
+      )
+    ) {
+      this.log.info(
+        "Auto-install configuration detected. Loading configuration from auto-install.",
+      );
 
-      const autoInstallConfig = JSON.parse(fsReadFileSync(path.join(this.instance.sys.filesystem.AUTOINSTALL_PATH, "configuration.json")).toString());
+      const autoInstallConfig = JSON.parse(
+        fsReadFileSync(
+          path.join(
+            this.instance.sys.filesystem.AUTO_INSTALL_PATH,
+            "configuration.json",
+          ),
+        ).toString(),
+      );
 
       for (const key of Object.keys(autoInstallConfig)) {
         if (key in this) {
@@ -148,7 +180,9 @@ export default class ConfigurationSystem extends System {
   }
 
   async enableFeature(feature: WorkspacesFeatureFlags | string) {
-    if (!this.enabledFeatures.includes(feature)) this.enabledFeatures.push(feature);
+    if (!this.enabledFeatures.includes(feature)) {
+      this.enabledFeatures.push(feature);
+    }
 
     await this.saveConfiguration();
 
@@ -156,7 +190,9 @@ export default class ConfigurationSystem extends System {
   }
 
   async disableFeature(feature: WorkspacesFeatureFlags | string) {
-    this.enabledFeatures = this.enabledFeatures.filter((feat) => feat !== feature);
+    this.enabledFeatures = this.enabledFeatures.filter((feat) =>
+      feat !== feature
+    );
 
     await this.saveConfiguration();
 
@@ -164,11 +200,18 @@ export default class ConfigurationSystem extends System {
   }
 
   async saveConfiguration(): Promise<boolean> {
-    const CONFIGURATION_FILE_PATH = path.join(this.instance.sys.filesystem.FS_ROOT, "configuration.json");
+    const CONFIGURATION_FILE_PATH = path.join(
+      this.instance.sys.filesystem.FS_ROOT,
+      "configuration.json",
+    );
 
-    const allowedProperties = (Object.keys(this) as (keyof ConfigurationSystem)[]).filter((property) => {
-      return typeof this[property] !== "function" && property !== "instance" && property !== "id" && property !== "log";
-    });
+    const allowedProperties =
+      (Object.keys(this) as (keyof ConfigurationSystem)[]).filter(
+        (property) => {
+          return typeof this[property] !== "function" &&
+            property !== "instance" && property !== "id" && property !== "log";
+        },
+      );
 
     const configurationFileContents: Record<string, unknown> = {};
 
@@ -177,23 +220,35 @@ export default class ConfigurationSystem extends System {
       configurationFileContents[propertyKey] = this[propertyKey];
     }
 
-    await fs.writeFile(CONFIGURATION_FILE_PATH, JSON.stringify(configurationFileContents, null, 2));
+    await fs.writeFile(
+      CONFIGURATION_FILE_PATH,
+      JSON.stringify(configurationFileContents, null, 2),
+    );
 
     return true;
   }
 
   override async startup(): Promise<boolean> {
-    const CONFIGURATION_FILE_PATH = path.join(this.instance.sys.filesystem.FS_ROOT, "configuration.json");
+    const CONFIGURATION_FILE_PATH = path.join(
+      this.instance.sys.filesystem.FS_ROOT,
+      "configuration.json",
+    );
 
     if (!fsExistsSync(CONFIGURATION_FILE_PATH)) {
       await this.saveConfiguration();
     }
 
-    const configurationFile = JSON.parse((await fs.readFile(CONFIGURATION_FILE_PATH)).toString());
+    const configurationFile = JSON.parse(
+      (await fs.readFile(CONFIGURATION_FILE_PATH)).toString(),
+    );
 
-    const allowedProperties = (Object.keys(this) as (keyof ConfigurationSystem)[]).filter((property) => {
-      return typeof this[property] !== "function" && property !== "instance" && property !== "id" && property !== "log";
-    });
+    const allowedProperties =
+      (Object.keys(this) as (keyof ConfigurationSystem)[]).filter(
+        (property) => {
+          return typeof this[property] !== "function" &&
+            property !== "instance" && property !== "id" && property !== "log";
+        },
+      );
 
     for (const propertyKey of allowedProperties) {
       if (propertyKey in configurationFile) {
@@ -202,8 +257,16 @@ export default class ConfigurationSystem extends System {
       }
     }
 
-    for (const feature of Object.keys(WorkspacesFeatureFlags) as (keyof typeof WorkspacesFeatureFlags)[]) {
-      this.log.info(`Feature ${feature} -> ${this.enabledFeatures.includes(WorkspacesFeatureFlags[feature])}`);
+    for (
+      const feature of Object.keys(
+        WorkspacesFeatureFlags,
+      ) as (keyof typeof WorkspacesFeatureFlags)[]
+    ) {
+      this.log.info(
+        `Feature ${feature} -> ${
+          this.enabledFeatures.includes(WorkspacesFeatureFlags[feature])
+        }`,
+      );
     }
 
     return true;

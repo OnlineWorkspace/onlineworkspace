@@ -1,19 +1,11 @@
 import readline from "node:readline/promises";
-import {
-  BoxRenderable,
-  type CliRenderer,
-  ConsolePosition,
-  createCliRenderer,
-  InputRenderable,
-  RGBA,
-  ScrollBoxRenderable,
-  TextRenderable,
-} from "@opentui/core";
+import type { CliRenderer, RGBA } from "@opentui/core";
 import chalk from "chalk";
 import type { Instance } from "../index.ts";
 import { LogMessageStyle, LogType } from "../log.ts";
 import System from "../system.ts";
 import { WorkspacesFeatureFlags } from "./configuration.ts";
+import { WorkspacesEvent } from "./events.ts";
 
 const COMPACT_LOG_TYPE = false;
 
@@ -32,6 +24,7 @@ const MESSAGE_LEVEL_COLOR: [number, number, number] = [250, 163, 7];
 
 export default class TerminalUISystem extends System {
   private renderer!: CliRenderer;
+  private readlineInterface!: readline.Interface;
 
   constructor(instance: Instance) {
     super("terminal_ui", instance);
@@ -42,7 +35,11 @@ export default class TerminalUISystem extends System {
 
     await super.startup();
 
-    if (!this.instance.sys.configuration.hasFeature(WorkspacesFeatureFlags.TerminalGui)) {
+    this.instance.sys.event.on(WorkspacesEvent.BeforeShutdown, () => {
+      this.stop();
+    });
+
+    if (!this.instance.sys.configuration.hasFeature(WorkspacesFeatureFlags.ExperimentalTerminalGui)) {
       function addLogMessage(log: { type: LogType; level: string; message: string }) {
         let consoleLogOutput: string = "";
         const currentTypeColor = MESSAGE_TYPE_COLORS[log.type];
@@ -128,6 +125,7 @@ export default class TerminalUISystem extends System {
               break;
           }
         }
+        // @ts-ignore
         global.backup.console.log(consoleLogOutput);
       }
 
@@ -139,24 +137,24 @@ export default class TerminalUISystem extends System {
         addLogMessage(message);
       });
 
-      const rlInterface = readline.createInterface(process.stdin, process.stdout);
+      this.readlineInterface = readline.createInterface(process.stdin, process.stdout);
 
-      rlInterface.addListener("line", (data) => {
+      this.readlineInterface.addListener("line", (data) => {
         this.instance.sys.consoleCommands.executeCommandFromString(data);
       });
 
-      rlInterface.on("SIGINT", () => {
-        rlInterface.close();
+      this.readlineInterface.on("SIGINT", () => {
         this.instance.shutdown();
       });
 
-      rlInterface.on("SIGTERM", () => {
-        rlInterface.close();
+      this.readlineInterface.on("SIGTERM", () => {
         this.instance.shutdown();
       });
 
       return true;
     }
+
+    const { BoxRenderable, ConsolePosition, createCliRenderer, InputRenderable, RGBA, ScrollBoxRenderable, TextRenderable } = await import("@opentui/core");
 
     const self = this;
     function toRGBA(colorArray: [number, number, number]): RGBA {
@@ -341,6 +339,7 @@ export default class TerminalUISystem extends System {
 
   override stop(): this {
     this.renderer?.destroy?.();
+    this.readlineInterface?.close?.();
 
     return this;
   }
