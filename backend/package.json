@@ -29,7 +29,7 @@
     "fast-folder-size": "^2.4.0",
     "hi-base32": "^0.5.1",
     "minimist": "^1.2.8",
-    "nodemailer": "^7.0.12",
+    "nodemailer": "^9.0.1",
     "otpauth": "^9.4.1",
     "path-to-regexp": "^8.3.0",
     "postgres": "^3.4.9",
