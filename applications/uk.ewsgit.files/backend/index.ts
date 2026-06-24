@@ -2,7 +2,7 @@
 
 import { promises as fs } from "node:fs";
 import * as path from "node:path";
-import { createTRPCContext, procedure } from "@onlineworkspace/workspace-instance/src/systems/trpcRouter.ts";
+import { createTRPCContext, procedure } from "@onlineworkspace/workspace-backend/src/systems/trpcRouter.ts";
 import { initTRPC } from "@trpc/server";
 import fastFolderSize from "fast-folder-size/sync.js";
 import z from "zod";

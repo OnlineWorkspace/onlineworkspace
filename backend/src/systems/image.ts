@@ -39,7 +39,7 @@ export default class ImageSystem extends System {
     path: string,
     options?: {
       isPublic?: boolean;
-      dontCachePath?: boolean;
+      evadeCache?: boolean;
       validMs?: number;
     } & (
       | {
@@ -68,7 +68,7 @@ export default class ImageSystem extends System {
   ): Promise<string> {
     const opts = {
       isPublic: options?.isPublic ?? false,
-      dontCachePath: options?.dontCachePath ?? false,
+      evadeCache: options?.evadeCache ?? false,
       validMs: options?.validMs ?? 21600000,
       crop: options && "crop" in options ? options.crop : undefined,
       resize: options && "resize" in options ? options.resize : undefined,
@@ -98,7 +98,7 @@ export default class ImageSystem extends System {
       requestResolution += `_${cropKey}`;
     }
 
-    if (!opts.dontCachePath) {
+    if (!opts.evadeCache) {
       const existingImageId = this._internalImagePaths.get(path);
       if (existingImageId) {
         const existingImage = this._internalImages.get(existingImageId);
@@ -106,7 +106,7 @@ export default class ImageSystem extends System {
           const existingImageOfResolution = existingImage[requestResolution];
           if (existingImageOfResolution) {
             existingImageOfResolution.validUntil = Date.now() + opts.validMs;
-            return `/api/asset/image/${existingImageId}/${requestResolution}`;
+            return `${this.instance.sys.configuration.proxy.secure ? "https://" : "http://"}${this.instance.sys.configuration.proxy.hostname}/api/asset/image/${existingImageId}/${requestResolution}`;
           }
         }
       }
@@ -137,7 +137,7 @@ export default class ImageSystem extends System {
 
     this.log.info(`Serving image at '${nodePath.relative(this.instance.sys.filesystem.FS_ROOT, path)}' as '${imageId}'`);
 
-    return `/api/asset/image/${imageId}/${requestResolution}`;
+    return `${this.instance.sys.configuration.proxy.secure ? "https://" : "http://"}${this.instance.sys.configuration.proxy.hostname}/api/asset/image/${imageId}/${requestResolution}`;
   }
 
   async resizeImage(

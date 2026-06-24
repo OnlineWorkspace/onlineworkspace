@@ -1,7 +1,7 @@
 /// <reference path="./global.d.ts" />
 
 import { EventEmitter, on } from "node:events";
-import { createTRPCContext, procedure } from "@onlineworkspace/workspace-instance/src/systems/trpcRouter.js";
+import { createTRPCContext, procedure } from "@onlineworkspace/workspace-backend/src/systems/trpcRouter.js";
 import { initTRPC } from "@trpc/server";
 import chalk from "chalk";
 

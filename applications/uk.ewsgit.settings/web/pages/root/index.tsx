@@ -13,7 +13,7 @@ import UKDivider from "@ewsgit/uikit-solid/src/components/divider/UKDivider.tsx"
 import UKStack from "@ewsgit/uikit-solid/src/components/stack/UKStack.tsx";
 import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.tsx";
 import UKTopAppBar from "@ewsgit/uikit-solid/src/components/topAppBar/UKTopAppBar.tsx";
-import webInstanceTRPC from "@onlineworkspace/workspace-instance-web/src/lib/trpc.ts";
+import webInstanceTRPC from "@onlineworkspace/workspace-web/src/lib/trpc.ts";
 import { useNavigate } from "@solidjs/router";
 import clsx from "clsx";
 import { type Component, createResource, Suspense } from "solid-js";

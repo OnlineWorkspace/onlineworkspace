@@ -1,5 +1,5 @@
 {
-  "name": "@onlineworkspace/workspace-instance-web",
+  "name": "@onlineworkspace/workspace-web",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -20,6 +20,7 @@
     "@trpc/server": "^11.13.4",
     "@types/qrcode": "^1.5.6",
     "@ewsgit/uikit-solid": "workspace:*",
+    "@onlineworkspace/workspace-backend": "workspace:*",
     "clsx": "^2.1.1",
     "qrcode": "^1.5.4",
     "solid-devtools": "^0.34.5",

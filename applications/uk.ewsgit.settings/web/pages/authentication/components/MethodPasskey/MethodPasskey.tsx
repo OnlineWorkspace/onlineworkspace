@@ -70,7 +70,7 @@ const MethodPasskey: Component = () => {
                 };
               }}
             >
-              Create a new Passkey
+              {supportsPasskeys() ? "Create a new Passkey" : "Your device does not yet support Passkeys"}
             </UKButton>
           </div>
         </Suspense>

@@ -1,7 +1,7 @@
 import UKDivider from "@ewsgit/uikit-solid/src/components/divider/UKDivider.tsx";
 import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.tsx";
 import UKTextField from "@ewsgit/uikit-solid/src/components/textField/UKTextField.tsx";
-import trpc from "@onlineworkspace/workspace-instance-web/src/lib/trpc";
+import trpc from "@onlineworkspace/workspace-web/src/lib/trpc";
 import QRCode from "qrcode";
 import { type Component, createEffect, createResource, createSignal } from "solid-js";
 import styles from "./TwoFactorCreateCodeDialog.module.scss";

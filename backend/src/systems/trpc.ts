@@ -48,12 +48,35 @@ export default class TRPCSystem extends System {
       server: Deno.HttpServer<Deno.NetAddr>,
     ) => object = createOnlineWorkspaceTRPCContext(this.instance),
   ) {
-    if (this.routers.find(r => r.basePath === basePath)) throw new Error(`A TRPC Router has already been registered with this basePath! ${basePath}`)
+    if (this.routers.find((r) => r.basePath === basePath)) {
+      this.log.info(this.routers);
+      throw new Error(
+        `A TRPC Router has already been registered with this basePath! ${basePath}`,
+      );
+    }
 
     this.routers.push({
       basePath,
       router,
-      createContext
+      createContext,
+    });
+
+    this.log.debug(`Registered tRPC router at ${basePath}`);
+
+    const self = this;
+
+    this.instance.sys.api.addRoute({
+      pattern: new URLPattern({ pathname: `${basePath}/*` }),
+      async handler(req) {
+        return (await self.instance.sys.tRPC.attemptTRPCRequest(
+          req,
+          self.instance.sys.api.webServer,
+        )) ||
+          Response.json({
+            notFound: true,
+            message: "Unhandled by tRPC router",
+          }, { status: 404 });
+      },
     });
   }
 

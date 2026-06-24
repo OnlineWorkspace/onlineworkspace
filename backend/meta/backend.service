@@ -1,12 +1,12 @@
 [Unit]
-Description=Start workspace instance backend
+Description=Start OnlineWorkspace instance backend
 After=network.target
 StartLimitBurst=10
 StartLimitIntervalSec=60
 
 [Service]
 Type=simple
-ExecStart=/var/www/workspaces/backend/meta/backend.sh
+ExecStart=/var/www/onlineworkspace/backend/meta/backend.sh
 Restart=on-failure
 RestartSec=5
 User=root

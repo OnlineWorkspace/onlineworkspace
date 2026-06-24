@@ -2,14 +2,14 @@
 
 import * as fs from "@std/fs";
 import path from "node:path";
-import { WorkspacesEvent } from "@onlineworkspace/workspace-instance/src/systems/events.ts";
-import { BooleanApplicationSetting } from "@onlineworkspace/workspace-instance/src/systems/settings/applicationSetting/booleanSetting.ts";
-import { StringListApplicationSetting } from "@onlineworkspace/workspace-instance/src/systems/settings/applicationSetting/stringListSetting.ts";
-import { StringApplicationSetting } from "@onlineworkspace/workspace-instance/src/systems/settings/applicationSetting/stringSetting.ts";
+import { WorkspacesEvent } from "@onlineworkspace/workspace-backend/src/systems/events.ts";
+import { BooleanApplicationSetting } from "@onlineworkspace/workspace-backend/src/systems/settings/applicationSetting/booleanSetting.ts";
+import { StringListApplicationSetting } from "@onlineworkspace/workspace-backend/src/systems/settings/applicationSetting/stringListSetting.ts";
+import { StringApplicationSetting } from "@onlineworkspace/workspace-backend/src/systems/settings/applicationSetting/stringSetting.ts";
 import {
   createOnlineWorkspaceTRPCContext,
   procedure,
-} from "@onlineworkspace/workspace-instance/src/systems/trpc/coreRouter.ts";
+} from "@onlineworkspace/workspace-backend/src/systems/trpc/coreRouter.ts";
 import { initTRPC } from "@trpc/server";
 import z from "zod";
 
@@ -46,11 +46,11 @@ const router = t.router({
               displayName: `${forename} ${surname}`,
               username: username,
               avatar:
-                `${opt.ctx.instance.sys.configuration.proxy}/api/user/me/avatar/m`,
+                `${opt.ctx.instance.sys.configuration.proxy.secure ? "https://" : "http://"}${opt.ctx.instance.sys.configuration.proxy.hostname}/api/user/me/avatar/m`,
             };
           }),
         avatar: procedure.output(z.string()).query(async (opt) => {
-          return `${opt.ctx.instance.sys.configuration.proxy}/api/user/me/avatar/2xl`;
+          return `${opt.ctx.instance.sys.configuration.proxy.secure ? "https://" : "http://"}${opt.ctx.instance.sys.configuration.proxy.hostname}/api/user/me/avatar/2xl`;
         }),
       },
     },
@@ -262,12 +262,8 @@ const router = t.router({
 });
 
 export type TRPCRouter = typeof router;
+instance.sys.tRPC.registerTRPCRouter(router, "/api/app/uk.ewsgit.dashboard")
 
-instance.sys.tRPC.routers.push({
-  basePath: "/api/app/uk.ewsgit.dashboard",
-  router: router,
-  createContext: createOnlineWorkspaceTRPCContext(instance),
-});
 
 instance.sys.event.on(WorkspacesEvent.BeforeStartupComplete, () => {
   instance.sys.settings.registerApplicationSetting(

@@ -7,7 +7,7 @@
     "@material-symbols/svg-700": "^0.42.3",
     "@solidjs/router": "^0.15.3",
     "@ewsgit/uikit-solid": "workspace:*",
-    "@onlineworkspace/workspace-instance-web": "workspace:*",
+    "@onlineworkspace/workspace-web": "workspace:*",
     "@thisbeyond/solid-dnd": "^0.7.5",
     "@trpc/client": "^11.6.0",
     "@trpc/server": "^11.6.0",

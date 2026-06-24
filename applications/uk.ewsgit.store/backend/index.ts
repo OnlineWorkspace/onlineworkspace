@@ -1,16 +1,16 @@
 /// <reference path="./global.d.ts" />
 
-import { WorkspacesFeatureFlags } from "@onlineworkspace/workspace-instance/src/systems/configuration.ts";
-import { adminProcedure, createTRPCContext, procedure } from "@onlineworkspace/workspace-instance/src/systems/trpcRouter.ts";
+import { WorkspacesFeatureFlags } from "@onlineworkspace/workspace-backend/src/systems/configuration.ts";
+import { adminProcedure, createOnlineWorkspaceTRPCContext, procedure } from "@onlineworkspace/workspace-backend/src/systems/trpc/coreRouter.ts";
 import { initTRPC } from "@trpc/server";
 import fastFolderSizeSync from "fast-folder-size/sync.js";
 import z from "zod";
-import type ApplicationRepository from "./repository/applicationRepository.ts";
-import LocalApplicationRepository from "./repository/localRepository.ts";
+import type ApplicationRepository from "./applicationRepository.ts";
+import LocalApplicationRepository from "./repositories/localRepository.ts";
 
 const log = instance.log.createLogger("uk.ewsgit.store");
 
-export const t = initTRPC.context<ReturnType<typeof createTRPCContext>>().create();
+export const t = initTRPC.context<ReturnType<typeof createOnlineWorkspaceTRPCContext>>().create();
 
 const applicationRepositories: ApplicationRepository[] = [new LocalApplicationRepository()];
 
@@ -40,7 +40,7 @@ const router = t.router({
       if (!app) return undefined;
 
       if (app.bannerImage) {
-        app.bannerImage = `${opt.ctx.instance.sys.configuration.proxy}${await instance.sys.image.serveImage(opt.ctx.userId, app.bannerImage)}`;
+        app.bannerImage = await instance.sys.image.serveImage(opt.ctx.userId, app.bannerImage);
       }
 
       return app;
@@ -82,12 +82,12 @@ const router = t.router({
                 if (app.manifest.icon.type === "image") {
                   icon = {
                     type: "image",
-                    value: `${opt.ctx.instance.sys.configuration.proxy}/api/application/${app.manifest.id}/icon/`,
+                    value: `${opt.ctx.instance.sys.configuration.proxy.secure ? "https://" : "http://"}${opt.ctx.instance.sys.configuration.proxy.hostname}/api/application/${app.manifest.id}/icon/`,
                   };
                 } else {
                   icon = {
                     type: "icon",
-                    value: `${opt.ctx.instance.sys.configuration.proxy}/api/application/${app.manifest.id}/icon/`,
+                    value: `${opt.ctx.instance.sys.configuration.proxy.secure ? "https://" : "http://"}${opt.ctx.instance.sys.configuration.proxy.hostname}/api/application/${app.manifest.id}/icon/`,
                   };
                 }
               }
@@ -167,11 +167,11 @@ const router = t.router({
       if (!app) return undefined;
 
       if (app.bannerImage) {
-        app.bannerImage = `${opt.ctx.instance.sys.configuration.proxy}${await instance.sys.image.serveImage(opt.ctx.userId, app.bannerImage)}`;
+        app.bannerImage = await instance.sys.image.serveImage(opt.ctx.userId, app.bannerImage)
       }
 
       if (app.icon) {
-        app.icon.value = `${opt.ctx.instance.sys.configuration.proxy}${await instance.sys.image.serveImage(opt.ctx.userId, app.icon.value)}`;
+        app.icon.value = await instance.sys.image.serveImage(opt.ctx.userId, app.icon.value)
       }
 
       return { ...app, isInstalled: instance.sys.applications.availableApplications.find((aid) => aid.manifest!.id === app.id) };
@@ -187,10 +187,10 @@ const router = t.router({
 
       if (!app) return undefined;
 
-      app.icon.value = `${opt.ctx.instance.sys.configuration.proxy}${await instance.sys.image.serveImage(opt.ctx.userId, app.icon.value)}`;
+      app.icon.value = await instance.sys.image.serveImage(opt.ctx.userId, app.icon.value)
 
       if (app.bannerImage) {
-        app.bannerImage = `${opt.ctx.instance.sys.configuration.proxy}${await instance.sys.image.serveImage(opt.ctx.userId, app.bannerImage)}`;
+        app.bannerImage = await instance.sys.image.serveImage(opt.ctx.userId, app.bannerImage)
       }
 
       return {
@@ -241,8 +241,4 @@ const router = t.router({
 
 export type TRPCRouter = typeof router;
 
-instance.sys.tRPC.routers.push({
-  basePath: "/api/app/uk.ewsgit.store",
-  router: router,
-  createContext: createTRPCContext(instance),
-});
+instance.sys.tRPC.registerTRPCRouter(router, "/api/app/uk.ewsgit.store")

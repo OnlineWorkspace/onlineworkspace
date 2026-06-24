@@ -3,7 +3,11 @@
     "target": "ESNext",
     "module": "nodenext",
     "moduleResolution": "nodenext",
-    "lib": ["ESNext", "Decorators"],
+    "lib": [
+      "ESNext",
+      "Decorators",
+      "deno.ns"
+    ],
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "strict": true,

@@ -3,19 +3,22 @@
 import { existsSync as fsExistsSync } from "node:fs";
 import fs from "node:fs/promises";
 import path from "node:path";
-import { AuthorizedDeviceType, SESSION_VALID_TERM_MS } from "@onlineworkspace/workspace-instance/src/systems/authorization.ts";
-import { FEATURE_FLAG_DESCRIPTIONS, WorkspacesFeatureFlags } from "@onlineworkspace/workspace-instance/src/systems/configuration.ts";
-import { WorkspacesNotificationPriority } from "@onlineworkspace/workspace-instance/src/systems/notifications.ts";
-import { GlobalApplicationSetting } from "@onlineworkspace/workspace-instance/src/systems/settings/applicationSetting/applicationSetting.ts";
-import { adminProcedure, createTRPCContext, procedure } from "@onlineworkspace/workspace-instance/src/systems/trpcRouter.ts";
+import { AuthorizedDeviceType, SESSION_VALID_TERM_MS } from "@onlineworkspace/workspace-backend/src/systems/authorization.ts";
+import { FEATURE_FLAG_DESCRIPTIONS, WorkspacesFeatureFlags } from "@onlineworkspace/workspace-backend/src/systems/configuration.ts";
+import { WorkspacesNotificationPriority } from "@onlineworkspace/workspace-backend/src/systems/notifications.ts";
+import { GlobalApplicationSetting } from "@onlineworkspace/workspace-backend/src/systems/settings/applicationSetting/applicationSetting.ts";
 import { initTRPC, TRPCError } from "@trpc/server";
 import { octetInputParser } from "@trpc/server/http";
 import sharp from "sharp";
 import z from "zod";
+import { adminProcedure, createOnlineWorkspaceTRPCContext, procedure } from "@onlineworkspace/workspace-backend/src/systems/trpc/coreRouter.ts";
+import { crypto } from "@std/crypto";
+import {getCookies} from "@std/http"
+import { FileMediaType } from "../../../backend/src/systems/filesystem.ts";
 
 const log = instance.log.createLogger("uk.ewsgit.settings");
 
-export const t = initTRPC.context<ReturnType<typeof createTRPCContext>>().create();
+export const t = initTRPC.context<ReturnType<typeof createOnlineWorkspaceTRPCContext>>().create();
 
 const router = t.router({
   overview: {
@@ -31,7 +34,7 @@ const router = t.router({
         return isAdministrator ? "Administrator" : "User";
       }),
       getAvatar: procedure.output(z.string()).query(async (opt) => {
-        return `${opt.ctx.instance.sys.configuration.proxy}/api/user/me/avatar/l`;
+        return `${opt.ctx.instance.sys.configuration.proxy.secure ? "https://" : "http://"}${opt.ctx.instance.sys.configuration.proxy.hostname}/api/user/me/avatar/l`;
       }),
     },
   },
@@ -143,7 +146,7 @@ const router = t.router({
       return true;
     }),
     getProfilePicture: procedure.output(z.string()).query(async (opt) => {
-      return `${opt.ctx.instance.sys.configuration.proxy}/api/user/me/avatar/l`;
+      return `${opt.ctx.instance.sys.configuration.proxy.secure ? "https://" : "http://"}${opt.ctx.instance.sys.configuration.proxy.hostname}/api/user/me/avatar/l`;
     }),
   },
   authentication: {
@@ -178,7 +181,7 @@ const router = t.router({
         const db = instance.sys.database.postgres();
 
         const passkeys =
-          await db`SELECT passkey_id, creation_timetamp, last_used_timestamp, device_type, counter FROM public.passkeys WHERE user_id = ${opt.ctx.userId}`;
+          await db`SELECT passkey_id, creation_timetamp, last_used_timestamp, device_type, counter FROM public.passkeys WHERE user_id = ${opt.ctx.userId}` as { passkey_id: string; creation_timetamp: Date; last_used_timestamp: Date; device_type: string; counter: string }[]
 
         return passkeys.map((passkey: { passkey_id: string; creation_timetamp: Date; last_used_timestamp: Date; device_type: string; counter: string }) => {
           return {
@@ -225,18 +228,16 @@ const router = t.router({
             login_method: string;
           }[];
 
-        const cookieString = opt.ctx.rawRequest.req.headers?.get("cookie");
+          const cookies = getCookies(opt.ctx.rawRequest.req.headers);
 
-        if (cookieString === null) {
-          throw new TRPCError({
-            code: "UNAUTHORIZED",
-            message: "missing auth cookie",
-          });
-        }
+          if (!cookies.Authorization) {
+            throw new TRPCError({
+              code: "UNAUTHORIZED",
+              message: "missing auth cookie",
+            });
+          }
 
-        const parsedCookie = Bun.Cookie.parse(cookieString);
-
-        const [_, _userId, token] = decodeURIComponent(parsedCookie.value).split(":");
+        const [_, _userId, token] = decodeURIComponent(cookies.Authorization).split(":");
 
         return sessions.map((s) => {
           return {
@@ -577,14 +578,14 @@ const router = t.router({
           opt.ctx.instance.sys.configuration.proxy +
           (await opt.ctx.instance.sys.image.serveImage(opt.ctx.userId, requiredResizedWallpaperPath, {
             isPublic: false,
-            dontCachePath: true,
+            evadeCache: true,
           }))
         );
       }),
       upload: procedure.input(octetInputParser).mutation(async (opt) => {
         const wallpapersPath = path.join((await opt.ctx.user()).getPath(), "assets/wallpapers");
 
-        const wallpaperUUID = Bun.randomUUIDv7();
+        const wallpaperUUID = crypto.randomUUID();
 
         // @ts-ignore
         const bytes = await opt.input.bytes();
@@ -752,12 +753,12 @@ const router = t.router({
                     if (app.manifest.icon.type === "image") {
                       icon = {
                         type: "image",
-                        value: `${opt.ctx.instance.sys.configuration.proxy}/api/application/${app.manifest.id}/icon/`,
+                        value: `${opt.ctx.instance.sys.configuration.proxy.secure ? "https://" : "http://"}${opt.ctx.instance.sys.configuration.proxy.hostname}/api/application/${app.manifest.id}/icon/`,
                       };
                     } else {
                       icon = {
                         type: "icon",
-                        value: `${opt.ctx.instance.sys.configuration.proxy}/api/application/${app.manifest.id}/icon/`,
+                        value: `${opt.ctx.instance.sys.configuration.proxy.secure ? "https://" : "http://"}${opt.ctx.instance.sys.configuration.proxy.hostname}/api/application/${app.manifest.id}/icon/`,
                       };
                     }
                   }
@@ -807,7 +808,7 @@ const router = t.router({
             if (application.manifest.icon.type === "image") {
               icon = {
                 type: "image",
-                value: `${opt.ctx.instance.sys.configuration.proxy}/api/application/${application.manifest.id}/icon/`,
+                value: `${opt.ctx.instance.sys.configuration.proxy.secure ? "https://" : "http://"}${opt.ctx.instance.sys.configuration.proxy.hostname}/api/application/${application.manifest.id}/icon/`,
               };
             } else {
               icon = application.manifest.icon;
@@ -841,7 +842,7 @@ const router = t.router({
           const children = await fs.readdir(dir);
 
           let output: {
-            type: string | undefined;
+            type: FileMediaType;
             size: number;
             path: string;
           }[] = [];
@@ -876,7 +877,7 @@ const router = t.router({
 
         for (const file of files) {
           if (file.type === undefined) {
-            file.type = "unknown";
+            file.type = FileMediaType.Unknown;
           }
 
           if (!categories[file.type]) {
@@ -964,12 +965,12 @@ const router = t.router({
           if (application.manifest.icon.type === "image") {
             icon = {
               type: "image",
-              value: `${opt.ctx.instance.sys.configuration.proxy}/api/application/${application.manifest.id}/icon/`,
+              value: `${opt.ctx.instance.sys.configuration.proxy.secure ? "https://" : "http://"}${opt.ctx.instance.sys.configuration.proxy.hostname}/api/application/${application.manifest.id}/icon/`,
             };
           } else {
             icon = {
               type: "icon",
-              value: `${opt.ctx.instance.sys.configuration.proxy}/api/application/${application.manifest.id}/icon/`,
+              value: `${opt.ctx.instance.sys.configuration.proxy.secure ? "https://" : "http://"}${opt.ctx.instance.sys.configuration.proxy.hostname}/api/application/${application.manifest.id}/icon/`,
             };
           }
         }
@@ -1065,8 +1066,4 @@ const router = t.router({
 
 export type TRPCRouter = typeof router;
 
-instance.sys.tRPC.routers.push({
-  basePath: "/api/app/uk.ewsgit.settings",
-  router: router,
-  createContext: createTRPCContext(instance),
-});
+instance.sys.tRPC.registerTRPCRouter(router, "/api/app/uk.ewsgit.settings")

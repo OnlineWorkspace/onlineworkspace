@@ -1,16 +1,16 @@
-import { serveFile } from "@std/http/file-server";
 import type { Route } from "@std/http/unstable-route";
+import { serveFile } from "@std/http";
 import * as path from "@std/path/posix";
 import nodeCanvas from "@napi-rs/canvas";
 import type { Instance } from "../index.ts";
 import System from "../system.ts";
 import { getCookies } from "@std/http";
-import { WorkspacesEvent } from "./events.ts";
 import { routeRadix } from "@std/http/unstable-route";
 
 export default class ApiSystem extends System {
   routes: Route[];
   webServer!: Deno.HttpServer<Deno.NetAddr>;
+  listening: boolean = false;
 
   constructor(instance: Instance) {
     super("api", instance);
@@ -22,8 +22,12 @@ export default class ApiSystem extends System {
       {
         method: ["GET"],
         pattern: new URLPattern({ pathname: "/api/teapot" }),
-        handler(req) {
-          return Response.json({ teapot: true, message: "This OnlineWorkspace (Teapot?) sadly does not support the Hyper Text Coffee Pot Control Protocol (HTCPCP) 😢"}, { status: 418 })
+        handler() {
+          return Response.json({
+            teapot: true,
+            message:
+              "This OnlineWorkspace (Teapot?) sadly does not support the Hyper Text Coffee Pot Control Protocol (HTCPCP) 😢",
+          }, { status: 418 });
         },
       },
       {
@@ -108,7 +112,7 @@ export default class ApiSystem extends System {
       {
         method: ["GET"],
         pattern: new URLPattern({ pathname: "/api/application/:app/icon/" }),
-        async handler(req, _, rawParams) {
+        async handler(req, rawParams) {
           // @ts-ignore this does exist
           const params = rawParams?.pathname.groups;
 
@@ -157,7 +161,7 @@ export default class ApiSystem extends System {
         pattern: new URLPattern({
           pathname: "/api/asset/image/:imageId/:resolution",
         }),
-        async handler(req, _, rawParams) {
+        async handler(req, rawParams) {
           // @ts-ignore this does exist
           const params = rawParams?.pathname.groups;
 
@@ -243,7 +247,7 @@ export default class ApiSystem extends System {
       {
         method: ["GET"],
         pattern: new URLPattern({ pathname: "/api/asset/raw/:assetId" }),
-        async handler(req, _, rawParams) {
+        async handler(req, rawParams) {
           // @ts-ignore this does exist
           const params = rawParams?.pathname.groups;
 
@@ -347,28 +351,68 @@ export default class ApiSystem extends System {
   }
 
   async addRoute(route: Route) {
-    await this.stop();
-    this.routes.push(route);
-    await this.startup();
+    if (this.listening) {
+      await this.stop();
+      this.routes.push(route);
+      await this.startup();
+    } else {
+      this.routes.push(route);
+    }
+
+    this.log.debug(`Registered api route at ${route.pattern.pathname} for ${route.method || route.method === undefined ? "All Methods" : "Unknown Method?"}`)
 
     return true;
   }
 
   override async startup(): Promise<boolean> {
+    if (this.listening) {
+      this.log.warning(
+        "Something called startup() when we were already listening for requests!",
+      );
+      return false;
+    }
+
+    this.listening = true;
     this.webServer = Deno.serve(
       { port: this.instance.sys.configuration.apiPort },
       routeRadix(
         this.instance.sys.api.routes,
-        () => Response.json({ notFound: true }, { status: 404 }),
+        async (req) => {
+          if (req.method === "OPTIONS") {
+            const headers = new Headers();
+            headers.set(
+              "access-control-allow-origin",
+              this.instance.sys.configuration.proxy.hostname,
+            );
+            headers.set("vary", "origin");
+            headers.set(
+              "access-control-allow-methods",
+              "GET, POST, PUT, DELETE",
+            );
+            headers.set(
+              "access-control-allow-headers",
+              "content-type, authorization",
+            );
+            headers.set("access-control-max-age", "86400");
+            return new Response(null, { status: 204, headers });
+          }
+
+          return Response.json({ notFound: true }, { status: 404 });
+        },
       ),
     );
+
+    this.webServer.finished.then(() => {
+      this.log.info("webserver closed");
+    });
 
     return true;
   }
 
-  override async stop(): Promise<this> {
-    this.webServer?.shutdown?.();
+  override async stop(): Promise<boolean> {
+    await this.webServer?.shutdown?.();
+    this.listening = false;
 
-    return this;
+    return true;
   }
 }

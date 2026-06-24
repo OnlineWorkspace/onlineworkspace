@@ -4,7 +4,7 @@ import MOBILE_ICON from "@material-symbols/svg-700/outlined/mobile.svg";
 import WEB_ICON from "@material-symbols/svg-700/outlined/web.svg";
 import UKIconButton from "@ewsgit/uikit-solid/src/components/iconButton/UKIconButton.tsx";
 import UKStackItem from "@ewsgit/uikit-solid/src/components/stack/UKStackItem.tsx";
-import { AuthorizedDeviceType } from "@onlineworkspace/workspace-instance/src/systems/authorization";
+import { AuthorizedDeviceType } from "@onlineworkspace/workspace-backend/src/systems/authorization";
 import type { Component } from "solid-js";
 import trpc from "../../../../../../lib/trpc";
 import styles from "./Session.module.scss";

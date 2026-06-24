@@ -138,10 +138,10 @@ const User: Component<{
             />
           </div>
           <UKButtonGroup size={"s"} align={"start"}>
-            <UKButton color={"tonal"} disabled={true} onClick={() => 0}>
+            <UKButton color={"tonal"} disabled={true} onClick={() => {}}>
               Invalidate all sessions
             </UKButton>
-            <UKButton color={"tonal"} disabled={true} onClick={() => 0}>
+            <UKButton color={"tonal"} disabled={true} onClick={() => {}}>
               Force password reset
             </UKButton>
             <UKButton
@@ -153,7 +153,6 @@ const User: Component<{
             >
               Boop
             </UKButton>
-            {/* FIXME: TODO: add warning dialog */}
             <UKButton
               color={"standard"}
               onClick={async () => {

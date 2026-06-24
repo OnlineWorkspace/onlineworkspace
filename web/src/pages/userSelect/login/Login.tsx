@@ -1,4 +1,3 @@
-import KEY_ICON from "@material-symbols/svg-700/outlined/key.svg";
 import UKButton, { AffirmativeButtonState } from "@ewsgit/uikit-solid/src/components/button/UKButton.tsx";
 import UKCard from "@ewsgit/uikit-solid/src/components/card/UKCard.tsx";
 import { DividerDirection } from "@ewsgit/uikit-solid/src/components/divider/lib/direction.ts";
@@ -16,18 +15,20 @@ const UserSelectPage: Component = () => {
   const preloadRoute = usePreloadRoute();
   const [searchParams] = useSearchParams();
 
-  const [username, setUsername] = createSignal(searchParams.username?.toString() || "");
+  const [username, setUsername] = createSignal(searchParams.username as string | undefined || "");
   const [password, setPassword] = createSignal("");
   const [showTwoFactor, setShowTwoFactor] = createSignal<boolean>(false);
   const [canSignup] = createResource(() => trpc.authorization.canSignup.query());
 
-  createEffect(async () => {
+  onMount(async () => {
     if ((await trpc.authorization.isAuthenticated.query()).authenticated) {
       navigate("/app");
     }
   });
 
   createEffect(async () => {
+    if (username() === "") return;
+
     const authenticationOptions = await trpc.authorization.passkeyRequestSignin.query({ username: username() });
 
     if (authenticationOptions === undefined) return;
@@ -116,8 +117,10 @@ const UserSelectPage: Component = () => {
                     password: password(),
                   });
 
-                  if (resp.type === "twofactor") {
-                    setShowTwoFactor(true);
+                  if (resp.type === "requirementsNotMet") {
+                    if (resp.requireAny.includes("totp"))
+                      setShowTwoFactor(true);
+
                     return { state: AffirmativeButtonState.Unset };
                   }
 

@@ -1,6 +1,6 @@
 /// <reference path="./global.d.ts" />
 
-import { createTRPCContext, procedure } from "@onlineworkspace/workspace-instance/src/systems/trpcRouter.js";
+import { createTRPCContext, procedure } from "@onlineworkspace/workspace-backend/src/systems/trpcRouter.js";
 import { initTRPC } from "@trpc/server";
 
 const log = instance.log.createLogger("uk.ewsgit.ghostty");

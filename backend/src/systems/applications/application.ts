@@ -20,8 +20,10 @@ export interface WorkspacesApplication {
   modules: {
     // located at /app/[id]/
     web?: { path: string };
-    // run bun ./[path.ts]
+    // load a typescript module directly into the main process (These modules are unsafe as they have control over everything within the OnlineWorkspace instance)
     internal?: { path: string };
+    // run a deno process with the requested permissions
+    deno?: { path: string, permissions: ("run" | "read" | "write" | "net" | "env" | "sys" | "ffi")[] };
     // run ./[path]
     external?: { path: string };
   };

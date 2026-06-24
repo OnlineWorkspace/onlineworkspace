@@ -1,4 +1,4 @@
-import { getCookies, setCookie } from "@std/http/cookie";
+import { getCookies, setCookie, deleteCookie } from "@std/http/cookie";
 import { initTRPC, TRPCError } from "@trpc/server";
 import type { FetchCreateContextFnOptions } from "@trpc/server/adapters/fetch";
 import * as hiBase32 from "hi-base32";
@@ -298,7 +298,9 @@ export const coreOnlineWorkspaceRouter = t.router({
           value: session,
           secure: true,
           expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 14),
-          domain: opt.ctx.instance.sys.configuration.proxy.hostname
+          domain: opt.ctx.instance.sys.configuration.proxy.hostname,
+          sameSite: "Strict",
+          path: "/"
         });
 
         return {
@@ -464,7 +466,9 @@ export const coreOnlineWorkspaceRouter = t.router({
           value: session,
           secure: true,
           expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 14),
-          domain: opt.ctx.instance.sys.configuration.proxy.hostname
+          domain: opt.ctx.instance.sys.configuration.proxy.hostname,
+          sameSite: "Strict",
+          path: "/"
         });
 
         return {
@@ -531,7 +535,9 @@ export const coreOnlineWorkspaceRouter = t.router({
           value: session,
           secure: true,
           expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 14),
-          domain: opt.ctx.instance.sys.configuration.proxy.hostname
+          domain: opt.ctx.instance.sys.configuration.proxy.hostname,
+          sameSite: "Strict",
+          path: "/"
         });
 
         return {
@@ -573,6 +579,8 @@ export const coreOnlineWorkspaceRouter = t.router({
             success: false,
           };
         }
+
+        deleteCookie(opt.ctx.rawRequest.resHeaders, "Authorization")
 
         await opt.ctx.instance.sys.authorization.endSessionByToken(
           decodeURIComponent(cookies.Authorization),
@@ -683,13 +691,13 @@ ${opt.ctx.instance.sys.configuration.termsOfUse.message}`;
                 icon = {
                   type: "image",
                   value:
-                    `${opt.ctx.instance.sys.configuration.proxy}/api/application/${app.manifest.id}/icon/`,
+                    `${opt.ctx.instance.sys.configuration.proxy.secure ? "https://" : "http://"}${opt.ctx.instance.sys.configuration.proxy.hostname}/api/application/${app.manifest.id}/icon/`,
                 };
               } else {
                 icon = {
                   type: "icon",
                   value:
-                    `${opt.ctx.instance.sys.configuration.proxy}/api/application/${app.manifest.id}/icon/`,
+                    `${opt.ctx.instance.sys.configuration.proxy.secure ? "https://" : "http://"}${opt.ctx.instance.sys.configuration.proxy.hostname}/api/application/${app.manifest.id}/icon/`,
                 };
               }
             }
@@ -725,7 +733,7 @@ ${opt.ctx.instance.sys.configuration.termsOfUse.message}`;
 
             let icon = {
               type: "icon" as "icon" | "image",
-              // TODO: replace this with an image link!
+              // TODO: replace this with an image link! (What does this mean?)
               value: "indeterminate_question_box",
             };
 
@@ -734,13 +742,13 @@ ${opt.ctx.instance.sys.configuration.termsOfUse.message}`;
                 icon = {
                   type: "image",
                   value:
-                    `${opt.ctx.instance.sys.configuration.proxy}/api/application/${app.manifest.id}/icon/`,
+                    `${opt.ctx.instance.sys.configuration.proxy.secure ? "https://" : "http://"}${opt.ctx.instance.sys.configuration.proxy.hostname}/api/application/${app.manifest.id}/icon/`,
                 };
               } else {
                 icon = {
                   type: "icon",
                   value:
-                    `${opt.ctx.instance.sys.configuration.proxy}/api/application/${app.manifest.id}/icon/`,
+                    `${opt.ctx.instance.sys.configuration.proxy.secure ? "https://" : "http://"}${opt.ctx.instance.sys.configuration.proxy.hostname}/api/application/${app.manifest.id}/icon/`,
                 };
               }
             }

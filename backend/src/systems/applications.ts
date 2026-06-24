@@ -102,19 +102,19 @@ export default class ApplicationsSystem extends System {
 }`,
         );
 
-        const child = Bun.spawn({
+        const command = new Deno.Command("deno", {
+          args: ["install"],
           cwd: path.join(this.instance.sys.filesystem.SYSTEM_PATH, "vite"),
-          cmd: ["bun", "install"],
-          stdout: "pipe",
-          stderr: "pipe",
+          stdout: "piped",
+          stderr: "piped",
         });
 
-        // @ts-ignore
+        const child = command.spawn();
+
         for await (const msg of child.stdout) {
           this.log.info(`Applications Initial Startup -> ${Buffer.from(msg).toString()}`);
         }
 
-        // @ts-ignore
         for await (const msg of child.stderr) {
           this.log.info(`Applications Initial Startup -> ${Buffer.from(msg).toString()}`);
         }
@@ -286,103 +286,140 @@ export default class ApplicationsSystem extends System {
 
     if (app) {
       app.enabled = true;
+      const startTime = performance.now();
+      this.log.info(`Enabling application '${this.log.emphasis(applicationId)}'...`);
 
       if (!this.enabledApplications.find((a) => a === app.manifest?.id)) {
         this.enabledApplications.push(app.manifest!.id);
       }
 
-      this.log.info(`Enabled application '${applicationId}'`);
-    } else {
-      this.log.error(`Couldn't find application with id '${applicationId}'`);
-    }
+      await this.saveApplicationsConfig();
+      await this.updateWebRouter();
 
-    await this.saveApplicationsConfig();
-    await this.updateWebRouter();
-
-    if (app?.manifest?.modules.internal) {
-      try {
-        // @ts-ignore
-        globalThis.instance = this.instance;
-        await import(`file://${path.join(app.path, app.manifest.modules.internal.path)}`);
-      } catch (err) {
-        console.error("problem with application's bun module ->", err);
+      if (app.manifest?.modules.internal) {
+        try {
+          // @ts-ignore
+          globalThis.instance = this.instance;
+          await import(`file://${path.join(app.path, app.manifest.modules.internal.path)}`);
+        } catch (err) {
+          console.error("problem with application's deno internal module ->", err);
+        }
       }
-    }
 
-    if (app?.manifest?.modules.external) {
-      const child = Bun.spawn({
-        stderr: "pipe",
-        stdout: "pipe",
-        stdin: "pipe",
-        cmd: [app.manifest.modules.external.path],
-        cwd: app.path,
-        env: process.env,
-      });
+      if (app.manifest?.modules.deno) {
+        // FIXME: this should use the requested args from the module.
+        let permissionArgs = ["-A"]
 
-      const MODULE_LOG_PREFIX = `${app.manifest.id} -> `;
+        const command = new Deno.Command("deno", {
+          args: [...permissionArgs, app.manifest.modules.deno.path],
+          stdout: "piped",
+          stderr: "piped",
+          stdin: "piped",
+          cwd: app.path
+        })
 
-      // @ts-ignore
-      for await (const msg of child.stdout) {
-        let bufMsg = MODULE_LOG_PREFIX + Buffer.from(msg).toString();
+        const child = command.spawn();
 
-        if (bufMsg.endsWith("\n")) {
-          bufMsg = bufMsg.slice(0, -1);
+        const MODULE_LOG_PREFIX = `${app.manifest.id} module:deno -> `;
+
+        for await (const msg of child.stdout) {
+          let bufMsg = MODULE_LOG_PREFIX + Buffer.from(msg).toString();
+
+          if (bufMsg.endsWith("\n")) {
+            bufMsg = bufMsg.slice(0, -1);
+          }
+
+          this.log.info(bufMsg);
         }
 
-        this.log.info(bufMsg);
+        for await (const msg of child.stderr) {
+          let bufMsg = MODULE_LOG_PREFIX + Buffer.from(msg).toString();
+
+          if (bufMsg.endsWith("\n")) {
+            bufMsg = bufMsg.slice(0, -1);
+          }
+
+          this.log.error(bufMsg);
+        }
       }
 
-      // @ts-ignore
-      for await (const msg of child.stderr) {
-        let bufMsg = MODULE_LOG_PREFIX + Buffer.from(msg).toString();
+      if (app.manifest?.modules.external) {
+        const command = new Deno.Command(app.manifest.modules.external.path, {
+          stdout: "piped",
+          stderr: "piped",
+          stdin: "piped",
+          cwd: app.path
+        });
 
-        if (bufMsg.endsWith("\n")) {
-          bufMsg = bufMsg.slice(0, -1);
+        const child = command.spawn();
+
+        const MODULE_LOG_PREFIX = `${app.manifest.id} module:external -> `;
+
+        for await (const msg of child.stdout) {
+          let bufMsg = MODULE_LOG_PREFIX + Buffer.from(msg).toString();
+
+          if (bufMsg.endsWith("\n")) {
+            bufMsg = bufMsg.slice(0, -1);
+          }
+
+          this.log.info(bufMsg);
         }
 
-        this.log.error(bufMsg);
-      }
-    }
+        for await (const msg of child.stderr) {
+          let bufMsg = MODULE_LOG_PREFIX + Buffer.from(msg).toString();
 
-    for (const administrator of (await this.instance.sys.users.getAllUsers()).filter((u) => u.isAdministrator())) {
-      this.instance.sys.notifications.send(
-        administrator.userId,
-        "instance.system.application.enable",
-        WorkspacesNotificationPriority.Important,
-        {
-          title: "Enabled Application",
-          icon: "check",
-          body: `The application ${app?.manifest?.displayName}(${app?.manifest?.id}) was enabled`,
-        },
-        {
-          buttons: [
-            {
-              id: "dismiss",
-              label: "Dismiss",
-              type: "tonal",
-            },
-            {
-              id: "reload",
-              label: "Reload",
-              type: "filled",
-            },
-          ],
-        },
-        {
-          onButton(optionId) {
-            if (optionId === "reload") {
-              return {
-                action: {
-                  type: "reload",
-                },
-              };
-            }
+          if (bufMsg.endsWith("\n")) {
+            bufMsg = bufMsg.slice(0, -1);
+          }
+
+          this.log.error(bufMsg);
+        }
+      }
+
+      for (const administrator of (await this.instance.sys.users.getAllUsers()).filter((u) => u.isAdministrator())) {
+        this.instance.sys.notifications.send(
+          administrator.userId,
+          "instance.system.application.enable",
+          WorkspacesNotificationPriority.Important,
+          {
+            title: "Enabled Application",
+            icon: "check",
+            body: `The application ${app?.manifest?.displayName}(${app?.manifest?.id}) was enabled`,
           },
-        },
-      );
-    }
+          {
+            buttons: [
+              {
+                id: "dismiss",
+                label: "Dismiss",
+                type: "tonal",
+              },
+              {
+                id: "reload",
+                label: "Reload",
+                type: "filled",
+              },
+            ],
+          },
+          {
+            onButton(optionId) {
+              if (optionId === "reload") {
+                return {
+                  action: {
+                    type: "reload",
+                  },
+                };
+              }
+            },
+          },
+        );
+      }
 
-    return true;
+      this.log.info(`Enabled application '${this.log.emphasis(applicationId)}' took ${(performance.now() - startTime).toFixed(2)}ms`);
+      return true;
+    } else {
+      this.log.error(`Couldn't find application with id '${this.log.emphasis(applicationId)}'`);
+      return false;
+    }
   }
 
   // Disable an application by its id

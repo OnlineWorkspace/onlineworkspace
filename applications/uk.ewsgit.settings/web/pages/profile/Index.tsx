@@ -6,7 +6,7 @@ import UKStackItem from "@ewsgit/uikit-solid/src/components/stack/UKStackItem.ts
 import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.tsx";
 import UKTopAppBar from "@ewsgit/uikit-solid/src/components/topAppBar/UKTopAppBar.tsx";
 import useIsMobile from "@ewsgit/uikit-solid/src/core/useIsMobile.js";
-import webInstanceTRPC from "@onlineworkspace/workspace-instance-web/src/lib/trpc.ts";
+import webInstanceTRPC from "@onlineworkspace/workspace-web/src/lib/trpc.ts";
 import { useNavigate } from "@solidjs/router";
 import clsx from "clsx";
 import { type Component, createResource, Suspense } from "solid-js";

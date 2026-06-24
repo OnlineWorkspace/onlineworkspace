@@ -1,8 +1,8 @@
 /// <reference path="./global.d.ts" />
 
-import { WorkspacesEvent } from "@onlineworkspace/workspace-instance/src/systems/events.ts";
-import { BooleanApplicationSetting } from "@onlineworkspace/workspace-instance/src/systems/settings/applicationSetting/booleanSetting.ts";
-import { createTRPCContext, procedure } from "@onlineworkspace/workspace-instance/src/systems/trpcRouter.ts";
+import { WorkspacesEvent } from "@onlineworkspace/workspace-backend/src/systems/events.ts";
+import { BooleanApplicationSetting } from "@onlineworkspace/workspace-backend/src/systems/settings/applicationSetting/booleanSetting.ts";
+import { createTRPCContext, procedure } from "@onlineworkspace/workspace-backend/src/systems/trpcRouter.ts";
 import { initTRPC } from "@trpc/server";
 import { promises as fs } from "node:fs";
 import path from "node:path";

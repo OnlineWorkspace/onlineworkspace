@@ -10,7 +10,10 @@ export enum FileMediaType {
   ThreeDimensionalModel,
   Audio,
   Text,
-  Unknown
+  Unknown,
+  PDF,
+  Archive,
+  RichOfficeDocument,
 }
 
 export default class FilesystemSystem extends System {
@@ -26,7 +29,10 @@ export default class FilesystemSystem extends System {
     { userId: number; path: string; validUntil: number; public?: boolean }
   >;
   _internalAssetPaths: Map<string, string>;
-  _internalFileExtensions: Map<string, { displayName: string, type: FileMediaType}>;
+  _internalFileExtensions: Map<
+    string,
+    { displayName: string; type: FileMediaType }
+  >;
 
   constructor(instance: Instance) {
     super("filesystem", instance);
@@ -34,23 +40,27 @@ export default class FilesystemSystem extends System {
     this._internalAssets = new Map();
     this._internalAssetPaths = new Map();
     this._internalFileExtensions = new Map();
-
-
   }
 
-  registerFileExtension(extension: `.${string}`, displayName: string, type: FileMediaType) {
-    this._internalFileExtensions.set(extension, { displayName, type })
+  /**
+    Register a file extension to be recognized by OnlineWorkspace applications
+  */
+  registerFileExtension(
+    extension: `.${string}`,
+    displayName: string,
+    type: FileMediaType,
+  ) {
+    this._internalFileExtensions.set(extension, { displayName, type });
+    this.log.debug(
+      `Registered file extension ${
+        this.log.emphasis(extension)
+      } -> '${displayName}' as type ${this.log.emphasis(FileMediaType[type])}`,
+    );
 
-    return this
+    return this;
   }
 
   getApplicationSrc(applicationId: string) {
-    console.log(
-      this.instance.sys.applications.availableApplications.find((a) =>
-        a.manifest?.id === applicationId
-      )?.path,
-    );
-
     return this.instance.sys.applications.availableApplications.find((a) =>
       a.manifest?.id === applicationId
     )?.path;
@@ -72,12 +82,13 @@ export default class FilesystemSystem extends System {
   }
 
   getFileType(path: string): FileMediaType {
-    const extension = "." + path.split(".").pop();
+    const extension = "." + (path.split(".").pop())?.toLowerCase();
 
     const mediaType = this._internalFileExtensions.get(extension)?.type;
 
-    if (!mediaType)
+    if (!mediaType) {
       this.log.warning(`Unknown file format: '${path}' ext: '${extension}'`);
+    }
 
     return FileMediaType.Unknown;
   }
@@ -88,10 +99,10 @@ export default class FilesystemSystem extends System {
     userId: number,
     fsPath: string,
     isPublic: boolean = false,
-    dontCachePath = false,
+    evadeCache = false,
     validMs: number = 21600000,
   ): string {
-    if (!dontCachePath) {
+    if (!evadeCache) {
       const existingAsset = this._internalAssetPaths.get(fsPath);
 
       if (existingAsset) {
@@ -138,12 +149,12 @@ export default class FilesystemSystem extends System {
       };
     }
 
-    const db = this.instance.sys.database.postgres();
+    // const db = this.instance.sys.database.postgres();
 
-    const userGroups = (await user.getGroups()) || [];
-    const userIdArray = userId ? [userId.toString()] : [];
+    // const userGroups = (await user.getGroups()) || [];
+    // const userIdArray = userId ? [userId.toString()] : [];
 
-    const validUserGroups = userGroups.filter(Boolean);
+    // const validUserGroups = userGroups.filter(Boolean);
 
     return {
       read: false,
@@ -182,9 +193,11 @@ export default class FilesystemSystem extends System {
 
     if (!fs.existsSync(this.AUTO_INSTALL_PATH)) {
       // do nothing
-    } else {this.log.info(
+    } else {
+      this.log.info(
         `Auto install directory detected. (${this.AUTO_INSTALL_PATH})`,
-      );}
+      );
+    }
 
     if (!fs.existsSync(this.FS_ROOT)) {
       Deno.mkdirSync(this.FS_ROOT, { recursive: true });
@@ -237,24 +250,24 @@ export default class FilesystemSystem extends System {
         path.join(this.SRC_ROOT, "assets/wallpapers/pexels-steve-29708303.jpg"),
         path.join(this.FS_ROOT, "assets/login/background.png"),
       );
-    } else this.log.debug(
-      `FS_ROOT/assets/login/background.png exists, (${
-        path.join(this.FS_ROOT, "assets/login/background.png")
-      })`,
-    );
+    } else {this.log.debug(
+        `FS_ROOT/assets/login/background.png exists, (${
+          path.join(this.FS_ROOT, "assets/login/background.png")
+        })`,
+      );}
 
     if (!fs.existsSync(path.join(this.SYSTEM_PATH, "fs_template_files"))) {
       Deno.mkdirSync(path.join(this.SYSTEM_PATH, "fs_template_files"));
       fs.copySync(
         path.join(this.SRC_ROOT, "assets/fs_template_files/"),
         path.join(this.SYSTEM_PATH, "fs_template_files"),
-        { overwrite: true }
+        { overwrite: true },
       );
-    }else this.log.debug(
-      `FS_ROOT/assets/fs_template_files exists, (${
-        path.join(this.FS_ROOT, "assets/fs_template_files")
-      })`,
-    );
+    } else {this.log.debug(
+        `FS_ROOT/assets/fs_template_files exists, (${
+          path.join(this.FS_ROOT, "assets/fs_template_files")
+        })`,
+      );}
 
     if (!fs.existsSync(path.join(this.SYSTEM_PATH, "vite"))) {
       Deno.mkdirSync(path.join(this.SYSTEM_PATH, "vite"));
@@ -268,6 +281,170 @@ export default class FilesystemSystem extends System {
     } else {
       this.log.warning("Cache was not cleared as we are running in devMode");
     }
+
+    this.registerFileExtension(
+      ".png",
+      "Portable Network Graphic (PNG)",
+      FileMediaType.Image,
+    );
+    this.registerFileExtension(
+      ".webp",
+      "Web Picture format (WebP)",
+      FileMediaType.Image,
+    );
+    this.registerFileExtension(
+      ".avif",
+      "AV1 Image File Format (AVIF)",
+      FileMediaType.Image,
+    );
+    this.registerFileExtension(
+      ".gif",
+      "Graphics Interchange Format (GIF)",
+      FileMediaType.Image,
+    );
+    this.registerFileExtension(
+      ".jpeg",
+      "Joint Photographic Experts Group (JPEG)",
+      FileMediaType.Image,
+    );
+    this.registerFileExtension(
+      ".jpg",
+      "Joint Photographic Experts Group (JPEG)",
+      FileMediaType.Image,
+    );
+    this.registerFileExtension(
+      ".svg",
+      "Scalable Vector Graphics (SVG)",
+      FileMediaType.Image,
+    );
+    this.registerFileExtension(".ico", "Icon format", FileMediaType.Image);
+
+    this.registerFileExtension(
+      ".mp4",
+      "MPEG-4 Video (MP4)",
+      FileMediaType.Video,
+    );
+    this.registerFileExtension(".webm", "WebM Video", FileMediaType.Video);
+    this.registerFileExtension(
+      ".mkv",
+      "Matroska Video (MKV)",
+      FileMediaType.Video,
+    );
+    this.registerFileExtension(
+      ".mov",
+      "Apple QuickTime Movie",
+      FileMediaType.Video,
+    );
+    this.registerFileExtension(
+      ".avi",
+      "Audio Video Interleave (AVI)",
+      FileMediaType.Video,
+    );
+
+    this.registerFileExtension(
+      ".obj",
+      "Wavefront OBJ 3D Model",
+      FileMediaType.ThreeDimensionalModel,
+    );
+    this.registerFileExtension(
+      ".gltf",
+      "GL Transmission Format (gLTF)",
+      FileMediaType.ThreeDimensionalModel,
+    );
+    this.registerFileExtension(
+      ".glb",
+      "Binary GL Transmission Format (GLB)",
+      FileMediaType.ThreeDimensionalModel,
+    );
+    this.registerFileExtension(
+      ".fbx",
+      "Filmbox 3D Asset (FBX)",
+      FileMediaType.ThreeDimensionalModel,
+    );
+    this.registerFileExtension(
+      ".stl",
+      "Stereolithography 3D Asset (STL)",
+      FileMediaType.ThreeDimensionalModel,
+    );
+
+    this.registerFileExtension(
+      ".mp3",
+      "MPEG Audio Layer III (MP3)",
+      FileMediaType.Audio,
+    );
+    this.registerFileExtension(
+      ".wav",
+      "Waveform Audio File Format (WAV)",
+      FileMediaType.Audio,
+    );
+    this.registerFileExtension(".ogg", "Ogg Vorbis Audio", FileMediaType.Audio);
+    this.registerFileExtension(".m4a", "MPEG-4 Audio", FileMediaType.Audio);
+
+    this.registerFileExtension(".txt", "Plain Text File", FileMediaType.Text);
+    this.registerFileExtension(
+      ".csv",
+      "Comma-Separated Values (CSV)",
+      FileMediaType.Text,
+    );
+    this.registerFileExtension(
+      ".md",
+      "Markdown Documentation",
+      FileMediaType.Text,
+    );
+
+    this.registerFileExtension(
+      ".pdf",
+      "Portable Document Format (PDF)",
+      FileMediaType.PDF,
+    );
+
+    this.registerFileExtension(".zip", "ZIP Archive", FileMediaType.Archive);
+    this.registerFileExtension(
+      ".tar",
+      "Tarball Archive",
+      FileMediaType.Archive,
+    );
+    this.registerFileExtension(
+      ".gz",
+      "Gzip Compressed Archive",
+      FileMediaType.Archive,
+    );
+    this.registerFileExtension(
+      ".rar",
+      "Roshal Archive (RAR)",
+      FileMediaType.Archive,
+    );
+    this.registerFileExtension(
+      ".7z",
+      "7-Zip Compressed Archive",
+      FileMediaType.Archive,
+    );
+
+    this.registerFileExtension(
+      ".docx",
+      "Microsoft Word Document",
+      FileMediaType.RichOfficeDocument,
+    );
+    this.registerFileExtension(
+      ".doc",
+      "Microsoft Word Document (Legacy)",
+      FileMediaType.RichOfficeDocument,
+    );
+    this.registerFileExtension(
+      ".xlsx",
+      "Microsoft Excel Spreadsheet",
+      FileMediaType.RichOfficeDocument,
+    );
+    this.registerFileExtension(
+      ".xls",
+      "Microsoft Excel Spreadsheet (Legacy)",
+      FileMediaType.RichOfficeDocument,
+    );
+    this.registerFileExtension(
+      ".pptx",
+      "Microsoft PowerPoint Presentation",
+      FileMediaType.RichOfficeDocument,
+    );
 
     this.instance.sys.event.on(
       WorkspacesEvent.BeforeStartupComplete,

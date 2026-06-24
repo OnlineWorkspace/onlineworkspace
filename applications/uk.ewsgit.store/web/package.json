@@ -5,7 +5,7 @@
   "version": "0.0.1",
   "dependencies": {
     "@material-symbols/svg-700": "^0.42.3",
-    "@onlineworkspace/workspace-instance-web": "workspace:*",
+    "@onlineworkspace/workspace-web": "workspace:*",
     "@solidjs/router": "^0.15.3",
     "solid-js": "^1.9.8",
     "@ewsgit/uikit-solid": "workspace:*",
