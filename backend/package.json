@@ -6,7 +6,7 @@
   "main": "src/index.ts",
   "repository": {
     "type": "git",
-    "url": "https://github.com/onlineworkspace/workspace"
+    "url": "https://github.com/onlineworkspace/onlineworkspace"
   },
   "private": true,
   "trustedDependencies": [

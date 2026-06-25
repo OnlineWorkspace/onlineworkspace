@@ -15,7 +15,7 @@
   ],
   "graphicsAcceleration": "Recommended",
   "license": "MIT",
-  "source": "https://github.com/onlineworkspace/workspace/src/branch/main/packages/applications/uk.ewsgit.store",
+  "source": "https://github.com/onlineworkspace/onlineworkspace/src/branch/main/packages/applications/uk.ewsgit.store",
   "modules": {
     "web": {
       "path": "./web"

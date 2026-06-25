@@ -14,7 +14,7 @@
     }
   ],
   "license": "MIT",
-  "source": "https://github.com/onlineworkspace/workspace/src/branch/main/packages/applications/uk.ewsgit.files",
+  "source": "https://github.com/onlineworkspace/onlineworkspace/src/branch/main/packages/applications/uk.ewsgit.files",
   "modules": {
     "web": {
       "path": "./web"

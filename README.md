@@ -9,8 +9,7 @@ A self-hosted web platform for applications & services with design based on Goog
 
 ### Links
 
-- Source Code (Tangled) -> <https://tangled.org/ewsgit.uk/onlineworkspace>
-- Source Code (GitHub Mirror) -> <https://github.com/onlineworkspace/workspace>
+- Source Code (GitHub) -> <https://github.com/onlineworkspace/onlineworkspace>
 - Installation Guide (NON Production) -> [Installation Guide for Development Environments](#installation-guide-for-development-environments)
 
 ## Screenshots
