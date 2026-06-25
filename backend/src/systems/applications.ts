@@ -120,7 +120,7 @@ export default class ApplicationsSystem extends System {
         }
 
         await fs.cp(
-          path.join(this.instance.sys.filesystem.SRC_ROOT, "web/tsconfig.app.json"),
+          path.join(this.instance.sys.filesystem.WEB_ROOT, "tsconfig.app.json"),
           path.join(this.instance.sys.filesystem.SYSTEM_PATH, "vite", "tsconfig.json"),
         );
         await fs.writeFile(

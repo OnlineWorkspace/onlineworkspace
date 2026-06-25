@@ -9,10 +9,14 @@ const ColorThemePage = lazy(() => import("./pages/customization/colorTheme/Index
 const CustomizationPage = lazy(() => import("./pages/customization/Index"));
 const QuickShortcutsPage = lazy(() => import("./pages/customization/quickShortcuts/Index.tsx"));
 const WallpaperPage = lazy(() => import("./pages/customization/wallpaper/Index.tsx"));
-const InstancePage = lazy(() => import("./pages/instance/Index"));
 const ProfilePage = lazy(() => import("./pages/profile/Index"));
 const RootPage = lazy(() => import("./pages/root"));
 const StoragePage = lazy(() => import("./pages/storage/Index"));
+const ManageInstanceFeaturesPage = lazy(() => import("./pages/instance/features/index.tsx"));
+const ManageInstanceInstalledApplicationsPage = lazy(() => import("./pages/instance/installed_applications/index.tsx"));
+const ManageInstanceMailServerPage = lazy(() => import("./pages/instance/mailserver/index.tsx"));
+const ManageInstanceUsersPage = lazy(() => import("./pages/instance/users/index.tsx"));
+const ManageInstanceBrandingPage = lazy(() => import("./pages/instance/branding/index.tsx"));
 
 const App: Component = () => {
   return (
@@ -29,7 +33,13 @@ const App: Component = () => {
         <Route path={"/color-theme"} component={ColorThemePage} />
         <Route path={"/quick-shortcuts"} component={QuickShortcutsPage} />
       </Route>
-      <Route path={"/instance"} component={InstancePage} />
+      <Route path={"/instance"}>
+        <Route path={"/branding"} component={ManageInstanceBrandingPage}/>
+        <Route path={"/features"} component={ManageInstanceFeaturesPage}/>
+        <Route path={"/installed_applications"} component={ManageInstanceInstalledApplicationsPage}/>
+        <Route path={"/mailserver"} component={ManageInstanceMailServerPage}/>
+        <Route path={"/users"} component={ManageInstanceUsersPage}/>
+      </Route>
       <Route path={"/applications"}>
         <Route path={"/"} component={ApplicationsPage} />
         <ErrorBoundary fallback={() => <div>Failed</div>}>

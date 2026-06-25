@@ -86,11 +86,12 @@ export default class FilesystemSystem extends System {
 
     const mediaType = this._internalFileExtensions.get(extension)?.type;
 
-    if (!mediaType) {
+    if (mediaType === undefined) {
       this.log.warning(`Unknown file format: '${path}' ext: '${extension}'`);
+      return FileMediaType.Unknown;
     }
 
-    return FileMediaType.Unknown;
+    return mediaType;
   }
 
   // returns an endpoint where the asset located at the provided path can be loaded from on the client

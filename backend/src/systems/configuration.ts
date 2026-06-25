@@ -216,7 +216,6 @@ export default class ConfigurationSystem extends System {
     const configurationFileContents: Record<string, unknown> = {};
 
     for (const propertyKey of allowedProperties) {
-      console.log(propertyKey);
       configurationFileContents[propertyKey] = this[propertyKey];
     }
 

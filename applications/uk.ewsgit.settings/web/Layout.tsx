@@ -140,13 +140,59 @@ const Layout: Component<ParentProps> = (props) => {
                       type: "icon" as const,
                       value: SETTINGS_APPLICATIONS_ICON,
                     },
-                    label: "Configure Instance",
+                    label: "Branding",
                     onClick() {
-                      navigate("/app/uk.ewsgit.settings/instance");
+                      navigate("/app/uk.ewsgit.settings/instance/branding");
                     },
-                    active: location.pathname.startsWith(
-                      "/app/uk.ewsgit.settings/instance",
-                    ),
+                    active: location.pathname === "/app/uk.ewsgit.settings/instance/branding",
+                  },
+                  {
+                    type: "button" as const,
+                    icon: {
+                      type: "icon" as const,
+                      value: SETTINGS_APPLICATIONS_ICON,
+                    },
+                    label: "Features",
+                    onClick() {
+                      navigate("/app/uk.ewsgit.settings/instance/features");
+                    },
+                    active: location.pathname === "/app/uk.ewsgit.settings/instance/features",
+                  },
+                  {
+                    type: "button" as const,
+                    icon: {
+                      type: "icon" as const,
+                      value: SETTINGS_APPLICATIONS_ICON,
+                    },
+                    label: "Installed Applications",
+                    onClick() {
+                      navigate("/app/uk.ewsgit.settings/instance/installed_applications");
+                    },
+                    active: location.pathname === "/app/uk.ewsgit.settings/instance/installed_applications",
+                  },
+                  {
+                    type: "button" as const,
+                    icon: {
+                      type: "icon" as const,
+                      value: SETTINGS_APPLICATIONS_ICON,
+                    },
+                    label: "Mailserver",
+                    onClick() {
+                      navigate("/app/uk.ewsgit.settings/instance/mailserver");
+                    },
+                    active: location.pathname === "/app/uk.ewsgit.settings/instance/mailserver",
+                  },
+                  {
+                    type: "button" as const,
+                    icon: {
+                      type: "icon" as const,
+                      value: SETTINGS_APPLICATIONS_ICON,
+                    },
+                    label: "Users",
+                    onClick() {
+                      navigate("/app/uk.ewsgit.settings/instance/users");
+                    },
+                    active: location.pathname === "/app/uk.ewsgit.settings/instance/users",
                   },
                 ]
                 : [],

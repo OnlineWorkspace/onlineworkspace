@@ -54,7 +54,7 @@ A self-hosted web platform for applications & services with design based on Goog
 
 | Dependency | External Installation Guide      | Optional |
 | ---------- | -------------------------------- | -------- |
-| Deno       | https://deno.land                | No       |
+| Deno (CANARY REQUIRED)      | https://deno.land                | No       |
 | PostgreSQL | https://www.postgresql.org/      | No       |
 
 1. Ensure all dependencies are installed before continuing
@@ -76,57 +76,67 @@ A self-hosted web platform for applications & services with design based on Goog
 
 ## Installation Guide for Development Environments
 
-<!-- > [!TIP]
+> [!TIP]
 > If you are struggling with the following instructions, please ask for help in the project's discord server which can be found in the links section. -->
 
 ### Dependencies
 
-| Dependency | NPM Package | External Installation Guide        | Optional |
-|------------|-------------|------------------------------------|----------|
-| Deno       |             | <https://deno.land>                | No       |
-| PostgreSQL |             | <https://www.postgresql.org/>      | No       |
-| Caddy      |             | <https://caddyserver.com/download> | No       |
+| Dependency             | External Installation Guide        | Optional |
+|------------------------|------------------------------------|----------|
+| Deno (CANARY REQUIRED) | <https://deno.land>                | No       |
+| PostgreSQL             | <https://www.postgresql.org/>      | No       |
+| Caddy                  | <https://caddyserver.com/download> | No       |
 
 > [!IMPORTANT]
 > Please ensure all non-optional dependencies are installed before proceeding.
 
 1. Ensure all non-NPM dependencies are installed
-    - Ubuntu Linux
-        1. Install PostgreSQL -> `sudo apt install postgresql postgresql-contrib`
-        2. Start the PostgreSQL service -> `sudo systemctl enable --now postgresql`
-        3. Switch to the postgres user -> `sudo su postgres`
-        4. Open PostgreSQL with psql -> `psql`
-        5. Create a PostgreSQL database with the following query -> `CREATE DATABASE onlineworkspace_workspace;`
-        6. Change the PostgreSQL password with the following query -> `ALTER USER postgres WITH PASSWORD 'postgres';` (Please note: you should set the password to anything other than the example shown here, please ensure if you use another password to use an autoinstall configuration with the non-default password specified - see [auto-install Configuration](#auto-install-configuration))
-        7. Exit psql -> `exit;`
-        8. Logout from the postgres user -> `exit`
-        9. Install Caddy -> `sudo apt install caddy`
-        10. When installing Caddy, a systemd service is automatically setup. If you are only using Caddy for development purposes, you will need to either modify the system Caddyfile to contain the contents of `./Caddyfile` in `/etc/caddy/Caddyfile` OR disable the systemd service with `sudo systemctl disable caddy && sudo systemctl stop caddy` before manually running Caddy.
-    - Windows
-        1. Simply install postgreSQL with the setup file downloaded from the postgreSQL website
-        2. Open your database viewer of choice (DBeaver Community Edition is recommended)
-        3. Create the `onlineworkspace_workspace` table
-        4. Download the caddy executable from the caddy website, this can be placed anywhere but in the repo root directory is recommended for ease of use
-    - MacOS
-        1. Using Orbstack with an Ubuntu container, follow the Ubuntu Linux instructions above
+  - Ubuntu Linux
+    1. Install PostgreSQL -> `sudo apt install postgresql postgresql-contrib`
+    2. Start the PostgreSQL service -> `sudo systemctl enable --now postgresql`
+    3. Switch to the postgres user -> `sudo su postgres`
+    4. Open PostgreSQL with psql -> `psql`
+    5. Create a PostgreSQL database with the following query -> `CREATE DATABASE onlineworkspace_workspace;`
+    6. Change the PostgreSQL password with the following query -> `ALTER USER postgres WITH PASSWORD 'postgres';` (Please note: you should set the password to
+       anything other than the example shown here, please ensure if you use another password to use an autoinstall configuration with the non-default password
+       specified - see [auto-install Configuration](#auto-install-configuration))
+    7. Exit psql -> `exit;`
+    8. Logout from the postgres user -> `exit`
+    9. Install Caddy -> `sudo apt install caddy`
+    10. When installing Caddy, a systemd service is automatically setup. If you are only using Caddy for development purposes, you will need to either modify
+        the system Caddyfile to contain the contents of `./Caddyfile` in `/etc/caddy/Caddyfile` OR disable the systemd service with
+        `sudo systemctl disable caddy && sudo systemctl stop caddy` before manually running Caddy.
+  - Windows
+    1. Simply install postgreSQL with the setup file downloaded from the postgreSQL website
+    2. Open your database viewer of choice (DBeaver Community Edition is recommended)
+    3. Create the `onlineworkspace_workspace` table
+    4. Download the caddy executable from the caddy website, this can be placed anywhere but in the repo root directory is recommended for ease of use
+  - MacOS
+    1. Using Orbstack with an Ubuntu container, follow the Ubuntu Linux instructions above
 2. Run `deno install` inside the project root directory to install all NPM dependencies
-3. Ensure all auto-install configuration is set before proceeding, if you want a vanilla setup this step can be skipped (see [auto-install Configuration](#auto-install-configuration) section in the documentation for more details)
+3. Ensure all auto-install configuration is set before proceeding, if you want a vanilla setup this step can be skipped
+   (see [auto-install Configuration](#auto-install-configuration) section in the documentation for more details)
 4. Run `deno run dev` to start up the web interface and backend in development mode
 5. If on Linux or MacOS, ensure that caddy is allowed to bind to ports lower than 1024 by running `sudo setcap 'cap_net_bind_service=+ep' $(which caddy)`.
 6. Run Caddy
 
-- Linux & MacOS (Note: if you have chosen to keep the systemd service and have copied the contents of `./Caddyfile` into `/etc/caddy/Caddyfile` then you should skip this step and navigate to `https://localhost`)
-  - Run `sudo caddy run --config ./Caddyfile` to start the caddy server with the provided configuration (this will serve the web interface on `https://localhost` by default)
-- Windows
-    Run `.\caddy.exe run --config ./Caddyfile` to start the caddy server with the provided configuration (this will serve the web interface on `https://localhost` by default)
+- Linux & MacOS (Note: if you have chosen to keep the systemd service and have copied the contents of `./Caddyfile` into `/etc/caddy/Caddyfile` then you should
+  skip this step and navigate to `https://localhost`)
+  - Run `sudo caddy run --config ./Caddyfile` to start the caddy server with the provided configuration (this will serve the web interface on`https://localhost`
+    by default)
+- Windows Run `.\caddy.exe run --config ./Caddyfile` to start the caddy server with the provided configuration (this will serve the web interface on
+  `https://localhost` by default)
 
 ## Auto-install Configuration
 
-To automatically configure an onlineworkspace instance on the first run, create a directory called `autoinstall` in the project root and place a `config.json` file inside with the following structure:
+To automatically configure an onlineworkspace instance on the first run, create a directory called `autoinstall` in the project root and place a `config.json`
+file inside with the following structure:
 
 ```json
 {
-  "enabledFeatures": ["slash_commands"],
+  "enabledFeatures": [
+    "slash_commands"
+  ],
   "databases": {
     "postgres": {
       "user": "postgres",
@@ -137,7 +147,9 @@ To automatically configure an onlineworkspace instance on the first run, create 
     }
   },
   "backendUrl": "https://localhost",
-  "proxyUrl": ["https://localhost"],
+  "proxyUrl": [
+    "https://localhost"
+  ],
   "signupRequirements": {
     "email": false,
     "twoFactorAuthentication": false,
@@ -173,7 +185,8 @@ To automatically configure an onlineworkspace instance on the first run, create 
 }
 ```
 
-Any fields provided in the `config.json` file will override the default settings. By leaving out any fields, the default values will be used instead. This allows you to only modify the settings you want to change while leaving the rest of the default configuration intact.
+Any fields provided in the `config.json` file will override the default settings. By leaving out any fields, the default values will be used instead. This
+allows you to only modify the settings you want to change while leaving the rest of the default configuration intact.
 
 Instance branding assets can be added to the `autoinstall` directory and should be located and named as follows:
 

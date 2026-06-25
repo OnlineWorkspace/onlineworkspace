@@ -1,5 +1,4 @@
 {
-  "workspace": ["backend/", "web/", "applications/*/web/", "applications/*/backend/", "applications/*/electron/", "uikit-solid"],
   "tasks": {
     "dev": "deno -A --watch backend/src/index.ts",
     "start": "deno -A backend/src/index.ts",

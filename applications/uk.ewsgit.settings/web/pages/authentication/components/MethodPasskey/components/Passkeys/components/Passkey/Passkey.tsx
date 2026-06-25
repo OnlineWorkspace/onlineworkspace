@@ -4,6 +4,7 @@ import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.tsx";
 import type { Component } from "solid-js";
 import trpc from "../../../../../../../../lib/trpc";
 import styles from "./Passkey.module.scss";
+import UKCard from "@ewsgit/uikit-solid/src/components/card/UKCard.tsx";
 
 const Passkey: Component<{
   id: string;
@@ -14,9 +15,9 @@ const Passkey: Component<{
   refetchPasskeys: () => void;
 }> = (props) => {
   return (
-    <div class={styles.root}>
+    <UKCard class={styles.root} color={"elevated"}>
       <div class={styles.info}>
-        <UKText role="title" size="m">
+        <UKText role="title" size="s">
           {`ID: ${props.id}`}
         </UKText>
         <UKText role="body" size="m">
@@ -34,7 +35,7 @@ const Passkey: Component<{
           props.refetchPasskeys();
         }}
       ></UKIconButton>
-    </div>
+    </UKCard>
   );
 };
 
