@@ -1,0 +1,26 @@
+import type {CommandModule} from "yargs";
+import type {Instance} from "../../index.ts";
+
+const command: CommandModule = {
+  command: "make_operator <username>",
+  aliases: ["op"],
+  describe: "Grant a user administrator permissions",
+  async handler(args) {
+    const username = args.username as string;
+    const instance = (globalThis as unknown as { INSTANCE: Instance }).INSTANCE;
+    const log = instance.log.system
+
+    let user = await instance.sys.users.getUserByUsername(username);
+
+    if (!user) {
+      log.error(`Invalid user '${log.emphasis(username)}'`);
+      return;
+    }
+
+    await user.setIsAdministrator(true);
+
+    log.success(`User '${log.emphasis(username)}' was promoted to administrator successfully!`);
+  }
+};
+
+export default command;

@@ -1,15 +1,16 @@
 /// <reference path="./global.d.ts" />
 
-import { promises as fs } from "node:fs";
+import * as fs from "@std/fs"
 import * as path from "node:path";
-import { createTRPCContext, procedure } from "@onlineworkspace/workspace-backend/src/systems/trpcRouter.ts";
-import { initTRPC } from "@trpc/server";
+import {initTRPC} from "@trpc/server";
 import fastFolderSize from "fast-folder-size/sync.js";
 import z from "zod";
+import {createOnlineWorkspaceTRPCContext, procedure} from "@onlineworkspace/workspace-backend/src/systems/trpc/coreRouter.ts";
+import {FileMediaType} from "@onlineworkspace/workspace-backend/src/systems/filesystem.ts";
 
 const log = instance.log.createLogger("uk.ewsgit.files");
 
-export const t = initTRPC.context<ReturnType<typeof createTRPCContext>>().create();
+export const t = initTRPC.context<ReturnType<typeof createOnlineWorkspaceTRPCContext>>().create();
 
 const router = t.router({
   /*   getFileGrid: procedure.input(z.object({ path: z.string(), sortBy: z.enum(["name"]) })).query(async (opt) => {
@@ -383,16 +384,22 @@ const router = t.router({
       }
 
       try {
-        const directoryContents = await fs.readdir(resolvedPath, { withFileTypes: true });
+        let directories: Deno.DirEntry[] = [];
+        let files: Deno.DirEntry[] = [];
 
-        directoryContents.sort((a, b) => {
-          if (a.isDirectory() && !b.isDirectory()) return -1;
-          if (!a.isDirectory() && b.isDirectory()) return 1;
+        for await (const entry of Deno.readDir(resolvedPath)) {
+          if (entry.isDirectory) {
+            directories.push(entry)
+          }
+          if (entry.isFile) {
+            files.push(entry)
+          }
+        }
 
-          return a.name.localeCompare(b.name, undefined, { sensitivity: "base" });
-        });
+        directories.sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: "base" }))
+        files.sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: "base" }))
 
-        return { items: directoryContents.map((ent) => ent.name), status: "ok" };
+        return { items: [...directories.map(d => d.name), ...files.map(f => f.name)], status: "ok" };
       } catch (_) {
         return { status: "invalid_path" as const };
       }
@@ -430,19 +437,19 @@ const router = t.router({
         }
 
         try {
-          const itemStats = await fs.lstat(resolvedPath);
+          const itemStats = await Deno.lstat(resolvedPath);
 
           return {
             status: "ok" as const,
             data: {
               path: opt.input.path,
-              type: itemStats.isSymbolicLink() ? "link" : itemStats.isDirectory() ? "directory" : itemStats.isFile() ? "file" : "file",
+              type: itemStats.isSymlink ? "link" : itemStats.isDirectory ? "directory" : itemStats.isFile ? "file" : "file",
               // TODO: implement sharing first
               shared: false,
               size: itemStats.size,
               thumbnail:
-                opt.input.thumbnailSize !== undefined && itemStats.isFile()
-                  ? instance.sys.filesystem.getFileType(opt.input.path) === "image"
+                opt.input.thumbnailSize !== undefined && itemStats.isFile
+                  ? instance.sys.filesystem.getFileType(opt.input.path) === FileMediaType.Image
                     ? await instance.sys.image.serveImage(opt.ctx.userId, resolvedPath, {
                         resize: {
                           fit: "cover",
@@ -454,8 +461,8 @@ const router = t.router({
                     : undefined
                   : undefined,
               hidden: path.basename(opt.input.path).startsWith("."),
-              createdAt: itemStats.ctimeMs,
-              modifiedAt: itemStats.atimeMs,
+              createdAt: itemStats.ctime?.getMilliseconds(),
+              modifiedAt: itemStats.atime?.getMilliseconds(),
             },
           };
         } catch (_) {
@@ -475,7 +482,7 @@ const router = t.router({
 
       return {
         image:
-          instance.sys.filesystem.getFileType(opt.input.path) === "image"
+          instance.sys.filesystem.getFileType(opt.input.path) === FileMediaType.Image
             ? await instance.sys.image.serveImage(opt.ctx.userId, resolvedPath, {
                 resize: {
                   fit: "cover",
@@ -496,21 +503,18 @@ const router = t.router({
   quota: procedure.output(z.object({ currentUsage: z.number(), maximum: z.number() })).query(async (opt) => {
     const quotaMax = (await (await opt.ctx.user()).getQuota()) || 8589934592;
 
-    const resp = {
+    return {
       maximum: Number(quotaMax),
       currentUsage: fastFolderSize((await opt.ctx.user()).getPath()) || -1,
     };
-
-    return resp;
   }),
   previewDialog: {
     get: procedure.input(z.object({ path: z.string() })).query(async (opt) => {
       const resolvedPath = path.join(instance.sys.filesystem.FS_ROOT, opt.input.path);
 
-      const pathStat = await fs.lstat(resolvedPath);
-      const isDirectory = pathStat.isDirectory();
+      const pathStat = await Deno.lstat(resolvedPath);
 
-      const fileType = !isDirectory ? instance.sys.filesystem.getFileType(resolvedPath) : "directory";
+      const fileType = !pathStat.isDirectory ? instance.sys.filesystem.getFileType(resolvedPath) : "directory";
 
       let imageDimensions: { width: number; height: number } = { width: 0, height: 0 };
 
@@ -518,7 +522,7 @@ const router = t.router({
         status: "ok" as const,
         data: {
           assets:
-            fileType === "image"
+            fileType === FileMediaType.Image
               ? {
                   original: await instance.sys.image.serveImage(opt.ctx.userId, resolvedPath),
                   small: await instance.sys.image.serveImage(opt.ctx.userId, resolvedPath, {
@@ -534,8 +538,8 @@ const router = t.router({
               : undefined,
           metadata: {
             size: pathStat.size,
-            type: pathStat.isSymbolicLink() ? "link" : pathStat.isDirectory() ? "directory" : pathStat.isFile() ? "file" : "file",
-            itemCount: isDirectory ? (await fs.readdir(resolvedPath)).length : undefined,
+            type: pathStat.isSymlink ? "link" : pathStat.isDirectory ? "directory" : pathStat.isFile ? "file" : "file",
+            itemCount: pathStat.isDirectory ? Deno.readDirSync(resolvedPath).toArray().length : undefined,
             pixelate: imageDimensions.width !== 0 && imageDimensions.height !== 0 && imageDimensions.width < 640 && imageDimensions.height < 640,
           },
         },
@@ -547,13 +551,13 @@ const router = t.router({
       const resolvedPath = path.join(instance.sys.filesystem.FS_ROOT, opt.input.path);
 
       try {
-        await fs.mkdir(resolvedPath, { recursive: true });
+        await Deno.mkdir(resolvedPath, { recursive: true });
 
         return {
           status: "ok" as const,
         };
       } catch (err) {
-        console.log("dir creation error", err);
+        log.error("dir creation error", err);
 
         return {
           status: "already_exists" as const,
@@ -568,7 +572,8 @@ const router = t.router({
       if (opt.input.template !== undefined) {
         const templateFilePath = path.join(FILE_TEMPLATE_PATH, opt.input.template);
         if (await fs.exists(templateFilePath)) {
-          templateContents = (await fs.readFile(templateFilePath)).toString();
+          const textDecoder = new TextDecoder()
+          templateContents = textDecoder.decode(await Deno.readFile(templateFilePath));
         }
       }
 
@@ -577,13 +582,15 @@ const router = t.router({
           return { status: "already_exists" as const };
         }
 
-        await fs.writeFile(resolvedPath, templateContents);
+        const textEncoder = new TextEncoder()
+
+        await Deno.writeFile(resolvedPath, textEncoder.encode(templateContents));
 
         return {
           status: "ok" as const,
         };
       } catch (err) {
-        console.log("file creation error", err);
+        log.error("file creation error", err);
 
         return {
           status: "already_exists" as const,
@@ -595,8 +602,4 @@ const router = t.router({
 
 export type TRPCRouter = typeof router;
 
-instance.sys.tRPC.routers.push({
-  basePath: "/api/app/uk.ewsgit.files",
-  router: router,
-  createContext: createTRPCContext(instance),
-});
+instance.sys.tRPC.registerTRPCRouter(router, "/api/app/uk.ewsgit.files")

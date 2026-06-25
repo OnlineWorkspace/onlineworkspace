@@ -4,13 +4,6 @@ import sharp from "sharp";
 import type { Instance } from "../index.ts";
 import System from "../system.ts";
 
-export interface IUserDatabaseUser {
-  id: number;
-  username: string;
-  forename: string;
-  surname: string;
-}
-
 // WARNING!: do not call new WorkspacesUser() it is only to be created by the UsersSubsystem
 export class WorkspacesUser {
   userId: number;

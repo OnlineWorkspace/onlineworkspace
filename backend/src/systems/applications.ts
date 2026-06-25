@@ -480,16 +480,16 @@ export default class ApplicationsSystem extends System {
         },
       );
 
-    return false;
+    return true;
   }
 
-  async getApplicationStatus(applicationId: string) {
+  async getApplicationStatus(applicationId: string): { installed: true, enabled: boolean} | { installed: false } {
     const app = this.availableApplications.find((a) => a.manifest?.id === applicationId);
 
     if (app) {
-      return { installed: true, enabled: app.enabled };
+      return { installed: true as const, enabled: app.enabled };
     } else {
-      return { installed: false };
+      return { installed: false as const };
     }
   }
 }

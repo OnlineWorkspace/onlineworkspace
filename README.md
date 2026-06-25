@@ -89,8 +89,9 @@ A self-hosted web platform for applications & services with design based on Goog
 
 > [!IMPORTANT]
 > Please ensure all non-optional dependencies are installed before proceeding.
-
-1. Ensure all non-NPM dependencies are installed
+1. Clone the Git repo -> `git clone git@github.com:onlineworkspace/onlineworkspace --recurse-submodules`
+2. Change into the cloned directory -> `cd onlineworkspace`
+3. Ensure all non-NPM dependencies are installed
   - Ubuntu Linux
     1. Install PostgreSQL -> `sudo apt install postgresql postgresql-contrib`
     2. Start the PostgreSQL service -> `sudo systemctl enable --now postgresql`
@@ -107,18 +108,17 @@ A self-hosted web platform for applications & services with design based on Goog
         the system Caddyfile to contain the contents of `./Caddyfile` in `/etc/caddy/Caddyfile` OR disable the systemd service with
         `sudo systemctl disable caddy && sudo systemctl stop caddy` before manually running Caddy.
   - Windows
-    1. Simply install postgreSQL with the setup file downloaded from the postgreSQL website
+    1. Install postgreSQL with the setup file downloaded from the postgreSQL website (https://www.postgresql.org/download/)
     2. Open your database viewer of choice (DBeaver Community Edition is recommended)
     3. Create the `onlineworkspace_workspace` table
     4. Download the caddy executable from the caddy website, this can be placed anywhere but in the repo root directory is recommended for ease of use
   - MacOS
     1. Using Orbstack with an Ubuntu container, follow the Ubuntu Linux instructions above
-2. Run `deno install` inside the project root directory to install all NPM dependencies
-3. Ensure all auto-install configuration is set before proceeding, if you want a vanilla setup this step can be skipped
-   (see [auto-install Configuration](#auto-install-configuration) section in the documentation for more details)
-4. Run `deno run dev` to start up the web interface and backend in development mode
-5. If on Linux or MacOS, ensure that caddy is allowed to bind to ports lower than 1024 by running `sudo setcap 'cap_net_bind_service=+ep' $(which caddy)`.
-6. Run Caddy
+4. Run `deno install` inside the project root directory to install all NPM dependencies
+5. Ensure all auto-install configuration is set before proceeding, if you want a vanilla setup this step can be skipped (see [auto-install Configuration](#auto-install-configuration) section in the documentation for more details)
+6. Run `deno task dev` to start up the web interface and backend in development mode
+7. If on Linux or MacOS, ensure that caddy is allowed to bind to ports lower than 1024 by running `sudo setcap 'cap_net_bind_service=+ep' $(which caddy)`.
+8. Run Caddy
 
 - Linux & MacOS (Note: if you have chosen to keep the systemd service and have copied the contents of `./Caddyfile` into `/etc/caddy/Caddyfile` then you should
   skip this step and navigate to `https://localhost`)
@@ -134,9 +134,7 @@ file inside with the following structure:
 
 ```json
 {
-  "enabledFeatures": [
-    "slash_commands"
-  ],
+  "isDevMode": true,
   "databases": {
     "postgres": {
       "user": "postgres",
@@ -146,23 +144,26 @@ file inside with the following structure:
       "database": "onlineworkspace_workspace"
     }
   },
-  "backendUrl": "https://localhost",
-  "proxyUrl": [
-    "https://localhost"
+  "proxy": {
+    "secure": true,
+    "hostname": "localhost"
+  },
+  "enabledFeatures": [
+    "slash_commands"
   ],
   "signupRequirements": {
     "email": false,
     "twoFactorAuthentication": false,
-    "passwordMinimumLength": 8,
+    "passwordMinimumLength": 5,
     "passwordContains": {
-      "minimumUppercase": 1,
       "minimumLowercase": 1,
       "minimumNumbers": 1,
-      "minimumSymbols": 1
+      "minimumSymbols": 1,
+      "minimumUppercase": 1
     }
   },
   "displayName": "Workspace",
-  "mailserver": {
+  "mailServer": {
     "host": "smtp.example.com",
     "port": 587,
     "secure": true,
@@ -173,7 +174,7 @@ file inside with the following structure:
   },
   "termsOfUse": {
     "message": "1. Acceptance of Terms\n    - By logging in, you agree to these rules. If you do not agree, please do not use the service.\n2. Account Security\n    - You are the gatekeeper of your account. Keep your password private, as you are responsible for all activity that happens under your login.\n3. Content Ownership\n    - What is yours remains yours. We claim no ownership over the files, photos, or data you upload to this instance.\n4. Acceptable Use\n    - Do not use this space for anything illegal, malicious, or harmful. This includes uploading malware or attempting to disrupt the service for others.\n5. Privacy and Access\n    - We value your privacy. We will not access your stored data unless it is strictly necessary for technical support or required by legal authorities.\n6. Storage and Maintenance\n    - While we strive for 100% uptime, this service is provided \"as is.\" We may occasionally perform maintenance that results in temporary downtime.\n7. Personal Responsibility\n    - Hardware and software can fail. You agree to maintain your own external backups of any mission-critical data. We are not liable for data loss.\n8. Termination\n    - We reserve the right to suspend or close accounts that violate these terms or compromise the security of the server.\n9. Policy Updates\n    - These terms may change. If we make significant updates, we will post a notification within the app or send an email.",
-    "lastUpdated": 1774139372136
+    "lastUpdated": 1782388315951
   },
   "defaultQuickShortcuts": [
     "uk.ewsgit.dashboard",
@@ -181,7 +182,41 @@ file inside with the following structure:
     "uk.ewsgit.settings",
     "uk.ewsgit.photos",
     "uk.ewsgit.files"
-  ]
+  ],
+  "defaultApplications": [
+    {
+      "id": "uk.ewsgit.dashboard",
+      "uri": "local:uk.ewsgit.dashboard"
+    },
+    {
+      "id": "uk.ewsgit.store",
+      "uri": "local:uk.ewsgit.store"
+    },
+    {
+      "id": "uk.ewsgit.settings",
+      "uri": "local:uk.ewsgit.settings"
+    },
+    {
+      "id": "uk.ewsgit.photos",
+      "uri": "local:uk.ewsgit.photos"
+    },
+    {
+      "id": "uk.ewsgit.files",
+      "uri": "local:uk.ewsgit.files"
+    }
+  ],
+  "userDefault": {
+    "homeDirectories": [
+      "Documents",
+      "Photos",
+      "Videos",
+      "Projects"
+    ],
+    "quotaSize": 10485760,
+    "displayNameFormat": "New User %num%"
+  },
+  "caddyfile": "../Caddyfile",
+  "apiPort": 3563
 }
 ```
 

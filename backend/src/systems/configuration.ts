@@ -12,6 +12,7 @@ export enum WorkspacesFeatureFlags {
   ShootYourselfInTheFoot = "shoot_yourself_in_the_foot",
   AllowUserSignups = "allow_user_signups",
   ExperimentalTerminalGui = "experimental_terminal_gui",
+  ClearTerminalConsoleOnStartup = "clear_terminal_console_on_startup",
   DisplayProfilesAtLogon = "display_profiles_at_logon"
 }
 
@@ -49,6 +50,7 @@ export default class ConfigurationSystem extends System {
   };
   enabledFeatures: (WorkspacesFeatureFlags | string)[] = [
     WorkspacesFeatureFlags.SlashCommands,
+    WorkspacesFeatureFlags.ClearTerminalConsoleOnStartup
   ];
   signupRequirements: {
     email: boolean;
@@ -71,7 +73,15 @@ export default class ConfigurationSystem extends System {
       minimumUppercase: 1,
     },
   };
-  displayName: string;
+  branding: {
+    displayName: string;
+    tagline: string;
+    metaDescription: string;
+  } = {
+    displayName: "OnlineWorkspace",
+    tagline: "Under construction...",
+    metaDescription: "A self-hosted web platform for applications & services with design based on Google's Material 3 Expressive. (Work In Progress)"
+  }
   mailServer: {
     host: string;
     port: number;
@@ -80,7 +90,15 @@ export default class ConfigurationSystem extends System {
       user: string;
       pass: string;
     };
-  };
+  } = {
+    host: "smtp.example.com",
+    port: 465,
+    secure: true,
+    auth: {
+      user: "user",
+      pass: "password",
+    },
+  }
   termsOfUse: { message: string; lastUpdated: number };
   defaultQuickShortcuts: string[] = [
     "uk.ewsgit.dashboard",
@@ -114,16 +132,6 @@ export default class ConfigurationSystem extends System {
     if (process.env.POSTGRES_DATABASE_HOST) {
       this.databases.postgres.host = process.env.POSTGRES_DATABASE_HOST;
     }
-    this.displayName = "Workspace";
-    this.mailServer = {
-      host: "smtp.example.com",
-      port: 587,
-      secure: true,
-      auth: {
-        user: "user",
-        pass: "password",
-      },
-    };
     this.termsOfUse = {
       message: `1. Acceptance of Terms
     - By logging in, you agree to these rules. If you do not agree, please do not use the service.
@@ -267,6 +275,8 @@ export default class ConfigurationSystem extends System {
         }`,
       );
     }
+
+    await this.saveConfiguration()
 
     return true;
   }

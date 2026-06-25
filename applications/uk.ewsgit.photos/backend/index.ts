@@ -2,17 +2,17 @@
 
 import { WorkspacesEvent } from "@onlineworkspace/workspace-backend/src/systems/events.ts";
 import { BooleanApplicationSetting } from "@onlineworkspace/workspace-backend/src/systems/settings/applicationSetting/booleanSetting.ts";
-import { createTRPCContext, procedure } from "@onlineworkspace/workspace-backend/src/systems/trpcRouter.ts";
 import { initTRPC } from "@trpc/server";
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import sharp from "sharp";
 import z from "zod";
+import {createOnlineWorkspaceTRPCContext, procedure} from "@onlineworkspace/workspace-backend/src/systems/trpc/coreRouter.ts";
 
 const log = instance.log.createLogger("uk.ewsgit.photos");
 const db = instance.sys.database.postgres();
 
-export const t = initTRPC.context<ReturnType<typeof createTRPCContext>>().create();
+export const t = initTRPC.context<ReturnType<typeof createOnlineWorkspaceTRPCContext>>().create();
 
 await db`CREATE TABLE IF NOT EXISTS public.uk_ewsgit_photos_media (
     image_id SERIAL PRIMARY KEY,
@@ -118,11 +118,7 @@ const router = t.router({
 
 export type TRPCRouter = typeof router;
 
-instance.sys.tRPC.routers.push({
-  basePath: "/api/app/uk.ewsgit.photos",
-  router: router,
-  createContext: createTRPCContext(instance),
-});
+instance.sys.tRPC.registerTRPCRouter(router, "/api/app/uk.ewsgit.photos")
 
 instance.sys.event.on(WorkspacesEvent.BeforeStartupComplete, () => {
   instance.sys.settings.registerApplicationSetting(
@@ -157,7 +153,7 @@ instance.sys.event.on(WorkspacesEvent.QuarterHourly, async () => {
       // Check if image is already in the database
       const exists = await db`SELECT image_id FROM public.uk_ewsgit_photos_media WHERE path = ${imagePath}`;
       if (exists.length === 0) {
-        console.log(`Sharp path ${path.join(userFsDir, imagePath)}`);
+        log.info(`Sharp path ${path.join(userFsDir, imagePath)}`);
         const imageMetadata = await sharp(path.join(userFsDir, imagePath)).metadata();
         const imageFileStats = await fs.stat(path.join(userFsDir, imagePath));
 

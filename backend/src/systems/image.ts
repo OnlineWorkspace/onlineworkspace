@@ -135,7 +135,7 @@ export default class ImageSystem extends System {
 
     this._internalImagePaths.set(path, imageId);
 
-    this.log.info(`Serving image at '${nodePath.relative(this.instance.sys.filesystem.FS_ROOT, path)}' as '${imageId}'`);
+    this.log.info(`Serving image at '${nodePath.relative(this.instance.sys.filesystem.FS_ROOT, path)}' as '${this.log.emphasis(imageId)}'`);
 
     return `${this.instance.sys.configuration.proxy.secure ? "https://" : "http://"}${this.instance.sys.configuration.proxy.hostname}/api/asset/image/${imageId}/${requestResolution}`;
   }
@@ -156,6 +156,7 @@ export default class ImageSystem extends System {
       background?: string;
     },
   ): Promise<boolean> {
+    const t0 = performance.now();
     const sharpInstance = sharp(inputPath);
 
     const originalDimensions = await sharpInstance.metadata();
@@ -179,6 +180,9 @@ export default class ImageSystem extends System {
     }
 
     await sharpInstance.toFile(outputPath);
+    const t1 = performance.now();
+
+    this.log.debug(`Resizing image ${inputPath} (${originalDimensions.width}x${originalDimensions.height}) to ${outputPath} (${dimensions.width}x${dimensions.height}) took ${(t1 - t0).toFixed(2)}ms`)
 
     return true;
   }

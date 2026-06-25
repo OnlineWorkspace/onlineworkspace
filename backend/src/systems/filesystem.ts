@@ -3,6 +3,8 @@ import path from "node:path";
 import type { Instance } from "../index.ts";
 import System from "../system.ts";
 import { WorkspacesEvent } from "./events.ts";
+import {iterateReader} from "@std/io";
+import { createHash } from "node:crypto";
 
 export enum FileMediaType {
   Image,
@@ -79,6 +81,21 @@ export default class FilesystemSystem extends System {
     await Deno.mkdir(path, { recursive: true });
 
     return true;
+  }
+
+  /**
+   * Get a file's md5 hash
+   * @returns {string} an md5 hash of the input file
+   */
+  async getFileHash(path: string): Promise<string> {
+    const hash = createHash("md5")
+    const file = await Deno.open(path)
+
+    for await (const chunk of iterateReader(file)) {
+      hash.update(chunk)
+    }
+
+    return hash.digest("utf-8")
   }
 
   getFileType(path: string): FileMediaType {
@@ -390,6 +407,11 @@ export default class FilesystemSystem extends System {
     this.registerFileExtension(
       ".md",
       "Markdown Documentation",
+      FileMediaType.Text,
+    );
+    this.registerFileExtension(
+      ".json",
+      "Javascript Object Notation",
       FileMediaType.Text,
     );
 

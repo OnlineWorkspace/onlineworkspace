@@ -6,6 +6,7 @@ import type { Instance } from "../index.ts";
 import System from "../system.ts";
 import { getCookies } from "@std/http";
 import { routeRadix } from "@std/http/unstable-route";
+import * as fs from "@std/fs";
 
 export default class ApiSystem extends System {
   routes: Route[];
@@ -207,7 +208,7 @@ export default class ApiSystem extends System {
           }
 
           if (resolutionParam === "raw") {
-            self.instance.sys.image.log.info(
+            self.instance.sys.image.log.debug(
               `Served Image -> '${
                 (params as { imageId: string }).imageId
               } @ ${resolutionParam}'`,
@@ -215,15 +216,14 @@ export default class ApiSystem extends System {
             return serveFile(req, sourceImage.path);
           }
 
-          return Response.json({ false: true });
-          /* TODO: implement hashing again...  else {
             const cachedFilePath = path.join(self.instance.sys.filesystem.CACHE_PATH, sourceImage.path.replaceAll(":", ""));
             const outputPath = path.join(cachedFilePath, resolutionParam);
             const hashPath = path.join(`${outputPath}.hash`);
 
             if (fs.existsSync(outputPath)) {
-              const fileHash = Bun.hash.rapidhash(await Deno.readFile(sourceImage.path)).toString();
-              const cacheFileHash = (await Deno.readFile(hashPath)).toString();
+              const fileHash = await instance.sys.filesystem.getFileHash(sourceImage.path);
+              const textDecoder = new TextDecoder("utf8")
+              const cacheFileHash = textDecoder.decode(await Deno.readFile(hashPath));
 
               if (fileHash === cacheFileHash) {
                 self.instance.sys.image.log.info(`Served Image -> '${(params as { imageId: string }).imageId} @ ${resolutionParam}'`);
@@ -235,13 +235,12 @@ export default class ApiSystem extends System {
               await fs.ensureDir(path.join(outputPath, ".."));
             }
 
-            const fileHash = Bun.hash.rapidhash(await Deno.readFile(sourceImage.path)).toString();
+            const fileHash = await instance.sys.filesystem.getFileHash(sourceImage.path);
             await self.instance.sys.image.resizeImage(sourceImage.path, outputPath, sourceImage.resize!.dimensions, sourceImage.resize!);
-            await Deno.writeFile(hashPath, Buffer.from(fileHash));
+            await Deno.writeFile(hashPath, Buffer.from(fileHash, "utf8"));
 
             self.instance.sys.image.log.info(`Served Image -> '${(params as { imageId: string }).imageId} @ ${resolutionParam}'`);
             return serveFile(req, outputPath);
-          } */
         },
       },
       {
@@ -359,7 +358,13 @@ export default class ApiSystem extends System {
       this.routes.push(route);
     }
 
-    this.log.debug(`Registered api route at ${route.pattern.pathname} for ${route.method || route.method === undefined ? "All Methods" : "Unknown Method?"}`)
+    this.log.debug(
+      `Registered api route at ${route.pattern.pathname} for ${
+        route.method || route.method === undefined
+          ? "All Methods"
+          : "Unknown Method?"
+      }`,
+    );
 
     return true;
   }
@@ -373,8 +378,14 @@ export default class ApiSystem extends System {
     }
 
     this.listening = true;
+    const self = this;
     this.webServer = Deno.serve(
-      { port: this.instance.sys.configuration.apiPort },
+      {
+        port: this.instance.sys.configuration.apiPort,
+        onListen(localAddr) {
+          self.log.info(`Listening on port ${localAddr.port}`)
+        },
+      },
       routeRadix(
         this.instance.sys.api.routes,
         async (req) => {
