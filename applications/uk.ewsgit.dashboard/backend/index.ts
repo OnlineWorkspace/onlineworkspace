@@ -45,12 +45,19 @@ const router = t.router({
             return {
               displayName: `${forename} ${surname}`,
               username: username,
-              avatar:
-                `${opt.ctx.instance.sys.configuration.proxy.secure ? "https://" : "http://"}${opt.ctx.instance.sys.configuration.proxy.hostname}/api/user/me/avatar/m`,
+              avatar: `${
+                opt.ctx.instance.sys.configuration.proxy.secure
+                  ? "https://"
+                  : "http://"
+              }${opt.ctx.instance.sys.configuration.proxy.hostname}/api/user/me/avatar/m`,
             };
           }),
         avatar: procedure.output(z.string()).query(async (opt) => {
-          return `${opt.ctx.instance.sys.configuration.proxy.secure ? "https://" : "http://"}${opt.ctx.instance.sys.configuration.proxy.hostname}/api/user/me/avatar/2xl`;
+          return `${
+            opt.ctx.instance.sys.configuration.proxy.secure
+              ? "https://"
+              : "http://"
+          }${opt.ctx.instance.sys.configuration.proxy.hostname}/api/user/me/avatar/2xl`;
         }),
       },
     },
@@ -70,10 +77,9 @@ const router = t.router({
         ) {
           const date = new Date(opt.input);
           const hours = date.getHours();
-          const forename =
-            (await (await opt.ctx.instance.sys.users.getUserById(
-              opt.ctx.userId,
-            ))?.getForename()) || "Anonymous";
+          const forename = (await (await opt.ctx.instance.sys.users.getUserById(
+            opt.ctx.userId,
+          ))?.getForename()) || "Anonymous";
           const shouldShowTimeBasedGreeting = Math.random() < 0.5;
 
           if (shouldShowTimeBasedGreeting) {
@@ -223,10 +229,13 @@ const router = t.router({
       if (!(await fs.exists(requiredResizedWallpaperPath))) {
         const options = await (async () => {
           if (await fs.exists(path.join(wallpapersRootPath, "config.json"))) {
+            const textDecoder = new TextDecoder("utf8");
             const options = JSON.parse(
-              (await Deno.readFile(
-                path.join(wallpapersRootPath, "config.json"),
-              )).toString(),
+              textDecoder.decode(
+                await Deno.readFile(
+                  path.join(wallpapersRootPath, "config.json"),
+                ),
+              ),
             );
 
             options.position = options.position.split(" ");
@@ -252,18 +261,16 @@ const router = t.router({
         );
       }
 
-      return opt.ctx.instance.sys.configuration.proxy +
-        (await opt.ctx.instance.sys.image.serveImage(
-          opt.ctx.userId,
-          requiredResizedWallpaperPath,
-        ));
+      await opt.ctx.instance.sys.image.serveImage(
+        opt.ctx.userId,
+        requiredResizedWallpaperPath,
+      );
     }),
   },
 });
 
 export type TRPCRouter = typeof router;
-instance.sys.tRPC.registerTRPCRouter(router, "/api/app/uk.ewsgit.dashboard")
-
+instance.sys.tRPC.registerTRPCRouter(router, "/api/app/uk.ewsgit.dashboard");
 
 instance.sys.event.on(WorkspacesEvent.BeforeStartupComplete, () => {
   instance.sys.settings.registerApplicationSetting(

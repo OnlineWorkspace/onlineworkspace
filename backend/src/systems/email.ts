@@ -17,7 +17,7 @@ export default class EmailSystem extends System {
     await this.transporter.sendMail({
       to: to,
       from:
-        `${this.instance.sys.configuration.displayName} <${this.instance.sys.configuration.mailServer.auth.user}>`,
+        `${this.instance.sys.configuration.branding.displayName} <${this.instance.sys.configuration.mailServer.auth.user}>`,
       sender: this.instance.sys.configuration.mailServer.auth.user,
       subject,
       text: content.type === "string" ? content.content : undefined,
@@ -49,7 +49,7 @@ export default class EmailSystem extends System {
           await this.sendEmail(userEmail, "Instance Online", {
             type: "string",
             content:
-              `Your OnlineWorkspace instance '${this.instance.sys.configuration.displayName}' has just come online!`,
+              `Your OnlineWorkspace instance '${this.instance.sys.configuration.branding.displayName}' has just come online!`,
           });
         }
       }
@@ -77,7 +77,7 @@ export default class EmailSystem extends System {
         await this.sendEmail(userEmail, "Instance Offline", {
           type: "string",
           content:
-            `Your OnlineWorkspace instance '${this.instance.sys.configuration.displayName}' has just gone offline!`,
+            `Your OnlineWorkspace instance '${this.instance.sys.configuration.branding.displayName}' has just gone offline!`,
         });
       }
     }

@@ -19,9 +19,9 @@ export enum FileMediaType {
 }
 
 export default class FilesystemSystem extends System {
-  readonly SRC_ROOT = path.resolve("./backend/src/");
+  readonly SRC_ROOT = path.resolve(process.cwd(), "./backend/src/");
   readonly WEB_ROOT = path.join(this.SRC_ROOT, "../../web/");
-  readonly FS_ROOT = path.resolve("./fs/");
+  readonly FS_ROOT = path.resolve(process.cwd(), "./fs/");
   readonly CACHE_PATH = path.join(this.FS_ROOT, "cache");
   readonly SYSTEM_PATH = path.join(this.FS_ROOT, "system");
   readonly AUTO_INSTALL_PATH = path.join(process.cwd(), "auto_install");

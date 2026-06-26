@@ -20,6 +20,13 @@ export enum AuthorizedDeviceType {
   UnknownBrowser,
 }
 
+export enum SessionCreationError {
+  InvalidCredentials,
+  MissingUser,
+  UserTimedOut,
+  GenericError
+}
+
 // the number of ms that a login session is valid for
 export const SESSION_VALID_TERM_MS = 7 * 24 * 60 * 60 * 1000;
 const PASSWORD_HASH_ITERATIONS = 600_000;
@@ -33,12 +40,14 @@ export default class AuthorizationSystem extends System {
     number,
     PublicKeyCredentialRequestOptionsJSON
   >;
+  private loginAttemptCount: Map<number, { amount: number; lastAttempt: number }>;
 
   constructor(instance: Instance) {
     super("authorization", instance);
 
     this.temporaryPasskeyCreationChallenges = new Map();
     this.temporaryPasskeyAuthenticationChallenges = new Map();
+    this.loginAttemptCount = new Map();
   }
 
   private async _internalHashPassword(password: string) {
@@ -69,7 +78,12 @@ export default class AuthorizationSystem extends System {
       ["deriveBits"],
     );
     const bits = await crypto.subtle.deriveBits(
-      { name: "PBKDF2", hash: "SHA-256", salt, iterations: PASSWORD_HASH_ITERATIONS },
+      {
+        name: "PBKDF2",
+        hash: "SHA-256",
+        salt,
+        iterations: PASSWORD_HASH_ITERATIONS,
+      },
       key,
       256,
     );
@@ -77,16 +91,26 @@ export default class AuthorizationSystem extends System {
   }
 
   /**
-   Creates a new session for a user
-   @returns {string} the new session's sessionToken
-  */
+   * Creates a new password-authed session for a user.
+   *
+   * @param {number} userId
+   * @param {string} password
+   * @param {AuthorizedDeviceType} deviceId - The type of device making the request.
+   * @param {string} [otpCode] - The optional one-time password (OTP) code for two-factor authentication.
+   * @param {string} [ipAddress] - The optional IP address of the client initiating the session.
+   * @returns {Promise<string | SessionCreationError>} A promise that resolves to the new session's `sessionToken` string,
+   * or a `SessionCreationError` if the session could not be created.
+   */
   async createPasswordSession(
     userId: number,
     password: string,
     deviceId: AuthorizedDeviceType,
     otpCode?: string,
     ipAddress?: string,
-  ): Promise<string | undefined> {
+  ): Promise<string | SessionCreationError> {
+    if(this.loginAttemptCount.has(userId)) {
+    }
+
     try {
       const db = this.instance.sys.database.postgres();
 
@@ -97,7 +121,11 @@ export default class AuthorizationSystem extends System {
             ?.[0]?.hashed_password,
         ))
       ) {
-        return undefined;
+        if(this.loginAttemptCount.has(userId)) {
+          this.loginAttemptCount.set(userId, {amount: this.loginAttemptCount.get(userId)!.amount + 1, lastAttempt: Date.now()})
+        }
+
+        return SessionCreationError.InvalidCredentials;
       }
 
       if (
@@ -107,12 +135,12 @@ export default class AuthorizationSystem extends System {
       ) {
         if (!otpCode) {
           console.log("no otp code provided when creating session?");
-          return undefined;
+          return SessionCreationError.GenericError;
         }
 
         const totp = new OTPAuth.TOTP({
           issuer: this.instance.sys.configuration.proxy.hostname,
-          label: `${this.instance.sys.configuration.displayName} (Workspace)`,
+          label: `${this.instance.sys.configuration.branding.displayName} (Workspace)`,
           algorithm: "SHA1",
           digits: 6,
           secret:
@@ -121,7 +149,7 @@ export default class AuthorizationSystem extends System {
         });
 
         if (totp.validate({ token: otpCode }) === null) {
-          return undefined;
+          return SessionCreationError.InvalidCredentials;
         }
       }
 
@@ -184,7 +212,7 @@ export default class AuthorizationSystem extends System {
         utils.inspect(err),
       );
 
-      return undefined;
+      return SessionCreationError.GenericError;
     }
   }
 
@@ -267,7 +295,7 @@ export default class AuthorizationSystem extends System {
     @returns {true} if they have a password
     @returns {false} if they lack a password
   */
-  async hasPassword(userId: number) {
+  async hasPassword(userId: number): Promise<boolean> {
     const db = this.instance.sys.database.postgres();
 
     if (!(await this.instance.sys.users.doesUserExist(userId))) {
@@ -288,7 +316,7 @@ export default class AuthorizationSystem extends System {
     @returns {true} successful
     @returns {false} failed
   */
-  async setTwoFactorAuthenticationSecret(userId: number, secret: string) {
+  async setTwoFactorAuthenticationSecret(userId: number, secret: string): Promise<boolean> {
     const db = this.instance.sys.database.postgres();
 
     if (!(await this.instance.sys.users.doesUserExist(userId))) {
@@ -309,7 +337,7 @@ export default class AuthorizationSystem extends System {
     @returns {true} if they have a factor authentication secret
     @returns {false} if they lack a factor authentication secret
   */
-  async hasTwoFactorAuthenticationSecret(userId: number) {
+  async hasTwoFactorAuthenticationSecret(userId: number): Promise<boolean> {
     const db = this.instance.sys.database.postgres();
 
     if (!(await this.instance.sys.users.doesUserExist(userId))) {
@@ -330,7 +358,7 @@ export default class AuthorizationSystem extends System {
     @returns {true} if they have a passkey
     @returns {false} if they lack a passkey
   */
-  async hasPasskey(userId: number) {
+  async hasPasskey(userId: number): Promise<boolean> {
     const db = this.instance.sys.database.postgres();
 
     if (!(await this.instance.sys.users.doesUserExist(userId))) {
@@ -358,7 +386,7 @@ export default class AuthorizationSystem extends System {
 
     const passkeyCreationOptions: PublicKeyCredentialCreationOptionsJSON =
       await generateRegistrationOptions({
-        rpName: this.instance.sys.configuration.displayName,
+        rpName: this.instance.sys.configuration.branding.displayName,
         rpID: this.instance.sys.configuration.proxy.hostname,
         userName: (await (await this.instance.sys.users.getUserById(userId))
           ?.getUsername()) || `${userId}`,
@@ -386,9 +414,9 @@ export default class AuthorizationSystem extends System {
     Register a new passkey for the provided userId,
     the user's temporary Passkey response is required as the input param
   */
-  // biome-ignore lint/suspicious/noExplicitAny: the input is a webauthn response
+  // biome-ignore lint/suspicious/noExplicitAny: the input is a WebAuthn response
   // which is very complex and would require a lot of work to type, so we'll just
-  // use any here as it is handled by a library and we don't need to worry about the types
+  // use any here as it is handled by a library, and we don't need to worry about the types
   async registerPasskey(userId: number, input: any) {
     const db = this.instance.sys.database.postgres();
     const expectedChallenge = this.temporaryPasskeyCreationChallenges.get(

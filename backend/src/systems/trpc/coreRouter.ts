@@ -325,7 +325,7 @@ export const coreOnlineWorkspaceRouter = t.router({
         const totp = new OTPAuth.TOTP({
           issuer: opt.ctx.instance.sys.configuration.proxy.hostname,
           label:
-            `${opt.ctx.instance.sys.configuration.displayName} (Workspace)`,
+            `${opt.ctx.instance.sys.configuration.branding.displayName} (Workspace)`,
           algorithm: "SHA1",
           digits: 6,
           secret: secretString,
@@ -388,7 +388,7 @@ export const coreOnlineWorkspaceRouter = t.router({
         const totp = new OTPAuth.TOTP({
           issuer: opt.ctx.instance.sys.configuration.proxy.hostname,
           label:
-            `${opt.ctx.instance.sys.configuration.displayName} (Workspace)`,
+            `${opt.ctx.instance.sys.configuration.branding.displayName} (Workspace)`,
           algorithm: "SHA1",
           digits: 6,
           secret: secretString,
@@ -622,7 +622,7 @@ export const coreOnlineWorkspaceRouter = t.router({
       localeDateString.split(" ")[1]
     }, ${localeDateString.split(" ")[2]}`;
 
-    return `Terms of Use: ${opt.ctx.instance.sys.configuration.displayName}
+    return `Terms of Use: ${opt.ctx.instance.sys.configuration.branding.displayName}
 Effective Date: ${formattedDate}
 
 ${opt.ctx.instance.sys.configuration.termsOfUse.message}`;

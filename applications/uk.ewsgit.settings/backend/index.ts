@@ -516,7 +516,6 @@ const router = t.router({
           output.push({
             name: wallpaperName,
             previewSrc:
-              opt.ctx.instance.sys.configuration.proxy +
               (await instance.sys.image.serveImage(opt.ctx.userId, wallpaperPath, {
                 resize: {
                   dimensions: { width: 296, height: 192 },
@@ -541,7 +540,6 @@ const router = t.router({
           output.push({
             name: wallpaperName,
             previewSrc:
-              opt.ctx.instance.sys.configuration.proxy +
               (await instance.sys.image.serveImage(opt.ctx.userId, wallpaperPath, { resize: { dimensions: { height: 140, width: 250 }, position: "centre" } })),
           });
         }
@@ -575,7 +573,6 @@ const router = t.router({
         }
 
         return (
-          opt.ctx.instance.sys.configuration.proxy +
           (await opt.ctx.instance.sys.image.serveImage(opt.ctx.userId, requiredResizedWallpaperPath, {
             isPublic: false,
             evadeCache: true,
