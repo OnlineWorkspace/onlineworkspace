@@ -32,15 +32,7 @@ export default class TRPCSystem extends System {
     });
   }
 
-  override async startup(): Promise<boolean> {
-    super.startup();
-
-    // TODO: add tRPC routes to apiSystem when registered here by applications
-
-    return true;
-  }
-
-  registerTRPCRouter(
+  async registerTRPCRouter(
     router: TRPCBuiltRouter<any, any>,
     basePath: string,
     createContext: (
@@ -65,7 +57,7 @@ export default class TRPCSystem extends System {
 
     const self = this;
 
-    this.instance.sys.api.addRoute({
+    await this.instance.sys.api.addRoute({
       pattern: new URLPattern({ pathname: `${basePath}/*` }),
       async handler(req) {
         return (await self.instance.sys.tRPC.attemptTRPCRequest(
@@ -84,6 +76,7 @@ export default class TRPCSystem extends System {
     req: Request,
     server: Deno.HttpServer<Deno.NetAddr>,
   ) {
+    const self = this;
     const url = new URL(req.url);
 
     for (const router of this.routers) {
@@ -96,6 +89,9 @@ export default class TRPCSystem extends System {
         req,
         endpoint: router.basePath ?? "",
         router: router.router,
+        onError(opts) {
+          self.log.error(`${opts.error.name} occurred on path: ${router.basePath} -> ${opts.path}; type: ${opts.type}`, opts.input, opts.error)
+        }
       });
     }
 

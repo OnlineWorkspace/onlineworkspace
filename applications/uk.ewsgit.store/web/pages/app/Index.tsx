@@ -18,7 +18,12 @@ const ApplicationPage: Component = () => {
   const { applicationId, repository } = useParams();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const [application] = createResource(() => trpc.app.get.query({ applicationId: applicationId!, repository: repository! }));
+  const [application] = createResource(() =>
+    trpc.app.get.query({
+      applicationId: applicationId!,
+      repository: repository!,
+    })
+  );
 
   return (
     <div class={styles.root}>
@@ -33,19 +38,34 @@ const ApplicationPage: Component = () => {
         Back
       </UKButton>
       <div class={styles.header}>
-        <img alt={""} class={styles.headerImage} src={application()?.bannerImage || "/assets/placeholder/placeholder_image.svg"} />
+        <img
+          alt={""}
+          class={styles.headerImage}
+          src={application()?.bannerImage ||
+            "/assets/placeholder/placeholder_image.svg"}
+        />
       </div>
       <div class={styles.headerContent}>
-        {application()?.icon.type === "image" ? (
-          <img alt={""} class={styles.iconImage} src={application()?.icon.value || "/assets/onlineworkspace/online_workspace_logo.svg"} />
-        ) : (
-          <UKIcon class={styles.iconIcon}>{application()?.icon.value || ""}</UKIcon>
-        )}
+        {application()?.icon.type === "image"
+          ? (
+            <img
+              alt={""}
+              class={styles.iconImage}
+              src={application()?.icon.value ||
+                "/assets/onlineworkspace/online_workspace_logo.svg"}
+            />
+          )
+          : (
+            <UKIcon class={styles.iconIcon}>
+              {application()?.icon.value || ""}
+            </UKIcon>
+          )}
         <UKText role="display" size="m">
           {application()?.displayName}
         </UKText>
         <UKButton
-          disabled={!application()?.isUserAdministrator || !application()?.canBeUninstalled}
+          disabled={!application()?.isUserAdministrator ||
+            !application()?.canBeUninstalled}
           class={styles.headerContentButton}
           leadingIcon={application()?.isInstalled ? DELETE_ICON : DOWNLOAD_ICON}
           onClick={async () => {
@@ -71,7 +91,8 @@ const ApplicationPage: Component = () => {
       {!application()?.isUserAdministrator && (
         <UKCard color="elevated" class={styles.permissionWarning}>
           <UKText role="body" size="l">
-            Info: You are not an administrator and lack the permission to install or uninstall applications.
+            Info: You are not an administrator and lack the permission to
+            install or uninstall applications.
           </UKText>
         </UKCard>
       )}
@@ -114,11 +135,27 @@ const ApplicationPage: Component = () => {
                   </UKText>
                 </>
               )}
+              {(application()?.permissions || []).length > 0
+                ? (
+                  <>
+                    <UKText align={"end"} role="label" size="l">
+                      Permissions
+                    </UKText>
+                    <UKText role="body" size="m">
+                    {application()?.permissions?.join(", ")}
+                    </UKText>
+                  </>
+                )
+                : null}
             </div>
           }
         />
       </UKStack>
-      <UKDivider direction={DividerDirection.horizontal} width="middle-inset" class={styles.divider} />
+      <UKDivider
+        direction={DividerDirection.horizontal}
+        width="middle-inset"
+        class={styles.divider}
+      />
       <UKCard color="filled" class={styles.author}>
         <UKText role="title" size="m">
           Created by
@@ -133,7 +170,11 @@ const ApplicationPage: Component = () => {
           }}
         </For>
       </UKCard>
-      <UKDivider direction={DividerDirection.horizontal} width="middle-inset" class={styles.divider} />
+      <UKDivider
+        direction={DividerDirection.horizontal}
+        width="middle-inset"
+        class={styles.divider}
+      />
       <UKCard color="filled" class={styles.repository}>
         <UKText role="label" size="m">
           Repository: {repository}

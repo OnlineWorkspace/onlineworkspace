@@ -7,6 +7,7 @@ export interface RepositoryApplication {
   modules: string[];
   bannerImage?: string;
   graphicsAcceleration?: string;
+  permissions: string[];
 }
 export interface RepositoryApplicationSummary {
   id: string;

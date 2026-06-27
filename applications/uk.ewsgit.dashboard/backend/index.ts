@@ -193,9 +193,9 @@ const router = t.router({
         );
 
         if (await fs.exists(path.join(wallpaperPath, "config.json"))) {
+          const textDecoder = new TextDecoder("utf8")
           const options = JSON.parse(
-            (await Deno.readFile(path.join(wallpaperPath, "config.json")))
-              .toString(),
+            textDecoder.decode(await Deno.readFile(path.join(wallpaperPath, "config.json"))),
           );
 
           options.position = options.position.split(" ");

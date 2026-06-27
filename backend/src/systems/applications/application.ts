@@ -1,4 +1,4 @@
-export interface WorkspacesApplication {
+export interface OnlineWorkspaceApplication {
   id: string;
   // if undefined, just the id is used
   displayName?: string;
@@ -6,8 +6,9 @@ export interface WorkspacesApplication {
     type: "icon" | "image";
     value: string;
   };
+  bannerImage?: string;
   description?: string;
-  authors: string[];
+  authors: { name: string, link: string }[];
   license: string;
   source?: string;
   dependsOn?: {

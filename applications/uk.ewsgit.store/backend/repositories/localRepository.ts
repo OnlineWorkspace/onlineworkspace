@@ -4,6 +4,7 @@ import ApplicationRepository, {
   type RepositoryApplication,
   type RepositoryApplicationSummary,
 } from "../applicationRepository.ts";
+import { OnlineWorkspaceApplication } from "@onlineworkspace/workspace-backend/src/systems/applications/application.ts";
 
 export default class LocalApplicationRepository extends ApplicationRepository {
   id = "local";
@@ -34,41 +35,54 @@ export default class LocalApplicationRepository extends ApplicationRepository {
           ),
         ),
       ),
-    );
+    ) as OnlineWorkspaceApplication;
 
     return {
-      displayName: applicationManifest.displayName,
+      displayName: applicationManifest.displayName || "Not Defined",
       authors: applicationManifest.authors,
-      description: applicationManifest.description,
-      icon: applicationManifest.icon.type === "image"
-        ? {
-          type: "image",
-          value: path.join(
-            instance.sys.filesystem.SRC_ROOT,
-            "../../applications/",
-            applicationId,
-            applicationManifest.icon.value,
-          ),
-        }
+      description: applicationManifest.description || "Not Defined",
+      icon: applicationManifest.icon
+        ? applicationManifest.icon.type === "image"
+          ? {
+            type: "image",
+            value: path.join(
+              instance.sys.filesystem.APPLICATIONS_ROOT,
+              applicationId,
+              applicationManifest.icon.value,
+            ),
+          }
+          : {
+            type: "icon",
+            value: path.join(
+              instance.sys.filesystem.APPLICATIONS_ROOT,
+              applicationId,
+              applicationManifest.icon.value,
+            ),
+          }
         : {
           type: "icon",
           value: path.join(
-            instance.sys.filesystem.SRC_ROOT,
-            "../../applications/",
+            instance.sys.filesystem.APPLICATIONS_ROOT,
             applicationId,
-            applicationManifest.icon.value,
+            "web/node_modules/@material-symbols/svg-700/outlined/broken_image.svg",
           ),
         },
       id: applicationId,
       modules: Object.keys(applicationManifest.modules),
       bannerImage: applicationManifest.bannerImage
         ? path.join(
-          instance.sys.filesystem.SRC_ROOT,
-          "../../applications/",
+          instance.sys.filesystem.APPLICATIONS_ROOT,
           applicationId,
           applicationManifest.bannerImage,
         )
         : undefined,
+      permissions:
+        (!!applicationManifest.modules.internal ||
+            !!applicationManifest.modules.external)
+          ? ["All"]
+          : applicationManifest.modules.deno
+          ? applicationManifest.modules.deno.permissions
+          : [],
     };
   }
 
@@ -87,7 +101,7 @@ export default class LocalApplicationRepository extends ApplicationRepository {
 
       if (entry.name.includes(query)) {
         applicationIds.push(entry.name);
-        continue;
+
       }
     }
 

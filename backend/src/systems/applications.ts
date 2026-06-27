@@ -3,7 +3,7 @@ import { promises as fs, existsSync as fsExistsSync } from "node:fs";
 import path from "node:path";
 import type { Instance } from "../index.ts";
 import System from "../system.ts";
-import type { WorkspacesApplication } from "./applications/application.ts";
+import type { OnlineWorkspaceApplication } from "./applications/application.ts";
 import type { WorkspacesApplicationServiceStatus } from "./applications/serviceStatus.ts";
 import { WorkspacesNotificationPriority } from "./notifications.ts";
 
@@ -11,10 +11,11 @@ const APPLICATIONS_CONFIG_FILE_PATH = (subsystem: System) => path.join(subsystem
 const APPLICATIONS_TSX_FILE_PATH = (subsystem: System) => path.join(subsystem.instance.sys.filesystem.SYSTEM_PATH, "vite", "Applications.tsx");
 
 interface AvailableWorkspacesApplication {
+  id: string;
   path: string;
   enabled: boolean;
   status?: WorkspacesApplicationServiceStatus[];
-  manifest?: WorkspacesApplication;
+  manifest?: OnlineWorkspaceApplication;
 }
 
 export default class ApplicationsSystem extends System {
@@ -270,6 +271,7 @@ export default class ApplicationsSystem extends System {
     }
 
     this.availableApplications.push({
+      id: applicationManifest.id,
       enabled: false,
       path: applicationPath,
       manifest: applicationManifest,
@@ -483,7 +485,7 @@ export default class ApplicationsSystem extends System {
     return true;
   }
 
-  async getApplicationStatus(applicationId: string): { installed: true, enabled: boolean} | { installed: false } {
+  async getApplicationStatus(applicationId: string): Promise<{ installed: true, enabled: boolean } | { installed: false }> {
     const app = this.availableApplications.find((a) => a.manifest?.id === applicationId);
 
     if (app) {

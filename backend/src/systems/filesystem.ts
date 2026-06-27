@@ -25,6 +25,7 @@ export default class FilesystemSystem extends System {
   readonly CACHE_PATH = path.join(this.FS_ROOT, "cache");
   readonly SYSTEM_PATH = path.join(this.FS_ROOT, "system");
   readonly AUTO_INSTALL_PATH = path.join(process.cwd(), "auto_install");
+  readonly APPLICATIONS_ROOT = path.join(this.SRC_ROOT, "../../applications/")
 
   _internalAssets: Map<
     string,
