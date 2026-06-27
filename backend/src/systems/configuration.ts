@@ -83,6 +83,7 @@ export default class ConfigurationSystem extends System {
     metaDescription: "A self-hosted web platform for applications & services with design based on Google's Material 3 Expressive. (Work In Progress)"
   }
   mailServer: {
+    enabled: boolean;
     host: string;
     port: number;
     secure: boolean;
@@ -91,6 +92,7 @@ export default class ConfigurationSystem extends System {
       pass: string;
     };
   } = {
+    enabled: false,
     host: "smtp.example.com",
     port: 465,
     secure: true,
@@ -176,7 +178,7 @@ export default class ConfigurationSystem extends System {
 
       for (const key of Object.keys(autoInstallConfig)) {
         if (key in this) {
-          // @ts-ignore
+          // @ts-ignore unimportant
           this[key] = autoInstallConfig[key];
         }
       }

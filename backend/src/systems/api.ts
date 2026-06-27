@@ -53,7 +53,7 @@ export default class ApiSystem extends System {
             path.join(
               self.instance.sys.filesystem.FS_ROOT,
               "assets/login/background.png",
-            ),
+            )
           );
         },
       },

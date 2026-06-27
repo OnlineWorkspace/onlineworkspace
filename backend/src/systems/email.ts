@@ -14,6 +14,10 @@ export default class EmailSystem extends System {
     subject: string,
     content: { type: "string" | "html"; content: string },
   ) {
+    if (!this.instance.sys.configuration.mailServer.enabled) {
+      return false;
+    }
+
     await this.transporter.sendMail({
       to: to,
       from:
@@ -23,9 +27,18 @@ export default class EmailSystem extends System {
       text: content.type === "string" ? content.content : undefined,
       html: content.type === "html" ? content.content : undefined,
     });
+
+    return true;
   }
 
   override async startup(): Promise<boolean> {
+    if (!this.instance.sys.configuration.mailServer.enabled) {
+      this.log.info("Mail server disabled");
+      return true;
+    }
+
+    this.log.info("Mail server enabled");
+
     this.transporter = nm.createTransport(
       this.instance.sys.configuration.mailServer,
     );
@@ -62,7 +75,9 @@ export default class EmailSystem extends System {
 
   override async stop(): Promise<boolean> {
     if (this.instance.sys.configuration.isDevMode) {
-      this.transporter.close();
+      if (this.instance.sys.configuration.mailServer.enabled) {
+        this.transporter.close();
+      }
 
       return true;
     }
@@ -82,7 +97,9 @@ export default class EmailSystem extends System {
       }
     }
 
-    this.transporter.close();
+    if (this.instance.sys.configuration.mailServer.enabled) {
+      this.transporter.close();
+    }
 
     return true;
   }
