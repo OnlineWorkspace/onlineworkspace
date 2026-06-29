@@ -63,10 +63,14 @@ export default class FilesystemSystem extends System {
     return this;
   }
 
-  getApplicationSrc(applicationId: string) {
+  getApplicationSrcDirectory(applicationId: string) {
     return this.instance.sys.applications.availableApplications.find((a) =>
       a.manifest?.id === applicationId
     )?.path;
+  }
+
+  getApplicationCacheDirectory(applicationId: string) {
+    return path.join(this.CACHE_PATH, "applications", applicationId);
   }
 
   // Create a directory if it does not already exist

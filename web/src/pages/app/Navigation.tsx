@@ -13,7 +13,6 @@ import trpc from "../../lib/trpc";
 import NavigationRailApplications from "./components/NavigationRail/components/navigationRailApplications/NavigationRailApplications";
 import NavigationRailAvatar from "./components/NavigationRail/components/navigationRailAvatar/NavigationRailAvatar";
 import NavigationRailClock from "./components/NavigationRail/components/navigationRailClock/NavigationRailClock";
-import NavigationRailNotifications from "./components/NavigationRail/components/navigationRailNotifications/NavigationRailNotifications";
 import styles from "./Navigation.module.scss";
 
 const AppNavigation: Component<ParentProps> = (props) => {
@@ -100,17 +99,18 @@ const AppNavigation: Component<ParentProps> = (props) => {
                 Dev Build
               </UKText>
             </Show>
-            <NavigationRailNotifications
-              isToggled={toggledDrawer() === "notifications"}
-              toggle={(drawerState) => {
-                if (toggledDrawer() === "notifications") {
-                  setToggledDrawer(false);
-                } else {
-                  setToggledDrawer(drawerState);
-                }
-              }}
-              expanded={expanded()}
-            />
+            {/* TODO: move this into the applications drawer instead, only using one nav button */}
+            {/*<NavigationRailNotifications*/}
+            {/*  isToggled={toggledDrawer() === "notifications"}*/}
+            {/*  toggle={(drawerState) => {*/}
+            {/*    if (toggledDrawer() === "notifications") {*/}
+            {/*      setToggledDrawer(false);*/}
+            {/*    } else {*/}
+            {/*      setToggledDrawer(drawerState);*/}
+            {/*    }*/}
+            {/*  }}*/}
+            {/*  expanded={expanded()}*/}
+            {/*/>*/}
           </>
         ),
       }}

@@ -4,6 +4,7 @@ import LOGOUT_ICON from "@material-symbols/svg-700/outlined/logout.svg";
 import PASSKEY_ICON from "@material-symbols/svg-700/outlined/passkey.svg";
 import PERSON_ICON from "@material-symbols/svg-700/outlined/person.svg";
 import SETTINGS_APPLICATIONS_ICON from "@material-symbols/svg-700/outlined/settings_applications.svg";
+import FORMAT_PAINT_ICON from "@material-symbols/svg-700/outlined/format_paint.svg"
 import STORAGE_ICON from "@material-symbols/svg-700/outlined/storage.svg";
 import WALLPAPER_ICON from "@material-symbols/svg-700/outlined/wallpaper.svg";
 import UKAvatar from "@ewsgit/uikit-solid/src/components/avatar/UKAvatar.tsx";
@@ -12,7 +13,6 @@ import { DividerDirection } from "@ewsgit/uikit-solid/src/components/divider/lib
 import UKDivider from "@ewsgit/uikit-solid/src/components/divider/UKDivider.tsx";
 import UKStack from "@ewsgit/uikit-solid/src/components/stack/UKStack.tsx";
 import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.tsx";
-import UKTopAppBar from "@ewsgit/uikit-solid/src/components/topAppBar/UKTopAppBar.tsx";
 import webInstanceTRPC from "@onlineworkspace/workspace-web/src/lib/trpc.ts";
 import { useNavigate } from "@solidjs/router";
 import clsx from "clsx";
@@ -20,6 +20,7 @@ import { type Component, createResource, Suspense } from "solid-js";
 import trpc from "../../lib/trpc";
 import Shortcut from "./component/Shortcut/Shortcut";
 import styles from "./index.module.scss";
+import UKStackLabel from "@ewsgit/uikit-solid/src/components/stack/UKStackLabel.tsx";
 
 const RootPage: Component = () => {
   const navigate = useNavigate();
@@ -29,7 +30,6 @@ const RootPage: Component = () => {
 
   return (
     <>
-      <UKTopAppBar type="small" headline={"Overview"} />
       <Suspense>
         <div class={styles.root}>
           <div class={clsx(styles.content)}>
@@ -40,9 +40,18 @@ const RootPage: Component = () => {
                 navigate("/app/uk.ewsgit.settings/profile");
               }}
             >
-              <UKAvatar username="username" avatar={avatar() || "/assets/placeholder/avatar.png"} size="l" />
+              <UKAvatar
+                username="username"
+                avatar={avatar() || "/assets/placeholder/avatar.png"}
+                size="l"
+              />
               <div>
-                <UKText role="display" size="l" emphasized class={styles.fullName}>
+                <UKText
+                  role="display"
+                  size="l"
+                  emphasized
+                  class={styles.fullName}
+                >
                   {fullName() || "Unknown"}
                 </UKText>
                 <UKText role="label" size="l" class={styles.permissionLevel}>
@@ -61,13 +70,29 @@ const RootPage: Component = () => {
               >
                 Logout
               </UKButton>
-              <UKButton color="tonal" leadingIcon={KEY_ICON} onClick={() => navigate("/app/uk.ewsgit.settings/authentication/?change-passsword=true")}>
+              <UKButton
+                color="tonal"
+                leadingIcon={KEY_ICON}
+                onClick={() =>
+                  navigate(
+                    "/app/uk.ewsgit.settings/authentication/?change-passsword=true",
+                  )}
+              >
                 Change Password
               </UKButton>
             </div>
-            <UKDivider class={styles.divider} direction={DividerDirection.horizontal} width="middle-inset" />
+            <UKDivider
+              class={styles.divider}
+              direction={DividerDirection.horizontal}
+              width="middle-inset"
+            />
             <UKStack>
-              <Shortcut title="Profile" description="View & Manage your profile" icon={PERSON_ICON} path="/app/uk.ewsgit.settings/profile" />
+              <Shortcut
+                title="Profile"
+                description="View & Manage your profile"
+                icon={PERSON_ICON}
+                path="/app/uk.ewsgit.settings/profile"
+              />
               <Shortcut
                 title="Authentication"
                 description="View & Manage your login sessions & credentials"
@@ -86,16 +111,50 @@ const RootPage: Component = () => {
                 icon={WALLPAPER_ICON}
                 path="/app/uk.ewsgit.settings/customization"
               />
-              <Shortcut title="Applications" description="Manage application settings" icon={APPS_ICON} path="/app/uk.ewsgit.settings/applications" />
-              {role() === "Administrator" && (
-                <Shortcut
-                  title="Configure Instance"
-                  description="(ADMINISTRATORS ONLY) Manage the instance & it’s users"
-                  icon={SETTINGS_APPLICATIONS_ICON}
-                  path="/app/uk.ewsgit.settings/instance"
-                />
-              )}
+              <Shortcut
+                title="Applications"
+                description="Manage application settings"
+                icon={APPS_ICON}
+                path="/app/uk.ewsgit.settings/applications"
+              />
             </UKStack>
+            {role() === "Administrator" && (
+              <>
+                <UKStackLabel>Manage Instance</UKStackLabel>
+                <UKStack>
+                  <Shortcut
+                    title="Instance Branding"
+                    description=""
+                    icon={FORMAT_PAINT_ICON}
+                    path="/app/uk.ewsgit.settings/instance/branding"
+                  />
+                  <Shortcut
+                    title="Configure Features"
+                    description=""
+                    icon={SETTINGS_APPLICATIONS_ICON}
+                    path="/app/uk.ewsgit.settings/instance/features"
+                  />
+                  <Shortcut
+                    title="Manage Installed Applications"
+                    description=""
+                    icon={SETTINGS_APPLICATIONS_ICON}
+                    path="/app/uk.ewsgit.settings/instance/installed_applications"
+                  />
+                  <Shortcut
+                    title="Configure Mailserver"
+                    description=""
+                    icon={SETTINGS_APPLICATIONS_ICON}
+                    path="/app/uk.ewsgit.settings/instance/mailserver"
+                  />
+                  <Shortcut
+                    title="Manage Users"
+                    description=""
+                    icon={SETTINGS_APPLICATIONS_ICON}
+                    path="/app/uk.ewsgit.settings/instance/users"
+                  />
+                </UKStack>
+              </>
+            )}
           </div>
         </div>
       </Suspense>

@@ -37,7 +37,7 @@ const NavigationRailClock: Component<{ expanded: boolean }> = (props) => {
 
   return (
     <div class={styles.root} data-expanded={props.expanded}>
-      <UKText size="m" role="title" class={clsx(styles.content, styles.collapsed)}>
+      <UKText size="m" role="title" class={clsx(styles.content)}>
         {time()}
       </UKText>
       <UKText size="m" role="title" class={clsx(styles.content, styles.expanded)}>

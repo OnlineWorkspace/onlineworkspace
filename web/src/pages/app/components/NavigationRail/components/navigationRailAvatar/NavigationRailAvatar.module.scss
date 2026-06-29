@@ -9,9 +9,9 @@
   border-radius: 10rem;
   position: relative;
 
-  transition:
-    background-color var(--uk-sys-motion-duration-250) var(--uk-sys-motion-easing-emphasized-decelerate),
-    color var(--uk-sys-motion-duration-250) var(--uk-sys-motion-easing-emphasized-decelerate);
+
+  transition: background-color var(--uk-sys-motion-duration-250) var(--uk-sys-motion-easing-emphasized-decelerate),
+  color var(--uk-sys-motion-duration-250) var(--uk-sys-motion-easing-emphasized-decelerate);
 
   .avatarContainer {
     outline-style: solid;
@@ -20,10 +20,9 @@
     outline-color: transparent;
     margin-bottom: 0;
 
-    transition:
-      outline-color var(--uk-sys-motion-duration-100) var(--uk-sys-motion-easing-standard-decelerate),
-      outline-width var(--uk-sys-motion-duration-50) linear,
-      margin-bottom var(--uk-sys-motion-duration-500) var(--uk-sys-motion-easing-emphasized-decelerate);
+    transition: outline-color var(--uk-sys-motion-duration-100) var(--uk-sys-motion-easing-standard-decelerate),
+    outline-width var(--uk-sys-motion-duration-50) linear,
+    margin-bottom var(--uk-sys-motion-duration-500) var(--uk-sys-motion-easing-emphasized-decelerate);
 
     &:hover {
       outline-width: var(--uk-sys-state-focus-indicator-thickness);
@@ -63,6 +62,7 @@
     right: 0.75rem;
     opacity: 0;
     visibility: hidden;
+    transition: all var(--uk-sys-motion-duration-50) var(--uk-sys-motion-easing-standard-decelerate), outline-color var(--uk-sys-motion-duration-100) var(--uk-sys-motion-easing-standard-decelerate), outline-width 0ms linear, background-color var(--uk-sys-motion-duration-100) var(--uk-sys-motion-easing-standard-normal), color var(--uk-sys-motion-duration-100) var(--uk-sys-motion-easing-standard-normal), padding-left var(--uk-sys-motion-duration-50) var(--uk-sys-motion-easing-linear), margin-left var(--uk-sys-motion-duration-50) var(--uk-sys-motion-easing-linear), padding-right var(--uk-sys-motion-duration-50) var(--uk-sys-motion-easing-linear), margin-right var(--uk-sys-motion-duration-50) var(--uk-sys-motion-easing-linear), border-radius var(--border-radius-duration, var(--uk-sys-motion-duration-50)) var(--uk-sys-motion-easing-linear), opacity 0ms;
   }
 
   &[data-expanded="false"]:hover {
@@ -81,9 +81,6 @@
       visibility: visible;
       pointer-events: all;
       opacity: 1;
-      transition:
-        opacity var(--uk-sys-motion-duration-1000) var(--uk-sys-motion-easing-emphasized-decelerate),
-        border-radius var(--uk-sys-motion-duration-250) var(--uk-sys-motion-easing-emphasized-decelerate);
     }
 
     .nameContainer {
@@ -93,12 +90,17 @@
   }
 
   *[data-navigation-rail-mobile-mode="true"] > div > & {
-    margin-top: auto;
-    margin-bottom: auto;
+    margin-top: 0;
+    margin-bottom: 0;
     margin-right: 1rem;
     padding: unset;
     aspect-ratio: 1 / 1;
     background: transparent;
+    height: max-content;
+
+    .nameContainer, .logout {
+      display: none !important;
+    }
 
     &:hover {
       .avatarContainer {

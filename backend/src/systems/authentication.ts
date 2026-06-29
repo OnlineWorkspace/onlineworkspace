@@ -32,6 +32,8 @@ export default class AuthenticationSystem extends System {
 
     if (!user) return undefined
 
-    user
+    let sessionRequirements: Authenticator[] = [];
+
+    if ()
   }
 }

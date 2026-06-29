@@ -6,7 +6,6 @@ import UKIconButton from "@ewsgit/uikit-solid/src/components/iconButton/UKIconBu
 import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.tsx";
 import { useNavigate } from "@solidjs/router";
 import { type Component, createSignal, For } from "solid-js";
-import type { WorkspacesNotification } from "../../../../../../../../systems/notifications";
 import trpc from "../../../../../../lib/trpc";
 import styles from "./NavigationRailNotifications.module.scss";
 import Notification from "./notification/Notification";

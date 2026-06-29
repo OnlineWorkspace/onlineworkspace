@@ -23,6 +23,7 @@
   *[data-navigation-rail-mobile-mode="true"] > div > & {
     justify-content: unset;
     width: unset;
+    height: max-content;
     padding-bottom: unset;
 
     > .notifications,
