@@ -35,30 +35,22 @@ export const t = initTRPC.context<
 
 const router = t.router({
   overview: {
-    user: {
-      fullName: procedure.output(z.string()).query(async (opt) => {
-        const fullName =
-          await (await opt.ctx.instance.sys.users.getUserById(opt.ctx.userId))
-            ?.getFullName();
+    user: procedure.query(async opt => {
+      const user = await opt.ctx.instance.sys.users.getUserById(opt.ctx.userId)
 
-        return `${fullName?.forename} ${fullName?.surname || ""}` ||
-          "Unknown User";
-      }),
-      role: procedure.output(z.string()).query(async (opt) => {
-        const isAdministrator =
-          await (await opt.ctx.instance.sys.users.getUserById(opt.ctx.userId))
-            ?.isAdministrator();
+      if (!user) throw new TRPCError({ message: "Unknown user", code: "UNAUTHORIZED"})
 
-        return isAdministrator ? "Administrator" : "User";
-      }),
-      getAvatar: procedure.output(z.string()).query(async (opt) => {
-        return `${
-          opt.ctx.instance.sys.configuration.proxy.secure
-            ? "https://"
-            : "http://"
-        }${opt.ctx.instance.sys.configuration.proxy.hostname}/api/user/me/avatar/l`;
-      }),
-    },
+      const fullName = await (user.getFullName());
+      const isAdministrator = await user.isAdministrator();
+      const username = await user.getUsername()
+
+      return {
+        fullName: `${fullName?.forename} ${fullName?.surname || ""}` || "Unknown User",
+        username: username || "unknown",
+        isAdministrator: isAdministrator,
+        avatar: `${instance.sys.api.getProxyBasePath()}/api/user/me/avatar/l`
+      }
+    })
   },
   profile: {
     getName: procedure.output(z.string()).query(async (opt) => {

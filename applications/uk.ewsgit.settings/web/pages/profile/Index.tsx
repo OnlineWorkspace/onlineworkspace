@@ -23,7 +23,7 @@ const ProfilePage: Component = () => {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const [name, { refetch: refetchName, mutate: mutateName }] = createResource(() => trpc.profile.getName.query());
-  const [role] = createResource(() => trpc.profile.getRole.query());
+  const [username] = createResource(() => trpc.profile.getUsername.query());
   const [avatar, { refetch: refetchAvatar }] = createResource(() => trpc.profile.getProfilePicture.query());
 
   return (
@@ -48,7 +48,7 @@ const ProfilePage: Component = () => {
                 {name() || "Unknown"}
               </UKText>
               <UKText role="label" size="l" class={styles.permissionLevel}>
-                {role() || "Unknown"}
+                @{username() || "unknown"}
               </UKText>
             </div>
           </div>

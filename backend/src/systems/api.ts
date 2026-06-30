@@ -53,7 +53,7 @@ export default class ApiSystem extends System {
             path.join(
               self.instance.sys.filesystem.FS_ROOT,
               "assets/login/background.png",
-            )
+            ),
           );
         },
       },
@@ -216,31 +216,53 @@ export default class ApiSystem extends System {
             return serveFile(req, sourceImage.path);
           }
 
-            const cachedFilePath = path.join(self.instance.sys.filesystem.CACHE_PATH, sourceImage.path.replaceAll(":", ""));
-            const outputPath = path.join(cachedFilePath, resolutionParam);
-            const hashPath = path.join(`${outputPath}.hash`);
+          const cachedFilePath = path.join(
+            self.instance.sys.filesystem.CACHE_PATH,
+            sourceImage.path.replaceAll(":", ""),
+          );
+          const outputPath = path.join(cachedFilePath, resolutionParam);
+          const hashPath = path.join(`${outputPath}.hash`);
 
-            if (fs.existsSync(outputPath)) {
-              const fileHash = await instance.sys.filesystem.getFileHash(sourceImage.path);
-              const textDecoder = new TextDecoder("utf8")
-              const cacheFileHash = textDecoder.decode(await Deno.readFile(hashPath));
+          if (fs.existsSync(outputPath)) {
+            const fileHash = await instance.sys.filesystem.getFileHash(
+              sourceImage.path,
+            );
+            const textDecoder = new TextDecoder("utf8");
+            const cacheFileHash = textDecoder.decode(
+              await Deno.readFile(hashPath),
+            );
 
-              if (fileHash === cacheFileHash) {
-                self.instance.sys.image.log.info(`Served Image -> '${(params as { imageId: string }).imageId} @ ${resolutionParam}'`);
-                return serveFile(req, outputPath);
-              }
+            if (fileHash === cacheFileHash) {
+              self.instance.sys.image.log.info(
+                `Served Image -> '${
+                  (params as { imageId: string }).imageId
+                } @ ${resolutionParam}'`,
+              );
+              return serveFile(req, outputPath);
             }
+          }
 
-            if (!fs.existsSync(path.join(outputPath, ".."))) {
-              await fs.ensureDir(path.join(outputPath, ".."));
-            }
+          if (!fs.existsSync(path.join(outputPath, ".."))) {
+            await fs.ensureDir(path.join(outputPath, ".."));
+          }
 
-            const fileHash = await instance.sys.filesystem.getFileHash(sourceImage.path);
-            await self.instance.sys.image.resizeImage(sourceImage.path, outputPath, sourceImage.resize!.dimensions, sourceImage.resize!);
-            await Deno.writeFile(hashPath, Buffer.from(fileHash, "utf8"));
+          const fileHash = await instance.sys.filesystem.getFileHash(
+            sourceImage.path,
+          );
+          await self.instance.sys.image.resizeImage(
+            sourceImage.path,
+            outputPath,
+            sourceImage.resize!.dimensions,
+            sourceImage.resize!,
+          );
+          await Deno.writeFile(hashPath, Buffer.from(fileHash, "utf8"));
 
-            self.instance.sys.image.log.info(`Served Image -> '${(params as { imageId: string }).imageId} @ ${resolutionParam}'`);
-            return serveFile(req, outputPath);
+          self.instance.sys.image.log.info(
+            `Served Image -> '${
+              (params as { imageId: string }).imageId
+            } @ ${resolutionParam}'`,
+          );
+          return serveFile(req, outputPath);
         },
       },
       {
@@ -369,6 +391,12 @@ export default class ApiSystem extends System {
     return true;
   }
 
+  getProxyBasePath(): string {
+    return `${
+      this.instance.sys.configuration.proxy.secure ? "https://" : "http://"
+    }${this.instance.sys.configuration.proxy.hostname}`;
+  }
+
   override async startup(): Promise<boolean> {
     if (this.listening) {
       this.log.warning(
@@ -383,7 +411,7 @@ export default class ApiSystem extends System {
       {
         port: this.instance.sys.configuration.apiPort,
         onListen(localAddr) {
-          self.log.info(`Listening on port ${localAddr.port}`)
+          self.log.info(`Listening on port ${localAddr.port}`);
         },
       },
       routeRadix(

@@ -24,9 +24,7 @@ import UKStackLabel from "@ewsgit/uikit-solid/src/components/stack/UKStackLabel.
 
 const RootPage: Component = () => {
   const navigate = useNavigate();
-  const [fullName] = createResource(() => trpc.overview.user.fullName.query());
-  const [role] = createResource(() => trpc.overview.user.role.query());
-  const [avatar] = createResource(() => trpc.overview.user.getAvatar.query());
+  const [user] = createResource(() => trpc.overview.user.query());
 
   return (
     <>
@@ -42,7 +40,7 @@ const RootPage: Component = () => {
             >
               <UKAvatar
                 username="username"
-                avatar={avatar() || "/assets/placeholder/avatar.png"}
+                avatar={user()?.avatar || "/assets/placeholder/avatar.png"}
                 size="l"
               />
               <div>
@@ -52,10 +50,10 @@ const RootPage: Component = () => {
                   emphasized
                   class={styles.fullName}
                 >
-                  {fullName() || "Unknown"}
+                  {user()?.fullName || "Unknown"}
                 </UKText>
                 <UKText role="label" size="l" class={styles.permissionLevel}>
-                  {role() || "Unknown"}
+                  @{user()?.username || "Unknown"}
                 </UKText>
               </div>
             </button>
@@ -118,7 +116,7 @@ const RootPage: Component = () => {
                 path="/app/uk.ewsgit.settings/applications"
               />
             </UKStack>
-            {role() === "Administrator" && (
+            {user()?.isAdministrator && (
               <>
                 <UKStackLabel>Manage Instance</UKStackLabel>
                 <UKStack>
