@@ -6,19 +6,20 @@ import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.tsx";
 import UKTextField from "@ewsgit/uikit-solid/src/components/textField/UKTextField.tsx";
 import { startAuthentication } from "@simplewebauthn/browser";
 import { useNavigate, usePreloadRoute, useSearchParams } from "@solidjs/router";
-import { type Component, createEffect, createResource, createSignal, onMount } from "solid-js";
+import {type Component, createEffect, createSignal, onMount, useContext} from "solid-js";
 import trpc from "../../../lib/trpc";
 import styles from "./Login.module.scss";
+import UserSelectContext from "../userSelectContext.ts";
 
 const UserSelectPage: Component = () => {
   const navigate = useNavigate();
   const preloadRoute = usePreloadRoute();
+  const options = useContext(UserSelectContext)
   const [searchParams] = useSearchParams();
 
   const [username, setUsername] = createSignal(searchParams.username as string | undefined || "");
   const [password, setPassword] = createSignal("");
   const [showTwoFactor, setShowTwoFactor] = createSignal<boolean>(false);
-  const [canSignup] = createResource(() => trpc.authorization.canSignup.query());
 
   onMount(async () => {
     if ((await trpc.authorization.isAuthenticated.query()).authenticated) {
@@ -149,7 +150,7 @@ const UserSelectPage: Component = () => {
               </UKButton>
             </div>
           </form>
-          {canSignup() ? (
+          {options.showSignup ? (
             <>
               <UKDivider direction={DividerDirection.horizontal} />
               <div class={styles.signupSegment}>

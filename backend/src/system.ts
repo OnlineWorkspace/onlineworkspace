@@ -17,6 +17,7 @@ import type TerminalSystem from "./systems/terminal.ts";
 import type TRPCSubsystem from "./systems/trpc.ts";
 import type UsersSubsystem from "./systems/users.ts";
 import type WebFrontendSubsystem from "./systems/webFrontend.ts";
+import AuthenticationSystem from "./systems/authentication.ts";
 
 export type Sys = {
   users: UsersSubsystem;
@@ -25,6 +26,7 @@ export type Sys = {
   configuration: ConfigurationSubsystem;
   consoleCommands: ConsoleCommandsSubsystem;
   authorization: AuthorizationSubsystem;
+  authentication: AuthenticationSystem;
   database: DatabaseSubsystem;
   applications: ApplicationsSubsystem;
   tRPC: TRPCSubsystem;

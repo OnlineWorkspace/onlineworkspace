@@ -1,4 +1,4 @@
-import { getCookies, setCookie, deleteCookie } from "@std/http/cookie";
+import { deleteCookie, getCookies, setCookie } from "@std/http/cookie";
 import { initTRPC, TRPCError } from "@trpc/server";
 import type { FetchCreateContextFnOptions } from "@trpc/server/adapters/fetch";
 import * as hiBase32 from "hi-base32";
@@ -6,7 +6,10 @@ import * as nodeCrypto from "node:crypto";
 import * as OTPAuth from "otpauth";
 import z from "zod";
 import type { Instance } from "../../index.ts";
-import { AuthorizedDeviceType } from "../authorization.ts";
+import {
+  AuthorizedDeviceType,
+  SessionCreationError,
+} from "../authorization.ts";
 import { WorkspacesFeatureFlags } from "../configuration.ts";
 import type { WorkspacesUser } from "../users.ts";
 
@@ -95,7 +98,18 @@ const temporaryTwoFactorSecrets: Map<number, string> = new Map();
 const emailSignupVerificationCodes: Map<string, string> = new Map();
 
 export const coreOnlineWorkspaceRouter = t.router({
-  authorization: {
+  userSelect: {
+    getOptions: publicProcedure.query(async (opt) => {
+      return {
+        showSignup: opt.ctx.instance.sys.configuration.hasFeature(
+          WorkspacesFeatureFlags.AllowUserSignups,
+        ),
+        showProfiles: opt.ctx.instance.sys.configuration.hasFeature(
+          WorkspacesFeatureFlags.DisplayProfilesAtLogon,
+        ),
+        tagline: opt.ctx.instance.sys.configuration.branding.tagline,
+      };
+    }),
     signupRequirements: publicProcedure
       .output(
         z.object({
@@ -115,6 +129,17 @@ export const coreOnlineWorkspaceRouter = t.router({
       .query(async (opt) => {
         return opt.ctx.instance.sys.configuration.signupRequirements;
       }),
+    signInRequirements: publicProcedure.input(z.string()).query(async opt => {
+      const username = opt.input;
+
+      const userId = (await opt.ctx.instance.sys.users.getUserByUsername(username))?.userId
+
+      if (userId === undefined) return [];
+
+      return await opt.ctx.instance.sys.authentication.getSessionRequirements(userId)
+    })
+  },
+  authorization: {
     checkEmailAddressOwnership: publicProcedure
       .input(z.object({ emailAddress: z.string() }))
       .output(z.boolean().or(z.string()))
@@ -134,9 +159,15 @@ export const coreOnlineWorkspaceRouter = t.router({
         }
 
         emailSignupVerificationCodes.set(opt.input.emailAddress, emailCode);
-        // TODO: send an email...
-        opt.ctx.instance.log.system.info(
-          `Email code for email '${opt.input.emailAddress}' is '${emailCode}'`,
+        const emailBody =
+          `Email code for email '${opt.input.emailAddress}' is '${emailCode}'`;
+        await opt.ctx.instance.sys.email.sendEmail(
+          opt.input.emailAddress,
+          "Email verification code",
+          { type: "string", content: emailBody },
+        );
+        opt.ctx.instance.log.system.debug(
+          emailBody,
         );
 
         return true;
@@ -144,31 +175,12 @@ export const coreOnlineWorkspaceRouter = t.router({
     validateEmailCode: publicProcedure.input(
       z.object({ emailAddress: z.string(), emailCode: z.string() }),
     ).query(async (opt) => {
-      if (
-        emailSignupVerificationCodes.get(opt.input.emailAddress) ===
-          opt.input.emailCode
-      ) {
-        return true;
-      }
-
-      return false;
+      return emailSignupVerificationCodes.get(opt.input.emailAddress) ===
+        opt.input.emailCode;
     }),
     isUsernameValid: publicProcedure.input(z.string()).query(async (opt) => {
-      if (
-        (await opt.ctx.instance.sys.users.getUserByUsername(opt.input)) ===
-          undefined
-      ) return true;
-
-      return false;
-    }),
-    canSignup: publicProcedure.query(async (opt) => {
-      if (
-        opt.ctx.instance.sys.configuration.hasFeature(
-          WorkspacesFeatureFlags.AllowUserSignups,
-        )
-      ) return true;
-
-      return false;
+      return (await opt.ctx.instance.sys.users.getUserByUsername(opt.input)) ===
+        undefined;
     }),
     signup: publicProcedure
       .input(
@@ -286,7 +298,7 @@ export const coreOnlineWorkspaceRouter = t.router({
               "missing-caddy-ip",
           );
 
-        if (session === undefined) {
+        if (session === undefined || session in SessionCreationError) {
           return {
             type: "error",
             message: "Failed to create a session?",
@@ -295,12 +307,12 @@ export const coreOnlineWorkspaceRouter = t.router({
 
         setCookie(opt.ctx.rawRequest.resHeaders, {
           name: "Authorization",
-          value: session,
+          value: session as string,
           secure: true,
           expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 14),
           domain: opt.ctx.instance.sys.configuration.proxy.hostname,
           sameSite: "Strict",
-          path: "/"
+          path: "/",
         });
 
         return {
@@ -468,7 +480,7 @@ export const coreOnlineWorkspaceRouter = t.router({
           expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 14),
           domain: opt.ctx.instance.sys.configuration.proxy.hostname,
           sameSite: "Strict",
-          path: "/"
+          path: "/",
         });
 
         return {
@@ -537,7 +549,7 @@ export const coreOnlineWorkspaceRouter = t.router({
           expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 14),
           domain: opt.ctx.instance.sys.configuration.proxy.hostname,
           sameSite: "Strict",
-          path: "/"
+          path: "/",
         });
 
         return {
@@ -580,7 +592,7 @@ export const coreOnlineWorkspaceRouter = t.router({
           };
         }
 
-        deleteCookie(opt.ctx.rawRequest.resHeaders, "Authorization")
+        deleteCookie(opt.ctx.rawRequest.resHeaders, "Authorization");
 
         await opt.ctx.instance.sys.authorization.endSessionByToken(
           decodeURIComponent(cookies.Authorization),
@@ -690,14 +702,20 @@ ${opt.ctx.instance.sys.configuration.termsOfUse.message}`;
               if (app.manifest.icon.type === "image") {
                 icon = {
                   type: "image",
-                  value:
-                    `${opt.ctx.instance.sys.configuration.proxy.secure ? "https://" : "http://"}${opt.ctx.instance.sys.configuration.proxy.hostname}/api/application/${app.manifest.id}/icon/`,
+                  value: `${
+                    opt.ctx.instance.sys.configuration.proxy.secure
+                      ? "https://"
+                      : "http://"
+                  }${opt.ctx.instance.sys.configuration.proxy.hostname}/api/application/${app.manifest.id}/icon/`,
                 };
               } else {
                 icon = {
                   type: "icon",
-                  value:
-                    `${opt.ctx.instance.sys.configuration.proxy.secure ? "https://" : "http://"}${opt.ctx.instance.sys.configuration.proxy.hostname}/api/application/${app.manifest.id}/icon/`,
+                  value: `${
+                    opt.ctx.instance.sys.configuration.proxy.secure
+                      ? "https://"
+                      : "http://"
+                  }${opt.ctx.instance.sys.configuration.proxy.hostname}/api/application/${app.manifest.id}/icon/`,
                 };
               }
             }
@@ -741,14 +759,20 @@ ${opt.ctx.instance.sys.configuration.termsOfUse.message}`;
               if (app.manifest.icon.type === "image") {
                 icon = {
                   type: "image",
-                  value:
-                    `${opt.ctx.instance.sys.configuration.proxy.secure ? "https://" : "http://"}${opt.ctx.instance.sys.configuration.proxy.hostname}/api/application/${app.manifest.id}/icon/`,
+                  value: `${
+                    opt.ctx.instance.sys.configuration.proxy.secure
+                      ? "https://"
+                      : "http://"
+                  }${opt.ctx.instance.sys.configuration.proxy.hostname}/api/application/${app.manifest.id}/icon/`,
                 };
               } else {
                 icon = {
                   type: "icon",
-                  value:
-                    `${opt.ctx.instance.sys.configuration.proxy.secure ? "https://" : "http://"}${opt.ctx.instance.sys.configuration.proxy.hostname}/api/application/${app.manifest.id}/icon/`,
+                  value: `${
+                    opt.ctx.instance.sys.configuration.proxy.secure
+                      ? "https://"
+                      : "http://"
+                  }${opt.ctx.instance.sys.configuration.proxy.hostname}/api/application/${app.manifest.id}/icon/`,
                 };
               }
             }

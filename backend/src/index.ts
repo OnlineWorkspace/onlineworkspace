@@ -19,6 +19,7 @@ import TerminalUISystem from "./systems/terminal.ts";
 import TRPCSystem from "./systems/trpc.ts";
 import UsersSystem from "./systems/users.ts";
 import WebFrontendSystem from "./systems/webFrontend.ts";
+import AuthenticationSystem from "./systems/authentication.ts";
 
 export enum InstanceStatus {
   Online,
@@ -48,6 +49,7 @@ class Instance {
     this.sys.consoleCommands = new ConsoleCommandsSystem(this);
     this.sys.users = new UsersSystem(this);
     this.sys.authorization = new AuthorizationSystem(this);
+    this.sys.authentication = new AuthenticationSystem(this);
     this.sys.applications = new ApplicationsSystem(this);
     this.sys.tRPC = new TRPCSystem(this);
     this.sys.image = new ImageSystem(this);

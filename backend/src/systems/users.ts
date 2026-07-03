@@ -1,8 +1,9 @@
-import { promises as fs, existsSync as fsExistsSync } from "node:fs";
+import {existsSync as fsExistsSync, promises as fs} from "node:fs";
 import path from "node:path";
 import sharp from "sharp";
-import type { Instance } from "../index.ts";
+import type {Instance} from "../index.ts";
 import System from "../system.ts";
+import {Authenticator} from "./authentication/authenticator.ts";
 
 // WARNING!: do not call new WorkspacesUser() it is only to be created by the UsersSubsystem
 export class WorkspacesUser {
@@ -489,6 +490,7 @@ export default class UsersSystem extends System {
       socials TEXT[] DEFAULT '{}',
       hashed_password TEXT,
       two_factor_secret TEXT,
+      session_requirements INT,
       settings JSONB DEFAULT '{}'::JSONB,
       groups TEXT[],
       color_scheme JSONB
@@ -555,7 +557,10 @@ export default class UsersSystem extends System {
       return undefined;
     }
 
-    if (password) await this.instance.sys.authorization.setPassword(id, password);
+    if (password) {
+      await this.instance.sys.authentication.setSessionRequirementsForUser(id, [Authenticator.Password])
+      await this.instance.sys.authentication.authenticators[Authenticator.Password].setPassword(id, password)
+    }
 
     await ubi.setAvatar(path.join(this.instance.sys.filesystem.SRC_ROOT, "assets/placeholder/avatar.png"));
 

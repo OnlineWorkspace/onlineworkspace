@@ -1,4 +1,3 @@
-import UKAvatar from "@ewsgit/uikit-solid/src/components/avatar/UKAvatar.tsx";
 import UKButton, {
   AffirmativeButtonState,
 } from "@ewsgit/uikit-solid/src/components/button/UKButton.tsx";
@@ -6,9 +5,7 @@ import UKCircularProgressIndicator from "@ewsgit/uikit-solid/src/components/circ
 import UKCard from "@ewsgit/uikit-solid/src/components/card/UKCard.tsx";
 import { DividerDirection } from "@ewsgit/uikit-solid/src/components/divider/lib/direction.ts";
 import UKDivider from "@ewsgit/uikit-solid/src/components/divider/UKDivider.tsx";
-import UKSearchableDropdownMenu from "@ewsgit/uikit-solid/src/components/searchableDropdownMenu/UKSearchableDropdownMenu.tsx";
 import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.tsx";
-import UKTextField from "@ewsgit/uikit-solid/src/components/textField/UKTextField.tsx";
 import { useNavigate, usePreloadRoute } from "@solidjs/router";
 import clsx from "clsx";
 import {
@@ -61,7 +58,7 @@ const UserSelectPage: Component = () => {
   const [bio, setBio] = createSignal<string>("");
 
   const [requirements] = createResource(() =>
-    trpc.authorization.signupRequirements.query(),
+    trpc.userSelect.signupRequirements.query(),
   );
 
   const [isUsernameValid, setIsUsernameValid] = createSignal<boolean>(false);
