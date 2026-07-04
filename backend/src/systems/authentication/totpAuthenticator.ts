@@ -7,3 +7,7 @@ export default class TotpAuthenticator {
     this.authenticationSystem = authenticationSystem
   }
 }
+
+export interface TotpAuthenticatorRequestRequirements {
+  totpCode: string;
+}

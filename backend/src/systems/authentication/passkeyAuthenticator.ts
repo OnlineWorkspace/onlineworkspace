@@ -6,4 +6,19 @@ export default class PasskeyAuthenticator {
   constructor(authenticationSystem: AuthenticationSystem) {
     this.authenticationSystem = authenticationSystem
   }
+
+  /*
+    - setPasskey()
+    - generatePasskey()
+    - private verifyIntermediaryPasskey(generatedPasskeySecret, userProvidedPasskey)
+    - private verifyPasskey()
+  */
+
+  async verifyPasskey(): Promise<boolean> {
+    return false;
+  }
+}
+
+export interface PasskeyAuthenticatorRequestRequirements {
+  webAuthnResponse: any;
 }

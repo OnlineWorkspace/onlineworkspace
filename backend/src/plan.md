@@ -7,25 +7,25 @@
 - getUserAuthMethods(userId)
 
 ### Password
-- isSecondFactor = false
+- isSecondaryFactor = false
 - setPassword()
 - private verifyPassword()
  
 ### Timed One Time Pass
-- isSecondFactor = true
+- isSecondaryFactor = true
 - setTimedOneTimePassSecret()
 - generateTimedOneTimePassSecret()
 - private verifyIntermediaryTimedOneTimePassCode(generatedTimedOneTimePassSecret, userProvidedCode)
 - private verifyTimedOneTimePassCode()
 
 ### Email Code
-- isSecondFactor = true
+- isSecondaryFactor = true
 - generateEmailOneTimeCode()
 - sendEmailOneTimeCode()
 - private verifyEmailOneTimeCode()
 
 ### Passkey
-- isSecondFactor = false
+- isSecondaryFactor = false
 - setPasskey()
 - generatePasskey()
 - private verifyIntermediaryPasskey(generatedPasskeySecret, userProvidedPasskey)

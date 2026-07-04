@@ -1,19 +1,10 @@
 import AuthenticationSystem from "../authentication.ts";
 import { timingSafeEqual } from "@std/crypto";
-import * as OTPAuth from "otpauth";
-import { WorkspacesNotificationPriority } from "../notifications.ts";
-import utils from "node:util";
-import {
-  AuthorizedDeviceType,
-  SESSION_VALID_TERM_MS,
-  SessionCreationError,
-} from "../authorization.ts";
 
 const PASSWORD_HASH_ITERATIONS = 600_000;
 
 export default class PasswordAuthenticator {
   private authenticationSystem;
-  isSecondFactor = false;
 
   constructor(authenticationSystem: AuthenticationSystem) {
     this.authenticationSystem = authenticationSystem;
@@ -202,4 +193,8 @@ export default class PasswordAuthenticator {
       return SessionCreationError.GenericError;
     }
   }*/
+}
+
+export interface PasswordAuthenticatorRequestRequirements {
+  password: string;
 }
