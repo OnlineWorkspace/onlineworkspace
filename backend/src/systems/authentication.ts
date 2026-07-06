@@ -106,6 +106,8 @@ export default class AuthenticationSystem extends System {
       switch (Number(authenticatorId) as Authenticator) {
         case Authenticator.Email: {
           const authenticatorProvider = authenticator as EmailAuthenticator
+
+          // authenticatorProvider.verifyCode()
           // TODO: this
           break;
         }

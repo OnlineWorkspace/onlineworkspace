@@ -3,10 +3,11 @@ import AuthenticationSystem from "../authentication.ts";
 export default class EmailAuthenticator {
   private authenticationSystem;
   // string -> userId
-  private emailCodes: Record<string, { userId: number; expires: number }>;
+  private readonly emailCodes: Record<string, { userId: number; expires: number }>;
 
   constructor(authenticationSystem: AuthenticationSystem) {
     this.authenticationSystem = authenticationSystem;
+    this.emailCodes = {};
   }
 
   async generateCode(userId: number): Promise<string | undefined> {
@@ -30,10 +31,12 @@ export default class EmailAuthenticator {
     this.emailCodes[code] = { userId, expires: Date.now() };
 
     const fullName = await user.getFullName();
-    const emailAddress = await user.getEmail()
+    const emailAddress = await user.getEmail();
 
     if (!emailAddress) {
-      this.authenticationSystem.log.error("Cannot send an auth code email to a user without an email address linked")
+      this.authenticationSystem.log.error(
+        "Cannot send an auth code email to a user without an email address linked",
+      );
       return undefined;
     }
 

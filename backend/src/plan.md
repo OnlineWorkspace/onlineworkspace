@@ -1,6 +1,6 @@
 # Backend Systems Plan
 
-## Authorization
+## Authentication
 - getSessionRequirements(userId)
 - createSession(userId, parameters: { password, timedOneTimePassCode, passkey })
 - verifySession(authorizationCookie)
