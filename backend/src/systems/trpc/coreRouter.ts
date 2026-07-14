@@ -706,7 +706,7 @@ ${opt.ctx.instance.sys.configuration.termsOfUse.message}`;
                     opt.ctx.instance.sys.configuration.proxy.secure
                       ? "https://"
                       : "http://"
-                  }${opt.ctx.instance.sys.configuration.proxy.hostname}/api/application/${app.manifest.id}/icon/`,
+                  }${opt.ctx.instance.sys.configuration.proxy.hostname}/api/application-icon/${app.manifest.id}`,
                 };
               } else {
                 icon = {
@@ -715,7 +715,7 @@ ${opt.ctx.instance.sys.configuration.termsOfUse.message}`;
                     opt.ctx.instance.sys.configuration.proxy.secure
                       ? "https://"
                       : "http://"
-                  }${opt.ctx.instance.sys.configuration.proxy.hostname}/api/application/${app.manifest.id}/icon/`,
+                  }${opt.ctx.instance.sys.configuration.proxy.hostname}/api/application-icon/${app.manifest.id}`,
                 };
               }
             }
@@ -763,7 +763,7 @@ ${opt.ctx.instance.sys.configuration.termsOfUse.message}`;
                     opt.ctx.instance.sys.configuration.proxy.secure
                       ? "https://"
                       : "http://"
-                  }${opt.ctx.instance.sys.configuration.proxy.hostname}/api/application/${app.manifest.id}/icon/`,
+                  }${opt.ctx.instance.sys.configuration.proxy.hostname}/api/application-icon/${app.manifest.id}`,
                 };
               } else {
                 icon = {
@@ -772,7 +772,7 @@ ${opt.ctx.instance.sys.configuration.termsOfUse.message}`;
                     opt.ctx.instance.sys.configuration.proxy.secure
                       ? "https://"
                       : "http://"
-                  }${opt.ctx.instance.sys.configuration.proxy.hostname}/api/application/${app.manifest.id}/icon/`,
+                  }${opt.ctx.instance.sys.configuration.proxy.hostname}/api/application-icon/${app.manifest.id}`,
                 };
               }
             }

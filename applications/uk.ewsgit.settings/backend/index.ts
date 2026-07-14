@@ -1183,7 +1183,7 @@ const router = t.router({
                           opt.ctx.instance.sys.configuration.proxy.secure
                             ? "https://"
                             : "http://"
-                        }${opt.ctx.instance.sys.configuration.proxy.hostname}/api/application/${app.manifest.id}/icon/`,
+                        }${opt.ctx.instance.sys.configuration.proxy.hostname}/api/application-icon/${app.manifest.id}`,
                       };
                     } else {
                       icon = {
@@ -1192,7 +1192,7 @@ const router = t.router({
                           opt.ctx.instance.sys.configuration.proxy.secure
                             ? "https://"
                             : "http://"
-                        }${opt.ctx.instance.sys.configuration.proxy.hostname}/api/application/${app.manifest.id}/icon/`,
+                        }${opt.ctx.instance.sys.configuration.proxy.hostname}/api/application-icon/${app.manifest.id}`,
                       };
                     }
                   }
@@ -1249,7 +1249,7 @@ const router = t.router({
                   opt.ctx.instance.sys.configuration.proxy.secure
                     ? "https://"
                     : "http://"
-                }${opt.ctx.instance.sys.configuration.proxy.hostname}/api/application/${application.manifest.id}/icon/`,
+                }${opt.ctx.instance.sys.configuration.proxy.hostname}/api/application-icon/${application.manifest.id}`,
               };
             } else {
               icon = application.manifest.icon;
@@ -1418,7 +1418,7 @@ const router = t.router({
                 opt.ctx.instance.sys.configuration.proxy.secure
                   ? "https://"
                   : "http://"
-              }${opt.ctx.instance.sys.configuration.proxy.hostname}/api/application/${application.manifest.id}/icon/`,
+              }${opt.ctx.instance.sys.configuration.proxy.hostname}/api/application-icon/${application.manifest.id}`,
             };
           } else {
             icon = {
@@ -1427,7 +1427,7 @@ const router = t.router({
                 opt.ctx.instance.sys.configuration.proxy.secure
                   ? "https://"
                   : "http://"
-              }${opt.ctx.instance.sys.configuration.proxy.hostname}/api/application/${application.manifest.id}/icon/`,
+              }${opt.ctx.instance.sys.configuration.proxy.hostname}/api/application-icon/${application.manifest.id}`,
             };
           }
         }

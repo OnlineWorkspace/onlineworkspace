@@ -28,12 +28,12 @@ const ApplicationsPage: Component = () => {
       />
       <div class={styles.page}>
         <UKStackLabel>Applications</UKStackLabel>
-        <Suspense fallback={<UKCircularProgressIndicator />}>
+        <Suspense>
           <UKStack>
             <For each={applications()}>
               {(app) => {
                 return (
-                  <UKStackItem labelText={app.displayName} supportingText={app.id} onClick={() => navigate(`/app/uk.ewsgit.settings/applications/${app.id}`)} />
+                  <UKStackItem leading={{ type: "icon", value: `/api/application-icon/${app.id}`, alt: `${app.displayName} icon` }} labelText={app.displayName} supportingText={app.id} onClick={() => navigate(`/app/uk.ewsgit.settings/applications/${app.id}`)} />
                 );
               }}
             </For>

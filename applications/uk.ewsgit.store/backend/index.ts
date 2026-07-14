@@ -82,12 +82,12 @@ const router = t.router({
                 if (app.manifest.icon.type === "image") {
                   icon = {
                     type: "image",
-                    value: `${opt.ctx.instance.sys.configuration.proxy.secure ? "https://" : "http://"}${opt.ctx.instance.sys.configuration.proxy.hostname}/api/application/${app.manifest.id}/icon/`,
+                    value: `${opt.ctx.instance.sys.configuration.proxy.secure ? "https://" : "http://"}${opt.ctx.instance.sys.configuration.proxy.hostname}/api/application-icon/${app.manifest.id}`,
                   };
                 } else {
                   icon = {
                     type: "icon",
-                    value: `${opt.ctx.instance.sys.configuration.proxy.secure ? "https://" : "http://"}${opt.ctx.instance.sys.configuration.proxy.hostname}/api/application/${app.manifest.id}/icon/`,
+                    value: `${opt.ctx.instance.sys.configuration.proxy.secure ? "https://" : "http://"}${opt.ctx.instance.sys.configuration.proxy.hostname}/api/application-icon/${app.manifest.id}`,
                   };
                 }
               }
