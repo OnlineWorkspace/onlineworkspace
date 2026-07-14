@@ -1,5 +1,4 @@
 import UKButton from "@ewsgit/uikit-solid/src/components/button/UKButton.tsx";
-import UKCard from "@ewsgit/uikit-solid/src/components/card/UKCard.tsx";
 import UKIcon from "@ewsgit/uikit-solid/src/components/icon/UKIcon.tsx";
 import UKIconButton from "@ewsgit/uikit-solid/src/components/iconButton/UKIconButton.tsx";
 import UKStack from "@ewsgit/uikit-solid/src/components/stack/UKStack.tsx";

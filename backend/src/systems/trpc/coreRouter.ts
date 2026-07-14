@@ -220,7 +220,7 @@ export const coreOnlineWorkspaceRouter = t.router({
           )
         ) {
           return {
-            type: "error",
+            type: "error" as const,
             message: "This instance has disabled user signups",
           };
         }
@@ -230,7 +230,7 @@ export const coreOnlineWorkspaceRouter = t.router({
         if (opt.ctx.instance.sys.configuration.signupRequirements.email) {
           if (!("emailAddress" in opt.input)) {
             return {
-              type: "error",
+              type: "error" as const,
               message: "This instance requires an email address for signups!",
             };
           }
@@ -240,7 +240,7 @@ export const coreOnlineWorkspaceRouter = t.router({
               emailSignupVerificationCodes.get(opt.input.emailAddress)
           ) {
             return {
-              type: "error",
+              type: "error" as const,
               message: "The email code did not match!",
             };
           }
@@ -253,7 +253,7 @@ export const coreOnlineWorkspaceRouter = t.router({
 
         if (uid === undefined) {
           return {
-            type: "error",
+            type: "error" as const,
             message: "Failed to create the user",
           };
         }
@@ -262,7 +262,7 @@ export const coreOnlineWorkspaceRouter = t.router({
 
         if (user === undefined) {
           return {
-            type: "error",
+            type: "error" as const,
             message: "Failed to fetch the user",
           };
         }
@@ -300,7 +300,7 @@ export const coreOnlineWorkspaceRouter = t.router({
 
         if (session === undefined || session in SessionCreationError) {
           return {
-            type: "error",
+            type: "error" as const,
             message: "Failed to create a session?",
           };
         }
@@ -316,8 +316,8 @@ export const coreOnlineWorkspaceRouter = t.router({
         });
 
         return {
-          type: "success",
-          sessionToken: session,
+          type: "success" as const,
+          sessionToken: session as string,
         };
       }),
     confirmTwoFactor: procedure.input(z.object({ twoFactorCode: z.string() }))
@@ -466,7 +466,7 @@ export const coreOnlineWorkspaceRouter = t.router({
               "missing-caddy-ip",
           );
 
-        if (session === undefined) {
+        if (session in SessionCreationError) {
           return {
             type: "error" as const,
             message: "Failed to create a session?",
@@ -475,7 +475,7 @@ export const coreOnlineWorkspaceRouter = t.router({
 
         setCookie(opt.ctx.rawRequest.resHeaders, {
           name: "Authorization",
-          value: session,
+          value: session as string,
           secure: true,
           expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 14),
           domain: opt.ctx.instance.sys.configuration.proxy.hostname,
@@ -485,10 +485,10 @@ export const coreOnlineWorkspaceRouter = t.router({
 
         return {
           type: "success" as const,
-          sessionToken: session,
+          sessionToken: session as string,
         };
       }),
-    passkeyRequestSignin: publicProcedure
+    passkeyRequestSignIn: publicProcedure
       .input(
         z.object({
           username: z.string(),
@@ -500,14 +500,14 @@ export const coreOnlineWorkspaceRouter = t.router({
         );
 
         if (user === undefined) {
-          return undefined;
+          return false;
         }
 
-        return opt.ctx.instance.sys.authorization.requestPasskeySession(
+        return (await opt.ctx.instance.sys.authorization.requestPasskeySession(
           user.userId,
-        );
+        ));
       }),
-    passkeyCompleteSignin: publicProcedure
+    passkeyCompleteSignIn: publicProcedure
       .input(
         z.object({
           username: z.string(),

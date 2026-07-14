@@ -30,7 +30,7 @@ const UserSelectPage: Component = () => {
   createEffect(async () => {
     if (username() === "") return;
 
-    const authenticationOptions = await trpc.authorization.passkeyRequestSignin.query({ username: username() });
+    const authenticationOptions = await trpc.authorization.passkeyRequestSignIn.query({ username: username() });
 
     if (authenticationOptions === undefined) return;
 
@@ -39,7 +39,7 @@ const UserSelectPage: Component = () => {
       useBrowserAutofill: true,
     });
 
-    const response = await trpc.authorization.passkeyCompleteSignin.mutate({ username: username(), passkeyResponse: authenticationResponse });
+    const response = await trpc.authorization.passkeyCompleteSignIn.mutate({ username: username(), passkeyResponse: authenticationResponse });
 
     if (response.type === "success") {
       const redirect = new URLSearchParams(window.location.search).get("redirect");

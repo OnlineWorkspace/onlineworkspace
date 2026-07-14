@@ -1,5 +1,6 @@
 import CHEVRON_LEFT_ICON from "@material-symbols/svg-700/outlined/chevron_left.svg";
 import ERROR_ICON from "@material-symbols/svg-700/outlined/error.svg";
+import STORE_ICON from "@material-symbols/svg-700/outlined/store.svg"
 import UKButton from "@ewsgit/uikit-solid/src/components/button/UKButton.tsx";
 import UKButtonGroup from "@ewsgit/uikit-solid/src/components/buttonGroup/UKButtonGroup.tsx";
 import UKDivider from "@ewsgit/uikit-solid/src/components/divider/UKDivider.tsx";
@@ -57,8 +58,9 @@ const ApplicationPage: Component = () => {
                   navigate(`/app/uk.ewsgit.store/app/local/${params.applicationId}?origin=/app/uk.ewsgit.settings/applications/${params.applicationId}`);
                 }}
                 color={"tonal"}
+                leadingIcon={STORE_ICON}
               >
-                View in Store
+                View Store Page
               </UKButton>
               <UKButton
                 onClick={() => {
