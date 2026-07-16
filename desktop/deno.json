@@ -1,0 +1,10 @@
+{
+  "lint": {
+    "exclude": ["**"]
+  },
+  "permissions": {
+    "default": {
+      "all": true
+    }
+  }
+}

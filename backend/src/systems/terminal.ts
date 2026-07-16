@@ -1,11 +1,11 @@
 import readline from "node:readline/promises";
-import type {CliRenderer, RGBA} from "@opentui/core";
+import type { CliRenderer, RGBA } from "@opentui/core";
 import chalk from "chalk";
-import type {Instance} from "../index.ts";
-import {LogMessageStyle, LogType} from "../log.ts";
+import type { Instance } from "../index.ts";
+import { LogMessageStyle, LogType } from "../log.ts";
 import System from "../system.ts";
-import {WorkspacesFeatureFlags} from "./configuration.ts";
-import {WorkspacesEvent} from "./events.ts";
+import { WorkspacesFeatureFlags } from "./configuration.ts";
+import { WorkspacesEvent } from "./events.ts";
 
 const COMPACT_LOG_TYPE = false;
 
@@ -39,14 +39,29 @@ export default class TerminalUISystem extends System {
       this.stop();
     });
 
-    if (this.instance.sys.configuration.hasFeature(WorkspacesFeatureFlags.ClearTerminalConsoleOnStartup)) {
+    if (
+      this.instance.sys.configuration.hasFeature(
+        WorkspacesFeatureFlags.ClearTerminalConsoleOnStartup,
+      )
+    ) {
       console.clear();
     }
 
-    if (!this.instance.sys.configuration.hasFeature(WorkspacesFeatureFlags.ExperimentalTerminalGui)) {
-      function addLogMessage(log: { type: LogType; level: string; message: string }) {
+    if (
+      !this.instance.sys.configuration.hasFeature(
+        WorkspacesFeatureFlags.ExperimentalTerminalGui,
+      )
+    ) {
+      function addLogMessage(
+        log: { type: LogType; level: string; message: string },
+      ) {
         // ignore logs related to a bug in Deno.serve();
-        if (log.type === LogType.WARNING && log.level === "system" && log.message.startsWith("Deno.serve: request.signal aborts on successful responses")) return;
+        if (
+          log.type === LogType.WARNING && log.level === "system" &&
+          log.message.startsWith(
+            "Deno.serve: request.signal aborts on successful responses",
+          )
+        ) return;
 
         let consoleLogOutput: string = "";
         const currentTypeColor = MESSAGE_TYPE_COLORS[log.type];
@@ -77,12 +92,16 @@ export default class TerminalUISystem extends System {
           consoleLogOutput += chalk.rgb(...currentTypeColor)(`${typeString} `);
         }
 
-        consoleLogOutput += chalk.rgb(...MESSAGE_LEVEL_COLOR)(`${log.level.padEnd(16)} `);
+        consoleLogOutput += chalk.rgb(...MESSAGE_LEVEL_COLOR)(
+          `${log.level.padEnd(16)} `,
+        );
 
         const styledSegments = log.message.split("%");
         let currentMessageStyle: LogMessageStyle = LogMessageStyle.NORMAL;
         let customColorDef: [number, number, number] | undefined;
-        for (let segmentIdx = 0; segmentIdx < styledSegments.length; segmentIdx++) {
+        for (
+          let segmentIdx = 0; segmentIdx < styledSegments.length; segmentIdx++
+        ) {
           const segmentContent = styledSegments[segmentIdx];
 
           if (segmentContent === "") continue;
@@ -102,10 +121,15 @@ export default class TerminalUISystem extends System {
             }
             case LogMessageStyle.END_CUSTOM: {
               currentMessageStyle = LogMessageStyle.END_CUSTOM;
-              const colorValSegments = styledSegments[segmentIdx - 1].split(",").map((val) => Number(val));
+              const colorValSegments = styledSegments[segmentIdx - 1].split(",")
+                .map((val) => Number(val));
 
               if (colorValSegments.length === 4) {
-                customColorDef = [colorValSegments[0], colorValSegments[1], colorValSegments[2]];
+                customColorDef = [
+                  colorValSegments[0],
+                  colorValSegments[1],
+                  colorValSegments[2],
+                ];
               }
 
               continue;
@@ -121,13 +145,19 @@ export default class TerminalUISystem extends System {
               consoleLogOutput += chalk.rgb(...TEXT_COLOR)(segmentContent);
               break;
             case LogMessageStyle.EMPHASIZED:
-              consoleLogOutput += chalk.rgb(...EMPHASIZED_TEXT_COLOR)(segmentContent);
+              consoleLogOutput += chalk.rgb(...EMPHASIZED_TEXT_COLOR)(
+                segmentContent,
+              );
               break;
             case LogMessageStyle.END_CUSTOM:
               if (!customColorDef) {
-                consoleLogOutput += chalk.bold.red(`UNABLE TO PARSE CUSTOM COLOR '${customColorDef}'`);
+                consoleLogOutput += chalk.bold.red(
+                  `UNABLE TO PARSE CUSTOM COLOR '${customColorDef}'`,
+                );
               } else {
-                consoleLogOutput += chalk.rgb(...customColorDef)(segmentContent);
+                consoleLogOutput += chalk.rgb(...customColorDef)(
+                  segmentContent,
+                );
               }
               break;
           }
@@ -144,16 +174,22 @@ export default class TerminalUISystem extends System {
         addLogMessage(message);
       });
 
-      this.readlineInterface = readline.createInterface(process.stdin, process.stdout);
+      this.readlineInterface = readline.createInterface(
+        process.stdin,
+        process.stdout,
+      );
 
+      // @ts-ignore
       this.readlineInterface.addListener("line", (data) => {
         this.instance.sys.consoleCommands.executeCommandFromString(data);
       });
 
+      // @ts-ignore
       this.readlineInterface.on("SIGINT", () => {
         this.instance.shutdown("Console Admin Ctrl+C");
       });
 
+      // @ts-ignore
       this.readlineInterface.on("SIGTERM", () => {
         this.instance.shutdown("SIGTERM");
       });
@@ -161,7 +197,15 @@ export default class TerminalUISystem extends System {
       return true;
     }
 
-    const { BoxRenderable, ConsolePosition, createCliRenderer, InputRenderable, RGBA, ScrollBoxRenderable, TextRenderable } = await import("@opentui/core");
+    const {
+      BoxRenderable,
+      ConsolePosition,
+      createCliRenderer,
+      InputRenderable,
+      RGBA,
+      ScrollBoxRenderable,
+      TextRenderable,
+    } = await import("@opentui/core");
 
     const self = this;
     function toRGBA(colorArray: [number, number, number]): RGBA {
@@ -200,9 +244,16 @@ export default class TerminalUISystem extends System {
       stickyStart: "bottom",
     });
 
-    function addLogMessage(log: { type: LogType; level: string; message: string }) {
+    function addLogMessage(
+      log: { type: LogType; level: string; message: string },
+    ) {
       // ignore logs related to a bug in Deno.serve();
-      if (log.type === LogType.WARNING && log.level === "system" && log.message.startsWith("Deno.serve: request.signal aborts on successful responses")) return;
+      if (
+        log.type === LogType.WARNING && log.level === "system" &&
+        log.message.startsWith(
+          "Deno.serve: request.signal aborts on successful responses",
+        )
+      ) return;
 
       const logEntry = new BoxRenderable(self.renderer, {
         flexDirection: "row",
@@ -213,7 +264,12 @@ export default class TerminalUISystem extends System {
       const currentTypeColor = MESSAGE_TYPE_COLORS[log.type];
 
       if (COMPACT_LOG_TYPE) {
-        logEntry.add(new TextRenderable(self.renderer, { content: "▌", fg: toRGBA(currentTypeColor) }));
+        logEntry.add(
+          new TextRenderable(self.renderer, {
+            content: "▌",
+            fg: toRGBA(currentTypeColor),
+          }),
+        );
       } else {
         let typeString = "";
 
@@ -235,18 +291,37 @@ export default class TerminalUISystem extends System {
             break;
         }
 
-        logEntry.add(new TextRenderable(self.renderer, { content: `${typeString}`, fg: toRGBA(currentTypeColor), paddingRight: 1, flexShrink: 0 }));
+        logEntry.add(
+          new TextRenderable(self.renderer, {
+            content: `${typeString}`,
+            fg: toRGBA(currentTypeColor),
+            paddingRight: 1,
+            flexShrink: 0,
+          }),
+        );
       }
 
-      logEntry.add(new TextRenderable(self.renderer, { content: log.level.padEnd(16), fg: toRGBA(MESSAGE_LEVEL_COLOR), paddingRight: 1, flexShrink: 0 }));
+      logEntry.add(
+        new TextRenderable(self.renderer, {
+          content: log.level.padEnd(16),
+          fg: toRGBA(MESSAGE_LEVEL_COLOR),
+          paddingRight: 1,
+          flexShrink: 0,
+        }),
+      );
 
-      const logMessageContainer = new BoxRenderable(self.renderer, { flexDirection: "row", flexWrap: "wrap" });
+      const logMessageContainer = new BoxRenderable(self.renderer, {
+        flexDirection: "row",
+        flexWrap: "wrap",
+      });
       logEntry.add(logMessageContainer);
 
       const styledSegments = log.message.split("%");
       let currentMessageStyle: LogMessageStyle = LogMessageStyle.NORMAL;
       let customColorDef: RGBA | undefined;
-      for (let segmentIdx = 0; segmentIdx < styledSegments.length; segmentIdx++) {
+      for (
+        let segmentIdx = 0; segmentIdx < styledSegments.length; segmentIdx++
+      ) {
         const segmentContent = styledSegments[segmentIdx];
 
         if (segmentContent === "") continue;
@@ -266,10 +341,16 @@ export default class TerminalUISystem extends System {
           }
           case LogMessageStyle.END_CUSTOM: {
             currentMessageStyle = LogMessageStyle.END_CUSTOM;
-            const colorValSegments = styledSegments[segmentIdx - 1].split(",").map((val) => Number(val));
+            const colorValSegments = styledSegments[segmentIdx - 1].split(",")
+              .map((val) => Number(val));
 
             if (colorValSegments.length === 4) {
-              customColorDef = RGBA.fromInts(colorValSegments[0], colorValSegments[1], colorValSegments[2], colorValSegments[3]);
+              customColorDef = RGBA.fromInts(
+                colorValSegments[0],
+                colorValSegments[1],
+                colorValSegments[2],
+                colorValSegments[3],
+              );
             }
 
             continue;
@@ -282,15 +363,31 @@ export default class TerminalUISystem extends System {
         switch (currentMessageStyle) {
           case LogMessageStyle.RESET:
           case LogMessageStyle.NORMAL:
-            logMessageContainer.add(new TextRenderable(self.renderer, { content: segmentContent, fg: toRGBA(TEXT_COLOR), bg: toRGBA(BACKGROUND_COLOR) }));
+            logMessageContainer.add(
+              new TextRenderable(self.renderer, {
+                content: segmentContent,
+                fg: toRGBA(TEXT_COLOR),
+                bg: toRGBA(BACKGROUND_COLOR),
+              }),
+            );
             break;
           case LogMessageStyle.EMPHASIZED:
             logMessageContainer.add(
-              new TextRenderable(self.renderer, { content: segmentContent, fg: toRGBA(EMPHASIZED_TEXT_COLOR), bg: toRGBA(BACKGROUND_COLOR) }),
+              new TextRenderable(self.renderer, {
+                content: segmentContent,
+                fg: toRGBA(EMPHASIZED_TEXT_COLOR),
+                bg: toRGBA(BACKGROUND_COLOR),
+              }),
             );
             break;
           case LogMessageStyle.END_CUSTOM:
-            logMessageContainer.add(new TextRenderable(self.renderer, { content: segmentContent, fg: customColorDef, bg: toRGBA(BACKGROUND_COLOR) }));
+            logMessageContainer.add(
+              new TextRenderable(self.renderer, {
+                content: segmentContent,
+                fg: customColorDef,
+                bg: toRGBA(BACKGROUND_COLOR),
+              }),
+            );
             break;
         }
       }
@@ -335,7 +432,9 @@ export default class TerminalUISystem extends System {
         if (e.name === "return") {
           const trimmedContent = commandInput.plainText.trim();
           if (!trimmedContent) return;
-          self.instance.sys.consoleCommands.executeCommandFromString(trimmedContent);
+          self.instance.sys.consoleCommands.executeCommandFromString(
+            trimmedContent,
+          );
           commandInput.value = "";
         }
         commandInput.requestRender();
@@ -349,7 +448,6 @@ export default class TerminalUISystem extends System {
 
   override stop(): boolean {
     this.renderer?.destroy?.();
-    this.readlineInterface?.close?.();
 
     return true;
   }

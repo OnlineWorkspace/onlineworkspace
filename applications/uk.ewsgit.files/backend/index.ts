@@ -1,12 +1,12 @@
 /// <reference path="./global.d.ts" />
 
-import * as fs from "@std/fs"
 import * as path from "node:path";
-import {initTRPC} from "@trpc/server";
+import { FileMediaType } from "@onlineworkspace/workspace-backend/src/systems/filesystem.ts";
+import { type createOnlineWorkspaceTRPCContext, procedure } from "@onlineworkspace/workspace-backend/src/systems/trpc/coreRouter.ts";
+import * as fs from "@std/fs";
+import { initTRPC } from "@trpc/server";
 import fastFolderSize from "fast-folder-size/sync.js";
 import z from "zod";
-import {createOnlineWorkspaceTRPCContext, procedure} from "@onlineworkspace/workspace-backend/src/systems/trpc/coreRouter.ts";
-import {FileMediaType} from "@onlineworkspace/workspace-backend/src/systems/filesystem.ts";
 
 const log = instance.log.createLogger("uk.ewsgit.files");
 
@@ -384,22 +384,22 @@ const router = t.router({
       }
 
       try {
-        let directories: Deno.DirEntry[] = [];
-        let files: Deno.DirEntry[] = [];
+        const directories: Deno.DirEntry[] = [];
+        const files: Deno.DirEntry[] = [];
 
         for await (const entry of Deno.readDir(resolvedPath)) {
           if (entry.isDirectory) {
-            directories.push(entry)
+            directories.push(entry);
           }
           if (entry.isFile) {
-            files.push(entry)
+            files.push(entry);
           }
         }
 
-        directories.sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: "base" }))
-        files.sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: "base" }))
+        directories.sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: "base" }));
+        files.sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: "base" }));
 
-        return { items: [...directories.map(d => d.name), ...files.map(f => f.name)], status: "ok" };
+        return { items: [...directories.map((d) => d.name), ...files.map((f) => f.name)], status: "ok" };
       } catch (_) {
         return { status: "invalid_path" as const };
       }
@@ -572,7 +572,7 @@ const router = t.router({
       if (opt.input.template !== undefined) {
         const templateFilePath = path.join(FILE_TEMPLATE_PATH, opt.input.template);
         if (await fs.exists(templateFilePath)) {
-          const textDecoder = new TextDecoder()
+          const textDecoder = new TextDecoder();
           templateContents = textDecoder.decode(await Deno.readFile(templateFilePath));
         }
       }
@@ -582,7 +582,7 @@ const router = t.router({
           return { status: "already_exists" as const };
         }
 
-        const textEncoder = new TextEncoder()
+        const textEncoder = new TextEncoder();
 
         await Deno.writeFile(resolvedPath, textEncoder.encode(templateContents));
 
@@ -602,4 +602,4 @@ const router = t.router({
 
 export type TRPCRouter = typeof router;
 
-instance.sys.tRPC.registerTRPCRouter(router, "/api/app/uk.ewsgit.files")
+instance.sys.tRPC.registerTRPCRouter(router, "/api/app/uk.ewsgit.files");

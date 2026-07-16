@@ -1,0 +1,6 @@
+{
+  "name": "uk-ewsgit-files-desktop",
+  "dependencies": {
+    "@onlineworkspace/desktop": "workspace:*"
+  }
+}

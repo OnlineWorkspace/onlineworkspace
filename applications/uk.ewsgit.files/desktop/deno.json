@@ -31,5 +31,10 @@
   },
   "tasks": {
     "dev": "deno desktop ./index.ts"
+  },
+  "permissions": {
+    "default": {
+      "all": true
+    }
   }
 }

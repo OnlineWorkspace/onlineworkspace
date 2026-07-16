@@ -19,6 +19,7 @@
     "npm:@solid-primitives/refs@^1.1.3": "1.1.3_solid-js@1.9.13",
     "npm:@solid-primitives/upload@~0.1.3": "0.1.4_solid-js@1.9.13",
     "npm:@solid-primitives/upload@~0.1.4": "0.1.4_solid-js@1.9.13",
+    "npm:@solidjs/meta@~0.29.4": "0.29.4_solid-js@1.9.13",
     "npm:@solidjs/router@~0.15.3": "0.15.4_solid-js@1.9.13",
     "npm:@solidjs/router@~0.16.1": "0.16.1_solid-js@1.9.13",
     "npm:@thisbeyond/solid-dnd@~0.7.5": "0.7.5_solid-js@1.9.13",
@@ -34,7 +35,6 @@
     "npm:@types/express@^5.0.3": "5.0.6",
     "npm:@types/jsdom@28": "28.0.3",
     "npm:@types/minimist@^1.2.5": "1.2.5",
-    "npm:@types/node@latest": "26.0.1",
     "npm:@types/nodemailer@^7.0.4": "7.0.12",
     "npm:@types/path-browserify@^1.0.3": "1.0.3",
     "npm:@types/qrcode@^1.5.6": "1.5.6",
@@ -71,7 +71,6 @@
     "npm:sass-embedded@^1.90.0": "1.100.0",
     "npm:sass-embedded@^1.98.0": "1.100.0",
     "npm:sharp@~0.34.3": "0.34.5",
-    "npm:sharp@~0.34.5": "0.34.5",
     "npm:solid-devtools@~0.34.5": "0.34.5_solid-js@1.9.13_vite@8.1.0__@types+node@26.0.1__esbuild@0.27.7__sass-embedded@1.100.0",
     "npm:solid-js@^1.9.11": "1.9.13",
     "npm:solid-js@^1.9.8": "1.9.13",
@@ -1750,6 +1749,12 @@
     },
     "@solid-primitives/utils@6.4.0_solid-js@1.9.13": {
       "integrity": "sha512-AeGTBg8Wtkh/0s+evyLtP8piQoS4wyqqQaAFs2HJcFMMjYAtUgo+ZPduRXLjPlqKVc2ejeR544oeqpbn8Egn8A==",
+      "dependencies": [
+        "solid-js"
+      ]
+    },
+    "@solidjs/meta@0.29.4_solid-js@1.9.13": {
+      "integrity": "sha512-zdIWBGpR9zGx1p1bzIPqF5Gs+Ks/BH8R6fWhmUa/dcK1L2rUC8BAcZJzNRYBQv74kScf1TSOs0EY//Vd/I0V8g==",
       "dependencies": [
         "solid-js"
       ]
@@ -5030,15 +5035,6 @@
           ]
         }
       },
-      "applications/uk.ewsgit.files/electron": {
-        "packageJson": {
-          "dependencies": [
-            "npm:@types/node@latest",
-            "npm:fast-folder-size@^2.4.0",
-            "npm:sharp@~0.34.5"
-          ]
-        }
-      },
       "applications/uk.ewsgit.files/web": {
         "packageJson": {
           "dependencies": [
@@ -5310,6 +5306,7 @@
             "npm:@solid-primitives/media@^2.3.5",
             "npm:@solid-primitives/refs@^1.1.3",
             "npm:@solid-primitives/upload@~0.1.4",
+            "npm:@solidjs/meta@~0.29.4",
             "npm:@solidjs/router@~0.16.1",
             "npm:@trpc/client@^11.13.4",
             "npm:@trpc/server@^11.13.4",
