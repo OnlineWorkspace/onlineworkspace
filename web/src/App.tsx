@@ -15,6 +15,7 @@ const App: Component = () => {
           <Route path={"/signup"} component={lazy(() => import("./pages/userSelect/signup/Signup.tsx"))} />
           <Route path={"/forgot-password"} component={lazy(() => import("./pages/userSelect/forgotPassword/ForgotPassword.tsx"))} />
         </Route>
+        <Route component={lazy(() => import("./pages/auth/app/flow.tsx"))} path="auth/app/flow" />
         <Route component={lazy(() => import("./pages/app/AuthCheck.tsx"))}>
           <Route component={lazy(() => import("./pages/app/Layout.tsx"))}>
             <Route path={"app"}>

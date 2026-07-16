@@ -1,0 +1,35 @@
+{
+  "name": "uk-ewsgit-files-desktop",
+  "version": "1.0.0",
+  "exports": "./index.ts",
+  "desktop": {
+    "app": {
+      "name": "OW Files",
+      "identifier": "uk.ewsgit.files.desktop",
+      "icons": {
+        "macos": "../assets/uk.ewsgit.files.app.png",
+        "windows": "../assets/uk.ewsgit.files.app.ico",
+        "linux": "../assets/uk.ewsgit.files.app.png"
+      },
+      "deepLinks": ["owfiles"]
+    },
+    "backend": "cef",
+    "output": {
+      "macos": "./dist/OWFiles.app",
+      "windows": "./dist/OWFiles",
+      "linux": "./dist/ow-files"
+    },
+    "macos": {
+      "codesignIdentity": "Acme, Inc."
+    },
+    "release": {
+      "baseUrl": "https://github.com/onlineworkspace/onlineworkspace/"
+    },
+    "errorReporting": {
+      "url": "https://github.com/OnlineWorkspace/onlineworkspace/issues"
+    }
+  },
+  "tasks": {
+    "dev": "deno desktop ./index.ts"
+  }
+}

@@ -60,7 +60,7 @@ export default class AuthenticationSystem extends System {
 
     const db = this.instance.sys.database.postgres();
 
-    let requirementInt =
+    const requirementInt =
       (await db`SELECT session_requirements FROM users WHERE id = ${userId}`)?.[0]?.session_requirements as number || 0;
 
     if ((requirementInt & Authenticator.Password) !== 0)

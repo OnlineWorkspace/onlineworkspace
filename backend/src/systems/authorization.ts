@@ -1,3 +1,5 @@
+import console from "node:console";
+import crypto from "node:crypto";
 import utils from "node:util";
 import {
   type AuthenticatorTransportFuture,
@@ -8,11 +10,11 @@ import {
   verifyAuthenticationResponse,
   verifyRegistrationResponse,
 } from "@simplewebauthn/server";
+import { timingSafeEqual } from "@std/crypto";
 import * as OTPAuth from "otpauth";
 import type { Instance } from "../index.ts";
 import System from "../system.ts";
 import { WorkspacesNotificationPriority } from "./notifications.ts";
-import { timingSafeEqual } from "@std/crypto";
 
 export enum AuthorizedDeviceType {
   Desktop,
@@ -24,7 +26,7 @@ export enum SessionCreationError {
   InvalidCredentials,
   MissingUser,
   UserTimedOut,
-  GenericError
+  GenericError,
 }
 
 // the number of ms that a login session is valid for
@@ -32,14 +34,8 @@ export const SESSION_VALID_TERM_MS = 7 * 24 * 60 * 60 * 1000;
 const PASSWORD_HASH_ITERATIONS = 600_000;
 
 export default class AuthorizationSystem extends System {
-  private temporaryPasskeyCreationChallenges: Map<
-    number,
-    PublicKeyCredentialCreationOptionsJSON
-  >;
-  private temporaryPasskeyAuthenticationChallenges: Map<
-    number,
-    PublicKeyCredentialRequestOptionsJSON
-  >;
+  private temporaryPasskeyCreationChallenges: Map<number, PublicKeyCredentialCreationOptionsJSON>;
+  private temporaryPasskeyAuthenticationChallenges: Map<number, PublicKeyCredentialRequestOptionsJSON>;
   private loginAttemptCount: Map<number, { amount: number; lastAttempt: number }>;
 
   constructor(instance: Instance) {
@@ -56,27 +52,14 @@ export default class AuthorizationSystem extends System {
     return `${salt.toBase64()}:${hash.toBase64()}`;
   }
 
-  private async _internalVerifyPassword(
-    password: string,
-    hashedPassword: string,
-  ): Promise<boolean> {
-    const [salt, expected] = hashedPassword.split(":")
-      .map((part) => Uint8Array.fromBase64(part));
+  private async _internalVerifyPassword(password: string, hashedPassword: string): Promise<boolean> {
+    const [salt, expected] = hashedPassword.split(":").map((part) => Uint8Array.fromBase64(part));
     const actual = await this._internalDeriveBits(password, salt);
     return timingSafeEqual(actual, expected);
   }
 
-  private async _internalDeriveBits(
-    password: string,
-    salt: Uint8Array<ArrayBuffer>,
-  ): Promise<Uint8Array> {
-    const key = await crypto.subtle.importKey(
-      "raw",
-      new TextEncoder().encode(password),
-      "PBKDF2",
-      false,
-      ["deriveBits"],
-    );
+  private async _internalDeriveBits(password: string, salt: Uint8Array<ArrayBuffer>): Promise<Uint8Array> {
+    const key = await crypto.subtle.importKey("raw", new TextEncoder().encode(password), "PBKDF2", false, ["deriveBits"]);
     const bits = await crypto.subtle.deriveBits(
       {
         name: "PBKDF2",
@@ -108,31 +91,21 @@ export default class AuthorizationSystem extends System {
     otpCode?: string,
     ipAddress?: string,
   ): Promise<string | SessionCreationError> {
-    if(this.loginAttemptCount.has(userId)) {
+    if (this.loginAttemptCount.has(userId)) {
     }
 
     try {
       const db = this.instance.sys.database.postgres();
 
-      if (
-        !(await this._internalVerifyPassword(
-          password,
-          (await db`SELECT hashed_password FROM public.users WHERE id = ${userId}`)
-            ?.[0]?.hashed_password,
-        ))
-      ) {
-        if(this.loginAttemptCount.has(userId)) {
-          this.loginAttemptCount.set(userId, {amount: this.loginAttemptCount.get(userId)!.amount + 1, lastAttempt: Date.now()})
+      if (!(await this._internalVerifyPassword(password, (await db`SELECT hashed_password FROM public.users WHERE id = ${userId}`)?.[0]?.hashed_password))) {
+        if (this.loginAttemptCount.has(userId)) {
+          this.loginAttemptCount.set(userId, { amount: this.loginAttemptCount.get(userId)!.amount + 1, lastAttempt: Date.now() });
         }
 
         return SessionCreationError.InvalidCredentials;
       }
 
-      if (
-        await this.instance.sys.authorization.hasTwoFactorAuthenticationSecret(
-          userId,
-        )
-      ) {
+      if (await this.instance.sys.authorization.hasTwoFactorAuthenticationSecret(userId)) {
         if (!otpCode) {
           console.log("no otp code provided when creating session?");
           return SessionCreationError.GenericError;
@@ -143,9 +116,7 @@ export default class AuthorizationSystem extends System {
           label: `${this.instance.sys.configuration.branding.displayName} (Workspace)`,
           algorithm: "SHA1",
           digits: 6,
-          secret:
-            (await db`SELECT two_factor_secret FROM public.users WHERE id = ${userId}`)
-              ?.[0]?.two_factor_secret,
+          secret: (await db`SELECT two_factor_secret FROM public.users WHERE id = ${userId}`)?.[0]?.two_factor_secret,
         });
 
         if (totp.validate({ token: otpCode }) === null) {
@@ -163,10 +134,7 @@ export default class AuthorizationSystem extends System {
 
       if (await user?.isAdministrator()) {
         if (password === "password") {
-          this.log.warning(
-            `User (${userId})${await user
-              ?.getUsername()} has the default password! Please tell them to change it!`,
-          );
+          this.log.warning(`User (${userId})${await user?.getUsername()} has the default password! Please tell them to change it!`);
 
           setTimeout(() => {
             this.instance.sys.notifications.send(
@@ -192,8 +160,7 @@ export default class AuthorizationSystem extends System {
                   return {
                     action: {
                       type: "navigate",
-                      value:
-                        "/app/uk.ewsgit.settings/authentication/reset-password",
+                      value: "/app/uk.ewsgit.settings/authentication/reset-password",
                     },
                   };
                 },
@@ -205,12 +172,7 @@ export default class AuthorizationSystem extends System {
 
       return `workspaces_session:${userId}:${sessionToken}`;
     } catch (err) {
-      this.log.warning(
-        `Failed to create session. -> ${userId} @ ${
-          AuthorizedDeviceType[deviceId]
-        }`,
-        utils.inspect(err),
-      );
+      this.log.warning(`Failed to create session. -> ${userId} @ ${AuthorizedDeviceType[deviceId]}`, utils.inspect(err));
 
       return SessionCreationError.GenericError;
     }
@@ -226,9 +188,7 @@ export default class AuthorizationSystem extends System {
 
     const sessionsDb = this.instance.sys.database.postgres();
 
-    const session =
-      (await sessionsDb`SELECT session_id, valid_until FROM public.sessions WHERE user_id = ${userId} AND session_token = ${token}`)
-        ?.[0];
+    const session = (await sessionsDb`SELECT session_id, valid_until FROM public.sessions WHERE user_id = ${userId} AND session_token = ${token}`)?.[0];
 
     if (Number(session?.valid_until) < Date.now()) {
       await sessionsDb`DELETE FROM public.sessions WHERE user_id = ${userId} AND session_token = ${token}`;
@@ -260,10 +220,7 @@ export default class AuthorizationSystem extends System {
     @returns {true} the session is removed, and it's token is invalidated
     @returns {undefined} the sessionToken is invalid
   */
-  async endSessionById(
-    userId: number,
-    sessionId: number,
-  ): Promise<boolean | undefined> {
+  async endSessionById(userId: number, sessionId: number): Promise<boolean | undefined> {
     const sessionsDb = this.instance.sys.database.postgres();
 
     await sessionsDb`DELETE FROM public.sessions WHERE user_id = ${userId} AND session_id = ${sessionId}`;
@@ -365,8 +322,7 @@ export default class AuthorizationSystem extends System {
       return false;
     }
 
-    const userPasskeys =
-      await db`SELECT COUNT(*) FROM public.passkeys WHERE user_id = ${userId}`;
+    const userPasskeys = await db`SELECT COUNT(*) FROM public.passkeys WHERE user_id = ${userId}`;
 
     return Number(userPasskeys[0].count) > 0;
   }
@@ -378,32 +334,27 @@ export default class AuthorizationSystem extends System {
   async requestNewPasskey(userId: number) {
     const db = this.instance.sys.database.postgres();
 
-    const userPasskeys =
-      await db`SELECT * FROM public.passkeys WHERE user_id = ${userId}` as {
-        passkey_id: string;
-        transports: string;
-      }[];
+    const userPasskeys = (await db`SELECT * FROM public.passkeys WHERE user_id = ${userId}`) as {
+      passkey_id: string;
+      transports: string;
+    }[];
 
-    const passkeyCreationOptions: PublicKeyCredentialCreationOptionsJSON =
-      await generateRegistrationOptions({
-        rpName: this.instance.sys.configuration.branding.displayName,
-        rpID: this.instance.sys.configuration.proxy.hostname,
-        userName: (await (await this.instance.sys.users.getUserById(userId))
-          ?.getUsername()) || `${userId}`,
-        excludeCredentials: userPasskeys.map((passkey) => {
-          return {
-            id: passkey.passkey_id,
-            transports: passkey.transports.split(
-              ",",
-            ) as AuthenticatorTransportFuture[],
-          };
-        }),
-        authenticatorSelection: {
-          residentKey: "preferred",
-          userVerification: "preferred",
-          authenticatorAttachment: "platform",
-        },
-      });
+    const passkeyCreationOptions: PublicKeyCredentialCreationOptionsJSON = await generateRegistrationOptions({
+      rpName: this.instance.sys.configuration.branding.displayName,
+      rpID: this.instance.sys.configuration.proxy.hostname,
+      userName: (await (await this.instance.sys.users.getUserById(userId))?.getUsername()) || `${userId}`,
+      excludeCredentials: userPasskeys.map((passkey) => {
+        return {
+          id: passkey.passkey_id,
+          transports: passkey.transports.split(",") as AuthenticatorTransportFuture[],
+        };
+      }),
+      authenticatorSelection: {
+        residentKey: "preferred",
+        userVerification: "preferred",
+        authenticatorAttachment: "platform",
+      },
+    });
 
     this.temporaryPasskeyCreationChallenges.set(userId, passkeyCreationOptions);
 
@@ -419,9 +370,7 @@ export default class AuthorizationSystem extends System {
   // use any here as it is handled by a library, and we don't need to worry about the types
   async registerPasskey(userId: number, input: any) {
     const db = this.instance.sys.database.postgres();
-    const expectedChallenge = this.temporaryPasskeyCreationChallenges.get(
-      userId,
-    );
+    const expectedChallenge = this.temporaryPasskeyCreationChallenges.get(userId);
     if (!expectedChallenge) {
       return false;
     }
@@ -429,9 +378,7 @@ export default class AuthorizationSystem extends System {
     const verification = await verifyRegistrationResponse({
       response: input,
       expectedChallenge: expectedChallenge.challenge,
-      expectedOrigin: `${
-        this.instance.sys.configuration.proxy.secure ? "https://" : "http://"
-      }${this.instance.sys.configuration.proxy.hostname}`,
+      expectedOrigin: `${this.instance.sys.configuration.proxy.secure ? "https://" : "http://"}${this.instance.sys.configuration.proxy.hostname}`,
       expectedRPID: this.instance.sys.configuration.proxy.hostname,
     });
 
@@ -465,24 +412,20 @@ export default class AuthorizationSystem extends System {
 
   async requestPasskeySession(userId: number) {
     const db = this.instance.sys.database.postgres();
-    const userPasskeys =
-      await db`SELECT * FROM public.passkeys WHERE user_id = ${userId}` as {
-        passkey_id: string;
-        transports: string;
-      }[];
+    const userPasskeys = (await db`SELECT * FROM public.passkeys WHERE user_id = ${userId}`) as {
+      passkey_id: string;
+      transports: string;
+    }[];
 
-    const passkeyOptions: PublicKeyCredentialRequestOptionsJSON =
-      await generateAuthenticationOptions({
-        rpID: this.instance.sys.configuration.proxy.hostname,
-        allowCredentials: userPasskeys.map((passkey) => {
-          return {
-            id: passkey.passkey_id,
-            transports: passkey.transports.split(
-              ",",
-            ) as AuthenticatorTransportFuture[],
-          };
-        }),
-      });
+    const passkeyOptions: PublicKeyCredentialRequestOptionsJSON = await generateAuthenticationOptions({
+      rpID: this.instance.sys.configuration.proxy.hostname,
+      allowCredentials: userPasskeys.map((passkey) => {
+        return {
+          id: passkey.passkey_id,
+          transports: passkey.transports.split(",") as AuthenticatorTransportFuture[],
+        };
+      }),
+    });
 
     this.temporaryPasskeyAuthenticationChallenges.set(userId, passkeyOptions);
 
@@ -490,23 +433,14 @@ export default class AuthorizationSystem extends System {
   }
 
   // biome-ignore lint/suspicious/noExplicitAny: the input is a webauthn response which is very complex and would require a lot of work to type, so we'll just use any here as it is handled by a library and we don't need to worry about the types
-  async createPasskeySession(
-    userId: number,
-    deviceId: AuthorizedDeviceType,
-    input: any,
-    ipAddress?: string,
-  ) {
+  async createPasskeySession(userId: number, deviceId: AuthorizedDeviceType, input: any, ipAddress?: string) {
     const db = this.instance.sys.database.postgres();
-    const expectedChallenge = this.temporaryPasskeyAuthenticationChallenges.get(
-      userId,
-    );
+    const expectedChallenge = this.temporaryPasskeyAuthenticationChallenges.get(userId);
     if (!expectedChallenge) {
       return undefined;
     }
 
-    const passkey =
-      (await db`SELECT * FROM public.passkeys WHERE user_id = ${userId} AND passkey_id = ${input.id}`)
-        ?.[0];
+    const passkey = (await db`SELECT * FROM public.passkeys WHERE user_id = ${userId} AND passkey_id = ${input.id}`)?.[0];
     if (!passkey) {
       return undefined;
     }
@@ -514,17 +448,13 @@ export default class AuthorizationSystem extends System {
     const verification = await verifyAuthenticationResponse({
       response: input,
       expectedChallenge: expectedChallenge.challenge,
-      expectedOrigin: `${
-        this.instance.sys.configuration.proxy.secure ? "https://" : "http://"
-      }${this.instance.sys.configuration.proxy.hostname}`,
+      expectedOrigin: `${this.instance.sys.configuration.proxy.secure ? "https://" : "http://"}${this.instance.sys.configuration.proxy.hostname}`,
       expectedRPID: this.instance.sys.configuration.proxy.hostname,
       credential: {
         id: passkey.id,
         publicKey: passkey.public_key,
         counter: passkey.counter,
-        transports: passkey.transports.split(
-          ",",
-        ) as AuthenticatorTransportFuture[],
+        transports: passkey.transports.split(",") as AuthenticatorTransportFuture[],
       },
     });
 
@@ -534,9 +464,7 @@ export default class AuthorizationSystem extends System {
       await db`INSERT INTO public.sessions (user_id, session_token, device_type, valid_until, ip_address, login_method) VALUES (${userId}, ${sessionToken}, ${deviceId}, ${
         Date.now() + SESSION_VALID_TERM_MS
       }, ${ipAddress || "Anonymous"}, 'passkey')`;
-      await db`UPDATE public.passkeys SET last_used_timestamp = NOW(), counter = ${
-        passkey.counter + 1
-      } WHERE passkey_id = ${passkey.passkey_id}`;
+      await db`UPDATE public.passkeys SET last_used_timestamp = NOW(), counter = ${passkey.counter + 1} WHERE passkey_id = ${passkey.passkey_id}`;
 
       return `workspaces_session:${userId}:${sessionToken}`;
     }

@@ -160,134 +160,134 @@ try {
 } catch (_) {
   await fs.mkdir(REMOTE_MOUNT_PATH, { recursive: true });
 }
-
-fuse.mount(
-  REMOTE_MOUNT_PATH,
-  {
-    readdir(path, cb) {
-      console.log("readdir(%s)", path);
-      if (path === "/") return cb(0, ["test"]);
-      cb(0, []);
-    },
-    getattr(path, cb) {
-      console.log("getattr(%s)", path);
-      if (path === "/") {
-        cb(0, {
-          mtime: new Date(),
-          atime: new Date(),
-          ctime: new Date(),
-          nlink: 1,
-          size: 100,
-          mode: 16877,
-          uid: process.getuid ? process.getuid() : 0,
-          gid: process.getgid ? process.getgid() : 0,
-          isFile() {
-            return false;
-          },
-          isDirectory() {
-            return true;
-          },
-          isBlockDevice() {
-            return false;
-          },
-          isCharacterDevice() {
-            return false;
-          },
-          isSymbolicLink() {
-            return false;
-          },
-          isFIFO() {
-            return false;
-          },
-          isSocket() {
-            return false;
-          },
-          dev: 0,
-          ino: 0,
-          rdev: 0,
-          blksize: 0,
-          blocks: 0,
-          atimeMs: 0,
-          mtimeMs: 0,
-          ctimeMs: 0,
-          birthtimeMs: 0,
-          birthtime: new Date(0),
-        });
-        return;
-      }
-
-      if (path === "/test") {
-        cb(0, {
-          mtime: new Date(),
-          atime: new Date(),
-          ctime: new Date(),
-          nlink: 1,
-          size: 12,
-          mode: 33188,
-          uid: process.getuid ? process.getuid() : 0,
-          gid: process.getgid ? process.getgid() : 0,
-          isFile() {
-            return false;
-          },
-          isDirectory() {
-            return true;
-          },
-          isBlockDevice() {
-            return false;
-          },
-          isCharacterDevice() {
-            return false;
-          },
-          isSymbolicLink() {
-            return false;
-          },
-          isFIFO() {
-            return false;
-          },
-          isSocket() {
-            return false;
-          },
-          dev: 0,
-          ino: 0,
-          rdev: 0,
-          blksize: 0,
-          blocks: 0,
-          atimeMs: 0,
-          mtimeMs: 0,
-          ctimeMs: 0,
-          birthtimeMs: 0,
-          birthtime: new Date(0),
-        });
-        return;
-      }
-
-      cb(fuse.ENOENT);
-    },
-    open: (path, flags, cb) => {
-      console.log("open(%s, %d)", path, flags);
-      cb(0, 42); // 42 is an fd
-    },
-    read: (path, fd, buf, len, pos, cb) => {
-      console.log("read(%s, %d, %d, %d)", path, fd, len, pos);
-      var str = "hello world\n".slice(pos, pos + len);
-      if (!str) return cb(0);
-      buf.write(str);
-      return cb(str.length);
-    },
-  },
-  (err: number) => {
-    if (err) throw err;
-    console.log(`filesystem mounted on ${REMOTE_MOUNT_PATH}`);
-  },
-);
-
-process.on("SIGINT", () => {
-  fuse.unmount(REMOTE_MOUNT_PATH, async (err) => {
-    if (err) {
-      console.log(`filesystem at ${REMOTE_MOUNT_PATH} not unmounted`, err);
-    } else {
-      console.log(`filesystem at ${REMOTE_MOUNT_PATH} unmounted`);
-      await fs.rmdir(REMOTE_MOUNT_PATH);
-    }
-  });
-});
+//
+// fuse.mount(
+//   REMOTE_MOUNT_PATH,
+//   {
+//     readdir(path, cb) {
+//       console.log("readdir(%s)", path);
+//       if (path === "/") return cb(0, ["test"]);
+//       cb(0, []);
+//     },
+//     getattr(path, cb) {
+//       console.log("getattr(%s)", path);
+//       if (path === "/") {
+//         cb(0, {
+//           mtime: new Date(),
+//           atime: new Date(),
+//           ctime: new Date(),
+//           nlink: 1,
+//           size: 100,
+//           mode: 16877,
+//           uid: process.getuid ? process.getuid() : 0,
+//           gid: process.getgid ? process.getgid() : 0,
+//           isFile() {
+//             return false;
+//           },
+//           isDirectory() {
+//             return true;
+//           },
+//           isBlockDevice() {
+//             return false;
+//           },
+//           isCharacterDevice() {
+//             return false;
+//           },
+//           isSymbolicLink() {
+//             return false;
+//           },
+//           isFIFO() {
+//             return false;
+//           },
+//           isSocket() {
+//             return false;
+//           },
+//           dev: 0,
+//           ino: 0,
+//           rdev: 0,
+//           blksize: 0,
+//           blocks: 0,
+//           atimeMs: 0,
+//           mtimeMs: 0,
+//           ctimeMs: 0,
+//           birthtimeMs: 0,
+//           birthtime: new Date(0),
+//         });
+//         return;
+//       }
+//
+//       if (path === "/test") {
+//         cb(0, {
+//           mtime: new Date(),
+//           atime: new Date(),
+//           ctime: new Date(),
+//           nlink: 1,
+//           size: 12,
+//           mode: 33188,
+//           uid: process.getuid ? process.getuid() : 0,
+//           gid: process.getgid ? process.getgid() : 0,
+//           isFile() {
+//             return false;
+//           },
+//           isDirectory() {
+//             return true;
+//           },
+//           isBlockDevice() {
+//             return false;
+//           },
+//           isCharacterDevice() {
+//             return false;
+//           },
+//           isSymbolicLink() {
+//             return false;
+//           },
+//           isFIFO() {
+//             return false;
+//           },
+//           isSocket() {
+//             return false;
+//           },
+//           dev: 0,
+//           ino: 0,
+//           rdev: 0,
+//           blksize: 0,
+//           blocks: 0,
+//           atimeMs: 0,
+//           mtimeMs: 0,
+//           ctimeMs: 0,
+//           birthtimeMs: 0,
+//           birthtime: new Date(0),
+//         });
+//         return;
+//       }
+//
+//       cb(fuse.ENOENT);
+//     },
+//     open: (path, flags, cb) => {
+//       console.log("open(%s, %d)", path, flags);
+//       cb(0, 42); // 42 is an fd
+//     },
+//     read: (path, fd, buf, len, pos, cb) => {
+//       console.log("read(%s, %d, %d, %d)", path, fd, len, pos);
+//       var str = "hello world\n".slice(pos, pos + len);
+//       if (!str) return cb(0);
+//       buf.write(str);
+//       return cb(str.length);
+//     },
+//   },
+//   (err: number) => {
+//     if (err) throw err;
+//     console.log(`filesystem mounted on ${REMOTE_MOUNT_PATH}`);
+//   },
+// );
+//
+// process.on("SIGINT", () => {
+//   fuse.unmount(REMOTE_MOUNT_PATH, async (err) => {
+//     if (err) {
+//       console.log(`filesystem at ${REMOTE_MOUNT_PATH} not unmounted`, err);
+//     } else {
+//       console.log(`filesystem at ${REMOTE_MOUNT_PATH} unmounted`);
+//       await fs.rmdir(REMOTE_MOUNT_PATH);
+//     }
+//   });
+// });

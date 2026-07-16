@@ -32,7 +32,7 @@ const UserSelectPage: Component = () => {
 
     const authenticationOptions = await trpc.authorization.passkeyRequestSignIn.query({ username: username() });
 
-    if (authenticationOptions === undefined) return;
+    if (authenticationOptions === undefined || authenticationOptions === false) return;
 
     const authenticationResponse = await startAuthentication({
       optionsJSON: authenticationOptions,
@@ -54,7 +54,7 @@ const UserSelectPage: Component = () => {
   return (
     <UKCard color={"filled"} class={styles.modal}>
       <UKText role={"title"} size={"l"} emphasized={true}>
-        Sign In
+        Login
       </UKText>
       <UKDivider direction={DividerDirection.horizontal} />
       {showTwoFactor() ? (

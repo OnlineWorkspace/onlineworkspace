@@ -1,7 +1,7 @@
-import {EmailAuthenticatorRequestRequirements} from "./emailAuthenticator.ts";
-import {PasskeyAuthenticatorRequestRequirements} from "./passkeyAuthenticator.ts";
-import {PasswordAuthenticatorRequestRequirements} from "./passwordAuthenticator.ts";
-import {TotpAuthenticatorRequestRequirements} from "./totpAuthenticator.ts";
+import type {EmailAuthenticatorRequestRequirements} from "./emailAuthenticator.ts";
+import type {PasskeyAuthenticatorRequestRequirements} from "./passkeyAuthenticator.ts";
+import type {PasswordAuthenticatorRequestRequirements} from "./passwordAuthenticator.ts";
+import type {TotpAuthenticatorRequestRequirements} from "./totpAuthenticator.ts";
 
 export enum Authenticator {
   Email = 1 << 0,
