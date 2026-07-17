@@ -1,8 +1,11 @@
 {
-  "compilerOptions": {
-    "lib": [
-      "deno.ns",
-      "deno.desktop"
-    ]
-  }
+  "files": [],
+  "references": [
+    {
+      "path": "./tsconfig.desktop.json"
+    },
+    {
+      "path": "./tsconfig.frontend.json"
+    }
+  ]
 }

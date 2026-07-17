@@ -30,7 +30,13 @@
     }
   },
   "tasks": {
-    "dev": "deno desktop ./index.ts"
+    "dev": "deno desktop -P --hmr ./index.ts",
+    "start": "deno desktop -P ./index.ts"
+  },
+  "compile": {
+    "permissions": {
+      "all": true
+    }
   },
   "permissions": {
     "default": {

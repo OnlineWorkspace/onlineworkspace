@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "lib": [
+      "deno.ns",
+      "deno.desktop"
+    ]
+  },
+  "include": [
+    "./*.ts"
+  ]
+}

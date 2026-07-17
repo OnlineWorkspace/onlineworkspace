@@ -20,7 +20,7 @@
       "path": "./web"
     },
     "internal": {
-      "path": "./backend/index.ts"
+      "path": "./server/index.ts"
     }
   }
 }

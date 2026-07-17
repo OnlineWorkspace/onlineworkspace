@@ -1,6 +1,5 @@
 // import devtools from "solid-devtools/vite";
 import { defineConfig } from "vite";
-import { compression } from "vite-plugin-compression2";
 import solid from "vite-plugin-solid";
 
 export default defineConfig({
@@ -11,7 +10,6 @@ export default defineConfig({
     //     autoname: true, // e.g. enable autoname
     // }),
     solid(),
-    compression(),
   ],
   server: {
     host: true,

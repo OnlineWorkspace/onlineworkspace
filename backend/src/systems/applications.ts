@@ -112,10 +112,12 @@ export default class ApplicationsSystem extends System {
 
         const child = command.spawn();
 
+        // @ts-ignore don't know why typescript hates this
         for await (const msg of child.stdout) {
           this.log.info(`Applications Initial Startup -> ${Buffer.from(msg).toString()}`);
         }
 
+        // @ts-ignore don't know why typescript hates this
         for await (const msg of child.stderr) {
           this.log.info(`Applications Initial Startup -> ${Buffer.from(msg).toString()}`);
         }
@@ -310,7 +312,7 @@ export default class ApplicationsSystem extends System {
 
       if (app.manifest?.modules.deno) {
         // FIXME: this should use the requested args from the module.
-        let permissionArgs = ["-A"]
+        const permissionArgs = ["-A"]
 
         const command = new Deno.Command("deno", {
           args: [...permissionArgs, app.manifest.modules.deno.path],
@@ -324,6 +326,7 @@ export default class ApplicationsSystem extends System {
 
         const MODULE_LOG_PREFIX = `${app.manifest.id} module:deno -> `;
 
+        // @ts-ignore typescript hates this valid code.
         for await (const msg of child.stdout) {
           let bufMsg = MODULE_LOG_PREFIX + Buffer.from(msg).toString();
 
@@ -334,6 +337,7 @@ export default class ApplicationsSystem extends System {
           this.log.info(bufMsg);
         }
 
+        // @ts-ignore typescript hates this valid code.
         for await (const msg of child.stderr) {
           let bufMsg = MODULE_LOG_PREFIX + Buffer.from(msg).toString();
 
@@ -357,6 +361,7 @@ export default class ApplicationsSystem extends System {
 
         const MODULE_LOG_PREFIX = `${app.manifest.id} module:external -> `;
 
+        // @ts-ignore typescript hates this valid code.
         for await (const msg of child.stdout) {
           let bufMsg = MODULE_LOG_PREFIX + Buffer.from(msg).toString();
 
@@ -367,6 +372,7 @@ export default class ApplicationsSystem extends System {
           this.log.info(bufMsg);
         }
 
+        // @ts-ignore typescript hates this valid code.
         for await (const msg of child.stderr) {
           let bufMsg = MODULE_LOG_PREFIX + Buffer.from(msg).toString();
 
