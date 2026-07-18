@@ -458,7 +458,7 @@ const router = t.router({
                           changeFormatTo: "webp",
                         },
                       })
-                    : undefined
+                    : `${instance.sys.configuration.proxy.secure ? "https://" : "http://"}${instance.sys.configuration.proxy.hostname}/api/asset/fileicon/${path.extname(opt.input.path)}`
                   : undefined,
               hidden: path.basename(opt.input.path).startsWith("."),
               createdAt: itemStats.ctime?.getMilliseconds(),

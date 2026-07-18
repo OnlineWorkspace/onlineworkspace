@@ -1,7 +1,7 @@
 {
   "tasks": {
-    "dev": "deno -A --watch backend/src/index.ts",
-    "start": "deno -A backend/src/index.ts",
+    "dev": "deno -A --watch --unsafe-proto backend/src/index.ts",
+    "start": "deno -A --unsafe-proto backend/src/index.ts",
     "dev-debug": "deno -A --inspect-brk backend/src/index.ts",
     "build-web": "deno --cwd web build",
     "uikit": "deno --cwd uikit-solid dev"
@@ -12,16 +12,7 @@
     }
   },
   "nodeModulesDir": "auto",
-  "allowScripts": [
-    "npm:canvas@3.2.3",
-    "npm:core-js@2.6.12",
-    "npm:cpu-features@0.0.10",
-    "npm:esbuild@0.27.7",
-    "npm:fast-folder-size@2.4.0",
-    "npm:protobufjs@7.6.4",
-    "npm:sharp@0.34.5",
-    "npm:ssh2@1.17.0"
-  ],
+  "allowScripts": ["npm:canvas@3.2.3", "npm:core-js@2.6.12", "npm:cpu-features@0.0.10", "npm:esbuild@0.27.7", "npm:fast-folder-size@2.4.0", "npm:protobufjs@7.6.4", "npm:protobufjs@7.6.5", "npm:sharp@0.34.5", "npm:ssh2@1.17.0"],
   "lint": {
     "exclude": ["**"]
   },

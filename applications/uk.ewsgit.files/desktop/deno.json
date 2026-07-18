@@ -30,8 +30,10 @@
     }
   },
   "tasks": {
-    "dev": "deno desktop -P --hmr ./index.ts",
-    "start": "deno desktop -P ./index.ts"
+    "dev": "deno run -A npm:vite",
+    "build": "deno run -A npm:vite build",
+    "desktop": "deno desktop -A .",
+    "desktop:dev": "deno desktop -A --hmr ."
   },
   "compile": {
     "permissions": {

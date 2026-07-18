@@ -1,11 +1,12 @@
 /* @refresh reload */
-import type { Component, ParentProps } from "solid-js";
+import { lazy, type Component, type ParentProps } from "solid-js";
 import { render } from "solid-js/web";
 import "./index.scss";
 import { UIKitRoot } from "@ewsgit/uikit-solid/src/index.tsx";
 import { MetaProvider } from "@solidjs/meta";
-import { Router } from "@solidjs/router";
+import { Route, Router } from "@solidjs/router";
 import styles from "./index.module.scss";
+import Redirect from "./redirect.tsx";
 
 // import "solid-devtools";
 
@@ -19,13 +20,21 @@ const OWApplication: Component<ParentProps> = (props) => {
   );
 };
 
-export default function createApp(Comp: Component) {
+export default function createApp(appId: string, Comp: Component) {
   const root = document.getElementById("root");
 
   render(
     () => (
       <OWApplication>
-        <Comp />
+        <Route path="ow_desktop_integration">
+          <Route path="auth">
+            <Route path="flow" component={lazy(() => import("./auth/flow/index.tsx"))} />
+          </Route>
+        </Route>
+        <Route path={`/app/${appId}`}>
+          <Comp />
+        </Route>
+        <Route path={"/"} component={() => <Redirect to={`/app/${appId}`}/>}/>
       </OWApplication>
     ),
     root!,

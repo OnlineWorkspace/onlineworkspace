@@ -20,6 +20,7 @@ import TRPCSystem from "./systems/trpc.ts";
 import UsersSystem from "./systems/users.ts";
 import WebFrontendSystem from "./systems/webFrontend.ts";
 import AuthenticationSystem from "./systems/authentication.ts";
+import UploadSystem from "./systems/upload.ts";
 
 export enum InstanceStatus {
   Online,
@@ -59,6 +60,7 @@ class Instance {
     this.sys.reverseProxy = new ReverseProxySystem(this);
     this.sys.terminal = new TerminalUISystem(this);
     this.sys.api = new ApiSystem(this);
+    this.sys.upload = new UploadSystem(this);
 
     this.status = InstanceStatus.Offline;
 

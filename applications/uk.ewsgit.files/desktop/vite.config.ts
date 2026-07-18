@@ -16,10 +16,8 @@ export default defineConfig({
   root: ".",
   resolve: {
     alias: {
-      "@solidjs/router": "/../../../../node_modules/@solidjs/router",
-      "@ewsgit/uikit-solid": "/../../../../node_modules/@ewsgit/uikit-solid",
-      "@onlineworkspace/workspaces-applications":
-        "/../../../../fs/system/vite/Applications.tsx",
+      "@solidjs/router": "/../../../node_modules/@solidjs/router",
+      "@ewsgit/uikit-solid": "/../../../node_modules/@ewsgit/uikit-solid",
     },
   },
 });

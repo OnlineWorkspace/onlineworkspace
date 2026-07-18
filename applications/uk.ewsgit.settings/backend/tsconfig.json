@@ -14,5 +14,8 @@
     "skipLibCheck": true,
     "allowImportingTsExtensions": true
   },
-  "include": ["."]
+  "include": [
+    "./index.ts",
+    "./global.d.ts"
+  ]
 }

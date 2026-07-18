@@ -18,6 +18,7 @@ import type TRPCSubsystem from "./systems/trpc.ts";
 import type UsersSubsystem from "./systems/users.ts";
 import type WebFrontendSubsystem from "./systems/webFrontend.ts";
 import AuthenticationSystem from "./systems/authentication.ts";
+import UploadSystem from "./systems/upload.ts";
 
 export type Sys = {
   users: UsersSubsystem;
@@ -38,6 +39,7 @@ export type Sys = {
   reverseProxy: ReverseProxySystem;
   terminal: TerminalSystem;
   api: ApiSystem;
+  upload: UploadSystem;
 } & { [key: string]: System };
 
 export default abstract class System {

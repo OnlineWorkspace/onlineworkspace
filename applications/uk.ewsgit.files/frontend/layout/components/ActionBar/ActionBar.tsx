@@ -17,10 +17,19 @@ import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.tsx";
 import useIsMobile from "@ewsgit/uikit-solid/src/core/useIsMobile.ts";
 import clsx from "clsx";
 import browserPath from "path-browserify";
-import { type Component, createEffect, createSignal, Show, useContext } from "solid-js";
+import {
+  type Component,
+  createEffect,
+  createSignal,
+  Show,
+  useContext,
+} from "solid-js";
 import { AppContext } from "../../../appContext.ts";
 import type { UniformResourceLocator } from "../../../lib/filesystemInterface.ts";
-import { canViewNavigateUp, viewNavigateUp } from "../../../pages/dir/viewHistory.ts";
+import {
+  canViewNavigateUp,
+  viewNavigateUp,
+} from "../../../pages/dir/viewHistory.ts";
 import type { ViewItem } from "../../../pages/dir/viewItem.ts";
 import styles from "./ActionBar.module.scss";
 
@@ -32,14 +41,21 @@ const ActionBar: Component = () => {
   const [canNavigateUp, setCanNavigateUp] = createSignal<boolean>(false);
 
   createEffect(() => {
-    setCanNavigateUp(canViewNavigateUp((appContext?.viewState[appContext.globalState.activeViewId].pathUrl || "invalid:") as UniformResourceLocator));
+    setCanNavigateUp(
+      canViewNavigateUp(
+        (appContext?.viewState[appContext.globalState.activeViewId].pathUrl ||
+          "invalid:") as UniformResourceLocator,
+      ),
+    );
   });
 
   return (
     <div class={styles.root}>
       <div class={styles.actionButtons}>
-        {/* <UKIconButton icon={CHEVRON_LEFT_ICON} color={"standard"} alt={"go back"} onClick={() => window.history.back()} />
-        <UKIconButton icon={CHEVRON_RIGHT_ICON} color={"standard"} alt={"go forwards"} onClick={() => window.history.forward()} /> */}
+        {
+          /* <UKIconButton icon={CHEVRON_LEFT_ICON} color={"standard"} alt={"go back"} onClick={() => window.history.back()} />
+        <UKIconButton icon={CHEVRON_RIGHT_ICON} color={"standard"} alt={"go forwards"} onClick={() => window.history.forward()} /> */
+        }
         <UKIconButton
           icon={ARROW_UPWARD_ICON}
           color={"standard"}
@@ -47,34 +63,66 @@ const ActionBar: Component = () => {
           alt={"go up one directory"}
           onClick={() => {
             viewNavigateUp(
-              (p) => appContext?.setViewState(appContext.globalState.activeViewId, "pathUrl", p as UniformResourceLocator),
-              (appContext?.viewState[appContext.globalState.activeViewId].pathUrl || "invalid:") as UniformResourceLocator,
+              (p) =>
+                appContext?.setViewState(
+                  appContext.globalState.activeViewId,
+                  "pathUrl",
+                  p as UniformResourceLocator,
+                ),
+              (appContext?.viewState[appContext.globalState.activeViewId]
+                .pathUrl || "invalid:") as UniformResourceLocator,
             );
           }}
         />
       </div>
-      <Show when={appContext?.viewState[appContext.globalState.activeViewId].pathUrl !== undefined}>
+      <Show
+        when={appContext?.viewState[appContext.globalState.activeViewId]
+          .pathUrl !== undefined}
+      >
         <div class={styles.pathSelector}>
           <div class={styles.pathSegments}>
             <UKText role="label" size="l">
-              {(appContext?.viewState[appContext.globalState.activeViewId].pathUrl || "").split(browserPath.sep)[0].toUpperCase()}
+              {(appContext?.viewState[appContext.globalState.activeViewId]
+                .pathUrl || "").split(browserPath.sep)[0].toUpperCase()}
             </UKText>
-            {(appContext?.viewState[appContext.globalState.activeViewId].pathUrl || "")
+            {(appContext?.viewState[appContext.globalState.activeViewId]
+              .pathUrl || "")
               .split(browserPath.sep)
               .slice(0)
               .map((segment, index) => {
                 return (
-                  <div>
+                  // biome-ignore lint/a11y/useKeyWithClickEvents: todo
+                  // biome-ignore lint/a11y/noStaticElementInteractions: todo
+                  <div
+                    onClick={() => {
+                      const fullPath =
+                        appContext
+                          ?.viewState[appContext.globalState.activeViewId]
+                          .pathUrl || "";
+
+                      const segments = fullPath.split(browserPath.sep);
+
+                      const targetPath = segments.slice(0, index + 1).join(
+                        browserPath.sep,
+                      );
+
+                      appContext?.setViewState(appContext.globalState.activeViewId, "pathUrl", targetPath as UniformResourceLocator)
+                    }}
+                  >
                     {index !== 0 && (
                       <UKText role="label" size="l">
                         {segment}
                       </UKText>
                     )}
-                    {(appContext?.viewState[appContext.globalState.activeViewId].pathUrl || "").split(browserPath.sep).length - 1 === index ? null : (
-                      <UKText role="label" size="l">
-                        /
-                      </UKText>
-                    )}
+                    {(appContext?.viewState[appContext.globalState.activeViewId]
+                            .pathUrl || "").split(browserPath.sep).length -
+                          1 === index
+                      ? null
+                      : (
+                        <UKText role="label" size="l">
+                          /
+                        </UKText>
+                      )}
                   </div>
                 );
               })}
@@ -82,7 +130,8 @@ const ActionBar: Component = () => {
           <input
             class={styles.pathInput}
             type={"text"}
-            value={appContext?.viewState[appContext.globalState.activeViewId].pathUrl}
+            value={appContext?.viewState[appContext.globalState.activeViewId]
+              .pathUrl}
             onKeyDown={(e) => {
               setPathQuery(e.currentTarget.value);
             }}
@@ -90,7 +139,12 @@ const ActionBar: Component = () => {
             onClick={() => setShowTextualPath(true)}
             data-visible={showTextualPath()}
             // TODO: perhaps validate this first and warn the user if it's invalid
-            onChange={(e) => appContext?.setViewState(appContext.globalState.activeViewId, "pathUrl", e.currentTarget.value as UniformResourceLocator)}
+            onChange={(e) =>
+              appContext?.setViewState(
+                appContext.globalState.activeViewId,
+                "pathUrl",
+                e.currentTarget.value as UniformResourceLocator,
+              )}
           />
           <UKCard class={styles.pathSuggestions}>
             {pathQuery()}
@@ -113,14 +167,18 @@ const ActionBar: Component = () => {
         <UKIconButton
           icon={LISTS_ICON}
           disabled={appContext?.userPreferences.viewType === "details"}
-          color={appContext?.userPreferences.viewType === "details" ? "tonal" : "standard"}
+          color={appContext?.userPreferences.viewType === "details"
+            ? "tonal"
+            : "standard"}
           alt={"Details View"}
           onClick={() => appContext?.setUserPreferences("viewType", "details")}
         />
         <UKIconButton
           icon={VIEW_MODULE_ICON}
           disabled={appContext?.userPreferences.viewType === "grid"}
-          color={appContext?.userPreferences.viewType === "grid" ? "tonal" : "standard"}
+          color={appContext?.userPreferences.viewType === "grid"
+            ? "tonal"
+            : "standard"}
           alt={"Grid View"}
           onClick={() => appContext?.setUserPreferences("viewType", "grid")}
         />
@@ -128,9 +186,12 @@ const ActionBar: Component = () => {
           <UKIconButton
             icon={ART_TRACK_ICON}
             disabled={appContext?.userPreferences.viewType === "gallery"}
-            color={appContext?.userPreferences.viewType === "gallery" ? "tonal" : "standard"}
+            color={appContext?.userPreferences.viewType === "gallery"
+              ? "tonal"
+              : "standard"}
             alt={"Gallery View"}
-            onClick={() => appContext?.setUserPreferences("viewType", "gallery")}
+            onClick={() =>
+              appContext?.setUserPreferences("viewType", "gallery")}
           />
         )}
         {!appContext?.isDesktopApp && (
@@ -151,14 +212,20 @@ const ActionBar: Component = () => {
                 for (let i = 0; i < 10; i++) {
                   appContext?.setViewState(0, "viewItems", [
                     ...appContext.viewState[0].viewItems,
-                    { type: "file", path: `/randomNewItem${Math.round(Math.random() * 100000000)}` },
+                    {
+                      type: "file",
+                      path: `/randomNewItem${
+                        Math.round(Math.random() * 100000000)
+                      }`,
+                    },
                   ] as ViewItem[]);
                 }
               }}
             />
           </>
         )}
-        {/* {!isMobile() && (
+        {
+          /* {!isMobile() && (
           <UKIconButton
             icon={appContext?.userPreferences.showPreview ? RIGHT_PANEL_OPEN_ICON : RIGHT_PANEL_CLOSE_ICON}
             color={"filled"}
@@ -167,47 +234,51 @@ const ActionBar: Component = () => {
               appContext?.setUserPreferences("showPreview", !appContext?.userPreferences.showPreview);
             }}
           />
-        )} */}
-        {appContext?.isDesktopApp && localStorage.getItem("onlineworkspace_workspace_desktop_platform") !== "darwin" && (
-          <>
-            <UKIconButton
-              icon={MINIMIZE_ICON}
-              color={"standard"}
-              size="s"
-              shape="square"
-              alt={"minimize window"}
-              class={styles.windowIcon}
-              onClick={() => {
-                // @ts-ignore
-                window.electronAPI.minimize_window();
-              }}
-            />
-            <UKIconButton
-              icon={CROP_SQUARE_ICON}
-              color={"standard"}
-              size="s"
-              shape="square"
-              alt={"maximize window"}
-              class={styles.windowIcon}
-              onClick={() => {
-                // @ts-ignore
-                window.electronAPI.maximize_window();
-              }}
-            />
-            <UKIconButton
-              icon={CLOSE_ICON}
-              color={"standard"}
-              size="s"
-              shape="square"
-              alt={"close window"}
-              class={clsx(styles.closeWindowIcon, styles.windowIcon)}
-              onClick={() => {
-                // @ts-ignore
-                window.electronAPI.close_window();
-              }}
-            />
-          </>
-        )}
+        )} */
+        }
+        {appContext?.isDesktopApp &&
+          localStorage.getItem("onlineworkspace_workspace_desktop_platform") !==
+            "darwin" &&
+          (
+            <>
+              <UKIconButton
+                icon={MINIMIZE_ICON}
+                color={"standard"}
+                size="s"
+                shape="square"
+                alt={"minimize window"}
+                class={styles.windowIcon}
+                onClick={() => {
+                  // @ts-ignore
+                  window.electronAPI.minimize_window();
+                }}
+              />
+              <UKIconButton
+                icon={CROP_SQUARE_ICON}
+                color={"standard"}
+                size="s"
+                shape="square"
+                alt={"maximize window"}
+                class={styles.windowIcon}
+                onClick={() => {
+                  // @ts-ignore
+                  window.electronAPI.maximize_window();
+                }}
+              />
+              <UKIconButton
+                icon={CLOSE_ICON}
+                color={"standard"}
+                size="s"
+                shape="square"
+                alt={"close window"}
+                class={clsx(styles.closeWindowIcon, styles.windowIcon)}
+                onClick={() => {
+                  // @ts-ignore
+                  window.electronAPI.close_window();
+                }}
+              />
+            </>
+          )}
       </div>
     </div>
   );

@@ -1,5 +1,10 @@
 {
   "compilerOptions": {
-    "lib": ["esnext", "deno.ns"]
-  }
+    "lib": ["esnext", "deno.ns"],
+    "types": [],
+    "skipLibCheck": true
+  },
+  "include": [
+    "src"
+  ]
 }

@@ -2,6 +2,7 @@ import * as nodePath from "node:path";
 import sharp from "sharp";
 import type { Instance } from "../index.ts";
 import System from "../system.ts";
+import crypto from "node:crypto"
 
 export default class ImageSystem extends System {
   _internalImages: Map<

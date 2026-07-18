@@ -1,4 +1,13 @@
-import { type AppConfiguration, IS_DEVELOPMENT } from "./index.ts";
+import { AppConfiguration, BINDING_PREFIX } from "./index.ts";
+
+export function applyAuthBindings(
+  appConfiguration: AppConfiguration,
+  win: Deno.BrowserWindow,
+) {
+  win.bind(`${BINDING_PREFIX}`, async () => {
+    return true;
+  });
+}
 
 export async function startAuth(
   instanceBaseUrl: string,
@@ -12,28 +21,5 @@ export async function startAuth(
     });
 
     win.show();
-
-    if (IS_DEVELOPMENT) {
-      win.navigate(
-        `${instanceBaseUrl}/auth/app/flow/?app_id=${
-          encodeURIComponent(appConfiguration.id)
-        }&app_display_name=${
-          encodeURIComponent(appConfiguration.displayName)
-        }&redirect=${
-          encodeURIComponent(
-            appConfiguration.developmentStartPageUrl ||
-              appConfiguration.startPageUrl,
-          )
-        }`,
-      );
-    } else {
-      win.navigate(
-        `${instanceBaseUrl}/auth/app/flow/?app_id=${
-          encodeURIComponent(appConfiguration.id)
-        }&app_display_name=${
-          encodeURIComponent(appConfiguration.displayName)
-        }&redirect=${encodeURIComponent(appConfiguration.startPageUrl)}`,
-      );
-    }
   });
 }

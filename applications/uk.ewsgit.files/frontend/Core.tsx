@@ -20,6 +20,7 @@ export interface GlobalState {
   disableShortcuts: boolean;
   deletedItemCount: number;
   activeViewId: number;
+  remotes: {[remoteId: string]: string};
 }
 
 const Core: Component<ParentProps> = (props) => {
@@ -63,6 +64,9 @@ const Core: Component<ParentProps> = (props) => {
     disableShortcuts: false,
     deletedItemCount: 0,
     activeViewId: 0,
+    remotes: {
+      local: {}
+    }
   });
 
   onMount(async () => {

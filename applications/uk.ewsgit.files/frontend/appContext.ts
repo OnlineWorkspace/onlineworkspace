@@ -1,7 +1,6 @@
 import { type Accessor, createContext, type Setter } from "solid-js";
 import type { SetStoreFunction, Store } from "solid-js/store";
 import type { GlobalState, Preferences } from "./Core";
-import type { Task } from "./layout/components/StatusBar/task";
 import type { ViewState } from "./pages/dir/View";
 
 export interface AppContextType {

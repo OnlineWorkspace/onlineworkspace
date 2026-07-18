@@ -3,7 +3,7 @@
   "displayName": "Files",
   "icon": {
     "type": "icon",
-    "value": "./web/node_modules/@material-symbols/svg-700/outlined/folder.svg"
+    "value": "./frontend/node_modules/@material-symbols/svg-700/outlined/folder.svg"
   },
   "bannerImage": "./files_banner.svg",
   "description": "Navigate and manage files in your Workspace",
@@ -17,7 +17,7 @@
   "source": "https://github.com/onlineworkspace/onlineworkspace/src/branch/main/packages/applications/uk.ewsgit.files",
   "modules": {
     "web": {
-      "path": "./web"
+      "path": "./frontend"
     },
     "internal": {
       "path": "./server/index.ts"

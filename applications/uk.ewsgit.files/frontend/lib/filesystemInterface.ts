@@ -211,7 +211,7 @@ class FilesystemInterface {
     return `${firstUrlType}:${path.join(...paths)}`;
   }
 
-  urlToPath(url: UniformResourceLocator): { type: "remote" | "local"; path: string } | { type: "invalid" } {
+  urlToPath(url: UniformResourceLocator): { type: "remote" | "local"; origin?: string; path: string } | { type: "invalid" } {
     if (url.startsWith("local:")) {
       return {
         type: "local",
@@ -221,6 +221,8 @@ class FilesystemInterface {
       return {
         type: "remote",
         path: url.substring(7),
+        // TODO: do this
+        origin: "WORK IN PROGRESS"
       };
     }
 

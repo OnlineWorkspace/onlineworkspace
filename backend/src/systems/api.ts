@@ -1,4 +1,4 @@
-import nodeCanvas from "@napi-rs/canvas";
+import { createCanvas, Image } from "@gfx/canvas";
 import * as fs from "@std/fs";
 import { getCookies, serveFile } from "@std/http";
 import type { Route } from "@std/http/unstable-route";
@@ -21,7 +21,9 @@ export default class ApiSystem extends System {
     this.routes = [
       {
         method: ["GET"],
-        pattern: new URLPattern({ pathname: "/api/teapot" }),
+        pattern: new URLPattern({
+          pathname: "/api/teapot",
+        }) as unknown as Route["pattern"],
         handler() {
           return Response.json(
             {
@@ -29,7 +31,7 @@ export default class ApiSystem extends System {
               message: "This OnlineWorkspace (Teapot?) sadly does not support the Hyper Text Coffee Pot Control Protocol (HTCPCP) 😢",
             },
             { status: 418 },
-          );
+          ) as unknown as Response;
         },
       },
       {
@@ -60,7 +62,7 @@ export default class ApiSystem extends System {
             return Response.json({
               code: "UNAUTHORIZED",
               message: "missing auth cookie",
-            });
+            }) as unknown as Response;
           }
 
           const userId = await self.instance.sys.authorization.verifySession(decodeURIComponent(cookies.Authorization!));
@@ -69,7 +71,7 @@ export default class ApiSystem extends System {
             return Response.json({
               code: "UNAUTHORIZED",
               message: "invalid session",
-            });
+            }) as unknown as Response;
           }
 
           switch (size) {
@@ -97,7 +99,7 @@ export default class ApiSystem extends System {
             return Response.json({
               code: "UNAUTHORIZED",
               message: "missing auth cookie",
-            });
+            }) as unknown as Response;
           }
 
           const userId = await self.instance.sys.authorization.verifySession(decodeURIComponent(cookies.Authorization!));
@@ -106,7 +108,7 @@ export default class ApiSystem extends System {
             return Response.json({
               code: "UNAUTHORIZED",
               message: "invalid session",
-            });
+            }) as unknown as Response;
           }
 
           const application = self.instance.sys.applications.availableApplications.find((a) => a.manifest?.id === params);
@@ -115,7 +117,7 @@ export default class ApiSystem extends System {
             return Response.json({
               code: "INTERNAL_ERROR",
               message: "Invalid application!",
-            });
+            }) as unknown as Response;
           }
 
           const applicationIconPath = path.join(application.path, application.manifest?.icon?.value || "");
@@ -135,7 +137,7 @@ export default class ApiSystem extends System {
           const image = self.instance.sys.image._internalImages.get(params.imageId as string);
 
           if (!image) {
-            return new Response("Invalid image");
+            return new Response("Invalid image") as unknown as Response;
           }
 
           if (!image.public) {
@@ -145,7 +147,7 @@ export default class ApiSystem extends System {
               return Response.json({
                 code: "UNAUTHORIZED",
                 message: "missing auth cookie",
-              });
+              }) as unknown as Response;
             }
 
             const userId = await self.instance.sys.authorization.verifySession(decodeURIComponent(cookies.Authorization!));
@@ -154,7 +156,7 @@ export default class ApiSystem extends System {
               return Response.json({
                 code: "UNAUTHORIZED",
                 message: "invalid session",
-              });
+              }) as unknown as Response;
             }
           }
 
@@ -166,7 +168,7 @@ export default class ApiSystem extends System {
             return Response.json({
               code: "NOT_FOUND",
               message: "missing image",
-            });
+            }) as unknown as Response;
           }
 
           if (resolutionParam === "raw") {
@@ -211,7 +213,7 @@ export default class ApiSystem extends System {
           const asset = self.instance.sys.filesystem._internalAssets.get(params.assetId as string);
 
           if (!asset) {
-            return new Response("Invalid raw asset");
+            return new Response("Invalid raw asset") as unknown as Response;
           }
 
           if (!asset.public) {
@@ -221,7 +223,7 @@ export default class ApiSystem extends System {
               return Response.json({
                 code: "UNAUTHORIZED",
                 message: "missing auth cookie",
-              });
+              }) as unknown as Response;
             }
 
             const userId = await self.instance.sys.authorization.verifySession(decodeURIComponent(cookies.Authorization!));
@@ -230,7 +232,7 @@ export default class ApiSystem extends System {
               return Response.json({
                 code: "UNAUTHORIZED",
                 message: "invalid session",
-              });
+              }) as unknown as Response;
             }
           }
 
@@ -240,16 +242,24 @@ export default class ApiSystem extends System {
       {
         method: ["GET"],
         pattern: new URLPattern({ pathname: "/api/asset/fileicon/:filetype" }),
-        async handler(_req, _params, rawParams) {
+        async handler(req, rawParams) {
           // @ts-ignore this does exist
-          const params = rawParams?.pathname.groups;
+          const params = rawParams?.pathname?.groups;
+
+          const thumbCachePath = path.join(self.instance.sys.filesystem.CACHE_PATH, "fileicon", "filetype", params.filetype);
+          if (await fs.exists(thumbCachePath)) {
+            return serveFile(req, thumbCachePath);
+          } else {
+            await fs.ensureDir(path.dirname(thumbCachePath))
+          }
 
           const CANVAS_PADDING = 8;
           const CANVAS_WIDTH = 128;
           const CANVAS_HEIGHT = 128;
-          const canvas = nodeCanvas.createCanvas(CANVAS_WIDTH, CANVAS_HEIGHT);
+
+          const canvas = createCanvas(CANVAS_WIDTH, CANVAS_HEIGHT);
           const ctx = canvas.getContext("2d");
-          ctx.drawImage(await nodeCanvas.loadImage(path.join(self.instance.sys.filesystem.SRC_ROOT, "assets/placeholder/file.png")), 0, 0);
+          ctx.drawImage(Image.loadSync(path.join(self.instance.sys.filesystem.SRC_ROOT, "assets/placeholder/file.png")), 0, 0);
 
           ctx.font = `20px Arial`;
           ctx.textAlign = "end";
@@ -259,7 +269,7 @@ export default class ApiSystem extends System {
             x: CANVAS_WIDTH - CANVAS_PADDING,
             y: CANVAS_HEIGHT - CANVAS_PADDING,
           };
-          const textContent = `${params.filetype.toUpperCase().slice(0, 3)}`;
+          const textContent = `${params.filetype.toUpperCase().slice(0, 5)}`;
           const textSize = ctx.measureText(textContent);
           ctx.fillStyle = "#00aa00";
           ctx.fillRect(
@@ -271,7 +281,9 @@ export default class ApiSystem extends System {
           ctx.fillStyle = "white";
           ctx.fillText(textContent, labelBr.x - LABEL_PADDING.x, labelBr.y + LABEL_PADDING.y);
 
-          return new Response(canvas.encodeStream("png"));
+          canvas.save(thumbCachePath, "png", 100);
+
+          return serveFile(req, thumbCachePath);
         },
       },
       {
@@ -279,13 +291,13 @@ export default class ApiSystem extends System {
         async handler(req, _params) {
           return (
             (await self.instance.sys.tRPC.attemptTRPCRequest(req, self.instance.sys.api.webServer)) ||
-            Response.json(
+            (Response.json(
               {
                 notFound: true,
                 message: "Unhandled by tRPC router",
               },
               { status: 404 },
-            )
+            ) as unknown as Response)
           );
         },
       },
@@ -333,10 +345,18 @@ export default class ApiSystem extends System {
           headers.set("access-control-allow-methods", "GET, POST, PUT, DELETE");
           headers.set("access-control-allow-headers", "content-type, authorization");
           headers.set("access-control-max-age", "86400");
-          return new Response(null, { status: 204, headers });
+          return new Response(null, {
+            status: 204,
+            headers,
+          }) as unknown as Response;
         }
 
-        return Response.json({ notFound: true }, { status: 404 });
+        return Response.json(
+          { notFound: true },
+          {
+            status: 404,
+          },
+        ) as unknown as Response;
       }),
     );
 

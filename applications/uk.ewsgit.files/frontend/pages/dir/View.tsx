@@ -98,7 +98,7 @@ const View: Component<{ pathOverride?: UniformResourceLocator; disallowCreation?
               filesystemInterface
                 .getViewEntry(
                   itemPath as UniformResourceLocator,
-                  Math.floor(appContext!.userPreferences.defaultZoomPercentage * (appContext!.userPreferences.viewType === "details" ? 32 : 128)),
+                  Math.floor(appContext!.userPreferences.defaultZoomPercentage * (appContext!.userPreferences.viewType === "details" ? 32 : appContext!.userPreferences.viewType === "gallery" ? window.innerHeight / 2 :128)),
                 )
                 .then((viewEntry) => {
                   if (viewEntry.status === "ok") {
@@ -231,7 +231,7 @@ const View: Component<{ pathOverride?: UniformResourceLocator; disallowCreation?
     window.addEventListener("keydown", onKeyDown);
 
     function mouseMove(e: MouseEvent) {
-      if (!dragSelectRegion) return;
+      if (!dragSelectRegion.origin) return;
 
       const bounds = itemViewRef()!.getBoundingClientRect();
 

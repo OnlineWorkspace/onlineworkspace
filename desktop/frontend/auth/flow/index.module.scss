@@ -1,0 +1,27 @@
+.root {
+  display: grid;
+  grid-template-columns: auto auto 3fr;
+  padding: 1rem;
+  width: 100%;
+  height: 100%;
+  gap: 2rem;
+}
+
+.sidePanel {
+  display: flex;
+  align-items: end;
+  gap: 0.5rem;
+  justify-content: center;
+  flex-direction: column;
+  text-align: end;
+  white-space: nowrap;
+  width: 16rem;
+  position: relative;
+
+  > .footer {
+    position: absolute;
+    bottom: 0rem;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}
