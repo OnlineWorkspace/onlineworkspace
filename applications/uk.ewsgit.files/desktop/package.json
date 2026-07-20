@@ -1,7 +1,6 @@
 {
   "name": "uk-ewsgit-files-desktop",
   "dependencies": {
-    "@onlineworkspace/desktop": "workspace:*",
     "typescript": "~5.9.3",
     "vite": "^8.0.8",
     "vite-plugin-solid": "^2.11.11",

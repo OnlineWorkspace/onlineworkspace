@@ -1,9 +1,14 @@
-import { createDesktopApplication } from "@onlineworkspace/desktop";
+import { type AppConfiguration, initDesktopApplication } from "@onlineworkspace/desktop";
 
-await createDesktopApplication({
-  id: "uk.ewsgit.files",
-  displayName: "Files",
-  enforceLogin: true,
-  startPageUrl: "",
-  developmentStartPageUrl: "http://127.0.0.1:5175",
-});
+const APP_CONFIGURATION: AppConfiguration = {
+  handleAuthentication: true,
+  initialPath: "/",
+  frontendBasePath: "http://127.0.0.1:5175",
+  applicationId: "uk.ewsgit.files",
+  displayName: "OW Files"
+};
+
+const win = new Deno.BrowserWindow();
+win.hide();
+await initDesktopApplication(APP_CONFIGURATION, win);
+win.show();

@@ -94,10 +94,10 @@
     "npm:typescript@^5.9.2": "5.9.3",
     "npm:typescript@~5.8.3": "5.8.3",
     "npm:typescript@~5.9.3": "5.9.3",
-    "npm:vite-plugin-solid@^2.11.10": "2.11.12_solid-js@1.9.14_vite@8.1.5__esbuild@0.27.7__sass-embedded@1.100.0_esbuild@0.27.7_sass-embedded@1.100.0",
-    "npm:vite-plugin-solid@^2.11.11": "2.11.12_solid-js@1.9.14_vite@8.1.5__esbuild@0.27.7__sass-embedded@1.100.0_esbuild@0.27.7_sass-embedded@1.100.0",
-    "npm:vite-plugin-solid@^2.11.12": "2.11.12_solid-js@1.9.14_vite@8.1.5__esbuild@0.27.7__sass-embedded@1.100.0_esbuild@0.27.7_sass-embedded@1.100.0",
-    "npm:vite-plugin-solid@^2.11.8": "2.11.12_solid-js@1.9.14_vite@8.1.5__esbuild@0.27.7__sass-embedded@1.100.0_esbuild@0.27.7_sass-embedded@1.100.0",
+    "npm:vite-plugin-solid@^2.11.10": "2.11.13_solid-js@1.9.14_vite@8.1.5__esbuild@0.27.7__sass-embedded@1.100.0_esbuild@0.27.7_sass-embedded@1.100.0",
+    "npm:vite-plugin-solid@^2.11.11": "2.11.13_solid-js@1.9.14_vite@8.1.5__esbuild@0.27.7__sass-embedded@1.100.0_esbuild@0.27.7_sass-embedded@1.100.0",
+    "npm:vite-plugin-solid@^2.11.12": "2.11.13_solid-js@1.9.14_vite@8.1.5__esbuild@0.27.7__sass-embedded@1.100.0_esbuild@0.27.7_sass-embedded@1.100.0",
+    "npm:vite-plugin-solid@^2.11.8": "2.11.13_solid-js@1.9.14_vite@8.1.5__esbuild@0.27.7__sass-embedded@1.100.0_esbuild@0.27.7_sass-embedded@1.100.0",
     "npm:vite@*": "8.1.5_esbuild@0.27.7_sass-embedded@1.100.0",
     "npm:vite@^7.1.2": "7.3.6_sass-embedded@1.100.0",
     "npm:vite@^7.3.0": "7.3.6_sass-embedded@1.100.0",
@@ -2090,8 +2090,8 @@
         "type-is"
       ]
     },
-    "brace-expansion@1.1.15": {
-      "integrity": "sha512-EwOCDEex4quD37XhqM3omwtMoJjr//isUZz1JopUNWms+4Z2ViyM/k1YIRePpoVNnQhENnxtFjLaxNHrT7xIUg==",
+    "brace-expansion@1.1.16": {
+      "integrity": "sha512-IDw48K2/2kRkg9LdJxurvq3lV3aBgq0REY89duEqFRthjlPdXHKMj7EnQOXVckxzgisinf3nHfrcE2FufFLXMw==",
       "dependencies": [
         "balanced-match",
         "concat-map"
@@ -2506,8 +2506,8 @@
     "ee-first@1.1.1": {
       "integrity": "sha512-WMwm9LhRUo+WUaRN+vRuETqG89IgZphVSNkdFgeb6sS/E4OrDIN7t48CAewSHXc6C8lefD8KKfr5vY61brQlow=="
     },
-    "electron-to-chromium@1.5.392": {
-      "integrity": "sha512-1yQq3VQCZRwsnYc67Oc+1fge6Lwtn0hzi6zmEVkB61Zx21kTbwJAW4dFLadl5Rc1tKhG/kSpYXnfiAhu0f0a1g=="
+    "electron-to-chromium@1.5.393": {
+      "integrity": "sha512-kiDJdIUawuEIcp9XoICKp1iTYDEbgguIPq526N1Q7jIQDeQ3CqoMx71025PI/7E48Ddtw2HuWsVjY7afEgNxmg=="
     },
     "emoji-regex@10.6.0": {
       "integrity": "sha512-toUI84YS5YmxW219erniWD0CIVOo46xGKColeNQRgOzDorgBi1v4D71/OFzgD9GO2UGKIv1C3Sp8DAn0+j5w7A=="
@@ -4448,8 +4448,8 @@
         "extsprintf"
       ]
     },
-    "vite-plugin-solid@2.11.12_solid-js@1.9.14_vite@8.1.5__esbuild@0.27.7__sass-embedded@1.100.0_esbuild@0.27.7_sass-embedded@1.100.0": {
-      "integrity": "sha512-FgjPcx2OwX9h6f28jli7A4bG7PP3te8uyakE5iqsmpq3Jqi1TWLgSroC9N6cMfGRU2zXsl4Q6ISvTr2VL0QHpA==",
+    "vite-plugin-solid@2.11.13_solid-js@1.9.14_vite@8.1.5__esbuild@0.27.7__sass-embedded@1.100.0_esbuild@0.27.7_sass-embedded@1.100.0": {
+      "integrity": "sha512-YaCNMzwIawUO8K16uj5jaxUJIYCstBEjkUppC5OKElBz/K2+R7Q7MWycHDgqzjBca5WWy/2ZQQ45IHexaabYew==",
       "dependencies": [
         "@babel/core",
         "@types/babel__core",

@@ -1,24 +1,33 @@
-import { A, useSearchParams } from "@solidjs/router";
-import { type Component, createSignal } from "solid-js";
+import { A } from "@solidjs/router";
+import { type Component, createResource } from "solid-js";
 import styles from "./index.module.scss";
 import { Title } from "@solidjs/meta";
 import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.tsx";
 import UKDivider from "@ewsgit/uikit-solid/src/components/divider/UKDivider.tsx";
+import {
+  type AppConfiguration,
+  CORE_BINDING_PREFIX,
+  CoreBindingEndpoints,
+} from "@onlineworkspace/desktop";
+import {
+  AUTH_BINDING_PREFIX,
+  AuthBindingEndpoints,
+} from "../../../desktop/auth.ts";
 
 const AuthAppFlowPage: Component = () => {
-  const [searchParams] = useSearchParams();
-  const [appDisplayName, setAppDisplayName] = createSignal(
-    searchParams["app_display_name"] || searchParams["app_id"],
+  const [appConfiguration] = createResource<AppConfiguration>(() =>
+    // @ts-ignore
+    bindings[`${CORE_BINDING_PREFIX}${CoreBindingEndpoints.GetConfiguration}`]()
   );
-
-  // onMount(() => {
-  //   setAppDisplayName("Files");
-  // });
+  const [instanceUrl] = createResource(() =>
+    // @ts-ignore
+    bindings[`${AUTH_BINDING_PREFIX}${AuthBindingEndpoints.GetInstanceUrl}`]()
+  );
 
   return (
     <>
       <Title>
-        Authenticate to OnlineWorkspace @ {window.location.hostname}
+        Authenticate to OnlineWorkspace @ {instanceUrl()}
       </Title>
       <div class={styles.root}>
         <div class={styles.sidePanel}>
@@ -26,10 +35,16 @@ const AuthAppFlowPage: Component = () => {
             Sign in
           </UKText>
           <UKText role="label" size="l">
-            To authorize '{appDisplayName()}'
+            To authorize '{appConfiguration()?.displayName ||
+              appConfiguration()?.applicationId}'
           </UKText>
           <UKText role="label" size="l" class={styles.footer}>
-            OnlineWorkspace @ <A href="">next.alys.cloud</A>
+            OnlineWorkspace @{" "}
+            <A
+              href={`${appConfiguration()?.frontendBasePath}/ow_desktop_integration/auth/select_instance`}
+            >
+              {instanceUrl()}
+            </A>
           </UKText>
         </div>
         <UKDivider direction="vertical" />

@@ -1,4 +1,9 @@
 {
+  "name": "@onlineworkspace/desktop",
+  "exports": {
+    ".": "./desktop/index.ts",
+    "./frontend": "./frontend/index.tsx"
+  },
   "lint": {
     "exclude": ["**"]
   },
