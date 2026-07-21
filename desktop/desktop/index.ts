@@ -22,17 +22,23 @@ export function applyCoreBindings(appConfiguration: AppConfiguration, win: Deno.
 
 export async function initDesktopApplication(
   appConfiguration: AppConfiguration,
-  win: Deno.BrowserWindow
+  windowOptions: Deno.BrowserWindowOptions
 ) {
+  if (appConfiguration.handleAuthentication) {
+    await startAuth(appConfiguration)
+  }
+
+  const win = new Deno.BrowserWindow(windowOptions)
+
   applyCoreBindings(appConfiguration, win)
 
   if (appConfiguration.handleAuthentication) {
-    await startAuth(appConfiguration)
-
     applyAuthBindings(win)
   }
 
   win.navigate(`${appConfiguration.frontendBasePath}${appConfiguration.initialPath}`)
+
+  return win;
 }
 
 export { AuthBindingEndpoints } from "./auth.ts"

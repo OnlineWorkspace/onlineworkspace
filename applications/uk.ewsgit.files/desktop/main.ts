@@ -8,7 +8,4 @@ const APP_CONFIGURATION: AppConfiguration = {
   displayName: "OW Files"
 };
 
-const win = new Deno.BrowserWindow();
-win.hide();
-await initDesktopApplication(APP_CONFIGURATION, win);
-win.show();
+await initDesktopApplication(APP_CONFIGURATION, {});
