@@ -1,4 +1,3 @@
-import { createCanvas, Image } from "@gfx/canvas";
 import * as fs from "@std/fs";
 import { getCookies, serveFile } from "@std/http";
 import type { Route } from "@std/http/unstable-route";
@@ -237,56 +236,6 @@ export default class ApiSystem extends System {
           }
 
           return serveFile(req, asset.path);
-        },
-      },
-      {
-        method: ["GET"],
-        pattern: new URLPattern({ pathname: "/api/asset/fileicon/:filetype/:iconsize" }),
-        async handler(req, rawParams) {
-          // @ts-ignore this does exist
-          const params = rawParams?.pathname?.groups;
-
-          const thumbCachePath = path.join(self.instance.sys.filesystem.CACHE_PATH, "fileicon", "filetype", params.filetype + "x" + params.iconsize);
-          if (await fs.exists(thumbCachePath)) {
-            return serveFile(req, thumbCachePath);
-          } else {
-            await fs.ensureDir(path.dirname(thumbCachePath))
-          }
-
-          if (isNaN(Number(params.iconsize)))
-            return;
-
-          const CANVAS_PADDING = 8;
-          const CANVAS_WIDTH = Number(params.iconsize) || 128 ;
-          const CANVAS_HEIGHT = Number(params.iconsize) || 128 
-
-          const canvas = createCanvas(CANVAS_WIDTH, CANVAS_HEIGHT);
-          const ctx = canvas.getContext("2d");
-          ctx.drawImage(Image.loadSync(path.join(self.instance.sys.filesystem.SRC_ROOT, "assets/placeholder/file.png")), 0, 0);
-
-          ctx.font = `24px Arial`;
-          ctx.textAlign = "end";
-          ctx.textBaseline = "bottom";
-          const LABEL_PADDING: { x: number; y: number } = { x: 4, y: 0 };
-          const labelBr: { x: number; y: number } = {
-            x: CANVAS_WIDTH - CANVAS_PADDING,
-            y: CANVAS_HEIGHT - CANVAS_PADDING,
-          };
-          const textContent = `${params.filetype.toUpperCase().slice(0, 5)}`;
-          const textSize = ctx.measureText(textContent);
-          ctx.fillStyle = "#cc5588";
-          ctx.fillRect(
-            labelBr.x - (textSize.width + LABEL_PADDING.x * 2),
-            labelBr.y - (textSize.emHeightAscent + LABEL_PADDING.y * 2),
-            textSize.width + LABEL_PADDING.x * 2,
-            textSize.emHeightAscent + LABEL_PADDING.y * 2,
-          );
-          ctx.fillStyle = "white";
-          ctx.fillText(textContent, labelBr.x - LABEL_PADDING.x, labelBr.y + LABEL_PADDING.y);
-
-          canvas.save(thumbCachePath, "png", 100);
-
-          return serveFile(req, thumbCachePath);
         },
       },
       {
