@@ -265,7 +265,7 @@ export class WorkspacesUser {
 
       return true;
     } catch (error) {
-      console.error("Error joining group:", error);
+      this.instance.sys.users.log.error("Error joining group:", error);
       return false;
     }
   }
@@ -293,7 +293,7 @@ export class WorkspacesUser {
 
       return true;
     } catch (error) {
-      console.error("Error leaving group:", error);
+      this.instance.sys.users.log.error("Error leaving group:", error);
       return false;
     }
   }

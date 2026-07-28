@@ -66,7 +66,7 @@ class FilesystemInterface {
       if (readDirectoryResponse.status === "ok") {
         return {
           status: readDirectoryResponse.status,
-          items: readDirectoryResponse.items.map((newItem) => {
+          items: readDirectoryResponse.items.map((newItem: string) => {
             return `${parsedUrl.type}:${path.join(parsedUrl.path, newItem)}` as UniformResourceLocator;
           }),
         };

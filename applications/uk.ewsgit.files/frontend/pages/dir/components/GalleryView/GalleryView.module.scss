@@ -46,7 +46,7 @@ $min-size: 50vh;
     height: 100%;
     width: 100%;
     background-image: var(--src);
-    background-size: cover;
+    background-size: contain;
     transform: rotateX(-120deg) scale(1.25);
     filter: blur(1rem) brightness(0.25);
     z-index: 0;
@@ -70,8 +70,9 @@ $min-size: 50vh;
     width: 100%;
     top: 0;
     left: 0;
-    object-fit: cover;
     pointer-events: none;
+    object-fit: contain;
+    image-rendering: pixelated;
   }
 
   .label {

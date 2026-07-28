@@ -1,6 +1,6 @@
 {
   "tasks": {
-    "dev": "deno -A --watch --unsafe-proto backend/src/index.ts",
+    "dev": "deno -A --watch-hmr --unsafe-proto backend/src/index.ts",
     "start": "deno -A --unsafe-proto backend/src/index.ts",
     "dev-debug": "deno -A --inspect-brk backend/src/index.ts",
     "build-web": "deno --cwd web build",

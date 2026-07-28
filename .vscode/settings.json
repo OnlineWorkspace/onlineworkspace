@@ -15,7 +15,7 @@
     ],
     "js/ts.tsdk.path": "node_modules/typescript/lib",
     "[typescript]": {
-        "editor.defaultFormatter": "denoland.vscode-deno"
+        "editor.defaultFormatter": "biomejs.biome"
     },
     "[typescriptreact]": {
         "editor.defaultFormatter": "denoland.vscode-deno"

@@ -98,7 +98,7 @@ const View: Component<{ pathOverride?: UniformResourceLocator; disallowCreation?
               filesystemInterface
                 .getViewEntry(
                   itemPath as UniformResourceLocator,
-                  Math.floor(appContext!.userPreferences.defaultZoomPercentage * (appContext!.userPreferences.viewType === "details" ? 32 : appContext!.userPreferences.viewType === "gallery" ? window.innerHeight / 2 :128)),
+                  Math.floor(appContext!.userPreferences.defaultZoomPercentage * (appContext!.userPreferences.viewType === "details" ? 32 : appContext!.userPreferences.viewType === "gallery" ? window.innerHeight : 128)),
                 )
                 .then((viewEntry) => {
                   if (viewEntry.status === "ok") {

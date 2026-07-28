@@ -149,7 +149,7 @@ const GalleryView: Component = () => {
                 class={styles.box}
                 style={{
                   ...getBoxStyles(index()),
-                  "--src": `url(${cover})`,
+                  "--src": `url(${cover.thumbnail})`,
                 }}
                 onClick={(e) => handleCardClick(index(), e)}
               >

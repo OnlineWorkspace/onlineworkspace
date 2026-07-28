@@ -7,6 +7,7 @@ import * as fs from "@std/fs";
 import { initTRPC } from "@trpc/server";
 import fastFolderSize from "fast-folder-size/sync.js";
 import z from "zod";
+import { FilesystemConnectorEntryType } from "../lib/filesystemConnector.ts";
 
 const log = instance.log.createLogger("uk.ewsgit.files");
 
@@ -369,9 +370,17 @@ const router = t.router({
   readDirectory: procedure
     .input(z.object({ path: z.string() }))
     .output(
-      z
-        .object({ items: z.undefined(), status: z.enum(["missing_permission", "invalid_path"]) })
-        .or(z.object({ items: z.string().array(), status: z.literal("ok") })),
+      z.object({ status: z.enum(["missing_permission", "invalid_path"]) }).or(
+        z.object({
+          items: z
+            .object({
+              type: z.enum(FilesystemConnectorEntryType),
+              name: z.string(),
+            })
+            .array(),
+          status: z.literal("ok"),
+        }),
+      ),
     )
     .query(async (opt) => {
       const resolvedPath = path.join(instance.sys.filesystem.FS_ROOT, opt.input.path);
@@ -384,22 +393,39 @@ const router = t.router({
       }
 
       try {
-        const directories: Deno.DirEntry[] = [];
-        const files: Deno.DirEntry[] = [];
+        const directories: { type: FilesystemConnectorEntryType; name: string }[] = [];
+        const files: { type: FilesystemConnectorEntryType; name: string }[] = [];
+        const symlinks: { type: FilesystemConnectorEntryType; name: string }[] = [];
 
         for await (const entry of Deno.readDir(resolvedPath)) {
           if (entry.isDirectory) {
-            directories.push(entry);
+            directories.push({
+              type: FilesystemConnectorEntryType.Directory,
+              name: entry.name,
+            });
           }
           if (entry.isFile) {
-            files.push(entry);
+            files.push({
+              type: FilesystemConnectorEntryType.File,
+              name: entry.name,
+            });
+          }
+          if (entry.isSymlink) {
+            files.push({
+              type: FilesystemConnectorEntryType.Symlink,
+              name: entry.name,
+            });
           }
         }
 
         directories.sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: "base" }));
         files.sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: "base" }));
+        symlinks.sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: "base" }));
 
-        return { items: [...directories.map((d) => d.name), ...files.map((f) => f.name)], status: "ok" };
+        return {
+          items: [...directories, ...files, ...symlinks],
+          status: "ok",
+        };
       } catch (_) {
         return { status: "invalid_path" as const };
       }
@@ -422,7 +448,11 @@ const router = t.router({
               modifiedAt: z.number().optional(),
             }),
           })
-          .or(z.object({ status: z.enum(["missing_permission", "invalid_path"]) })),
+          .or(
+            z.object({
+              status: z.enum(["missing_permission", "invalid_path"]),
+            }),
+          ),
       )
       .query(async (opt) => {
         const resolvedPath = path.join(instance.sys.filesystem.FS_ROOT, opt.input.path);
@@ -454,11 +484,16 @@ const router = t.router({
                         resize: {
                           fit: "cover",
                           position: "centre",
-                          dimensions: { width: opt.input.thumbnailSize, height: Math.floor((opt.input.thumbnailSize / 16) * 9) },
+                          dimensions: {
+                            width: opt.input.thumbnailSize,
+                            height: opt.input.thumbnailSize,
+                          },
                           changeFormatTo: "webp",
                         },
                       })
-                    : `${instance.sys.configuration.proxy.secure ? "https://" : "http://"}${instance.sys.configuration.proxy.hostname}/api/asset/fileicon/${path.extname(opt.input.path)}`
+                    : `${instance.sys.configuration.proxy.secure ? "https://" : "http://"}${instance.sys.configuration.proxy.hostname}/api/asset/fileicon/${path
+                        .extname(opt.input.path)
+                        .slice(1)}/${opt.input.thumbnailSize}`
                   : undefined,
               hidden: path.basename(opt.input.path).startsWith("."),
               createdAt: itemStats.ctime?.getMilliseconds(),
@@ -472,7 +507,10 @@ const router = t.router({
         }
       }),
     getGalleryItem: procedure.input(z.object({ path: z.string().or(z.undefined()), height: z.number() })).query(async (opt) => {
-      let dimensions: { width: number; height: number } = { width: 0, height: 0 };
+      let dimensions: { width: number; height: number } = {
+        width: 0,
+        height: 0,
+      };
 
       if (opt.input.path === undefined) {
         return { image: "/assets/generic_background.svg", dimensions };
@@ -490,7 +528,10 @@ const router = t.router({
                   dimensions: ({ width: fileWidth, height: fileHeight }) => {
                     dimensions = { width: fileWidth, height: fileHeight };
 
-                    return { width: Math.floor((fileWidth / fileHeight) * opt.input.height), height: opt.input.height };
+                    return {
+                      width: Math.floor((fileWidth / fileHeight) * opt.input.height),
+                      height: opt.input.height,
+                    };
                   },
                   changeFormatTo: "webp",
                 },
@@ -516,7 +557,10 @@ const router = t.router({
 
       const fileType = !pathStat.isDirectory ? instance.sys.filesystem.getFileType(resolvedPath) : "directory";
 
-      let imageDimensions: { width: number; height: number } = { width: 0, height: 0 };
+      let imageDimensions: { width: number; height: number } = {
+        width: 0,
+        height: 0,
+      };
 
       return {
         status: "ok" as const,
@@ -530,7 +574,10 @@ const router = t.router({
                       dimensions: (original) => {
                         imageDimensions = original;
 
-                        return { width: 1024, height: Math.floor((original.height / original.width) * 1024) };
+                        return {
+                          width: 1024,
+                          height: Math.floor((original.height / original.width) * 1024),
+                        };
                       },
                     },
                   }),

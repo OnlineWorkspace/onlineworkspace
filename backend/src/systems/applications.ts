@@ -136,7 +136,7 @@ export default class ApplicationsSystem extends System {
 
       return true;
     } catch (err) {
-      console.error(err);
+      this.log.error(err);
       return false;
     }
   }
@@ -306,7 +306,7 @@ export default class ApplicationsSystem extends System {
           globalThis.instance = this.instance;
           await import(`file://${path.join(app.path, app.manifest.modules.internal.path)}`);
         } catch (err) {
-          console.error("problem with application's deno internal module ->", err);
+          this.log.error("problem with application's deno internal module ->", err);
         }
       }
 
