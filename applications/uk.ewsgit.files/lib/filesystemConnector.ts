@@ -20,8 +20,8 @@ export default abstract class FilesystemConnector {
   abstract readDirectoryItemCount(path: string): Promise<number>;
   abstract readFile(path: string): Promise<ReadableStream | undefined>;
   abstract writeFile(path: string, content: ReadableStream): Promise<boolean>;
-  abstract getThumbnail(path: string): Promise<Buffer | undefined>;
-  abstract rename(path: string, newPath: string): Promise<boolean>;
+  abstract getThumbnail(path: string, size: number): Promise<string | undefined>;
+  abstract move(path: string, newPath: string): Promise<boolean>;
   abstract makeDirectory(path: string): Promise<boolean>;
   abstract delete(path: string): Promise<boolean>;
   abstract deletePermanently(path: string): Promise<boolean>;

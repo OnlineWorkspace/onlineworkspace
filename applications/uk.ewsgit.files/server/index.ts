@@ -4,6 +4,7 @@ import * as path from "node:path";
 import { FileMediaType } from "@onlineworkspace/workspace-backend/src/systems/filesystem.ts";
 import { type createOnlineWorkspaceTRPCContext, procedure } from "@onlineworkspace/workspace-backend/src/systems/trpc/coreRouter.ts";
 import * as fs from "@std/fs";
+import { exists, move } from "@std/fs";
 import { initTRPC } from "@trpc/server";
 import fastFolderSize from "fast-folder-size/sync.js";
 import z from "zod";
@@ -367,69 +368,234 @@ const router = t.router({
       };
     }),
   },
-  readDirectory: procedure
-    .input(z.object({ path: z.string() }))
-    .output(
-      z.object({ status: z.enum(["missing_permission", "invalid_path"]) }).or(
-        z.object({
-          items: z
-            .object({
-              type: z.enum(FilesystemConnectorEntryType),
-              name: z.string(),
-            })
-            .array(),
-          status: z.literal("ok"),
-        }),
-      ),
-    )
-    .query(async (opt) => {
-      const resolvedPath = path.join(instance.sys.filesystem.FS_ROOT, opt.input.path);
+  filesystemConnector: {
+    readDirectory: procedure
+      .input(z.object({ path: z.string() }))
+      .output(
+        z.object({ status: z.enum(["missing_permission", "invalid_path"]) }).or(
+          z.object({
+            items: z
+              .object({
+                type: z.enum(FilesystemConnectorEntryType),
+                name: z.string(),
+              })
+              .array(),
+            status: z.literal("ok"),
+          }),
+        ),
+      )
+      .query(async (opt) => {
+        const resolvedPath = path.join(instance.sys.filesystem.FS_ROOT, opt.input.path);
+        log.info(`readDirectory requested by user ${opt.ctx.userId} ${resolvedPath}`);
 
-      log.info(`Read Directory requested by user ${opt.ctx.userId} ${resolvedPath}`);
-      const userPermissions = await instance.sys.filesystem.getUserPermissions(opt.ctx.userId, resolvedPath);
+        if (!(await exists(resolvedPath))) return { status: "invalid_path" as const };
 
-      if (!userPermissions.read) {
-        return { status: "missing_permission" as const };
-      }
+        const userPermissions = await instance.sys.filesystem.getUserPermissions(opt.ctx.userId, resolvedPath);
 
-      try {
-        const directories: { type: FilesystemConnectorEntryType; name: string }[] = [];
-        const files: { type: FilesystemConnectorEntryType; name: string }[] = [];
-        const symlinks: { type: FilesystemConnectorEntryType; name: string }[] = [];
-
-        for await (const entry of Deno.readDir(resolvedPath)) {
-          if (entry.isDirectory) {
-            directories.push({
-              type: FilesystemConnectorEntryType.Directory,
-              name: entry.name,
-            });
-          }
-          if (entry.isFile) {
-            files.push({
-              type: FilesystemConnectorEntryType.File,
-              name: entry.name,
-            });
-          }
-          if (entry.isSymlink) {
-            files.push({
-              type: FilesystemConnectorEntryType.Symlink,
-              name: entry.name,
-            });
-          }
+        if (!userPermissions.read) {
+          return { status: "missing_permission" as const };
         }
 
-        directories.sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: "base" }));
-        files.sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: "base" }));
-        symlinks.sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: "base" }));
+        try {
+          const directories: { type: FilesystemConnectorEntryType; name: string }[] = [];
+          const files: { type: FilesystemConnectorEntryType; name: string }[] = [];
+          const symlinks: { type: FilesystemConnectorEntryType; name: string }[] = [];
+
+          for await (const entry of Deno.readDir(resolvedPath)) {
+            if (entry.isDirectory) {
+              directories.push({
+                type: FilesystemConnectorEntryType.Directory,
+                name: entry.name,
+              });
+            }
+            if (entry.isFile) {
+              files.push({
+                type: FilesystemConnectorEntryType.File,
+                name: entry.name,
+              });
+            }
+            if (entry.isSymlink) {
+              files.push({
+                type: FilesystemConnectorEntryType.Symlink,
+                name: entry.name,
+              });
+            }
+          }
+
+          directories.sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: "base" }));
+          files.sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: "base" }));
+          symlinks.sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: "base" }));
+
+          return {
+            items: [...directories, ...files, ...symlinks],
+            status: "ok",
+          };
+        } catch (_) {
+          return { status: "invalid_path" as const };
+        }
+      }),
+    readDirectoryItemCount: procedure
+      .input(z.object({ path: z.string() }))
+      .output(
+        z.object({ status: z.enum(["missing_permission", "invalid_path"]) }).or(
+          z.object({
+            count: z.number(),
+            status: z.literal("ok"),
+          }),
+        ),
+      )
+      .query(async (opt) => {
+        const resolvedPath = path.join(instance.sys.filesystem.FS_ROOT, opt.input.path);
+        log.info(`readDirectoryItemCount requested by user ${opt.ctx.userId} ${resolvedPath}`);
+
+        if (!(await exists(resolvedPath))) return { status: "invalid_path" as const };
+
+        const userPermissions = await instance.sys.filesystem.getUserPermissions(opt.ctx.userId, resolvedPath);
+
+        if (!userPermissions.read) {
+          return { status: "missing_permission" as const };
+        }
+
+        let count = 0;
+        for await (const _ of Deno.readDir(resolvedPath)) {
+          count++;
+        }
+
+        return { status: "ok" as const, count };
+      }),
+    getThumbnail: procedure
+      .input(z.object({ path: z.string(), size: z.number() }))
+      .output(
+        z.object({ status: z.enum(["missing_permission", "invalid_path"]) }).or(
+          z.object({
+            thumbnail: z.string(),
+            status: z.literal("ok"),
+          }),
+        ),
+      )
+      .query(async (opt) => {
+        const resolvedPath = path.join(instance.sys.filesystem.FS_ROOT, opt.input.path);
+        log.info(`getThumbnail requested by user ${opt.ctx.userId} ${resolvedPath}`);
+
+        if (!(await exists(resolvedPath))) return { status: "invalid_path" as const };
+
+        const userPermissions = await instance.sys.filesystem.getUserPermissions(opt.ctx.userId, resolvedPath);
+
+        if (!userPermissions.read) {
+          return { status: "missing_permission" as const };
+        }
 
         return {
-          items: [...directories, ...files, ...symlinks],
           status: "ok",
+          thumbnail: (await instance.sys.image.getThumbnailBuffer(resolvedPath, opt.input.size)).toBase64(),
         };
-      } catch (_) {
-        return { status: "invalid_path" as const };
-      }
-    }),
+      }),
+    move: procedure
+      .input(z.object({ path: z.string(), newPath: z.string() }))
+      .output(z.object({ status: z.enum(["error", "missing_permission", "invalid_path", "invalid_new_path", "ok"]) }))
+      .mutation(async (opt) => {
+        const resolvedPath = path.join(instance.sys.filesystem.FS_ROOT, opt.input.path);
+        const newResolvedPath = path.join(instance.sys.filesystem.FS_ROOT, opt.input.newPath);
+        log.info(`move requested by user ${opt.ctx.userId} ${resolvedPath} -> ${newResolvedPath}`);
+
+        if (!(await exists(resolvedPath))) return { status: "invalid_path" as const };
+        if (!(await exists(path.join(newResolvedPath, "..")))) return { status: "invalid_new_path" as const };
+
+        const pathUserPermissions = await instance.sys.filesystem.getUserPermissions(opt.ctx.userId, resolvedPath);
+
+        if (!pathUserPermissions.write) {
+          return { status: "missing_permission" as const };
+        }
+
+        const newPathUserPermissions = await instance.sys.filesystem.getUserPermissions(opt.ctx.userId, newResolvedPath);
+
+        if (!newPathUserPermissions.write) {
+          return { status: "missing_permission" as const };
+        }
+
+        try {
+          await move(resolvedPath, newResolvedPath);
+
+          return { status: "ok" as const };
+        } catch (err) {
+          log.error(err);
+          return { status: "error" as const };
+        }
+      }),
+    makeDirectory: procedure
+      .input(z.object({ path: z.string() }))
+      .output(z.object({ status: z.enum(["error", "missing_permission", "invalid_path", "already_exists", "ok"]) }))
+      .mutation(async (opt) => {
+        const resolvedPath = path.join(instance.sys.filesystem.FS_ROOT, opt.input.path);
+        log.info(`makeDirectory requested by user ${opt.ctx.userId} ${resolvedPath}`);
+
+        const pathUserPermissions = await instance.sys.filesystem.getUserPermissions(opt.ctx.userId, resolvedPath);
+
+        if (!pathUserPermissions.write) {
+          return { status: "missing_permission" as const };
+        }
+
+        if (await exists(resolvedPath)) return { status: "already_exists" as const };
+
+        try {
+          await Deno.mkdir(resolvedPath, { recursive: true });
+
+          return { status: "ok" as const };
+        } catch (err) {
+          log.error(err);
+          return { status: "error" as const };
+        }
+      }),
+    // TODO: move to bin instead of deleting
+    delete: procedure
+      .input(z.object({ path: z.string() }))
+      .output(z.object({ status: z.enum(["error", "missing_permission", "invalid_path", "ok"]) }))
+      .mutation(async (opt) => {
+        const resolvedPath = path.join(instance.sys.filesystem.FS_ROOT, opt.input.path);
+        log.info(`delete requested by user ${opt.ctx.userId} ${resolvedPath}`);
+
+        const pathUserPermissions = await instance.sys.filesystem.getUserPermissions(opt.ctx.userId, resolvedPath);
+
+        if (!pathUserPermissions.write) {
+          return { status: "missing_permission" as const };
+        }
+
+        if (!(await exists(resolvedPath))) return { status: "invalid_path" as const };
+
+        try {
+          await Deno.remove(resolvedPath, { recursive: true });
+
+          return { status: "ok" as const };
+        } catch (err) {
+          log.error(err);
+          return { status: "error" as const };
+        }
+      }),
+    deletePermanently: procedure
+      .input(z.object({ path: z.string() }))
+      .output(z.object({ status: z.enum(["error", "missing_permission", "invalid_path", "ok"]) }))
+      .mutation(async (opt) => {
+        const resolvedPath = path.join(instance.sys.filesystem.FS_ROOT, opt.input.path);
+        log.info(`deletePermanently requested by user ${opt.ctx.userId} ${resolvedPath}`);
+
+        const pathUserPermissions = await instance.sys.filesystem.getUserPermissions(opt.ctx.userId, resolvedPath);
+
+        if (!pathUserPermissions.write) {
+          return { status: "missing_permission" as const };
+        }
+
+        if (!(await exists(resolvedPath))) return { status: "invalid_path" as const };
+
+        try {
+          await Deno.remove(resolvedPath, { recursive: true });
+
+          return { status: "ok" as const };
+        } catch (err) {
+          log.error(err);
+          return { status: "error" as const };
+        }
+      }),
+  },
   view: {
     getEntry: procedure
       .input(z.object({ path: z.string(), thumbnailSize: z.number().optional() }))
