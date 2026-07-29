@@ -1,24 +1,32 @@
 {
-    "cSpell.words": [
-        "booped",
-        "caddyfile",
-        "Electrobun",
-        "ewsgit",
-        "ghostty",
-        "Landmarker",
-        "onlineworkspace",
-        "onnotice",
-        "Renderable",
-        "solidjs",
-        "TOTP",
-        "unmaximize"
-    ],
-    "js/ts.tsdk.path": "node_modules/typescript/lib",
-    "[typescript]": {
-        "editor.defaultFormatter": "biomejs.biome"
-    },
-    "[typescriptreact]": {
-        "editor.defaultFormatter": "denoland.vscode-deno"
-    },
-    "deno.enable": true
+  "cSpell.words": [
+    "booped",
+    "caddyfile",
+    "Electrobun",
+    "ewsgit",
+    "ghostty",
+    "Landmarker",
+    "onlineworkspace",
+    "onnotice",
+    "Renderable",
+    "solidjs",
+    "TOTP",
+    "unmaximize"
+  ],
+  "js/ts.tsdk.path": "node_modules/typescript/lib",
+  "[typescript]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "denoland.vscode-deno"
+  },
+  "deno.enable": true,
+  "deno.enablePaths": [
+    "backend/src",
+    "applications/**/server",
+    "applications/**/backend",
+    "applications/**/desktop",
+    "applications/**/lib",
+  ],
+  "deno.documentPreloadLimit": 400
 }
