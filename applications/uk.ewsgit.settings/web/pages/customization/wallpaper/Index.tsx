@@ -1,8 +1,3 @@
-import CHECK_ICON from "@material-symbols/svg-700/outlined/check.svg";
-import CHEVRON_LEFT_ICON from "@material-symbols/svg-700/outlined/chevron_left.svg";
-import DELETE_ICON from "@material-symbols/svg-700/outlined/delete.svg";
-import FOLDER_ICON from "@material-symbols/svg-700/outlined/folder.svg";
-import UPLOAD_ICON from "@material-symbols/svg-700/outlined/upload.svg";
 import UKButton from "@ewsgit/uikit-solid/src/components/button/UKButton.tsx";
 import UKButtonGroup from "@ewsgit/uikit-solid/src/components/buttonGroup/UKButtonGroup.tsx";
 import UKCircularProgressIndicator from "@ewsgit/uikit-solid/src/components/circularProgressIndicator/UKCircularProgressIndicator.tsx";
@@ -14,6 +9,11 @@ import UKStackItem from "@ewsgit/uikit-solid/src/components/stack/UKStackItem.ts
 import UKStackLabel from "@ewsgit/uikit-solid/src/components/stack/UKStackLabel.tsx";
 import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.tsx";
 import UKTopAppBar from "@ewsgit/uikit-solid/src/components/topAppBar/UKTopAppBar.tsx";
+import CHECK_ICON from "@material-symbols/svg-700/outlined/check.svg";
+import CHEVRON_LEFT_ICON from "@material-symbols/svg-700/outlined/chevron_left.svg";
+import DELETE_ICON from "@material-symbols/svg-700/outlined/delete.svg";
+import FOLDER_ICON from "@material-symbols/svg-700/outlined/folder.svg";
+import UPLOAD_ICON from "@material-symbols/svg-700/outlined/upload.svg";
 import { createFileUploader } from "@solid-primitives/upload";
 import { useNavigate } from "@solidjs/router";
 import type { Component } from "solid-js";

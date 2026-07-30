@@ -24,14 +24,6 @@ const WelcomePage: Component = () => {
           onClick={() => {
             navigate("/app/uk.ewsgit.files/dir");
           }}
-          color={"tonal"}
-        >
-          Skip
-        </UKButton>
-        <UKButton
-          onClick={() => {
-            navigate("/app/uk.ewsgit.files/dir");
-          }}
         >
           Continue
         </UKButton>

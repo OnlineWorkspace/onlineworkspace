@@ -21,12 +21,9 @@
     "editor.defaultFormatter": "denoland.vscode-deno"
   },
   "deno.enable": true,
-  "deno.enablePaths": [
-    "backend/src",
-    "applications/**/server",
-    "applications/**/backend",
-    "applications/**/desktop",
-    "applications/**/lib",
+  "deno.disablePaths": [
+    "node_modules/",
+    "**/node_modules/",
   ],
   "deno.documentPreloadLimit": 400
 }

@@ -1,5 +1,5 @@
 import { createTRPCClient, httpBatchLink, httpLink, httpSubscriptionLink, isNonJsonSerializable, splitLink } from "@trpc/client";
-import type { TRPCRouter } from "../../server/index";
+import type { TRPCRouter } from "../../../server/index";
 
 const ENDPOINT_URL = `${window.location.origin}/api/app/uk.ewsgit.files`;
 

@@ -34,8 +34,8 @@ export default class ServerFilesystemConnector extends FilesystemConnector {
     throw new Error("Method not implemented.");
   }
 
-  async getThumbnail(path: string): Promise<string | undefined> {
-    const resp = await trpc.filesystemConnector.getThumbnail.query({ path, size: 32 });
+  async getThumbnail(path: string, size: number): Promise<string | undefined> {
+    const resp = await trpc.filesystemConnector.getThumbnail.query({ path, size: size });
 
     if (resp.status === "ok") return URL.createObjectURL(new Blob([Buffer.from(resp.thumbnail, "base64")], { type: "image/webp" }));
 

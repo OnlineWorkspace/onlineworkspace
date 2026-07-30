@@ -1,4 +1,4 @@
-import { type Accessor, createContext, type Setter } from "solid-js";
+import { type Accessor, createContext } from "solid-js";
 import type { SetStoreFunction, Store } from "solid-js/store";
 import type { GlobalState, Preferences } from "./Core";
 import type { ViewState } from "./pages/dir/View";
