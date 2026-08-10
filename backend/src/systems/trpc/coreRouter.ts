@@ -1,47 +1,39 @@
+import * as nodeCrypto from "node:crypto";
 import { deleteCookie, getCookies, setCookie } from "@std/http/cookie";
 import { initTRPC, TRPCError } from "@trpc/server";
 import type { FetchCreateContextFnOptions } from "@trpc/server/adapters/fetch";
 import * as hiBase32 from "hi-base32";
-import * as nodeCrypto from "node:crypto";
 import * as OTPAuth from "otpauth";
 import z from "zod";
 import type { Instance } from "../../index.ts";
-import {
-  AuthorizedDeviceType,
-  SessionCreationError,
-} from "../authorization.ts";
+import { AuthorizedDeviceType, SessionCreationError } from "../authorization.ts";
 import { WorkspacesFeatureFlags } from "../configuration.ts";
 import type { WorkspacesUser } from "../users.ts";
 
-export const createOnlineWorkspaceTRPCContext =
-  (instance: Instance) =>
-  (opt: FetchCreateContextFnOptions, server: Deno.HttpServer<Deno.NetAddr>) => {
-    return {
-      rawRequest: {
-        req: opt.req,
-        resHeaders: opt.resHeaders,
-        server: server,
-      },
-      instance: instance,
-    };
-  };
-
-export const t = initTRPC.context<
-  ReturnType<typeof createOnlineWorkspaceTRPCContext>
->()
-  .create({
-    sse: {
-      ping: {
-        // Enable periodic ping messages to keep connection alive
-        enabled: true,
-        // Send ping message every 2s
-        intervalMs: 4000,
-      },
-      client: {
-        reconnectAfterInactivityMs: 5000,
-      },
+export const createOnlineWorkspaceTRPCContext = (instance: Instance) => (opt: FetchCreateContextFnOptions, server: Deno.HttpServer<Deno.NetAddr>) => {
+  return {
+    rawRequest: {
+      req: opt.req,
+      resHeaders: opt.resHeaders,
+      server: server,
     },
-  });
+    instance: instance,
+  };
+};
+
+export const t = initTRPC.context<ReturnType<typeof createOnlineWorkspaceTRPCContext>>().create({
+  sse: {
+    ping: {
+      // Enable periodic ping messages to keep connection alive
+      enabled: true,
+      // Send ping message every 2s
+      intervalMs: 4000,
+    },
+    client: {
+      reconnectAfterInactivityMs: 5000,
+    },
+  },
+});
 
 export const publicProcedure = t.procedure.use(async (opt) => {
   return opt.next({
@@ -60,9 +52,7 @@ export const procedure = t.procedure.use(async (opt) => {
     });
   }
 
-  const userId = await opt.ctx.instance.sys.authorization.verifySession(
-    decodeURIComponent(cookies.Authorization!),
-  );
+  const userId = await opt.ctx.instance.sys.authorization.verifySession(decodeURIComponent(cookies.Authorization!));
 
   if (userId === undefined) {
     throw new TRPCError({ code: "UNAUTHORIZED", message: "invalid session" });
@@ -101,12 +91,8 @@ export const coreOnlineWorkspaceRouter = t.router({
   userSelect: {
     getOptions: publicProcedure.query(async (opt) => {
       return {
-        showSignup: opt.ctx.instance.sys.configuration.hasFeature(
-          WorkspacesFeatureFlags.AllowUserSignups,
-        ),
-        showProfiles: opt.ctx.instance.sys.configuration.hasFeature(
-          WorkspacesFeatureFlags.DisplayProfilesAtLogon,
-        ),
+        showSignup: opt.ctx.instance.sys.configuration.hasFeature(WorkspacesFeatureFlags.AllowUserSignups),
+        showProfiles: opt.ctx.instance.sys.configuration.hasFeature(WorkspacesFeatureFlags.DisplayProfilesAtLogon),
         tagline: opt.ctx.instance.sys.configuration.branding.tagline,
       };
     }),
@@ -129,15 +115,15 @@ export const coreOnlineWorkspaceRouter = t.router({
       .query(async (opt) => {
         return opt.ctx.instance.sys.configuration.signupRequirements;
       }),
-    signInRequirements: publicProcedure.input(z.string()).query(async opt => {
+    signInRequirements: publicProcedure.input(z.string()).query(async (opt) => {
       const username = opt.input;
 
-      const userId = (await opt.ctx.instance.sys.users.getUserByUsername(username))?.userId
+      const userId = (await opt.ctx.instance.sys.users.getUserByUsername(username))?.userId;
 
       if (userId === undefined) return [];
 
-      return await opt.ctx.instance.sys.authentication.getSessionRequirements(userId)
-    })
+      return await opt.ctx.instance.sys.authentication.getSessionRequirements(userId);
+    }),
   },
   authorization: {
     checkEmailAddressOwnership: publicProcedure
@@ -150,37 +136,23 @@ export const coreOnlineWorkspaceRouter = t.router({
 
         let emailCode = "";
         const CODE_LENGTH = 8;
-        const CODE_VALID_CHARS =
-          "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        const CODE_VALID_CHARS = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
         for (let i = CODE_LENGTH; i > 0; --i) {
-          emailCode += CODE_VALID_CHARS[
-            Math.floor(Math.random() * CODE_VALID_CHARS.length)
-          ];
+          emailCode += CODE_VALID_CHARS[Math.floor(Math.random() * CODE_VALID_CHARS.length)];
         }
 
         emailSignupVerificationCodes.set(opt.input.emailAddress, emailCode);
-        const emailBody =
-          `Email code for email '${opt.input.emailAddress}' is '${emailCode}'`;
-        await opt.ctx.instance.sys.email.sendEmail(
-          opt.input.emailAddress,
-          "Email verification code",
-          { type: "string", content: emailBody },
-        );
-        opt.ctx.instance.log.system.debug(
-          emailBody,
-        );
+        const emailBody = `Email code for email '${opt.input.emailAddress}' is '${emailCode}'`;
+        await opt.ctx.instance.sys.email.sendEmail(opt.input.emailAddress, "Email verification code", { type: "string", content: emailBody });
+        opt.ctx.instance.log.system.debug(emailBody);
 
         return true;
       }),
-    validateEmailCode: publicProcedure.input(
-      z.object({ emailAddress: z.string(), emailCode: z.string() }),
-    ).query(async (opt) => {
-      return emailSignupVerificationCodes.get(opt.input.emailAddress) ===
-        opt.input.emailCode;
+    validateEmailCode: publicProcedure.input(z.object({ emailAddress: z.string(), emailCode: z.string() })).query(async (opt) => {
+      return emailSignupVerificationCodes.get(opt.input.emailAddress) === opt.input.emailCode;
     }),
     isUsernameValid: publicProcedure.input(z.string()).query(async (opt) => {
-      return (await opt.ctx.instance.sys.users.getUserByUsername(opt.input)) ===
-        undefined;
+      return (await opt.ctx.instance.sys.users.getUserByUsername(opt.input)) === undefined;
     }),
     signup: publicProcedure
       .input(
@@ -214,11 +186,7 @@ export const coreOnlineWorkspaceRouter = t.router({
         ]),
       )
       .mutation(async (opt) => {
-        if (
-          !opt.ctx.instance.sys.configuration.hasFeature(
-            WorkspacesFeatureFlags.AllowUserSignups,
-          )
-        ) {
+        if (!opt.ctx.instance.sys.configuration.hasFeature(WorkspacesFeatureFlags.AllowUserSignups)) {
           return {
             type: "error" as const,
             message: "This instance has disabled user signups",
@@ -235,10 +203,7 @@ export const coreOnlineWorkspaceRouter = t.router({
             };
           }
 
-          if (
-            opt.input.emailCode !==
-              emailSignupVerificationCodes.get(opt.input.emailAddress)
-          ) {
+          if (opt.input.emailCode !== emailSignupVerificationCodes.get(opt.input.emailAddress)) {
             return {
               type: "error" as const,
               message: "The email code did not match!",
@@ -246,10 +211,7 @@ export const coreOnlineWorkspaceRouter = t.router({
           }
         }
 
-        const uid = await opt.ctx.instance.sys.users.createUser(
-          username,
-          opt.input.password,
-        );
+        const uid = await opt.ctx.instance.sys.users.createUser(username, opt.input.password);
 
         if (uid === undefined) {
           return {
@@ -268,10 +230,7 @@ export const coreOnlineWorkspaceRouter = t.router({
         }
 
         const splitDisplayName = opt.input.displayName.split(" ");
-        await user.setFullName(
-          splitDisplayName[0],
-          splitDisplayName.slice(1).join(" "),
-        );
+        await user.setFullName(splitDisplayName[0], splitDisplayName.slice(1).join(" "));
 
         if ("emailAddress" in opt.input) {
           await user.setEmail(opt.input.emailAddress);
@@ -279,24 +238,17 @@ export const coreOnlineWorkspaceRouter = t.router({
 
         await user.setBio(opt.input.bio);
 
-        if (
-          opt.input.gender === "male" || opt.input.gender === "female" ||
-          opt.input.gender === "other"
-        ) await user.setGender(opt.input.gender);
+        if (opt.input.gender === "male" || opt.input.gender === "female" || opt.input.gender === "other") await user.setGender(opt.input.gender);
 
-        await user.setQuota(
-          opt.ctx.instance.sys.configuration.userDefault.quotaSize,
+        await user.setQuota(opt.ctx.instance.sys.configuration.userDefault.quotaSize);
+
+        const session = await opt.ctx.instance.sys.authorization.createPasswordSession(
+          user.userId,
+          opt.input.password,
+          AuthorizedDeviceType.UnknownBrowser,
+          undefined,
+          opt.ctx.rawRequest.req.headers.get("X-Real-IP")?.split(":")?.[0] || "missing-caddy-ip",
         );
-
-        const session = await opt.ctx.instance.sys.authorization
-          .createPasswordSession(
-            user.userId,
-            opt.input.password,
-            AuthorizedDeviceType.UnknownBrowser,
-            undefined,
-            opt.ctx.rawRequest.req.headers.get("X-Real-IP")?.split(":")?.[0] ||
-              "missing-caddy-ip",
-          );
 
         if (session === undefined || session in SessionCreationError) {
           return {
@@ -320,43 +272,36 @@ export const coreOnlineWorkspaceRouter = t.router({
           sessionToken: session as string,
         };
       }),
-    confirmTwoFactor: procedure.input(z.object({ twoFactorCode: z.string() }))
-      .mutation(async (opt) => {
-        const user = await opt.ctx.user();
-        const secretString = temporaryTwoFactorSecrets.get(user.userId);
+    confirmTwoFactor: procedure.input(z.object({ twoFactorCode: z.string() })).mutation(async (opt) => {
+      const user = await opt.ctx.user();
+      const secretString = temporaryTwoFactorSecrets.get(user.userId);
 
-        if (secretString === undefined) {
-          opt.ctx.instance.log.system.warning(
-            `(${user.userId})${await user
-              .getUsername()} Tried to confirm a two factor code, but they lacked a temporary secret?`,
-          );
-
-          return false;
-        }
-
-        const totp = new OTPAuth.TOTP({
-          issuer: opt.ctx.instance.sys.configuration.proxy.hostname,
-          label:
-            `${opt.ctx.instance.sys.configuration.branding.displayName} (Workspace)`,
-          algorithm: "SHA1",
-          digits: 6,
-          secret: secretString,
-        });
-
-        if (totp.validate({ token: opt.input.twoFactorCode }) !== null) {
-          temporaryTwoFactorSecrets.delete(user.userId);
-          await opt.ctx.instance.sys.authorization
-            .setTwoFactorAuthenticationSecret(user.userId, secretString);
-          opt.ctx.instance.log.system.success(
-            `(${user.userId})${await user
-              .getUsername()} Setup two-factor authentication on their account!`,
-          );
-
-          return true;
-        }
+      if (secretString === undefined) {
+        opt.ctx.instance.log.system.warning(
+          `(${user.userId})${await user.getUsername()} Tried to confirm a two factor code, but they lacked a temporary secret?`,
+        );
 
         return false;
-      }),
+      }
+
+      const totp = new OTPAuth.TOTP({
+        issuer: opt.ctx.instance.sys.configuration.proxy.hostname,
+        label: `${opt.ctx.instance.sys.configuration.branding.displayName} (Workspace)`,
+        algorithm: "SHA1",
+        digits: 6,
+        secret: secretString,
+      });
+
+      if (totp.validate({ token: opt.input.twoFactorCode }) !== null) {
+        temporaryTwoFactorSecrets.delete(user.userId);
+        await opt.ctx.instance.sys.authorization.setTwoFactorAuthenticationSecret(user.userId, secretString);
+        opt.ctx.instance.log.system.success(`(${user.userId})${await user.getUsername()} Setup two-factor authentication on their account!`);
+
+        return true;
+      }
+
+      return false;
+    }),
     enableTwoFactor: procedure
       .output(
         z
@@ -369,22 +314,15 @@ export const coreOnlineWorkspaceRouter = t.router({
       .mutation(async (opt) => {
         const generateSecretString = () => {
           const buffer = nodeCrypto.randomBytes(15);
-          const base32 = hiBase32.encode(buffer).replace(/=/g, "").substring(
-            0,
-            24,
-          );
+          const base32 = hiBase32.encode(buffer).replace(/=/g, "").substring(0, 24);
           return base32;
         };
 
         const user = await opt.ctx.user();
 
-        if (
-          await opt.ctx.instance.sys.authorization
-            .hasTwoFactorAuthenticationSecret(user.userId)
-        ) {
+        if (await opt.ctx.instance.sys.authorization.hasTwoFactorAuthenticationSecret(user.userId)) {
           opt.ctx.instance.log.system.warning(
-            `User (${user.userId})${await user
-              .getUsername()} has attempted to re-setup their two factor from the signup method... this is suspicious...`,
+            `User (${user.userId})${await user.getUsername()} has attempted to re-setup their two factor from the signup method... this is suspicious...`,
           );
 
           return undefined;
@@ -399,8 +337,7 @@ export const coreOnlineWorkspaceRouter = t.router({
 
         const totp = new OTPAuth.TOTP({
           issuer: opt.ctx.instance.sys.configuration.proxy.hostname,
-          label:
-            `${opt.ctx.instance.sys.configuration.branding.displayName} (Workspace)`,
+          label: `${opt.ctx.instance.sys.configuration.branding.displayName} (Workspace)`,
           algorithm: "SHA1",
           digits: 6,
           secret: secretString,
@@ -433,9 +370,7 @@ export const coreOnlineWorkspaceRouter = t.router({
       )
       .mutation(async (opt) => {
         const username = opt.input.username.toLowerCase();
-        const user = await opt.ctx.instance.sys.users.getUserByUsername(
-          username,
-        );
+        const user = await opt.ctx.instance.sys.users.getUserByUsername(username);
 
         if (user === undefined) {
           return {
@@ -444,10 +379,7 @@ export const coreOnlineWorkspaceRouter = t.router({
           };
         }
 
-        if (
-          await opt.ctx.instance.sys.authorization
-            .hasTwoFactorAuthenticationSecret(user.userId)
-        ) {
+        if (await opt.ctx.instance.sys.authorization.hasTwoFactorAuthenticationSecret(user.userId)) {
           if (opt.input.twoFactorCode === undefined) {
             return {
               type: "requirementsNotMet" as const,
@@ -456,15 +388,13 @@ export const coreOnlineWorkspaceRouter = t.router({
           }
         }
 
-        const session = await opt.ctx.instance.sys.authorization
-          .createPasswordSession(
-            user.userId,
-            opt.input.password,
-            AuthorizedDeviceType.UnknownBrowser,
-            opt.input.twoFactorCode,
-            opt.ctx.rawRequest.req.headers.get("X-Real-IP")?.split(":")?.[0] ||
-              "missing-caddy-ip",
-          );
+        const session = await opt.ctx.instance.sys.authorization.createPasswordSession(
+          user.userId,
+          opt.input.password,
+          AuthorizedDeviceType.UnknownBrowser,
+          opt.input.twoFactorCode,
+          opt.ctx.rawRequest.req.headers.get("X-Real-IP")?.split(":")?.[0] || "missing-caddy-ip",
+        );
 
         if (session in SessionCreationError) {
           return {
@@ -495,17 +425,13 @@ export const coreOnlineWorkspaceRouter = t.router({
         }),
       )
       .query(async (opt) => {
-        const user = await opt.ctx.instance.sys.users.getUserByUsername(
-          opt.input.username.toLowerCase(),
-        );
+        const user = await opt.ctx.instance.sys.users.getUserByUsername(opt.input.username.toLowerCase());
 
         if (user === undefined) {
           return false;
         }
 
-        return (await opt.ctx.instance.sys.authorization.requestPasskeySession(
-          user.userId,
-        ));
+        return await opt.ctx.instance.sys.authorization.requestPasskeySession(user.userId);
       }),
     passkeyCompleteSignIn: publicProcedure
       .input(
@@ -515,9 +441,7 @@ export const coreOnlineWorkspaceRouter = t.router({
         }),
       )
       .mutation(async (opt) => {
-        const user = await opt.ctx.instance.sys.users.getUserByUsername(
-          opt.input.username.toLowerCase(),
-        );
+        const user = await opt.ctx.instance.sys.users.getUserByUsername(opt.input.username.toLowerCase());
 
         if (user === undefined) {
           throw new TRPCError({
@@ -526,14 +450,12 @@ export const coreOnlineWorkspaceRouter = t.router({
           });
         }
 
-        const session = await opt.ctx.instance.sys.authorization
-          .createPasskeySession(
-            user.userId,
-            AuthorizedDeviceType.UnknownBrowser,
-            opt.input.passkeyResponse,
-            opt.ctx.rawRequest.req.headers.get("X-Real-IP")?.split(":")?.[0] ||
-              "missing-caddy-ip",
-          );
+        const session = await opt.ctx.instance.sys.authorization.createPasskeySession(
+          user.userId,
+          AuthorizedDeviceType.UnknownBrowser,
+          opt.input.passkeyResponse,
+          opt.ctx.rawRequest.req.headers.get("X-Real-IP")?.split(":")?.[0] || "missing-caddy-ip",
+        );
 
         if (session === undefined) {
           return {
@@ -557,9 +479,7 @@ export const coreOnlineWorkspaceRouter = t.router({
           sessionToken: session,
         };
       }),
-    isAuthenticated: publicProcedure.output(
-      z.object({ authenticated: z.boolean() }),
-    ).query(async (opt) => {
+    isAuthenticated: publicProcedure.output(z.object({ authenticated: z.boolean() })).query(async (opt) => {
       const cookies = getCookies(opt.ctx.rawRequest.req.headers);
 
       if (!cookies.Authorization) {
@@ -568,9 +488,7 @@ export const coreOnlineWorkspaceRouter = t.router({
         };
       }
 
-      const userId = await opt.ctx.instance.sys.authorization.verifySession(
-        decodeURIComponent(cookies.Authorization!),
-      );
+      const userId = await opt.ctx.instance.sys.authorization.verifySession(decodeURIComponent(cookies.Authorization!));
 
       if (userId === undefined) {
         return {
@@ -582,32 +500,26 @@ export const coreOnlineWorkspaceRouter = t.router({
         authenticated: true,
       };
     }),
-    logout: procedure.output(z.object({ success: z.boolean() })).mutation(
-      async (opt) => {
-        const cookies = getCookies(opt.ctx.rawRequest.req.headers);
+    logout: procedure.output(z.object({ success: z.boolean() })).mutation(async (opt) => {
+      const cookies = getCookies(opt.ctx.rawRequest.req.headers);
 
-        if (!cookies.Authorization) {
-          return {
-            success: false,
-          };
-        }
-
-        deleteCookie(opt.ctx.rawRequest.resHeaders, "Authorization");
-
-        await opt.ctx.instance.sys.authorization.endSessionByToken(
-          decodeURIComponent(cookies.Authorization),
-        );
-
+      if (!cookies.Authorization) {
         return {
-          success: true,
+          success: false,
         };
-      },
-    ),
+      }
+
+      deleteCookie(opt.ctx.rawRequest.resHeaders, "Authorization");
+
+      await opt.ctx.instance.sys.authorization.endSessionByToken(decodeURIComponent(cookies.Authorization));
+
+      return {
+        success: true,
+      };
+    }),
   },
   termsOfUse: publicProcedure.query(async (opt) => {
-    const date = new Date(
-      opt.ctx.instance.sys.configuration.termsOfUse.lastUpdated,
-    );
+    const date = new Date(opt.ctx.instance.sys.configuration.termsOfUse.lastUpdated);
 
     const localeDateString: string = date.toLocaleDateString("en-GB", {
       day: "numeric",
@@ -630,9 +542,7 @@ export const coreOnlineWorkspaceRouter = t.router({
     };
 
     const day: number = date.getDate();
-    const formattedDate: string = `${day}${getOrdinalSuffix(day)} ${
-      localeDateString.split(" ")[1]
-    }, ${localeDateString.split(" ")[2]}`;
+    const formattedDate: string = `${day}${getOrdinalSuffix(day)} ${localeDateString.split(" ")[1]}, ${localeDateString.split(" ")[2]}`;
 
     return `Terms of Use: ${opt.ctx.instance.sys.configuration.branding.displayName}
 Effective Date: ${formattedDate}
@@ -653,9 +563,7 @@ ${opt.ctx.instance.sys.configuration.termsOfUse.message}`;
           .query(async (opt) => {
             const db = opt.ctx.instance.sys.database.postgres();
 
-            const user =
-              (await db`SELECT username, forename, surname FROM users WHERE id = ${opt.ctx.userId};`)
-                ?.[0];
+            const user = (await db`SELECT username, forename, surname FROM users WHERE id = ${opt.ctx.userId};`)?.[0];
 
             if (!user) {
               throw new TRPCError({
@@ -689,8 +597,7 @@ ${opt.ctx.instance.sys.configuration.termsOfUse.message}`;
           ),
         )
         .query(async (opt) => {
-          const applications = opt.ctx.instance.sys.applications
-            .getEnabledApplications();
+          const applications = opt.ctx.instance.sys.applications.getEnabledApplications();
 
           return applications.map((app) => {
             let icon = {
@@ -703,18 +610,14 @@ ${opt.ctx.instance.sys.configuration.termsOfUse.message}`;
                 icon = {
                   type: "image",
                   value: `${
-                    opt.ctx.instance.sys.configuration.proxy.secure
-                      ? "https://"
-                      : "http://"
+                    opt.ctx.instance.sys.configuration.proxy.secure ? "https://" : "http://"
                   }${opt.ctx.instance.sys.configuration.proxy.hostname}/api/application-icon/${app.manifest.id}`,
                 };
               } else {
                 icon = {
                   type: "icon",
                   value: `${
-                    opt.ctx.instance.sys.configuration.proxy.secure
-                      ? "https://"
-                      : "http://"
+                    opt.ctx.instance.sys.configuration.proxy.secure ? "https://" : "http://"
                   }${opt.ctx.instance.sys.configuration.proxy.hostname}/api/application-icon/${app.manifest.id}`,
                 };
               }
@@ -732,16 +635,13 @@ ${opt.ctx.instance.sys.configuration.termsOfUse.message}`;
           });
         }),
       getQuickShortcuts: procedure.query(async (opt) => {
-        const a = opt.ctx.instance.sys.settings.applicationSettings["core"]
-          .find((s) => s.id === "quick_shortcuts");
+        const a = opt.ctx.instance.sys.settings.applicationSettings["core"].find((s) => s.id === "quick_shortcuts");
 
         if (!a) throw "The core:quick_shortcuts setting is somehow missing???";
 
-        const quickShortcuts =
-          (await a.onValueChange(opt.ctx.userId)) as string[];
+        const quickShortcuts = (await a.onValueChange(opt.ctx.userId)) as string[];
 
-        const applications = opt.ctx.instance.sys.applications
-          .getEnabledApplications();
+        const applications = opt.ctx.instance.sys.applications.getEnabledApplications();
 
         return quickShortcuts
           .map((shortcut) => {
@@ -760,18 +660,14 @@ ${opt.ctx.instance.sys.configuration.termsOfUse.message}`;
                 icon = {
                   type: "image",
                   value: `${
-                    opt.ctx.instance.sys.configuration.proxy.secure
-                      ? "https://"
-                      : "http://"
+                    opt.ctx.instance.sys.configuration.proxy.secure ? "https://" : "http://"
                   }${opt.ctx.instance.sys.configuration.proxy.hostname}/api/application-icon/${app.manifest.id}`,
                 };
               } else {
                 icon = {
                   type: "icon",
                   value: `${
-                    opt.ctx.instance.sys.configuration.proxy.secure
-                      ? "https://"
-                      : "http://"
+                    opt.ctx.instance.sys.configuration.proxy.secure ? "https://" : "http://"
                   }${opt.ctx.instance.sys.configuration.proxy.hostname}/api/application-icon/${app.manifest.id}`,
                 };
               }
@@ -856,8 +752,7 @@ ${opt.ctx.instance.sys.configuration.termsOfUse.message}`;
     get: procedure.output(z.any().or(z.literal(false))).query(async (opt) => {
       const db = opt.ctx.instance.sys.database.postgres();
 
-      const themeValues =
-        await db`SELECT color_scheme FROM public.users WHERE id = ${opt.ctx.userId}`;
+      const themeValues = await db`SELECT color_scheme FROM public.users WHERE id = ${opt.ctx.userId}`;
 
       return themeValues?.[0]?.color_scheme || false;
     }),

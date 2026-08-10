@@ -64,7 +64,7 @@ export interface ImageCacheEntry {
 }
 
 export default class ImageSystem extends System {
-  private _internalImages = new Map<string, Record<string, ImageCacheEntry>>();
+  _internalImages = new Map<string, Record<string, ImageCacheEntry>>();
   private _internalImagePaths = new Map<string, string>();
 
   constructor(instance: Instance) {

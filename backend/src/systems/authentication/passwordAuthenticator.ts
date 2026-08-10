@@ -1,5 +1,6 @@
-import AuthenticationSystem from "../authentication.ts";
+import crypto from "node:crypto";
 import { timingSafeEqual } from "@std/crypto";
+import type AuthenticationSystem from "../authentication.ts";
 
 const PASSWORD_HASH_ITERATIONS = 600_000;
 
@@ -16,27 +17,14 @@ export default class PasswordAuthenticator {
     return `${salt.toBase64()}:${hash.toBase64()}`;
   }
 
-  private async _internalVerifyPassword(
-    password: string,
-    hashedPassword: string,
-  ): Promise<boolean> {
-    const [salt, expected] = hashedPassword.split(":")
-      .map((part) => Uint8Array.fromBase64(part));
+  private async _internalVerifyPassword(password: string, hashedPassword: string): Promise<boolean> {
+    const [salt, expected] = hashedPassword.split(":").map((part) => Uint8Array.fromBase64(part));
     const actual = await this._internalDeriveBits(password, salt);
     return timingSafeEqual(actual, expected);
   }
 
-  private async _internalDeriveBits(
-    password: string,
-    salt: Uint8Array<ArrayBuffer>,
-  ): Promise<Uint8Array> {
-    const key = await crypto.subtle.importKey(
-      "raw",
-      new TextEncoder().encode(password),
-      "PBKDF2",
-      false,
-      ["deriveBits"],
-    );
+  private async _internalDeriveBits(password: string, salt: Uint8Array<ArrayBuffer>): Promise<Uint8Array> {
+    const key = await crypto.subtle.importKey("raw", new TextEncoder().encode(password), "PBKDF2", false, ["deriveBits"]);
     const bits = await crypto.subtle.deriveBits(
       {
         name: "PBKDF2",
@@ -53,11 +41,7 @@ export default class PasswordAuthenticator {
   async setPassword(userId: number, password: string) {
     const db = this.authenticationSystem.instance.sys.database.postgres();
 
-    if (
-      !(await this.authenticationSystem.instance.sys.users.doesUserExist(
-        userId,
-      ))
-    ) {
+    if (!(await this.authenticationSystem.instance.sys.users.doesUserExist(userId))) {
       return false;
     }
 
@@ -71,12 +55,11 @@ export default class PasswordAuthenticator {
   async verifyPassword(userId: number, password: string) {
     const db = this.authenticationSystem.instance.sys.database.postgres();
 
-    const hashed_password = (await db`SELECT hashed_password FROM users WHERE id = ${userId}`)?.[0]?.hashed_password as string | undefined
+    const hashed_password = (await db`SELECT hashed_password FROM users WHERE id = ${userId}`)?.[0]?.hashed_password as string | undefined;
 
-    if (!hashed_password)
-      return false;
+    if (!hashed_password) return false;
 
-    return await this._internalVerifyPassword(password, hashed_password)
+    return await this._internalVerifyPassword(password, hashed_password);
   }
 
   /*async createSession(

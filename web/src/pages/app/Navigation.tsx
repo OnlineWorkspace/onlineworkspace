@@ -1,6 +1,6 @@
 import UKNavigationRail from "@ewsgit/uikit-solid/src/components/navigationRail/UKNavigationRail.tsx";
 import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.tsx";
-import useIsMobile from "@ewsgit/uikit-solid/src/core/useIsMobile.js";
+import useIsMobile from "@ewsgit/uikit-solid/src/core/useIsMobile.ts";
 import { useLocation, useNavigate } from "@solidjs/router";
 import {
   type Component,
@@ -29,10 +29,12 @@ const AppNavigation: Component<ParentProps> = (props) => {
     "applications" | "notifications" | false
   >(false);
 
+  const shouldBeExpanded = () => isMobile() ? false : expanded()
+
   return (
     <UKNavigationRail
       class={styles.rail}
-      expanded={isMobile() ? false : expanded()}
+      expanded={shouldBeExpanded()}
       items={quickShortcuts()
         .map((sc) => {
           return {
@@ -50,41 +52,27 @@ const AppNavigation: Component<ParentProps> = (props) => {
               }
             },
             onMiddleClick() {
-              if (sc.location.type === "local") {
-                window.open(sc.location.value, "_blank");
-              } else if (sc.location.type === "remote") {
-                window.open(sc.location.value, "_blank");
-              }
+              window.open(sc.location.value, "_blank");
             },
           };
         })
         .slice(0, isMobile() ? 3 : undefined)}
-      setExpanded={isMobile()
-        ? undefined
-        : (expandedState) => setExpanded(expandedState)}
+      setExpanded={isMobile() ? undefined : setExpanded}
       anchorPoints={{
         topMost: (
-          <>
-            <Show when={!isMobile()}>
-              <NavigationRailClock expanded={expanded()} />
-            </Show>
-          </>
+          <Show when={!isMobile()}>
+            <NavigationRailClock expanded={expanded()} />
+          </Show>
         ),
-        top: (
-          <>
-            <NavigationRailAvatar expanded={expanded()} />
-          </>
-        ),
+        top: <NavigationRailAvatar expanded={expanded()} />,
         bottom: (
           <>
             <NavigationRailApplications
               isToggled={toggledDrawer() === "applications"}
               toggle={(str) => {
-                if (toggledDrawer() === "applications") {
-                  setToggledDrawer(false);
-                } else {
-                  setToggledDrawer(str);
-                }
+                setToggledDrawer(
+                  td => td === "applications" ? false : str,
+                );
               }}
               expanded={expanded()}
             />

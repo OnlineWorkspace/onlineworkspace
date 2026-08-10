@@ -83,7 +83,7 @@
     "npm:sass-embedded@^1.90.0": "1.100.0",
     "npm:sass-embedded@^1.98.0": "1.100.0",
     "npm:sharp@~0.34.3": "0.34.5",
-    "npm:solid-devtools@~0.34.5": "0.34.5_solid-js@1.9.14_vite@8.1.5__esbuild@0.27.7__sass-embedded@1.100.0_sass-embedded@1.100.0",
+    "npm:solid-devtools@~0.34.5": "0.34.5_solid-js@1.9.14_vite@8.1.5__esbuild@0.27.7__sass-embedded@1.100.0",
     "npm:solid-js@^1.9.11": "1.9.14",
     "npm:solid-js@^1.9.8": "1.9.14",
     "npm:solid-js@^1.9.9": "1.9.14",
@@ -103,6 +103,7 @@
     "npm:vite@^7.3.0": "7.3.6_sass-embedded@1.100.0",
     "npm:vite@^8.0.1": "8.1.5_esbuild@0.27.7_sass-embedded@1.100.0",
     "npm:vite@^8.0.8": "8.1.5_esbuild@0.27.7_sass-embedded@1.100.0",
+    "npm:vite@^8.1.5": "8.1.5_esbuild@0.27.7_sass-embedded@1.100.0",
     "npm:ws@^8.18.3": "8.21.1",
     "npm:yargs@18": "18.0.0",
     "npm:zod@^4.0.17": "4.4.3"
@@ -4048,7 +4049,7 @@
         "simple-concat"
       ]
     },
-    "solid-devtools@0.34.5_solid-js@1.9.14_vite@8.1.5__esbuild@0.27.7__sass-embedded@1.100.0_sass-embedded@1.100.0": {
+    "solid-devtools@0.34.5_solid-js@1.9.14_vite@8.1.5__esbuild@0.27.7__sass-embedded@1.100.0": {
       "integrity": "sha512-KNVdS9MQzzeVS++Vmg4JeU0fM6ZMuBEmkBA7SmqPS2s5UHpRjv1PNH8gShmlN9L/tki6OUAzJP3H1aKq2AcOSg==",
       "dependencies": [
         "@babel/core",
@@ -4736,7 +4737,7 @@
             "npm:solid-js@^1.9.11",
             "npm:typescript@~5.9.3",
             "npm:vite-plugin-solid@^2.11.11",
-            "npm:vite@^8.0.8"
+            "npm:vite@^8.1.5"
           ]
         }
       },

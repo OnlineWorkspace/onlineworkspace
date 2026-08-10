@@ -1,7 +1,8 @@
 import type { Instance } from "./index.ts";
 import type { Logger } from "./log.ts";
-import ApiSystem from "./systems/api.ts";
+import type ApiSystem from "./systems/api.ts";
 import type ApplicationsSubsystem from "./systems/applications.ts";
+import type AuthenticationSystem from "./systems/authentication.ts";
 import type AuthorizationSubsystem from "./systems/authorization.ts";
 import type ConfigurationSubsystem from "./systems/configuration.ts";
 import type ConsoleCommandsSubsystem from "./systems/consoleCommands.ts";
@@ -15,10 +16,9 @@ import type ReverseProxySystem from "./systems/reverseProxy.ts";
 import type SettingsSubsystem from "./systems/settings.ts";
 import type TerminalSystem from "./systems/terminal.ts";
 import type TRPCSubsystem from "./systems/trpc.ts";
+import type UploadSystem from "./systems/upload.ts";
 import type UsersSubsystem from "./systems/users.ts";
 import type WebFrontendSubsystem from "./systems/webFrontend.ts";
-import AuthenticationSystem from "./systems/authentication.ts";
-import UploadSystem from "./systems/upload.ts";
 
 export type Sys = {
   users: UsersSubsystem;
