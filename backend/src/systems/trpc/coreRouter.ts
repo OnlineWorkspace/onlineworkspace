@@ -11,7 +11,7 @@ import { WorkspacesFeatureFlags } from "../configuration.ts";
 import type { WorkspacesUser } from "../users.ts";
 import { deleteCookie, getCookies, setCookie } from "../../utils/cookies.ts";
 
-export const createOnlineWorkspaceTRPCContext = (instance: Instance) => (opt: FetchCreateContextFnOptions, server: Server) => {
+export const createOnlineWorkspaceTRPCContext = (instance: Instance) => (opt: FetchCreateContextFnOptions, server: Server<any>) => {
   return {
     rawRequest: {
       req: opt.req,
