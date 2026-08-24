@@ -1,5 +1,5 @@
 import * as nodeCrypto from "node:crypto";
-import { deleteCookie, getCookies, setCookie } from "@std/http/cookie";
+import type { Server } from "bun";
 import { initTRPC, TRPCError } from "@trpc/server";
 import type { FetchCreateContextFnOptions } from "@trpc/server/adapters/fetch";
 import * as hiBase32 from "hi-base32";
@@ -9,8 +9,9 @@ import type { Instance } from "../../index.ts";
 import { AuthorizedDeviceType, SessionCreationError } from "../authorization.ts";
 import { WorkspacesFeatureFlags } from "../configuration.ts";
 import type { WorkspacesUser } from "../users.ts";
+import { deleteCookie, getCookies, setCookie } from "../../utils/cookies.ts";
 
-export const createOnlineWorkspaceTRPCContext = (instance: Instance) => (opt: FetchCreateContextFnOptions, server: Deno.HttpServer<Deno.NetAddr>) => {
+export const createOnlineWorkspaceTRPCContext = (instance: Instance) => (opt: FetchCreateContextFnOptions, server: Server) => {
   return {
     rawRequest: {
       req: opt.req,

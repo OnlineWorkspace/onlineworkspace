@@ -11,9 +11,9 @@ Files App
   - Pane
     - new FilesystemInterface()
       - connectors
-        - Deno Desktop
+        - Desktop
         - Server Backend
-        - SSHFS via Server Backend / Deno Desktop
+        - SSHFS via Server Backend / Desktop
       - methods
         - readDirectory(path: str, { attributes: str[] })
         - readDirectoryItemCount(path: str)

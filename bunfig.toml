@@ -1,0 +1,4 @@
+# Bun configuration file
+
+[install]
+trustedDependencies = ["fast-folder-size"]

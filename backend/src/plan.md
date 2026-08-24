@@ -54,4 +54,4 @@
 
 ### External Module APIs (REST)
 
-### Deno Module APIs (SDK)
+### Bun Module APIs (SDK)

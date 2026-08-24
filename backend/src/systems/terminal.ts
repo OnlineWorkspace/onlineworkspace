@@ -55,14 +55,6 @@ export default class TerminalUISystem extends System {
       function addLogMessage(
         log: { type: LogType; level: string; message: string },
       ) {
-        // ignore logs related to a bug in Deno.serve();
-        if (
-          log.type === LogType.WARNING && log.level === "system" &&
-          log.message.startsWith(
-            "Deno.serve: request.signal aborts on successful responses",
-          )
-        ) return;
-
         let consoleLogOutput: string = "";
         const currentTypeColor = MESSAGE_TYPE_COLORS[log.type];
 
@@ -247,14 +239,6 @@ export default class TerminalUISystem extends System {
     function addLogMessage(
       log: { type: LogType; level: string; message: string },
     ) {
-      // ignore logs related to a bug in Deno.serve();
-      if (
-        log.type === LogType.WARNING && log.level === "system" &&
-        log.message.startsWith(
-          "Deno.serve: request.signal aborts on successful responses",
-        )
-      ) return;
-
       const logEntry = new BoxRenderable(self.renderer, {
         flexDirection: "row",
         flexWrap: "no-wrap",

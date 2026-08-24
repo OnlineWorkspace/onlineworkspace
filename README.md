@@ -54,7 +54,7 @@ A self-hosted web platform for applications & services with design based on Goog
 
 | Dependency | External Installation Guide      | Optional |
 | ---------- | -------------------------------- | -------- |
-| Deno (CANARY REQUIRED)      | https://deno.land                | No       |
+| Bun        | https://bun.sh                   | No       |
 | PostgreSQL | https://www.postgresql.org/      | No       |
 
 1. Ensure all dependencies are installed before continuing
@@ -63,13 +63,13 @@ A self-hosted web platform for applications & services with design based on Goog
 4. create a directory to house the Workspaces filesystem root e.g.: `sudo mkdir /var/www/workspaces`
 5. change into the newly created directory `cd /var/www/workspaces`
 6. clone the workspaces docker configuration from git `git clone git@github.com:onlineworkspace/workspace.git .`
-7. run `deno install`
+7. run `bun install`
 8. create a postgresql database called `onlineworkspace_workspace`
 9. change into the `instance` directory
 10. copy `meta/backend.service` to `/etc/systemd/system/workspaces-backend.service`.
 11. run `systemctl enable workspaces-backend --now` to start the backend
 12. change into the project root `/var/www/workspaces`
-13. run `deno build-web`
+13. run `bun run build:web`
 14. choose a webserver of your choice to serve `/var/www/workspaces/web/dist` (caddy is fast & easy to use)
 15. open your browser and head to `https://[server-ip]` and login as the user `admin` with password `password` to finish setup.
 -->
@@ -83,7 +83,7 @@ A self-hosted web platform for applications & services with design based on Goog
 
 | Dependency             | External Installation Guide        | Optional |
 |------------------------|------------------------------------|----------|
-| Deno (CANARY REQUIRED) | <https://deno.land>                | No       |
+| Bun                    | <https://bun.sh>                   | No       |
 | PostgreSQL             | <https://www.postgresql.org/>      | No       |
 | Caddy                  | <https://caddyserver.com/download> | No       |
 
@@ -114,9 +114,9 @@ A self-hosted web platform for applications & services with design based on Goog
     4. Download the caddy executable from the caddy website, this can be placed anywhere but in the repo root directory is recommended for ease of use
   - MacOS
     1. Using Orbstack with an Ubuntu container, follow the Ubuntu Linux instructions above
-4. Run `deno install` inside the project root directory to install all NPM dependencies
+4. Run `bun install` inside the project root directory to install all dependencies
 5. Ensure all auto-install configuration is set before proceeding, if you want a vanilla setup this step can be skipped (see [auto-install Configuration](#auto-install-configuration) section in the documentation for more details)
-6. Run `deno task dev` to start up the web interface and backend in development mode
+6. Run `bun run dev` to start up the web interface and backend in development mode
 7. If on Linux or MacOS, ensure that caddy is allowed to bind to ports lower than 1024 by running `sudo setcap 'cap_net_bind_service=+ep' $(which caddy)`.
 8. Run Caddy
 

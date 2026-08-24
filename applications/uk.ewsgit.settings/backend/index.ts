@@ -8,8 +8,8 @@ import { FEATURE_FLAG_DESCRIPTIONS, WorkspacesFeatureFlags } from "@onlineworksp
 import { WorkspacesNotificationPriority } from "@onlineworkspace/workspace-backend/src/systems/notifications.ts";
 import { GlobalApplicationSetting } from "@onlineworkspace/workspace-backend/src/systems/settings/applicationSetting/applicationSetting.ts";
 import { adminProcedure, type createOnlineWorkspaceTRPCContext, procedure } from "@onlineworkspace/workspace-backend/src/systems/trpc/coreRouter.ts";
-import * as fs from "@std/fs";
-import { getCookies } from "@std/http";
+import fs from "node:fs/promises";
+import { getCookies } from "@onlineworkspace/workspace-backend/src/utils/cookies.ts";
 import { initTRPC, TRPCError } from "@trpc/server";
 import { octetInputParser } from "@trpc/server/http";
 import sharp from "sharp";
@@ -108,7 +108,7 @@ const router = t.router({
 
       const filePath = path.join(userPath, "system/temp/avatar");
 
-      await Deno.writeFile(filePath, opt.input);
+      await fs.writeFile(filePath, opt.input);
 
       await user.setAvatar(filePath);
       await user.generateAvatars(true);
@@ -673,19 +673,21 @@ const router = t.router({
           previewSrc: string;
         }[] = [];
 
-        for await (const wallpaperFile of Deno.readDir(wallpapersPath)) {
-          if (wallpaperFile.name === "current.webp" || wallpaperFile.name === "resized" || !wallpaperFile.name.endsWith(".webp")) continue;
+        if (fsExistsSync(wallpapersPath)) {
+          for (const wallpaperFile of await fs.readdir(wallpapersPath)) {
+            if (wallpaperFile === "current.webp" || wallpaperFile === "resized" || !wallpaperFile.endsWith(".webp")) continue;
 
-          const wallpaperPath = path.join(wallpapersPath, wallpaperFile.name);
+            const wallpaperPath = path.join(wallpapersPath, wallpaperFile);
 
-          output.push({
-            name: wallpaperFile.name,
-            previewSrc: await instance.sys.image.serveImage(opt.ctx.userId, wallpaperPath, {
-              resize: {
-                dimensions: { width: 296, height: 192 },
-              },
-            }),
-          });
+            output.push({
+              name: wallpaperFile,
+              previewSrc: await instance.sys.image.serveImage(opt.ctx.userId, wallpaperPath, {
+                resize: {
+                  dimensions: { width: 296, height: 192 },
+                },
+              }),
+            });
+          }
         }
 
         return output;
@@ -698,18 +700,20 @@ const router = t.router({
           previewSrc: string;
         }[] = [];
 
-        for await (const wallpaperFile of Deno.readDir(DEFAULT_WALLPAPERS_PATH)) {
-          const wallpaperPath = path.join(DEFAULT_WALLPAPERS_PATH, wallpaperFile.name);
+        if (fsExistsSync(DEFAULT_WALLPAPERS_PATH)) {
+          for (const wallpaperFile of await fs.readdir(DEFAULT_WALLPAPERS_PATH)) {
+            const wallpaperPath = path.join(DEFAULT_WALLPAPERS_PATH, wallpaperFile);
 
-          output.push({
-            name: wallpaperFile.name,
-            previewSrc: await instance.sys.image.serveImage(opt.ctx.userId, wallpaperPath, {
-              resize: {
-                dimensions: { height: 140, width: 250 },
-                position: "centre",
-              },
-            }),
-          });
+            output.push({
+              name: wallpaperFile,
+              previewSrc: await instance.sys.image.serveImage(opt.ctx.userId, wallpaperPath, {
+                resize: {
+                  dimensions: { height: 140, width: 250 },
+                  position: "centre",
+                },
+              }),
+            });
+          }
         }
 
         return output;
@@ -725,8 +729,7 @@ const router = t.router({
         }
 
         if (!fsExistsSync(requiredResizedWallpaperPath)) {
-          const textDecoder = new TextDecoder("utf-8");
-          const options = JSON.parse(textDecoder.decode(await Deno.readFile(path.join(wallpapersRootPath, "config.json"))));
+          const options = JSON.parse(await fs.readFile(path.join(wallpapersRootPath, "config.json"), "utf8"));
 
           await instance.sys.image.resizeImage(
             rawWallpaperPath,
@@ -764,8 +767,9 @@ const router = t.router({
       delete: procedure.input(z.object({ name: z.string() })).mutation(async (opt) => {
         const wallpapersPath = path.join((await opt.ctx.user()).getPath(), "assets/wallpapers");
 
-        await Deno.remove(path.join(wallpapersPath, opt.input.name), {
+        await fs.rm(path.join(wallpapersPath, opt.input.name), {
           recursive: true,
+          force: true,
         });
 
         return true;
@@ -781,8 +785,7 @@ const router = t.router({
           const wallpaperPath = path.join((await opt.ctx.user()).getPath(), "assets/wallpapers");
 
           if (fsExistsSync(path.join(wallpaperPath, "config.json"))) {
-            const textDecoder = new TextDecoder("utf-8");
-            const options = JSON.parse(textDecoder.decode(await Deno.readFile(path.join(wallpaperPath, "config.json"))));
+            const options = JSON.parse(await fs.readFile(path.join(wallpaperPath, "config.json"), "utf8"));
 
             options.position = options.position.split(" ");
 
@@ -803,8 +806,10 @@ const router = t.router({
           const wallpaperPath = path.join((await opt.ctx.user()).getPath(), "assets/wallpapers");
           const resizedWallpapersPath = path.join(wallpaperPath, "resized");
 
-          for await (const resizedWallpaperFile of Deno.readDir(resizedWallpapersPath)) {
-            await Deno.remove(path.join(resizedWallpapersPath, resizedWallpaperFile.name));
+          if (fsExistsSync(resizedWallpapersPath)) {
+            for (const resizedWallpaperFile of await fs.readdir(resizedWallpapersPath)) {
+              await fs.rm(path.join(resizedWallpapersPath, resizedWallpaperFile), { force: true });
+            }
           }
 
           const options = {
@@ -813,8 +818,7 @@ const router = t.router({
             background: opt.input.background || "#0000",
           };
 
-          const textEncoder = new TextEncoder();
-          await Deno.writeFile(path.join(wallpaperPath, "config.json"), textEncoder.encode(JSON.stringify(options)));
+          await fs.writeFile(path.join(wallpaperPath, "config.json"), JSON.stringify(options), "utf8");
 
           return true;
         }),
@@ -823,14 +827,16 @@ const router = t.router({
         const resizedWallpapersPath = path.join(userWallpapersPath, "resized");
         const currentWallpaperPath = path.join(userWallpapersPath, "current.webp");
 
-        for await (const resizedWallpaperFile of Deno.readDir(resizedWallpapersPath)) {
-          await Deno.remove(path.join(resizedWallpapersPath, resizedWallpaperFile.name));
+        if (fsExistsSync(resizedWallpapersPath)) {
+          for (const resizedWallpaperFile of await fs.readdir(resizedWallpapersPath)) {
+            await fs.rm(path.join(resizedWallpapersPath, resizedWallpaperFile), { force: true });
+          }
         }
 
         if (fsExistsSync(currentWallpaperPath)) {
-          await Deno.remove(currentWallpaperPath);
+          await fs.rm(currentWallpaperPath, { force: true });
         }
-        await Deno.copyFile(path.join(userWallpapersPath, opt.input.name.replace(".preview", "")), currentWallpaperPath);
+        await fs.copyFile(path.join(userWallpapersPath, opt.input.name.replace(".preview", "")), currentWallpaperPath);
 
         return true;
       }),
@@ -840,14 +846,16 @@ const router = t.router({
         const resizedWallpapersPath = path.join(userWallpapersPath, "resized");
         const currentWallpaperPath = path.join(userWallpapersPath, "current.webp");
 
-        for await (const resizedWallpaperFile of Deno.readDir(resizedWallpapersPath)) {
-          await Deno.remove(path.join(resizedWallpapersPath, resizedWallpaperFile.name));
+        if (fsExistsSync(resizedWallpapersPath)) {
+          for (const resizedWallpaperFile of await fs.readdir(resizedWallpapersPath)) {
+            await fs.rm(path.join(resizedWallpapersPath, resizedWallpaperFile), { force: true });
+          }
         }
 
         if (fsExistsSync(currentWallpaperPath)) {
-          await Deno.remove(currentWallpaperPath);
+          await fs.rm(currentWallpaperPath, { force: true });
         }
-        await Deno.copyFile(path.join(officialWallpaperPath, opt.input.name), currentWallpaperPath);
+        await fs.copyFile(path.join(officialWallpaperPath, opt.input.name), currentWallpaperPath);
 
         return true;
       }),
@@ -1029,18 +1037,20 @@ const router = t.router({
             path: string;
           }[] = [];
 
-          for await (const child of Deno.readDir(dir)) {
-            const childPath = path.join(dir, child.name);
-            const childLstat = await Deno.lstat(childPath);
-
-            if (childLstat.isDirectory) {
-              output = [...output, ...(await getChildFiles(childPath))];
-            } else {
-              output.push({
-                path: childPath,
-                size: childLstat.size,
-                type: instance.sys.filesystem.getFileType(childPath),
-              });
+          if (fsExistsSync(dir)) {
+            const entries = await fs.readdir(dir, { withFileTypes: true });
+            for (const child of entries) {
+              const childPath = path.join(dir, child.name);
+              if (child.isDirectory()) {
+                output = [...output, ...(await getChildFiles(childPath))];
+              } else {
+                const childLstat = await fs.lstat(childPath);
+                output.push({
+                  path: childPath,
+                  size: childLstat.size,
+                  type: instance.sys.filesystem.getFileType(childPath),
+                });
+              }
             }
           }
 

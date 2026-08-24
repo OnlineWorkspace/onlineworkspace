@@ -1,7 +1,7 @@
 import crypto from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
-import { createCanvas, Image } from "@gfx/canvas";
+import { createCanvas, loadImage } from "canvas";
 import sharp from "sharp";
 import type { Instance } from "../index.ts";
 import System from "../system.ts";
@@ -250,7 +250,8 @@ export default class ImageSystem extends System {
       this.instance.sys.filesystem.SRC_ROOT,
       "assets/placeholder/file.png"
     );
-    ctx.drawImage(Image.loadSync(placeholderPath), 0, 0, canvasWidth, canvasHeight);
+    const placeholderImage = await loadImage(placeholderPath);
+    ctx.drawImage(placeholderImage, 0, 0, canvasWidth, canvasHeight);
 
     ctx.font = "24px Arial";
     ctx.textAlign = "end";
@@ -277,9 +278,10 @@ export default class ImageSystem extends System {
     ctx.fillStyle = "white";
     ctx.fillText(textContent, labelPos.x - labelPadding.x, labelPos.y - labelPadding.y);
 
-    canvas.save(thumbCachePath, "png", 100);
+    const buffer = canvas.toBuffer("image/png");
+    await fs.writeFile(thumbCachePath, buffer);
 
-    return fs.readFile(thumbCachePath);
+    return buffer;
   }
 
   private _internalGetResponseUrl(imageId: string, resolutionKey: string): string {

@@ -1,14 +1,20 @@
 /// <reference path="./global.d.ts" />
 
+import { existsSync, readdirSync } from "node:fs";
+import fs from "node:fs/promises";
 import * as path from "node:path";
 import { FileMediaType } from "@onlineworkspace/workspace-backend/src/systems/filesystem.ts";
 import { type createOnlineWorkspaceTRPCContext, procedure } from "@onlineworkspace/workspace-backend/src/systems/trpc/coreRouter.ts";
-import * as fs from "@std/fs";
-import { exists, move } from "@std/fs";
 import { initTRPC } from "@trpc/server";
 import fastFolderSize from "fast-folder-size/sync.js";
 import z from "zod";
 import { FilesystemConnectorEntryType } from "../lib/filesystemConnector.ts";
+
+const fsExists = existsSync;
+const exists = async (p: string) => existsSync(p);
+const move = async (src: string, dest: string) => {
+  await fs.rename(src, dest);
+};
 
 const log = instance.log.createLogger("uk.ewsgit.files");
 
@@ -401,21 +407,22 @@ const router = t.router({
           const files: { type: FilesystemConnectorEntryType; name: string }[] = [];
           const symlinks: { type: FilesystemConnectorEntryType; name: string }[] = [];
 
-          for await (const entry of Deno.readDir(resolvedPath)) {
-            if (entry.isDirectory) {
+          const entries = await fs.readdir(resolvedPath, { withFileTypes: true });
+          for (const entry of entries) {
+            if (entry.isDirectory()) {
               directories.push({
                 type: FilesystemConnectorEntryType.Directory,
                 name: entry.name,
               });
             }
-            if (entry.isFile) {
+            if (entry.isFile()) {
               files.push({
                 type: FilesystemConnectorEntryType.File,
                 name: entry.name,
               });
             }
-            if (entry.isSymlink) {
-              files.push({
+            if (entry.isSymbolicLink()) {
+              symlinks.push({
                 type: FilesystemConnectorEntryType.Symlink,
                 name: entry.name,
               });
@@ -456,10 +463,8 @@ const router = t.router({
           return { status: "missing_permission" as const };
         }
 
-        let count = 0;
-        for await (const _ of Deno.readDir(resolvedPath)) {
-          count++;
-        }
+        const entries = await fs.readdir(resolvedPath);
+        const count = entries.length;
 
         return { status: "ok" as const, count };
       }),
@@ -538,7 +543,7 @@ const router = t.router({
         if (await exists(resolvedPath)) return { status: "already_exists" as const };
 
         try {
-          await Deno.mkdir(resolvedPath, { recursive: true });
+          await fs.mkdir(resolvedPath, { recursive: true });
 
           return { status: "ok" as const };
         } catch (err) {
@@ -563,7 +568,7 @@ const router = t.router({
         if (!(await exists(resolvedPath))) return { status: "invalid_path" as const };
 
         try {
-          await Deno.remove(resolvedPath, { recursive: true });
+          await fs.rm(resolvedPath, { recursive: true, force: true });
 
           return { status: "ok" as const };
         } catch (err) {
@@ -587,7 +592,7 @@ const router = t.router({
         if (!(await exists(resolvedPath))) return { status: "invalid_path" as const };
 
         try {
-          await Deno.remove(resolvedPath, { recursive: true });
+          await fs.rm(resolvedPath, { recursive: true, force: true });
 
           return { status: "ok" as const };
         } catch (err) {
@@ -633,18 +638,18 @@ const router = t.router({
         }
 
         try {
-          const itemStats = await Deno.lstat(resolvedPath);
+          const itemStats = await fs.lstat(resolvedPath);
 
           return {
             status: "ok" as const,
             data: {
               path: opt.input.path,
-              type: itemStats.isSymlink ? "link" : itemStats.isDirectory ? "directory" : itemStats.isFile ? "file" : "file",
+              type: itemStats.isSymbolicLink() ? "link" : itemStats.isDirectory() ? "directory" : itemStats.isFile() ? "file" : "file",
               // TODO: implement sharing first
               shared: false,
               size: itemStats.size,
               thumbnail:
-                opt.input.thumbnailSize !== undefined && itemStats.isFile
+                opt.input.thumbnailSize !== undefined && itemStats.isFile()
                   ? instance.sys.filesystem.getFileType(opt.input.path) === FileMediaType.Image
                     ? await instance.sys.image.serveImage(opt.ctx.userId, resolvedPath, {
                         resize: {
@@ -662,8 +667,8 @@ const router = t.router({
                         .slice(1)}/${opt.input.thumbnailSize}`
                   : undefined,
               hidden: path.basename(opt.input.path).startsWith("."),
-              createdAt: itemStats.ctime?.getMilliseconds(),
-              modifiedAt: itemStats.atime?.getMilliseconds(),
+              createdAt: itemStats.ctime?.getTime(),
+              modifiedAt: itemStats.atime?.getTime(),
             },
           };
         } catch (_) {
@@ -719,9 +724,9 @@ const router = t.router({
     get: procedure.input(z.object({ path: z.string() })).query(async (opt) => {
       const resolvedPath = path.join(instance.sys.filesystem.FS_ROOT, opt.input.path);
 
-      const pathStat = await Deno.lstat(resolvedPath);
+      const pathStat = await fs.lstat(resolvedPath);
 
-      const fileType = !pathStat.isDirectory ? instance.sys.filesystem.getFileType(resolvedPath) : "directory";
+      const fileType = !pathStat.isDirectory() ? instance.sys.filesystem.getFileType(resolvedPath) : "directory";
 
       let imageDimensions: { width: number; height: number } = {
         width: 0,
@@ -751,8 +756,8 @@ const router = t.router({
               : undefined,
           metadata: {
             size: pathStat.size,
-            type: pathStat.isSymlink ? "link" : pathStat.isDirectory ? "directory" : pathStat.isFile ? "file" : "file",
-            itemCount: pathStat.isDirectory ? Deno.readDirSync(resolvedPath).toArray().length : undefined,
+            type: pathStat.isSymbolicLink() ? "link" : pathStat.isDirectory() ? "directory" : pathStat.isFile() ? "file" : "file",
+            itemCount: pathStat.isDirectory() ? readdirSync(resolvedPath).length : undefined,
             pixelate: imageDimensions.width !== 0 && imageDimensions.height !== 0 && imageDimensions.width < 640 && imageDimensions.height < 640,
           },
         },
@@ -764,7 +769,7 @@ const router = t.router({
       const resolvedPath = path.join(instance.sys.filesystem.FS_ROOT, opt.input.path);
 
       try {
-        await Deno.mkdir(resolvedPath, { recursive: true });
+        await fs.mkdir(resolvedPath, { recursive: true });
 
         return {
           status: "ok" as const,
@@ -784,20 +789,17 @@ const router = t.router({
 
       if (opt.input.template !== undefined) {
         const templateFilePath = path.join(FILE_TEMPLATE_PATH, opt.input.template);
-        if (await fs.exists(templateFilePath)) {
-          const textDecoder = new TextDecoder();
-          templateContents = textDecoder.decode(await Deno.readFile(templateFilePath));
+        if (existsSync(templateFilePath)) {
+          templateContents = await fs.readFile(templateFilePath, "utf8");
         }
       }
 
       try {
-        if (await fs.exists(resolvedPath)) {
+        if (existsSync(resolvedPath)) {
           return { status: "already_exists" as const };
         }
 
-        const textEncoder = new TextEncoder();
-
-        await Deno.writeFile(resolvedPath, textEncoder.encode(templateContents));
+        await fs.writeFile(resolvedPath, templateContents, "utf8");
 
         return {
           status: "ok" as const,

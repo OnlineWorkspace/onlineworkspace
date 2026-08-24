@@ -1,20 +1,33 @@
-import * as fs from "@std/fs";
-import { getCookies, serveFile } from "@std/http";
-import type { Route } from "@std/http/unstable-route";
-import { routeRadix } from "@std/http/unstable-route";
-import * as path from "@std/path/posix";
+import { existsSync } from "node:fs";
+import fs from "node:fs/promises";
+import path from "node:path";
+import type { Server } from "bun";
 import type { Instance } from "../index.ts";
 import System from "../system.ts";
+import { getCookies } from "../utils/cookies.ts";
+
+export interface Route {
+  method?: string | string[];
+  pattern: URLPattern;
+  handler: (
+    req: Request,
+    params?: { pathname: { groups: Record<string, string | undefined> } },
+    info?: any,
+  ) => Promise<Response> | Response;
+}
+
+export function serveFile(_req: Request, filePath: string): Response {
+  return new Response(Bun.file(filePath));
+}
 
 export default class ApiSystem extends System {
   routes: Route[];
-  webServer!: Deno.HttpServer<Deno.NetAddr>;
+  webServer!: Server<any>;
   listening: boolean = false;
 
   constructor(instance: Instance) {
     super("api", instance);
 
-    // deno-lint-ignore no-this-alias
     const self = this;
 
     this.routes = [
@@ -52,6 +65,13 @@ export default class ApiSystem extends System {
         pattern: new URLPattern({ pathname: "/api/user/me/avatar/:size" }),
         async handler(req, rawParams, _info) {
           const params = rawParams?.pathname.groups;
+
+          if (!params) {
+            return Response.json({
+              code: "INVALID_REQUEST",
+              message: "missing params",
+            }) as unknown as Response;
+          }
 
           const size = params.size!;
 
@@ -130,8 +150,14 @@ export default class ApiSystem extends System {
           pathname: "/api/asset/image/:imageId/:resolution",
         }),
         async handler(req, rawParams) {
-          // @ts-ignore this does exist
           const params = rawParams?.pathname.groups;
+
+          if (!params) {
+            return Response.json({
+              code: "INVALID_REQUEST",
+              message: "missing params",
+            }) as unknown as Response;
+          }
 
           const image = self.instance.sys.image._internalImages.get(params.imageId as string);
 
@@ -170,6 +196,13 @@ export default class ApiSystem extends System {
             }) as unknown as Response;
           }
 
+          if (!sourceImage.path) {
+            return Response.json({
+              code: "INVALID_REQUEST",
+              message: "missing source image path",
+            }) as unknown as Response;
+          }
+
           if (resolutionParam === "raw") {
             self.instance.sys.image.log.debug(`Served Image -> '${(params as { imageId: string }).imageId} @ ${resolutionParam}'`);
             return serveFile(req, sourceImage.path);
@@ -179,10 +212,9 @@ export default class ApiSystem extends System {
           const outputPath = path.join(cachedFilePath, resolutionParam);
           const hashPath = path.join(`${outputPath}.hash`);
 
-          if (fs.existsSync(outputPath)) {
+          if (existsSync(outputPath)) {
             const fileHash = await instance.sys.filesystem.getFileHash(sourceImage.path);
-            const textDecoder = new TextDecoder("utf8");
-            const cacheFileHash = textDecoder.decode(await Deno.readFile(hashPath));
+            const cacheFileHash = await fs.readFile(hashPath, "utf8");
 
             if (fileHash === cacheFileHash) {
               self.instance.sys.image.log.info(`Served Image -> '${(params as { imageId: string }).imageId} @ ${resolutionParam}'`);
@@ -190,13 +222,20 @@ export default class ApiSystem extends System {
             }
           }
 
-          if (!fs.existsSync(path.join(outputPath, ".."))) {
-            await fs.ensureDir(path.join(outputPath, ".."));
+          if (!existsSync(path.join(outputPath, ".."))) {
+            await fs.mkdir(path.join(outputPath, ".."), { recursive: true });
+          }
+
+          if (!sourceImage.resize?.dimensions) {
+            return Response.json({
+              code: "INVALID_REQUEST",
+              message: "missing source image resize dimensions",
+            }) as unknown as Response;
           }
 
           const fileHash = await instance.sys.filesystem.getFileHash(sourceImage.path);
           await self.instance.sys.image.resizeImage(sourceImage.path, outputPath, sourceImage.resize!.dimensions, sourceImage.resize!);
-          await Deno.writeFile(hashPath, Buffer.from(fileHash, "utf8"));
+          await fs.writeFile(hashPath, fileHash, "utf8");
 
           self.instance.sys.image.log.info(`Served Image -> '${(params as { imageId: string }).imageId} @ ${resolutionParam}'`);
           return serveFile(req, outputPath);
@@ -206,8 +245,14 @@ export default class ApiSystem extends System {
         method: ["GET"],
         pattern: new URLPattern({ pathname: "/api/asset/raw/:assetId" }),
         async handler(req, rawParams) {
-          // @ts-ignore this does exist
           const params = rawParams?.pathname.groups;
+
+          if (!params) {
+            return Response.json({
+              code: "INVALID_REQUEST",
+              message: "missing params",
+            }) as unknown as Response;
+          }
 
           const asset = self.instance.sys.filesystem._internalAssets.get(params.assetId as string);
 
@@ -282,17 +327,24 @@ export default class ApiSystem extends System {
 
     this.listening = true;
     const self = this;
-    this.webServer = Deno.serve(
-      {
-        port: this.instance.sys.configuration.apiPort,
-        onListen(localAddr) {
-          self.log.info(`Listening on port ${localAddr.port}`);
-        },
-      },
-      routeRadix(this.instance.sys.api.routes, async (req) => {
+    this.webServer = Bun.serve({
+      port: this.instance.sys.configuration.apiPort,
+      async fetch(req) {
+        const url = new URL(req.url);
+        for (const route of self.routes) {
+          if (route.method) {
+            const methods = Array.isArray(route.method) ? route.method : [route.method];
+            if (!methods.includes(req.method)) continue;
+          }
+          const match = route.pattern.exec(url);
+          if (match) {
+            return await route.handler(req, match);
+          }
+        }
+
         if (req.method === "OPTIONS") {
           const headers = new Headers();
-          headers.set("access-control-allow-origin", this.instance.sys.configuration.proxy.hostname);
+          headers.set("access-control-allow-origin", self.instance.sys.configuration.proxy.hostname);
           headers.set("vary", "origin");
           headers.set("access-control-allow-methods", "GET, POST, PUT, DELETE");
           headers.set("access-control-allow-headers", "content-type, authorization");
@@ -300,7 +352,7 @@ export default class ApiSystem extends System {
           return new Response(null, {
             status: 204,
             headers,
-          }) as unknown as Response;
+          });
         }
 
         return Response.json(
@@ -308,19 +360,16 @@ export default class ApiSystem extends System {
           {
             status: 404,
           },
-        ) as unknown as Response;
-      }),
-    );
-
-    this.webServer.finished.then(() => {
-      this.log.info("webserver closed");
+        );
+      },
     });
 
+    this.log.info(`Listening on port ${this.webServer.port}`);
     return true;
   }
 
   override async stop(): Promise<boolean> {
-    await this.webServer?.shutdown?.();
+    this.webServer?.stop(true);
     this.listening = false;
 
     return true;

@@ -64,7 +64,7 @@ class Instance {
 
     this.status = InstanceStatus.Offline;
 
-    Deno.addSignalListener("SIGINT", async () => {
+    process.on("SIGINT", async () => {
       await this.shutdown("Console Admin Ctrl+C");
     });
   }

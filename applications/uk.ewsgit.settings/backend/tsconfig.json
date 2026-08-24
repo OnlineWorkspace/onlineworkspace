@@ -5,9 +5,9 @@
     "moduleResolution": "nodenext",
     "lib": [
       "ESNext",
-      "Decorators",
-      "deno.ns"
+      "Decorators"
     ],
+    "types": ["@types/bun"],
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "strict": true,

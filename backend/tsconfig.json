@@ -1,8 +1,9 @@
 {
   "compilerOptions": {
-    "lib": ["esnext", "deno.ns"],
-    "types": [],
-    "skipLibCheck": true
+    "lib": ["esnext"],
+    "types": ["@types/bun"],
+    "skipLibCheck": true,
+    "allowImportingTsExtensions": true
   },
   "include": [
     "src"

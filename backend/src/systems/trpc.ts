@@ -1,3 +1,4 @@
+import type { Server } from "bun";
 import type { TRPCBuiltRouter } from "@trpc/server";
 import {
   type FetchCreateContextFnOptions,
@@ -16,7 +17,7 @@ export default class TRPCSystem extends System {
     router: TRPCBuiltRouter<any, any>;
     createContext: (
       opts: FetchCreateContextFnOptions,
-      server: Deno.HttpServer<Deno.NetAddr>,
+      server: Server,
     ) => object;
   }[];
 
@@ -37,7 +38,7 @@ export default class TRPCSystem extends System {
     basePath: string,
     createContext: (
       opts: FetchCreateContextFnOptions,
-      server: Deno.HttpServer<Deno.NetAddr>,
+      server: Server,
     ) => object = createOnlineWorkspaceTRPCContext(this.instance),
   ) {
     if (this.routers.find((r) => r.basePath === basePath)) {
@@ -74,7 +75,7 @@ export default class TRPCSystem extends System {
 
   attemptTRPCRequest(
     req: Request,
-    server: Deno.HttpServer<Deno.NetAddr>,
+    server: Server,
   ) {
     const self = this;
     const url = new URL(req.url);

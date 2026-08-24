@@ -103,14 +103,11 @@ export default class ApplicationsSystem extends System {
 }`,
         );
 
-        const command = new Deno.Command("deno", {
-          args: ["install"],
+        const child = Bun.spawn(["bun", "install"], {
           cwd: path.join(this.instance.sys.filesystem.SYSTEM_PATH, "vite"),
-          stdout: "piped",
-          stderr: "piped",
+          stdout: "pipe",
+          stderr: "pipe",
         });
-
-        const child = command.spawn();
 
         // @ts-ignore don't know why typescript hates this
         for await (const msg of child.stdout) {
@@ -306,25 +303,19 @@ export default class ApplicationsSystem extends System {
           globalThis.instance = this.instance;
           await import(`file://${path.join(app.path, app.manifest.modules.internal.path)}`);
         } catch (err) {
-          this.log.error("problem with application's deno internal module ->", err);
+          this.log.error("problem with application's internal module ->", err);
         }
       }
 
-      if (app.manifest?.modules.deno) {
-        // FIXME: this should use the requested args from the module.
-        const permissionArgs = ["-A"]
+      if (app.manifest?.modules.bun) {
+        const child = Bun.spawn(["bun", app.manifest.modules.bun.path], {
+          stdout: "pipe",
+          stderr: "pipe",
+          stdin: "pipe",
+          cwd: app.path,
+        });
 
-        const command = new Deno.Command("deno", {
-          args: [...permissionArgs, app.manifest.modules.deno.path],
-          stdout: "piped",
-          stderr: "piped",
-          stdin: "piped",
-          cwd: app.path
-        })
-
-        const child = command.spawn();
-
-        const MODULE_LOG_PREFIX = `${app.manifest.id} module:deno -> `;
+        const MODULE_LOG_PREFIX = `${app.manifest.id} module:bun -> `;
 
         // @ts-ignore typescript hates this valid code.
         for await (const msg of child.stdout) {
@@ -350,14 +341,12 @@ export default class ApplicationsSystem extends System {
       }
 
       if (app.manifest?.modules.external) {
-        const command = new Deno.Command(app.manifest.modules.external.path, {
-          stdout: "piped",
-          stderr: "piped",
-          stdin: "piped",
-          cwd: app.path
+        const child = Bun.spawn([app.manifest.modules.external.path], {
+          stdout: "pipe",
+          stderr: "pipe",
+          stdin: "pipe",
+          cwd: app.path,
         });
-
-        const child = command.spawn();
 
         const MODULE_LOG_PREFIX = `${app.manifest.id} module:external -> `;
 

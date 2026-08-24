@@ -10,7 +10,6 @@ import {
   verifyAuthenticationResponse,
   verifyRegistrationResponse,
 } from "@simplewebauthn/server";
-import { timingSafeEqual } from "@std/crypto";
 import * as OTPAuth from "otpauth";
 import type { Instance } from "../index.ts";
 import System from "../system.ts";
@@ -55,7 +54,8 @@ export default class AuthorizationSystem extends System {
   private async _internalVerifyPassword(password: string, hashedPassword: string): Promise<boolean> {
     const [salt, expected] = hashedPassword.split(":").map((part) => Uint8Array.fromBase64(part));
     const actual = await this._internalDeriveBits(password, salt);
-    return timingSafeEqual(actual, expected);
+    if (actual.byteLength !== expected.byteLength) return false;
+    return crypto.timingSafeEqual(actual, expected);
   }
 
   private async _internalDeriveBits(password: string, salt: Uint8Array<ArrayBuffer>): Promise<Uint8Array> {

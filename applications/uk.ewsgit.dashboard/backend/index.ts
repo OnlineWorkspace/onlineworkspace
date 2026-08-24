@@ -1,6 +1,7 @@
 /// <reference path="./global.d.ts" />
 
-import * as fs from "@std/fs";
+import { existsSync } from "node:fs";
+import fs from "node:fs/promises";
 import path from "node:path";
 import { WorkspacesEvent } from "@onlineworkspace/workspace-backend/src/systems/events.ts";
 import { BooleanApplicationSetting } from "@onlineworkspace/workspace-backend/src/systems/settings/applicationSetting/booleanSetting.ts";
@@ -192,10 +193,9 @@ const router = t.router({
           "assets/wallpapers",
         );
 
-        if (await fs.exists(path.join(wallpaperPath, "config.json"))) {
-          const textDecoder = new TextDecoder("utf8")
+        if (existsSync(path.join(wallpaperPath, "config.json"))) {
           const options = JSON.parse(
-            textDecoder.decode(await Deno.readFile(path.join(wallpaperPath, "config.json"))),
+            await fs.readFile(path.join(wallpaperPath, "config.json"), "utf8"),
           );
 
           options.position = options.position.split(" ");
@@ -222,19 +222,17 @@ const router = t.router({
         `${opt.input.width}x${opt.input.height}.webp`,
       );
 
-      if (!(await fs.exists(rawWallpaperPath))) {
+      if (!existsSync(rawWallpaperPath)) {
         return undefined;
       }
 
-      if (!(await fs.exists(requiredResizedWallpaperPath))) {
+      if (!existsSync(requiredResizedWallpaperPath)) {
         const options = await (async () => {
-          if (await fs.exists(path.join(wallpapersRootPath, "config.json"))) {
-            const textDecoder = new TextDecoder("utf8");
+          if (existsSync(path.join(wallpapersRootPath, "config.json"))) {
             const options = JSON.parse(
-              textDecoder.decode(
-                await Deno.readFile(
-                  path.join(wallpapersRootPath, "config.json"),
-                ),
+              await fs.readFile(
+                path.join(wallpapersRootPath, "config.json"),
+                "utf8",
               ),
             );
 

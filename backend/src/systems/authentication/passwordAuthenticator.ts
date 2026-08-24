@@ -1,5 +1,4 @@
 import crypto from "node:crypto";
-import { timingSafeEqual } from "@std/crypto";
 import type AuthenticationSystem from "../authentication.ts";
 
 const PASSWORD_HASH_ITERATIONS = 600_000;
@@ -20,7 +19,8 @@ export default class PasswordAuthenticator {
   private async _internalVerifyPassword(password: string, hashedPassword: string): Promise<boolean> {
     const [salt, expected] = hashedPassword.split(":").map((part) => Uint8Array.fromBase64(part));
     const actual = await this._internalDeriveBits(password, salt);
-    return timingSafeEqual(actual, expected);
+    if (actual.byteLength !== expected.byteLength) return false;
+    return crypto.timingSafeEqual(actual, expected);
   }
 
   private async _internalDeriveBits(password: string, salt: Uint8Array<ArrayBuffer>): Promise<Uint8Array> {

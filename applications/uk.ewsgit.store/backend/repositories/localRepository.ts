@@ -1,4 +1,5 @@
-import * as fs from "@std/fs";
+import { existsSync } from "node:fs";
+import fs from "node:fs/promises";
 import path from "node:path";
 import ApplicationRepository, {
   type RepositoryApplication,
@@ -12,29 +13,17 @@ export default class LocalApplicationRepository extends ApplicationRepository {
   async getApplicationById(
     applicationId: string,
   ): Promise<RepositoryApplication | undefined> {
-    if (
-      !(await fs.exists(
-        path.join(
-          instance.sys.filesystem.SRC_ROOT,
-          "../../applications/",
-          applicationId,
-          "manifest.json",
-        ),
-      ))
-    ) return undefined;
+    const manifestPath = path.join(
+      instance.sys.filesystem.SRC_ROOT,
+      "../../applications/",
+      applicationId,
+      "manifest.json",
+    );
 
-    const decoder = new TextDecoder("utf-8");
+    if (!existsSync(manifestPath)) return undefined;
+
     const applicationManifest = JSON.parse(
-      decoder.decode(
-        await Deno.readFile(
-          path.join(
-            instance.sys.filesystem.SRC_ROOT,
-            "../../applications/",
-            applicationId,
-            "manifest.json",
-          ),
-        ),
-      ),
+      await fs.readFile(manifestPath, "utf8"),
     ) as OnlineWorkspaceApplication;
 
     return {
@@ -80,28 +69,26 @@ export default class LocalApplicationRepository extends ApplicationRepository {
         (!!applicationManifest.modules.internal ||
             !!applicationManifest.modules.external)
           ? ["All"]
-          : applicationManifest.modules.deno
-          ? applicationManifest.modules.deno.permissions
+          : applicationManifest.modules.bun
+          ? applicationManifest.modules.bun.permissions || []
           : [],
     };
   }
 
   async searchForApplicationIds(query?: string): Promise<string[]> {
     let applicationIds: string[] = [];
+    const entries = await fs.readdir(
+      path.join(instance.sys.filesystem.SRC_ROOT, "../../applications/"),
+    );
 
-    for await (
-      const entry of Deno.readDir(
-        path.join(instance.sys.filesystem.SRC_ROOT, "../../applications/"),
-      )
-    ) {
+    for (const entry of entries) {
       if (query === undefined) {
-        applicationIds.push(entry.name);
+        applicationIds.push(entry);
         continue;
       }
 
-      if (entry.name.includes(query)) {
-        applicationIds.push(entry.name);
-
+      if (entry.includes(query)) {
+        applicationIds.push(entry);
       }
     }
 

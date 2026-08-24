@@ -7,6 +7,13 @@
     "url": "https://github.com/onlineworkspace/onlineworkspace"
   },
   "private": true,
+  "scripts": {
+    "dev": "bun --watch backend/src/index.ts",
+    "start": "bun backend/src/index.ts",
+    "dev-debug": "bun --inspect-brk backend/src/index.ts",
+    "build-web": "bun --cwd web build",
+    "uikit": "bun --cwd uikit-solid dev"
+  },
   "dependencies": {
     "prettier": "^3.8.3",
     "typescript": "^6.0.0"
@@ -14,5 +21,5 @@
   "devDependencies": {
     "@biomejs/biome": "^2.4.14"
   },
-  "workspaces": ["backend/", "web/", "applications/*/web/", "applications/*/frontend/", "applications/*/server/", "applications/*/backend/", "applications/*/desktop/", "uikit-solid/", "desktop/"]
+  "workspaces": ["backend", "web", "uikit-solid", "applications/*/web", "applications/*/frontend", "applications/*/server", "applications/*/backend"]
 }

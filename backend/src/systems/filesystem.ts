@@ -1,7 +1,7 @@
 import crypto, { createHash } from "node:crypto";
+import { copyFileSync, cpSync, existsSync, mkdirSync, rmSync } from "node:fs";
+import fs from "node:fs/promises";
 import path from "node:path";
-import * as fs from "@std/fs";
-import { iterateReader } from "@std/io";
 import type { Instance } from "../index.ts";
 import System from "../system.ts";
 import { WorkspacesEvent } from "./events.ts";
@@ -61,11 +61,11 @@ export default class FilesystemSystem extends System {
   // @returns {true} if created
   // @returns {false} if already exists
   async createDirectoryIfNotExists(path: string): Promise<boolean> {
-    if (await fs.exists(path)) {
+    if (existsSync(path)) {
       return false;
     }
 
-    await Deno.mkdir(path, { recursive: true });
+    await fs.mkdir(path, { recursive: true });
 
     return true;
   }
@@ -75,14 +75,8 @@ export default class FilesystemSystem extends System {
    * @returns {string} an md5 hash of the input file
    */
   async getFileHash(path: string): Promise<string> {
-    const hash = createHash("md5");
-    const file = await Deno.open(path);
-
-    for await (const chunk of iterateReader(file)) {
-      hash.update(chunk);
-    }
-
-    return hash.digest("hex");
+    const fileBuffer = await fs.readFile(path);
+    return createHash("md5").update(fileBuffer).digest("hex");
   }
 
   getFileType(path: string): FileMediaType {
@@ -186,63 +180,63 @@ export default class FilesystemSystem extends System {
   override async startup(): Promise<boolean> {
     await super.startup();
 
-    if (!fs.existsSync(this.AUTO_INSTALL_PATH)) {
+    if (!existsSync(this.AUTO_INSTALL_PATH)) {
       // do nothing
     } else {
       this.log.info(`Auto install directory detected. (${this.AUTO_INSTALL_PATH})`);
     }
 
-    if (!fs.existsSync(this.FS_ROOT)) {
-      Deno.mkdirSync(this.FS_ROOT, { recursive: true });
+    if (!existsSync(this.FS_ROOT)) {
+      mkdirSync(this.FS_ROOT, { recursive: true });
     } else this.log.debug(`FS_ROOT exists, (${this.FS_ROOT})`);
 
-    if (!fs.existsSync(this.SYSTEM_PATH)) {
-      Deno.mkdirSync(this.SYSTEM_PATH, {
+    if (!existsSync(this.SYSTEM_PATH)) {
+      mkdirSync(this.SYSTEM_PATH, {
         recursive: true,
       });
     } else this.log.debug(`SYSTEM_PATH exists, (${this.SYSTEM_PATH})`);
 
-    if (!fs.existsSync(this.CACHE_PATH)) {
-      Deno.mkdirSync(this.CACHE_PATH, { recursive: true });
+    if (!existsSync(this.CACHE_PATH)) {
+      mkdirSync(this.CACHE_PATH, { recursive: true });
     } else this.log.debug(`CACHE_PATH exists, (${this.CACHE_PATH})`);
 
-    if (!fs.existsSync(path.join(this.FS_ROOT, "assets/login"))) {
-      Deno.mkdirSync(path.join(this.FS_ROOT, "assets/login"), {
+    if (!existsSync(path.join(this.FS_ROOT, "assets/login"))) {
+      mkdirSync(path.join(this.FS_ROOT, "assets/login"), {
         recursive: true,
       });
     } else {
       this.log.debug(`FS_ROOT/assets/login exists, (${path.join(this.FS_ROOT, "assets/login")})`);
     }
 
-    if (!fs.existsSync(path.join(this.FS_ROOT, "assets/login/banner.png"))) {
-      if (!fs.existsSync(path.join(this.AUTO_INSTALL_PATH, "assets/login/banner.png"))) {
-        Deno.copyFileSync(path.join(this.SRC_ROOT, "assets/placeholder/banner.png"), path.join(this.FS_ROOT, "assets/login/banner.png"));
+    if (!existsSync(path.join(this.FS_ROOT, "assets/login/banner.png"))) {
+      if (!existsSync(path.join(this.AUTO_INSTALL_PATH, "assets/login/banner.png"))) {
+        copyFileSync(path.join(this.SRC_ROOT, "assets/placeholder/banner.png"), path.join(this.FS_ROOT, "assets/login/banner.png"));
       } else {
-        Deno.copyFileSync(path.join(this.AUTO_INSTALL_PATH, "assets/login/banner.png"), path.join(this.FS_ROOT, "assets/login/banner.png"));
+        copyFileSync(path.join(this.AUTO_INSTALL_PATH, "assets/login/banner.png"), path.join(this.FS_ROOT, "assets/login/banner.png"));
       }
     }
 
-    if (!fs.existsSync(path.join(this.FS_ROOT, "assets/login/background.png"))) {
-      Deno.copyFileSync(path.join(this.SRC_ROOT, "assets/wallpapers/pexels-steve-29708303.jpg"), path.join(this.FS_ROOT, "assets/login/background.png"));
+    if (!existsSync(path.join(this.FS_ROOT, "assets/login/background.png"))) {
+      copyFileSync(path.join(this.SRC_ROOT, "assets/wallpapers/pexels-steve-29708303.jpg"), path.join(this.FS_ROOT, "assets/login/background.png"));
     } else {
       this.log.debug(`FS_ROOT/assets/login/background.png exists, (${path.join(this.FS_ROOT, "assets/login/background.png")})`);
     }
 
-    if (!fs.existsSync(path.join(this.SYSTEM_PATH, "fs_template_files"))) {
-      Deno.mkdirSync(path.join(this.SYSTEM_PATH, "fs_template_files"));
-      fs.copySync(path.join(this.SRC_ROOT, "assets/fs_template_files/"), path.join(this.SYSTEM_PATH, "fs_template_files"), { overwrite: true });
+    if (!existsSync(path.join(this.SYSTEM_PATH, "fs_template_files"))) {
+      mkdirSync(path.join(this.SYSTEM_PATH, "fs_template_files"), { recursive: true });
+      cpSync(path.join(this.SRC_ROOT, "assets/fs_template_files/"), path.join(this.SYSTEM_PATH, "fs_template_files"), { recursive: true, force: true });
     } else {
       this.log.debug(`FS_ROOT/assets/fs_template_files exists, (${path.join(this.FS_ROOT, "assets/fs_template_files")})`);
     }
 
-    if (!fs.existsSync(path.join(this.SYSTEM_PATH, "vite"))) {
-      Deno.mkdirSync(path.join(this.SYSTEM_PATH, "vite"));
+    if (!existsSync(path.join(this.SYSTEM_PATH, "vite"))) {
+      mkdirSync(path.join(this.SYSTEM_PATH, "vite"), { recursive: true });
     }
 
     if (!this.instance.sys.configuration.isDevMode) {
-      if (fs.existsSync(this.CACHE_PATH)) {
-        Deno.removeSync(this.CACHE_PATH, { recursive: true });
-        Deno.mkdirSync(this.CACHE_PATH, { recursive: true });
+      if (existsSync(this.CACHE_PATH)) {
+        rmSync(this.CACHE_PATH, { recursive: true, force: true });
+        mkdirSync(this.CACHE_PATH, { recursive: true });
       }
     } else {
       this.log.warning("Cache was not cleared as we are running in devMode");
