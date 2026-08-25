@@ -1,10 +1,10 @@
 import crypto from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
-import {createCanvas, loadImage} from "canvas";
 import type {Instance} from "../index.ts";
 import System from "../system.ts";
 import {FileMediaType} from "./filesystem.ts";
+import {Canvas, loadImage} from "skia-canvas";
 
 export type ImageFormat = "avif" | "jpeg" | "png" | "webp";
 
@@ -252,7 +252,7 @@ export default class ImageSystem extends System {
     const canvasWidth = size;
     const canvasHeight = size;
 
-    const canvas = createCanvas(canvasWidth, canvasHeight);
+    const canvas = new Canvas(canvasWidth, canvasHeight);
     const ctx = canvas.getContext("2d");
 
     const placeholderPath = path.join(
@@ -287,10 +287,10 @@ export default class ImageSystem extends System {
     ctx.fillStyle = "white";
     ctx.fillText(textContent, labelPos.x - labelPadding.x, labelPos.y - labelPadding.y);
 
-    const buffer = canvas.toBuffer("image/png");
-    await fs.writeFile(thumbCachePath, buffer);
+    const outputBuffer = await canvas.toBuffer("png");
+    await fs.writeFile(thumbCachePath, outputBuffer);
 
-    return buffer;
+    return outputBuffer;
   }
 
   private _internalGetResponseUrl(imageId: string, resolutionKey: string): string {

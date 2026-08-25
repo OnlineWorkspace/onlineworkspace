@@ -138,6 +138,7 @@ class Instance {
 export type { Instance };
 
 const INSTANCE = new Instance();
+// @ts-ignore - this does exist and is defined in globals.d.ts
 global.INSTANCE = INSTANCE;
 export default INSTANCE;
 

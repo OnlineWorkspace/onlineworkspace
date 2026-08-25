@@ -55,9 +55,9 @@ class Logger {
 
   // biome-ignore lint/suspicious/noExplicitAny: can be of any type
   debug(...message: any[]) {
-    // if (!this.log.instance.configurationManager.config.isDevMode) {
-    //     return this;
-    // }
+    if (!this.log.instance.sys.configuration.isDevMode) {
+        return this;
+    }
 
     return this.logMessage(LogType.DEBUG, ...message);
   }
@@ -113,13 +113,18 @@ export default class Log {
     this.system = this.createLogger("system");
     this._internal_onNewMessageListeners = [];
 
-    global.backup = {};
-    global.backup.console = {};
-    global.backup.console.log = global.console.log;
-    global.backup.console.info = global.console.info;
-    global.backup.console.warn = global.console.warn;
-    global.backup.console.error = global.console.error;
-    global.backup.console.debug = global.console.debug;
+    // @ts-ignore - this is declared in globals.d.ts
+    global.consoleBackup = {};
+    // @ts-ignore - this is declared in globals.d.ts
+    global.consoleBackup.log = global.console.log;
+    // @ts-ignore - this is declared in globals.d.ts
+    global.consoleBackup.info = global.console.info;
+    // @ts-ignore - this is declared in globals.d.ts
+    global.consoleBackup.warn = global.console.warn;
+    // @ts-ignore - this is declared in globals.d.ts
+    global.consoleBackup.error = global.console.error;
+    // @ts-ignore - this is declared in globals.d.ts
+    global.consoleBackup.debug = global.console.debug;
 
     // biome-ignore lint/suspicious/noExplicitAny: data could be of any type
     global.console.log = (...data: any[]): void => {

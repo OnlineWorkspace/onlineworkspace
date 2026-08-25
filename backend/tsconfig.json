@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "lib": ["esnext"],
-    "types": ["@types/bun"],
+    "types": ["@types/bun", "./globals.d.ts"],
     "skipLibCheck": true,
     "allowImportingTsExtensions": true
   },
