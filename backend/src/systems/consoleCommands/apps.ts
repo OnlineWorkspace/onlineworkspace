@@ -6,10 +6,9 @@ const command: CommandModule = {
   aliases: ["apps"],
   describe: "List installed applications",
   async handler(args) {
-    const instance = (globalThis as unknown as { INSTANCE: Instance }).INSTANCE;
-    const log = instance.log.system
+    const log = INSTANCE.log.system
 
-    for (const app of instance.sys.applications.availableApplications) {
+    for (const app of INSTANCE.sys.applications.availableApplications) {
       log.info(`application ${log.emphasis(app.manifest?.id || "")} is ${app.enabled ? "enabled" : "disabled"}`)
     }
   }

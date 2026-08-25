@@ -1,11 +1,13 @@
+export {};
+
 declare global {
   const INSTANCE: import("./index.ts").Instance;
 
   const consoleBackup: {
-    log: console.log
-    info: console.info
-    warn: console.warn
-    error: console.error
-    debug: console.debug
+    log: typeof console.log
+    info: typeof console.info
+    warn: typeof console.warn
+    error: typeof console.error
+    debug: typeof console.debug
   }
 }

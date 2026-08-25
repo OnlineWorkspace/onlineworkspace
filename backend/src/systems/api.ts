@@ -140,7 +140,7 @@ export default class ApiSystem extends System {
           }
 
           if (application.manifest?.icon?.type === "material-symbol") {
-            const applicationIconPath = path.join(self.instance.sys.filesystem.SRC_ROOT, "node_modules/@material0symbols", application.manifest?.icon?.value || "");
+            const applicationIconPath = path.join(self.instance.sys.filesystem.SRC_ROOT, "../../node_modules/@material-symbols/svg-700/outlined/", (application.manifest?.icon?.value + ".svg") || "");
 
             try {
               return serveFile(req, await fs.realpath(applicationIconPath));

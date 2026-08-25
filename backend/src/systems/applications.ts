@@ -109,12 +109,12 @@ export default class ApplicationsSystem extends System {
           stderr: "pipe",
         });
 
-        // @ts-ignore don't know why typescript hates this
+        // @ts-ignore don't know why TypeScript hates this
         for await (const msg of child.stdout) {
           this.log.info(`Applications Initial Startup -> ${Buffer.from(msg).toString()}`);
         }
 
-        // @ts-ignore don't know why typescript hates this
+        // @ts-ignore don't know why TypeScript hates this
         for await (const msg of child.stderr) {
           this.log.info(`Applications Initial Startup -> ${Buffer.from(msg).toString()}`);
         }
@@ -476,6 +476,34 @@ export default class ApplicationsSystem extends System {
       );
 
     return true;
+  }
+
+  async getApplicationIconPath(applicationId: string): Promise<string> {
+    const application = this.instance.sys.applications.availableApplications.find((a) => a.manifest?.id === applicationId);
+
+    if (!application) {
+      return path.join(this.instance.sys.filesystem.FS_ROOT, "assets/missing.png")
+    }
+
+    if (application.manifest?.icon?.type === "material-symbol") {
+      const applicationIconPath = path.join(this.instance.sys.filesystem.SRC_ROOT, "../../node_modules/@material-symbols/svg-700/outlined/", (application.manifest?.icon?.value + ".svg") || "");
+
+      try {
+        return await fs.realpath(applicationIconPath)
+      } catch (err) {
+        this.log.error(`Failed to serve icon at path '${applicationIconPath}'!`)
+        return path.join(this.instance.sys.filesystem.FS_ROOT, "assets/missing.png")
+      }
+    } else {
+      const applicationIconPath = path.join(application.path, application.manifest?.icon?.value || "");
+
+      try {
+        return await fs.realpath(applicationIconPath)
+      } catch (err) {
+        this.log.error(`Failed to serve icon at path '${applicationIconPath}'!`)
+        return path.join(this.instance.sys.filesystem.FS_ROOT, "assets/missing.png")
+      }
+    }
   }
 
   async getApplicationStatus(applicationId: string): Promise<{ installed: true, enabled: boolean } | { installed: false }> {

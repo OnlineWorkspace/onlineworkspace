@@ -3,8 +3,8 @@ import type { CommandModule } from "yargs";
 const command: CommandModule = {
   command: "exit",
   describe: "Shutdown the OnlineWorkspace Instance",
-  handler() {
-    global.INSTANCE.shutdown();
+  async handler() {
+    await INSTANCE.shutdown();
   },
 };
 

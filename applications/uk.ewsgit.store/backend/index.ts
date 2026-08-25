@@ -171,7 +171,7 @@ const router = t.router({
       }
 
       if (app.icon) {
-        app.icon.value = await instance.sys.image.serveImage(opt.ctx.userId, app.icon.value)
+        app.icon.value = await instance.sys.image.serveImage(opt.ctx.userId, await instance.sys.applications.getApplicationIconPath(opt.input.applicationId))
       }
 
       return { ...app, isInstalled: instance.sys.applications.availableApplications.find((aid) => aid.manifest!.id === app.id) };
