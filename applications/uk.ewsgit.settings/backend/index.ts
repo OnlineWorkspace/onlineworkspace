@@ -15,6 +15,7 @@ import { octetInputParser } from "@trpc/server/http";
 import sharp from "sharp";
 import z from "zod";
 import { FileMediaType } from "../../../backend/src/systems/filesystem.ts";
+import {OnlineWorkspaceApplication} from "@onlineworkspace/workspace-backend/src/systems/applications/application.js";
 
 const APPLICATION_ID = "uk.ewsgit.settings";
 const log = instance.log.createLogger(APPLICATION_ID);
@@ -537,7 +538,7 @@ const router = t.router({
               source: await instance.sys.image.serveImage(opt.ctx.userId, loginBannerCachePath, {
                 resize: {
                   dimensions: DIMENSIONS,
-                  fit: "cover",
+                  fit: "fill",
                   position: "centre",
                 },
               }),
@@ -545,7 +546,7 @@ const router = t.router({
             };
           }),
         // TODO: implement me!
-        set: procedure.mutation(async (opt) => {}),
+        set: procedure.mutation(async () => {}),
       },
       loginBackground: {
         preview: procedure
@@ -577,7 +578,7 @@ const router = t.router({
               source: await instance.sys.image.serveImage(opt.ctx.userId, loginBackgroundCachePath, {
                 resize: {
                   dimensions: DIMENSIONS,
-                  fit: "cover",
+                  fit: "fill",
                   position: "centre",
                 },
               }),
@@ -615,7 +616,7 @@ const router = t.router({
               source: await instance.sys.image.serveImage(opt.ctx.userId, loginBannerCachePath, {
                 resize: {
                   dimensions: DIMENSIONS,
-                  fit: "cover",
+                  fit: "fill",
                   position: "centre",
                 },
               }),
@@ -653,7 +654,7 @@ const router = t.router({
               source: await instance.sys.image.serveImage(opt.ctx.userId, loginBannerCachePath, {
                 resize: {
                   dimensions: DIMENSIONS,
-                  fit: "cover",
+                  fit: "fill",
                   position: "centre",
                 },
               }),
@@ -754,9 +755,9 @@ const router = t.router({
 
         const wallpaperUUID = crypto.randomUUID();
 
-        await sharp(opt.input)
-          .toFormat("webp")
-          .toFile(path.join(wallpapersPath, `${wallpaperUUID}.webp`));
+        let image = new Bun.Image(await new Response(opt.input).arrayBuffer()).webp()
+
+        await fs.writeFile(path.join(wallpapersPath, `${wallpaperUUID}.webp`), await image.bytes())
 
         log.info(
           `converted '${wallpaperUUID}' to WEBP -> '${path.relative(instance.sys.filesystem.FS_ROOT, path.join(wallpapersPath, `${wallpaperUUID}.webp`))}'`,
@@ -972,7 +973,7 @@ const router = t.router({
         const shortcuts: {
           id: string;
           displayName: string;
-          icon: { type: "icon" | "image"; value: string };
+          icon: { type: "material-symbol" | "image"; value: string };
         }[] = [];
 
         const quickShortcutsSetting = instance.sys.settings.applicationSettings.core?.find((s) => s.id === "quick_shortcuts");
@@ -990,21 +991,17 @@ const router = t.router({
           }
 
           let icon = {
-            type: "icon" as "icon" | "image",
+            type: "material-symbol",
             value: "indeterminate_question_box",
-          };
+          } as Required<OnlineWorkspaceApplication>["icon"];
 
           if (application.manifest?.icon) {
-            if (application.manifest.icon.type === "image") {
               icon = {
-                type: "image",
+                type: application.manifest.icon.type,
                 value: `${
                   opt.ctx.instance.sys.configuration.proxy.secure ? "https://" : "http://"
                 }${opt.ctx.instance.sys.configuration.proxy.hostname}/api/application-icon/${application.manifest.id}`,
               };
-            } else {
-              icon = application.manifest.icon;
-            }
           }
 
           shortcuts.push({

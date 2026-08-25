@@ -1,10 +1,10 @@
-import { existsSync } from "node:fs";
+import {existsSync} from "node:fs";
 import fs from "node:fs/promises";
 import path from "node:path";
-import type { Server } from "bun";
-import type { Instance } from "../index.ts";
+import type {Server} from "bun";
+import type {Instance} from "../index.ts";
 import System from "../system.ts";
-import { getCookies } from "../utils/cookies.ts";
+import {getCookies} from "../utils/cookies.ts";
 
 export interface Route {
   method?: string | string[];
@@ -40,29 +40,29 @@ export default class ApiSystem extends System {
           return Response.json(
             {
               teapot: true,
-              message: "This OnlineWorkspace (Teapot?) sadly does not support the Hyper Text Coffee Pot Control Protocol (HTCPCP) 😢",
+              message: "This OnlineWorkspace (Not a teapot?) sadly does not support the Hyper Text Coffee Pot Control Protocol 😢",
             },
-            { status: 418 },
+            {status: 418},
           ) as unknown as Response;
         },
       },
       {
         method: ["GET"],
-        pattern: new URLPattern({ pathname: "/api/instance/login/banner" }),
+        pattern: new URLPattern({pathname: "/api/instance/login/banner"}),
         handler(req) {
           return serveFile(req, path.join(self.instance.sys.filesystem.FS_ROOT, "assets/login/banner.png"));
         },
       },
       {
         method: ["GET"],
-        pattern: new URLPattern({ pathname: "/api/instance/login/background" }),
+        pattern: new URLPattern({pathname: "/api/instance/login/background"}),
         handler(req) {
           return serveFile(req, path.join(self.instance.sys.filesystem.FS_ROOT, "assets/login/background.png"));
         },
       },
       {
         method: ["GET"],
-        pattern: new URLPattern({ pathname: "/api/user/me/avatar/:size" }),
+        pattern: new URLPattern({pathname: "/api/user/me/avatar/:size"}),
         async handler(req, rawParams, _info) {
           const params = rawParams?.pathname.groups;
 
@@ -108,7 +108,7 @@ export default class ApiSystem extends System {
       },
       {
         method: ["GET"],
-        pattern: new URLPattern({ pathname: "/api/application-icon/*" }),
+        pattern: new URLPattern({pathname: "/api/application-icon/*"}),
         async handler(req, rawParams) {
           const params = rawParams?.pathname.groups["0"];
 
@@ -139,9 +139,27 @@ export default class ApiSystem extends System {
             }) as unknown as Response;
           }
 
-          const applicationIconPath = path.join(application.path, application.manifest?.icon?.value || "");
+          if (application.manifest?.icon?.type === "material-symbol") {
+            const applicationIconPath = path.join(self.instance.sys.filesystem.SRC_ROOT, "node_modules/@material0symbols", application.manifest?.icon?.value || "");
 
-          return serveFile(req, applicationIconPath);
+            try {
+              return serveFile(req, await fs.realpath(applicationIconPath));
+            } catch (err) {
+              self.log.error(`Failed to serve icon at path '${applicationIconPath}'!`)
+              return serveFile(req, path.join(self.instance.sys.filesystem.FS_ROOT, "assets/missing.png"))
+            }
+
+
+          } else {
+            const applicationIconPath = path.join(application.path, application.manifest?.icon?.value || "");
+
+            try {
+              return serveFile(req, await fs.realpath(applicationIconPath));
+            } catch (err) {
+              self.log.error(`Failed to serve icon at path '${applicationIconPath}'!`)
+              return serveFile(req, path.join(self.instance.sys.filesystem.FS_ROOT, "assets/missing.png"))
+            }
+          }
         },
       },
       {
@@ -223,7 +241,7 @@ export default class ApiSystem extends System {
           }
 
           if (!existsSync(path.join(outputPath, ".."))) {
-            await fs.mkdir(path.join(outputPath, ".."), { recursive: true });
+            await fs.mkdir(path.join(outputPath, ".."), {recursive: true});
           }
 
           if (!sourceImage.resize?.dimensions) {
@@ -243,7 +261,7 @@ export default class ApiSystem extends System {
       },
       {
         method: ["GET"],
-        pattern: new URLPattern({ pathname: "/api/asset/raw/:assetId" }),
+        pattern: new URLPattern({pathname: "/api/asset/raw/:assetId"}),
         async handler(req, rawParams) {
           const params = rawParams?.pathname.groups;
 
@@ -284,7 +302,7 @@ export default class ApiSystem extends System {
         },
       },
       {
-        pattern: new URLPattern({ pathname: "/api/trpc/*" }),
+        pattern: new URLPattern({pathname: "/api/trpc/*"}),
         async handler(req, _params) {
           return (
             (await self.instance.sys.tRPC.attemptTRPCRequest(req, self.instance.sys.api.webServer)) ||
@@ -293,7 +311,7 @@ export default class ApiSystem extends System {
                 notFound: true,
                 message: "Unhandled by tRPC router",
               },
-              { status: 404 },
+              {status: 404},
             ) as unknown as Response)
           );
         },
@@ -316,6 +334,7 @@ export default class ApiSystem extends System {
   }
 
   getProxyBasePath(): string {
+    // noinspection HttpUrlsUsage
     return `${this.instance.sys.configuration.proxy.secure ? "https://" : "http://"}${this.instance.sys.configuration.proxy.hostname}`;
   }
 
@@ -338,7 +357,7 @@ export default class ApiSystem extends System {
           }
           const match = route.pattern.exec(url);
           if (match) {
-            return await route.handler(req, match);
+            return route.handler(req, match);
           }
         }
 
@@ -356,10 +375,8 @@ export default class ApiSystem extends System {
         }
 
         return Response.json(
-          { notFound: true },
-          {
-            status: 404,
-          },
+          {notFound: true},
+          {status: 404},
         );
       },
     });
@@ -369,7 +386,7 @@ export default class ApiSystem extends System {
   }
 
   override async stop(): Promise<boolean> {
-    this.webServer?.stop(true);
+    await this.webServer?.stop(true);
     this.listening = false;
 
     return true;

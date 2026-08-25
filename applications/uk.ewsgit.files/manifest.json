@@ -2,8 +2,8 @@
   "id": "uk.ewsgit.files",
   "displayName": "Files",
   "icon": {
-    "type": "icon",
-    "value": "./frontend/node_modules/@material-symbols/svg-700/outlined/folder.svg"
+    "type": "material-symbol",
+    "value": "folder"
   },
   "bannerImage": "./files_banner.svg",
   "description": "Navigate and manage files in your Workspace",

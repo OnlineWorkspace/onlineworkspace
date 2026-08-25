@@ -1,9 +1,8 @@
-import postgres from "postgres";
 import type { Instance } from "../index.ts";
 import System from "../system.ts";
 
 export default class DatabaseSystem extends System {
-  databaseConnections: { [connectionId: string]: postgres.Sql };
+  databaseConnections: { [connectionId: string]: Bun.SQL };
 
   constructor(instance: Instance) {
     super("database", instance);
@@ -30,7 +29,7 @@ export default class DatabaseSystem extends System {
 
   /**
    * Create or get an already active postgresql database connection
-   * @returns postgres.Sql<{}>
+   * @returns Bun.SQL
    */
   postgres() {
     if (this.databaseConnections.postgres) return this.databaseConnections.postgres;
@@ -39,18 +38,12 @@ export default class DatabaseSystem extends System {
       `Connecting to database @ '${this.log.emphasis(this.instance.sys.configuration.databases.postgres.host)}' named '${this.log.emphasis(this.instance.sys.configuration.databases.postgres.database)}'`,
     );
 
-    const con = postgres({
+    const con = new Bun.SQL({
       db: this.instance.sys.configuration.databases.postgres.database,
       hostname: this.instance.sys.configuration.databases.postgres.host,
       port: this.instance.sys.configuration.databases.postgres.port,
       user: this.instance.sys.configuration.databases.postgres.user,
       password: this.instance.sys.configuration.databases.postgres.password,
-
-      onnotice: (message) => {
-        if (message.severity === "NOTICE") return;
-
-        console.log(message);
-      },
     });
 
     this.databaseConnections.postgres = con;

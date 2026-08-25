@@ -317,7 +317,6 @@ export default class ApplicationsSystem extends System {
 
         const MODULE_LOG_PREFIX = `${app.manifest.id} module:bun -> `;
 
-        // @ts-ignore typescript hates this valid code.
         for await (const msg of child.stdout) {
           let bufMsg = MODULE_LOG_PREFIX + Buffer.from(msg).toString();
 
@@ -328,7 +327,6 @@ export default class ApplicationsSystem extends System {
           this.log.info(bufMsg);
         }
 
-        // @ts-ignore typescript hates this valid code.
         for await (const msg of child.stderr) {
           let bufMsg = MODULE_LOG_PREFIX + Buffer.from(msg).toString();
 

@@ -1,11 +1,10 @@
 import crypto from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
-import { createCanvas, loadImage } from "canvas";
-import sharp from "sharp";
-import type { Instance } from "../index.ts";
+import {createCanvas, loadImage} from "canvas";
+import type {Instance} from "../index.ts";
 import System from "../system.ts";
-import { FileMediaType } from "./filesystem.ts";
+import {FileMediaType} from "./filesystem.ts";
 
 export type ImageFormat = "avif" | "jpeg" | "png" | "webp";
 
@@ -29,7 +28,7 @@ export interface ResizeOptions {
   dimensions?: Dimensions | ((original: Dimensions) => Dimensions);
   changeFormatTo?: ImageFormat;
   position?: ImagePosition;
-  fit?: "cover" | "contain" | "fill";
+  fit?: "inside" | "fill";
   background?: string;
 }
 
@@ -58,7 +57,7 @@ export interface ImageCacheEntry {
     dimensions?: Dimensions;
     changeFormatTo: ImageFormat;
     position: ImagePosition;
-    fit: "cover" | "contain" | "fill";
+    fit: "inside" | "fill";
     background: string;
   };
 }
@@ -79,7 +78,7 @@ export default class ImageSystem extends System {
 
     if (options.resize?.dimensions) {
       if (typeof options.resize.dimensions === "function") {
-        const metadata = await sharp(source).metadata();
+        const metadata = await new Bun.Image(source).metadata();
         dimensions = options.resize.dimensions({
           width: metadata.width ?? 0,
           height: metadata.height ?? 0,
@@ -96,7 +95,7 @@ export default class ImageSystem extends System {
     let resolutionKey = dimensions ? `${dimensions.width}x${dimensions.height}` : "raw";
     if (cropKey) resolutionKey += `_${cropKey}`;
 
-    return { resolutionKey, dimensions };
+    return {resolutionKey, dimensions};
   }
 
   async serveImage(
@@ -107,7 +106,7 @@ export default class ImageSystem extends System {
     const validMs = options.validMs ?? 21600000; // 6 hours
     const isPublic = options.isPublic ?? false;
 
-    const { resolutionKey, dimensions } = await this._internalGetResKey(filePath, options);
+    const {resolutionKey, dimensions} = await this._internalGetResKey(filePath, options);
 
     if (!options.evadeCache) {
       const existingImageId = this._internalImagePaths.get(filePath);
@@ -132,7 +131,7 @@ export default class ImageSystem extends System {
           dimensions,
           changeFormatTo: options.resize?.changeFormatTo ?? "jpeg",
           position: options.resize?.position ?? "top",
-          fit: options.resize?.fit ?? "cover",
+          fit: options.resize?.fit ?? "fill",
           background: options.resize?.background ?? "white",
         },
       },
@@ -154,7 +153,7 @@ export default class ImageSystem extends System {
     const validMs = options.validMs ?? 21600000;
     const isPublic = options.isPublic ?? false;
 
-    const { resolutionKey, dimensions } = await this._internalGetResKey(buffer, options);
+    const {resolutionKey, dimensions} = await this._internalGetResKey(buffer, options);
     const imageId = crypto.randomUUID();
 
     this._internalImages.set(imageId, {
@@ -167,7 +166,7 @@ export default class ImageSystem extends System {
           dimensions,
           changeFormatTo: options.resize?.changeFormatTo ?? "jpeg",
           position: options.resize?.position ?? "top",
-          fit: options.resize?.fit ?? "cover",
+          fit: options.resize?.fit ?? "fill",
           background: options.resize?.background ?? "white",
         },
       },
@@ -183,7 +182,7 @@ export default class ImageSystem extends System {
     options?: Omit<ResizeOptions, "dimensions">
   ): Promise<boolean> {
     const t0 = performance.now();
-    const sharpInstance = sharp(inputPath);
+    const sharpInstance = new Bun.Image(inputPath);
     const metadata = await sharpInstance.metadata();
 
     const originalDimensions: Dimensions = {
@@ -200,17 +199,27 @@ export default class ImageSystem extends System {
 
     sharpInstance.resize(targetDimensions.width, targetDimensions.height, {
       withoutEnlargement: true,
-      position: options?.position,
-      fit: options?.fit,
-      background: options?.background,
-      kernel: useCubic ? "cubic" : "mks2021",
+      fit: options?.fit
     });
 
     if (options?.changeFormatTo) {
-      sharpInstance.toFormat(options.changeFormatTo, { progressive: true });
+      switch (options.changeFormatTo) {
+        case "png":
+          sharpInstance.png()
+          break;
+        case "avif":
+          sharpInstance.avif()
+          break;
+        case "jpeg":
+          sharpInstance.jpeg()
+          break;
+        case "webp":
+          sharpInstance.webp()
+          break;
+      }
     }
 
-    await sharpInstance.toFile(outputPath);
+    await fs.writeFile(outputPath, await sharpInstance.bytes())
     const t1 = performance.now();
 
     this.log.debug(
@@ -236,7 +245,7 @@ export default class ImageSystem extends System {
     try {
       return await fs.readFile(thumbCachePath);
     } catch {
-      await fs.mkdir(path.dirname(thumbCachePath), { recursive: true });
+      await fs.mkdir(path.dirname(thumbCachePath), {recursive: true});
     }
 
     const canvasPadding = 8;
@@ -257,7 +266,7 @@ export default class ImageSystem extends System {
     ctx.textAlign = "end";
     ctx.textBaseline = "bottom";
 
-    const labelPadding = { x: 4, y: 2 };
+    const labelPadding = {x: 4, y: 2};
     const labelPos = {
       x: canvasWidth - canvasPadding,
       y: canvasHeight - canvasPadding,

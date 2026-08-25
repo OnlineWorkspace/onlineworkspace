@@ -200,6 +200,18 @@ export default class FilesystemSystem extends System {
       mkdirSync(this.CACHE_PATH, { recursive: true });
     } else this.log.debug(`CACHE_PATH exists, (${this.CACHE_PATH})`);
 
+    if (!existsSync(path.join(this.FS_ROOT, "assets"))) {
+      mkdirSync(path.join(this.FS_ROOT, "assets"), {
+        recursive: true,
+      });
+    } else {
+      this.log.debug(`FS_ROOT/assets exists, (${path.join(this.FS_ROOT, "assets")})`);
+    }
+
+    if (!existsSync(path.join(this.AUTO_INSTALL_PATH, "assets/missing.png"))) {
+      copyFileSync(path.join(this.SRC_ROOT, "assets/missing.png"), path.join(this.FS_ROOT, "assets/missing.png"));
+    }
+
     if (!existsSync(path.join(this.FS_ROOT, "assets/login"))) {
       mkdirSync(path.join(this.FS_ROOT, "assets/login"), {
         recursive: true,

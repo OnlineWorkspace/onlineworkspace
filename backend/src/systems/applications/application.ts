@@ -3,7 +3,7 @@ export interface OnlineWorkspaceApplication {
   // if undefined, just the id is used
   displayName?: string;
   icon?: {
-    type: "icon" | "image";
+    type: "material-symbol" | "image";
     value: string;
   };
   bannerImage?: string;

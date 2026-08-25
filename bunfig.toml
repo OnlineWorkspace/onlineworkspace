@@ -2,3 +2,4 @@
 
 [install]
 trustedDependencies = ["fast-folder-size"]
+linker = "hoisted"
