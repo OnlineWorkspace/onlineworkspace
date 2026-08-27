@@ -4,14 +4,15 @@
   "private": true,
   "version": "0.0.1",
   "dependencies": {
+    "@ewsgit/uikit-solid": "workspace:*",
     "@material-symbols/svg-700": "^0.42.3",
     "@onlineworkspace/workspace-web": "workspace:*",
+    "@solid-primitives/scheduled": "^1.5.3",
     "@solidjs/router": "^0.15.3",
-    "solid-js": "^1.9.8",
-    "@ewsgit/uikit-solid": "workspace:*",
     "@trpc/client": "^11.6.0",
     "@trpc/server": "^11.6.0",
-    "clsx": "^2.1.1"
+    "clsx": "^2.1.1",
+    "solid-js": "^1.9.8"
   },
   "devDependencies": {
     "typescript": "~5.8.3",

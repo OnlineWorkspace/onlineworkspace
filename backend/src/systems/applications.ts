@@ -497,6 +497,8 @@ export default class ApplicationsSystem extends System {
     } else {
       const applicationIconPath = path.join(application.path, application.manifest?.icon?.value || "");
 
+      this.log.debug(`applicationIconPath -> ${applicationIconPath} resolved to -> ${await fs.realpath(applicationIconPath)}`)
+
       try {
         return await fs.realpath(applicationIconPath)
       } catch (err) {

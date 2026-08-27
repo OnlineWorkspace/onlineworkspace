@@ -27,7 +27,7 @@ const SearchResult: Component<{ applicationId: string; repository: string }> = (
             <img alt="" class={styles.icon} draggable={false} src={result()?.icon.value || "/assets/onlineworkspace/online_workspace_logo.svg"} />
           )}
         </div>
-        <UKText class={styles.title} role={"title"} size={"l"}>
+        <UKText class={styles.title} role={"title"} size={"l"} emphasized>
           {result()?.displayName}
         </UKText>
         {result()?.isInstalled ? (

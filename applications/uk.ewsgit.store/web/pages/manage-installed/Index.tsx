@@ -10,6 +10,7 @@ import { useNavigate } from "@solidjs/router";
 import { type Component, createEffect, createResource, createSignal, For, Suspense } from "solid-js";
 import trpc from "../../lib/trpc";
 import styles from "./Index.module.scss";
+import STORE_ICON from "@material-symbols/svg-700/outlined/store.svg";
 
 const ManageInstalledPage: Component = () => {
   const navigate = useNavigate();
@@ -97,7 +98,7 @@ const ManageInstalledPage: Component = () => {
                         <>
                           <UKIconButton
                             class={styles.openInStoreButton}
-                            icon={"store"}
+                            icon={STORE_ICON}
                             alt={"go to store page"}
                             color={"standard"}
                             onClick={() => navigate(`/app/uk.ewsgit.store/app/${app.repository}/${app.id}?origin=/app/uk.ewsgit.store/manage-installed`)}

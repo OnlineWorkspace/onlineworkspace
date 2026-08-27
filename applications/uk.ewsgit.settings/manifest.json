@@ -2,8 +2,8 @@
   "id": "uk.ewsgit.settings",
   "displayName": "Settings",
   "icon": {
-    "type": "icon",
-    "value": "./web/node_modules/@material-symbols/svg-700/outlined/settings.svg"
+    "type": "material-symbol",
+    "value": "settings"
   },
   "bannerImage": "./settings_banner.svg",
   "description": "The Online Workspace Settings Manager",

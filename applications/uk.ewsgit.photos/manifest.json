@@ -2,8 +2,8 @@
   "id": "uk.ewsgit.photos",
   "displayName": "Photos",
   "icon": {
-    "type": "icon",
-    "value": "./web/node_modules/@material-symbols/svg-700/outlined/photo_prints.svg"
+    "type": "material-symbol",
+    "value": "photo_prints"
   },
   "bannerImage": "./photos_banner.svg",
   "description": "Manage & View your photos and videos",

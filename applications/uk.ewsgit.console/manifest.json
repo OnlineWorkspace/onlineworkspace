@@ -2,8 +2,8 @@
   "id": "uk.ewsgit.console",
   "displayName": "Console",
   "icon": {
-    "type": "icon",
-    "value": "./web/node_modules/@material-symbols/svg-700/outlined/terminal.svg"
+    "type": "material-symbol",
+    "value": "terminal"
   },
   "bannerImage": "./console_banner.svg",
   "description": "The instance administrator console as an application",

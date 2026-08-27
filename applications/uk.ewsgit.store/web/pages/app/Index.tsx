@@ -88,11 +88,18 @@ const ApplicationPage: Component = () => {
           {application()?.isInstalled ? "Uninstall" : "Install"}
         </UKButton>
       </div>
-      {!application()?.isUserAdministrator && (
+      {!application()?.isUserAdministrator ? (
         <UKCard color="elevated" class={styles.permissionWarning}>
           <UKText role="body" size="l">
             Info: You are not an administrator and lack the permission to
             install or uninstall applications.
+          </UKText>
+        </UKCard>
+      ) : !application()?.canBeUninstalled && (
+        <UKCard color="elevated" class={styles.permissionWarning}>
+          <UKText role="body" size="l">
+            This application is bundled with Online Workspace and cannot be
+            uninstalled without enabling the "shoot_yourself_in_the_foot" feature.
           </UKText>
         </UKCard>
       )}

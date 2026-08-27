@@ -2,8 +2,8 @@
   "id": "uk.ewsgit.store",
   "displayName": "Store",
   "icon": {
-    "type": "icon",
-    "value": "./web/node_modules/@material-symbols/svg-700/outlined/store.svg"
+    "type": "material-symbol",
+    "value": "store"
   },
   "bannerImage": "./store_banner.svg",
   "description": "Manage and install Applications",

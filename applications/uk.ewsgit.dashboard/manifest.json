@@ -2,8 +2,8 @@
   "id": "uk.ewsgit.dashboard",
   "displayName": "Dashboard",
   "icon": {
-    "type": "icon",
-    "value": "./web/node_modules/@material-symbols/svg-700/outlined/dashboard.svg"
+    "type": "material-symbol",
+    "value": "dashboard"
   },
   "bannerImage": "./dashboard_banner.svg",
   "description": "The Homepage for an online workspace",

@@ -155,7 +155,7 @@ export default class TerminalUISystem extends System {
           }
         }
         // @ts-ignore
-        global.backup.console.log(consoleLogOutput);
+        global.consoleBackup.log(consoleLogOutput);
       }
 
       for (const message of this.instance.log.allLogHistory) {

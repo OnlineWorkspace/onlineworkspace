@@ -187,7 +187,7 @@ const router = t.router({
 
       if (!app) return undefined;
 
-      app.icon.value = await instance.sys.image.serveImage(opt.ctx.userId, app.icon.value)
+      app.icon.value = await instance.sys.image.serveImage(opt.ctx.userId, await instance.sys.applications.getApplicationIconPath(app.id))
 
       if (app.bannerImage) {
         app.bannerImage = await instance.sys.image.serveImage(opt.ctx.userId, app.bannerImage)

@@ -33,7 +33,7 @@ const WallpaperPage: Component = () => {
   const [officialWallpapers] = createResource(() => trpc.customization.wallpaper.getDefaultWallpapers.query());
   const [wallpaperAlignHorizontal, setWallpaperAlignHorizontal] = createSignal<"left" | "center" | "right" | undefined>(undefined);
   const [wallpaperAlignVertical, setWallpaperAlignVertical] = createSignal<"top" | "middle" | "bottom" | undefined>(undefined);
-  const [wallpaperFit, setWallpaperFit] = createSignal<"fill" | "cover" | "contain" | undefined>(undefined);
+  const [wallpaperFit, setWallpaperFit] = createSignal<"fill" | "inside" | undefined>(undefined);
 
   onMount(async () => {
     const options = await trpc.customization.wallpaper.getOptions.query();
@@ -78,7 +78,7 @@ const WallpaperPage: Component = () => {
     }
 
     await trpc.customization.wallpaper.setOptions.mutate({
-      fit: wallpaperFit() || "cover",
+      fit: wallpaperFit() || "inside",
       position: position,
       background: "#0000",
     });
@@ -125,22 +125,25 @@ const WallpaperPage: Component = () => {
                   Fill
                 </UKButton>
                 <UKButton
-                  leadingIcon={wallpaperFit() === "cover" ? CHECK_ICON : undefined}
+                  disabled
+                  // leadingIcon={wallpaperFit() === "cover" ? CHECK_ICON : undefined}
                   onClick={() => {
-                    setWallpaperFit("cover");
+                    // setWallpaperFit("cover");
+                    return;
                   }}
-                  color={wallpaperFit() === "cover" ? "filled" : "tonal"}
+                  // color={wallpaperFit() === "cover" ? "filled" : "tonal"}
+                  color={"tonal"}
                 >
-                  Cover
+                  Cover (Currently Unsupported)
                 </UKButton>
                 <UKButton
-                  leadingIcon={wallpaperFit() === "contain" ? CHECK_ICON : undefined}
+                  leadingIcon={wallpaperFit() === "inside" ? CHECK_ICON : undefined}
                   onClick={() => {
-                    setWallpaperFit("contain");
+                    setWallpaperFit("inside");
                   }}
-                  color={wallpaperFit() === "contain" ? "filled" : "tonal"}
+                  color={wallpaperFit() === "inside" ? "filled" : "tonal"}
                 >
-                  Contain
+                  Inside
                 </UKButton>
               </UKButtonGroup>
             }

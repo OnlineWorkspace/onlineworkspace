@@ -182,8 +182,8 @@ export default class ImageSystem extends System {
     options?: Omit<ResizeOptions, "dimensions">
   ): Promise<boolean> {
     const t0 = performance.now();
-    const sharpInstance = new Bun.Image(inputPath);
-    const metadata = await sharpInstance.metadata();
+    const imageProcessor = new Bun.Image(inputPath);
+    const metadata = await imageProcessor.metadata();
 
     const originalDimensions: Dimensions = {
       width: metadata.width ?? 0,
@@ -193,11 +193,7 @@ export default class ImageSystem extends System {
     const targetDimensions =
       typeof dimensions === "function" ? dimensions(originalDimensions) : dimensions;
 
-    const useCubic =
-      originalDimensions.width / 2 > targetDimensions.width ||
-      originalDimensions.height / 2 > targetDimensions.height;
-
-    sharpInstance.resize(targetDimensions.width, targetDimensions.height, {
+    imageProcessor.resize(targetDimensions.width, targetDimensions.height, {
       withoutEnlargement: true,
       fit: options?.fit
     });
@@ -205,21 +201,21 @@ export default class ImageSystem extends System {
     if (options?.changeFormatTo) {
       switch (options.changeFormatTo) {
         case "png":
-          sharpInstance.png()
+          imageProcessor.png()
           break;
         case "avif":
-          sharpInstance.avif()
+          imageProcessor.avif()
           break;
         case "jpeg":
-          sharpInstance.jpeg()
+          imageProcessor.jpeg()
           break;
         case "webp":
-          sharpInstance.webp()
+          imageProcessor.webp()
           break;
       }
     }
 
-    await fs.writeFile(outputPath, await sharpInstance.bytes())
+    await fs.writeFile(outputPath, await imageProcessor.bytes())
     const t1 = performance.now();
 
     this.log.debug(

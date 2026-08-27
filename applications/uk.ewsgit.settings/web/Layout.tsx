@@ -8,7 +8,7 @@ import WALLPAPER_ICON from "@material-symbols/svg-700/outlined/wallpaper.svg";
 import FORMAT_PAINT_ICON from "@material-symbols/svg-700/outlined/format_paint.svg"
 import UKCircularProgressIndicator from "@ewsgit/uikit-solid/src/components/circularProgressIndicator/UKCircularProgressIndicator.tsx";
 import UKSideBar from "@ewsgit/uikit-solid/src/components/sideBar/UKSideBar.tsx";
-import { useLocation, useNavigate, useSearchParams } from "@solidjs/router";
+import {useLocation, useNavigate, useSearchParams} from "@solidjs/router";
 import {
   type Component,
   createEffect,
@@ -16,9 +16,10 @@ import {
   type ParentProps,
   Suspense,
 } from "solid-js";
-import { AppContext } from "./appContext";
+import {AppContext} from "./appContext";
 import styles from "./Layout.module.scss";
 import trpc from "./lib/trpc";
+import {MetaProvider, Title} from "@solidjs/meta";
 
 const Layout: Component<ParentProps> = (props) => {
   const [isAdministrator, setIsAdministrator] = createSignal<boolean>(false);
@@ -38,175 +39,180 @@ const Layout: Component<ParentProps> = (props) => {
   const navigate = useNavigate();
 
   return (
-    <AppContext.Provider
-      value={{
-        isAdministrator: isAdministrator,
-        shootYourselfInTheFoot: shootYourselfInTheFoot,
-        setShootYourselfInTheFoot: setShootYourselfInTheFoot,
-      }}
-    >
-      {searchParams.sidebar_hidden === "true"
-        ? (
-          <div class={styles.sidebarHiddenPage}>
-            <Suspense
-              fallback={<UKCircularProgressIndicator class={styles.spinner} />}
+    <>
+      <MetaProvider>
+        <Title>Settings</Title>
+      </MetaProvider>
+      <AppContext.Provider
+        value={{
+          isAdministrator: isAdministrator,
+          shootYourselfInTheFoot: shootYourselfInTheFoot,
+          setShootYourselfInTheFoot: setShootYourselfInTheFoot,
+        }}
+      >
+        {searchParams.sidebar_hidden === "true"
+          ? (
+            <div class={styles.sidebarHiddenPage}>
+              <Suspense
+                fallback={<UKCircularProgressIndicator class={styles.spinner}/>}
+              >
+                {props.children}
+              </Suspense>
+            </div>
+          )
+          : (
+            <UKSideBar
+              items={[
+                {
+                  type: "label",
+                  label: "Settings",
+                },
+                {
+                  type: "button",
+                  icon: {type: "icon", value: HOME_ICON},
+                  label: "Overview",
+                  onClick() {
+                    navigate("/app/uk.ewsgit.settings");
+                  },
+                  active: location.pathname === "/app/uk.ewsgit.settings",
+                },
+                {
+                  type: "button",
+                  icon: {type: "icon", value: PERSON_ICON},
+                  label: "Profile",
+                  onClick() {
+                    navigate("/app/uk.ewsgit.settings/profile");
+                  },
+                  active: location.pathname.startsWith(
+                    "/app/uk.ewsgit.settings/profile",
+                  ),
+                },
+                {
+                  type: "button",
+                  icon: {type: "icon", value: PASSKEY_ICON},
+                  label: "Authentication",
+                  onClick() {
+                    navigate("/app/uk.ewsgit.settings/authentication");
+                  },
+                  active: location.pathname.startsWith(
+                    "/app/uk.ewsgit.settings/authentication",
+                  ),
+                },
+                {
+                  type: "button",
+                  icon: {type: "icon", value: STORAGE_ICON},
+                  label: "Storage",
+                  onClick() {
+                    navigate("/app/uk.ewsgit.settings/storage");
+                  },
+                  active: location.pathname.startsWith(
+                    "/app/uk.ewsgit.settings/storage",
+                  ),
+                },
+                {
+                  type: "button",
+                  icon: {type: "icon", value: WALLPAPER_ICON},
+                  label: "Customization",
+                  onClick() {
+                    navigate("/app/uk.ewsgit.settings/customization");
+                  },
+                  active: location.pathname.startsWith(
+                    "/app/uk.ewsgit.settings/customization",
+                  ),
+                },
+                {
+                  type: "button",
+                  icon: {type: "icon", value: APPS_ICON},
+                  label: "Applications",
+                  onClick() {
+                    navigate("/app/uk.ewsgit.settings/applications");
+                  },
+                  active: location.pathname.startsWith(
+                    "/app/uk.ewsgit.settings/applications",
+                  ),
+                },
+                ...isAdministrator()
+                  ? [
+                    {
+                      type: "divider" as const,
+                    },
+                    {
+                      type: "label" as const,
+                      label: "Manage Instance",
+                    },
+                    {
+                      type: "button" as const,
+                      icon: {
+                        type: "icon" as const,
+                        value: FORMAT_PAINT_ICON,
+                      },
+                      label: "Branding",
+                      onClick() {
+                        navigate("/app/uk.ewsgit.settings/instance/branding");
+                      },
+                      active: location.pathname === "/app/uk.ewsgit.settings/instance/branding",
+                    },
+                    {
+                      type: "button" as const,
+                      icon: {
+                        type: "icon" as const,
+                        value: SETTINGS_APPLICATIONS_ICON,
+                      },
+                      label: "Features",
+                      onClick() {
+                        navigate("/app/uk.ewsgit.settings/instance/features");
+                      },
+                      active: location.pathname === "/app/uk.ewsgit.settings/instance/features",
+                    },
+                    {
+                      type: "button" as const,
+                      icon: {
+                        type: "icon" as const,
+                        value: SETTINGS_APPLICATIONS_ICON,
+                      },
+                      label: "Installed Applications",
+                      onClick() {
+                        navigate("/app/uk.ewsgit.settings/instance/installed_applications");
+                      },
+                      active: location.pathname === "/app/uk.ewsgit.settings/instance/installed_applications",
+                    },
+                    {
+                      type: "button" as const,
+                      icon: {
+                        type: "icon" as const,
+                        value: SETTINGS_APPLICATIONS_ICON,
+                      },
+                      label: "Mailserver",
+                      onClick() {
+                        navigate("/app/uk.ewsgit.settings/instance/mailserver");
+                      },
+                      active: location.pathname === "/app/uk.ewsgit.settings/instance/mailserver",
+                    },
+                    {
+                      type: "button" as const,
+                      icon: {
+                        type: "icon" as const,
+                        value: SETTINGS_APPLICATIONS_ICON,
+                      },
+                      label: "Users",
+                      onClick() {
+                        navigate("/app/uk.ewsgit.settings/instance/users");
+                      },
+                      active: location.pathname === "/app/uk.ewsgit.settings/instance/users",
+                    },
+                  ]
+                  : [],
+              ]}
             >
-              {props.children}
-            </Suspense>
-          </div>
-        )
-        : (
-          <UKSideBar
-            items={[
-              {
-                type: "label",
-                label: "Settings",
-              },
-              {
-                type: "button",
-                icon: { type: "icon", value: HOME_ICON },
-                label: "Overview",
-                onClick() {
-                  navigate("/app/uk.ewsgit.settings");
-                },
-                active: location.pathname === "/app/uk.ewsgit.settings",
-              },
-              {
-                type: "button",
-                icon: { type: "icon", value: PERSON_ICON },
-                label: "Profile",
-                onClick() {
-                  navigate("/app/uk.ewsgit.settings/profile");
-                },
-                active: location.pathname.startsWith(
-                  "/app/uk.ewsgit.settings/profile",
-                ),
-              },
-              {
-                type: "button",
-                icon: { type: "icon", value: PASSKEY_ICON },
-                label: "Authentication",
-                onClick() {
-                  navigate("/app/uk.ewsgit.settings/authentication");
-                },
-                active: location.pathname.startsWith(
-                  "/app/uk.ewsgit.settings/authentication",
-                ),
-              },
-              {
-                type: "button",
-                icon: { type: "icon", value: STORAGE_ICON },
-                label: "Storage",
-                onClick() {
-                  navigate("/app/uk.ewsgit.settings/storage");
-                },
-                active: location.pathname.startsWith(
-                  "/app/uk.ewsgit.settings/storage",
-                ),
-              },
-              {
-                type: "button",
-                icon: { type: "icon", value: WALLPAPER_ICON },
-                label: "Customization",
-                onClick() {
-                  navigate("/app/uk.ewsgit.settings/customization");
-                },
-                active: location.pathname.startsWith(
-                  "/app/uk.ewsgit.settings/customization",
-                ),
-              },
-              {
-                type: "button",
-                icon: { type: "icon", value: APPS_ICON },
-                label: "Applications",
-                onClick() {
-                  navigate("/app/uk.ewsgit.settings/applications");
-                },
-                active: location.pathname.startsWith(
-                  "/app/uk.ewsgit.settings/applications",
-                ),
-              },
-              ...isAdministrator()
-                ? [
-                  {
-                    type: "divider" as const,
-                  },
-                  {
-                    type: "label" as const,
-                    label: "Manage Instance",
-                  },
-                  {
-                    type: "button" as const,
-                    icon: {
-                      type: "icon" as const,
-                      value: FORMAT_PAINT_ICON,
-                    },
-                    label: "Branding",
-                    onClick() {
-                      navigate("/app/uk.ewsgit.settings/instance/branding");
-                    },
-                    active: location.pathname === "/app/uk.ewsgit.settings/instance/branding",
-                  },
-                  {
-                    type: "button" as const,
-                    icon: {
-                      type: "icon" as const,
-                      value: SETTINGS_APPLICATIONS_ICON,
-                    },
-                    label: "Features",
-                    onClick() {
-                      navigate("/app/uk.ewsgit.settings/instance/features");
-                    },
-                    active: location.pathname === "/app/uk.ewsgit.settings/instance/features",
-                  },
-                  {
-                    type: "button" as const,
-                    icon: {
-                      type: "icon" as const,
-                      value: SETTINGS_APPLICATIONS_ICON,
-                    },
-                    label: "Installed Applications",
-                    onClick() {
-                      navigate("/app/uk.ewsgit.settings/instance/installed_applications");
-                    },
-                    active: location.pathname === "/app/uk.ewsgit.settings/instance/installed_applications",
-                  },
-                  {
-                    type: "button" as const,
-                    icon: {
-                      type: "icon" as const,
-                      value: SETTINGS_APPLICATIONS_ICON,
-                    },
-                    label: "Mailserver",
-                    onClick() {
-                      navigate("/app/uk.ewsgit.settings/instance/mailserver");
-                    },
-                    active: location.pathname === "/app/uk.ewsgit.settings/instance/mailserver",
-                  },
-                  {
-                    type: "button" as const,
-                    icon: {
-                      type: "icon" as const,
-                      value: SETTINGS_APPLICATIONS_ICON,
-                    },
-                    label: "Users",
-                    onClick() {
-                      navigate("/app/uk.ewsgit.settings/instance/users");
-                    },
-                    active: location.pathname === "/app/uk.ewsgit.settings/instance/users",
-                  },
-                ]
-                : [],
-            ]}
-          >
-            <Suspense
-              fallback={<UKCircularProgressIndicator class={styles.spinner} />}
-            >
-              {props.children}
-            </Suspense>
-          </UKSideBar>
-        )}
-    </AppContext.Provider>
+              <Suspense
+                fallback={<UKCircularProgressIndicator class={styles.spinner}/>}
+              >
+                {props.children}
+              </Suspense>
+            </UKSideBar>
+          )}
+      </AppContext.Provider>
+    </>
   );
 };
 

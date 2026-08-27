@@ -24,16 +24,6 @@
     position: relative;
     min-width: 2ch;
 
-    &::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        background: gray;
-        height: var(--bar-height);
-        width: 100%;
-    }
-
     &:last-of-type {
         &::before {
             border-top-right-radius: var(--uk-sys-shape-corner-extra-small);
@@ -47,10 +37,10 @@
             border-bottom-left-radius: var(--uk-sys-shape-corner-extra-small);
         }
     }
-
-    &:not(:last-of-type) {
-        border-right: 1px solid rgb(var(--uk-sys-color-outline));
-    }
+    //
+    //&:not(:last-of-type) {
+    //    border-right: 1px solid rgb(var(--uk-sys-color-outline));
+    //}
 }
 
 .barLabel {

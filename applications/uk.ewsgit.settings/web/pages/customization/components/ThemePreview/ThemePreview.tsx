@@ -10,7 +10,7 @@ import styles from "./ThemePreview.module.scss";
 const ThemePreview: Component<{
   wallpaperOverride?: string;
   align?: ["left" | "center" | "right", "top" | "middle" | "bottom"];
-  fillStyle?: "cover" | "fill" | "contain";
+  fillStyle?: "fill" | "inside";
 }> = (props) => {
   const [currentWallpaper] = createResource(() => trpc.customization.wallpaper.getCurrentWallpaper.query());
 
@@ -26,7 +26,7 @@ const ThemePreview: Component<{
           alt={""}
           src={props.wallpaperOverride ?? currentWallpaper() ?? PLACEHOLDER_WALLPAPER}
           style={{
-            "object-fit": props.fillStyle || "cover",
+            "object-fit": props.fillStyle === "inside" ? "contain" : "fill",
           }}
           class={clsx(styles.wallpaper, styles[props.align?.[0] || "center"], styles[props.align?.[1] || "middle"])}
         />

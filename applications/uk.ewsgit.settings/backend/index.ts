@@ -20,6 +20,18 @@ import {OnlineWorkspaceApplication} from "@onlineworkspace/workspace-backend/src
 const APPLICATION_ID = "uk.ewsgit.settings";
 const log = instance.log.createLogger(APPLICATION_ID);
 
+const STORAGE_CATEGORY_COLORS: Record<FileMediaType, string> = {
+  [FileMediaType.Image]: "#3B82F6",
+  [FileMediaType.Video]: "#EC4899",
+  [FileMediaType.ThreeDimensionalModel]: "#8B5CF6",
+  [FileMediaType.Audio]: "#10B981",
+  [FileMediaType.Text]: "#6B7280",
+  [FileMediaType.Unknown]: "#9CA3AF",
+  [FileMediaType.PDF]: "#EF4444",
+  [FileMediaType.Archive]: "#F59E0B",
+  [FileMediaType.RichOfficeDocument]: "#06B6D4",
+}
+
 export const t = initTRPC.context<ReturnType<typeof createOnlineWorkspaceTRPCContext>>().create();
 
 const router = t.router({
@@ -763,6 +775,20 @@ const router = t.router({
           `converted '${wallpaperUUID}' to WEBP -> '${path.relative(instance.sys.filesystem.FS_ROOT, path.join(wallpapersPath, `${wallpaperUUID}.webp`))}'`,
         );
 
+        instance.sys.notifications.send(
+          opt.ctx.userId,
+          "commands.notify",
+          WorkspacesNotificationPriority.Important,
+          {
+            title: "Wallpaper uploaded",
+            body: `Your wallpaper '${wallpaperUUID}' has been uploaded!`,
+            icon: "image",
+          },
+          {
+            buttons: []
+          }
+        )
+
         return `${wallpaperUUID}.webp`;
       }),
       delete: procedure.input(z.object({ name: z.string() })).mutation(async (opt) => {
@@ -1023,15 +1049,17 @@ const router = t.router({
             displayName: z.string(),
             percentage: z.number(),
             size: z.number(),
+            color: z.string()
           })
           .array(),
       )
       .query(async (opt) => {
         async function getChildFiles(dir: string) {
           let output: {
-            type: FileMediaType;
+            type: string;
             size: number;
             path: string;
+            color: string;
           }[] = [];
 
           if (fsExistsSync(dir)) {
@@ -1042,10 +1070,12 @@ const router = t.router({
                 output = [...output, ...(await getChildFiles(childPath))];
               } else {
                 const childLstat = await fs.lstat(childPath);
+                const fileType = instance.sys.filesystem.getFileType(childPath)
                 output.push({
                   path: childPath,
                   size: childLstat.size,
-                  type: instance.sys.filesystem.getFileType(childPath),
+                  type: FileMediaType[fileType],
+                  color: STORAGE_CATEGORY_COLORS[fileType],
                 });
               }
             }
@@ -1061,12 +1091,13 @@ const router = t.router({
             fileCount: number;
             size: number;
             percentage: number;
+            color: string;
           };
         } = {};
 
         for (const file of files) {
           if (file.type === undefined) {
-            file.type = FileMediaType.Unknown;
+            file.type = FileMediaType[FileMediaType.Unknown];
           }
 
           if (!categories[file.type]) {
@@ -1074,6 +1105,7 @@ const router = t.router({
               fileCount: 0,
               size: 0,
               percentage: 0,
+              color: STORAGE_CATEGORY_COLORS[FileMediaType.Unknown]
             };
           }
 
@@ -1081,6 +1113,7 @@ const router = t.router({
             fileCount: categories[file.type].fileCount + 1,
             size: categories[file.type].size + file.size,
             percentage: 0,
+            color: file.color
           };
         }
 
@@ -1088,6 +1121,7 @@ const router = t.router({
           displayName: string;
           percentage: number;
           size: number;
+          color: string;
         }[] = [];
 
         const storageQuota = (await (await opt.ctx.user()).getQuota()) || 1;
@@ -1097,8 +1131,9 @@ const router = t.router({
 
           output.push({
             displayName: categoryName,
-            percentage: Number((category.size / 1000000000 / storageQuota).toFixed(2)),
-            size: category.size / 1000000000,
+            percentage: Number((category.size / (1024 * 1024) / storageQuota).toFixed(2)),
+            size: category.size / (1024 * 1024),
+            color: category.color
           });
         }
 
