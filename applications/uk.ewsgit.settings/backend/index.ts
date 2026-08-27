@@ -1,20 +1,20 @@
 /// <reference path="./global.d.ts" />
 
 import crypto from "node:crypto";
-import { existsSync as fsExistsSync } from "node:fs";
+import {existsSync as fsExistsSync} from "node:fs";
 import path from "node:path";
-import { AuthorizedDeviceType, SESSION_VALID_TERM_MS } from "@onlineworkspace/workspace-backend/src/systems/authorization.ts";
-import { FEATURE_FLAG_DESCRIPTIONS, WorkspacesFeatureFlags } from "@onlineworkspace/workspace-backend/src/systems/configuration.ts";
-import { WorkspacesNotificationPriority } from "@onlineworkspace/workspace-backend/src/systems/notifications.ts";
-import { GlobalApplicationSetting } from "@onlineworkspace/workspace-backend/src/systems/settings/applicationSetting/applicationSetting.ts";
-import { adminProcedure, type createOnlineWorkspaceTRPCContext, procedure } from "@onlineworkspace/workspace-backend/src/systems/trpc/coreRouter.ts";
+import {AuthorizedDeviceType, SESSION_VALID_TERM_MS} from "@onlineworkspace/workspace-backend/src/systems/authorization.ts";
+import {FEATURE_FLAG_DESCRIPTIONS, WorkspacesFeatureFlags} from "@onlineworkspace/workspace-backend/src/systems/configuration.ts";
+import {WorkspacesNotificationPriority} from "@onlineworkspace/workspace-backend/src/systems/notifications.ts";
+import {GlobalApplicationSetting} from "@onlineworkspace/workspace-backend/src/systems/settings/applicationSetting/applicationSetting.ts";
+import {adminProcedure, type createOnlineWorkspaceTRPCContext, procedure} from "@onlineworkspace/workspace-backend/src/systems/trpc/coreRouter.ts";
 import fs from "node:fs/promises";
-import { getCookies } from "@onlineworkspace/workspace-backend/src/utils/cookies.ts";
-import { initTRPC, TRPCError } from "@trpc/server";
-import { octetInputParser } from "@trpc/server/http";
+import {getCookies} from "@onlineworkspace/workspace-backend/src/utils/cookies.ts";
+import {initTRPC, TRPCError} from "@trpc/server";
+import {octetInputParser} from "@trpc/server/http";
 import sharp from "sharp";
 import z from "zod";
-import { FileMediaType } from "../../../backend/src/systems/filesystem.ts";
+import {FileMediaType} from "../../../backend/src/systems/filesystem.ts";
 import {OnlineWorkspaceApplication} from "@onlineworkspace/workspace-backend/src/systems/applications/application.js";
 
 const APPLICATION_ID = "uk.ewsgit.settings";
@@ -32,6 +32,8 @@ const STORAGE_CATEGORY_COLORS: Record<FileMediaType, string> = {
   [FileMediaType.RichOfficeDocument]: "#06B6D4",
 }
 
+const BYTES_PER_MB = 1_048_576;
+
 export const t = initTRPC.context<ReturnType<typeof createOnlineWorkspaceTRPCContext>>().create();
 
 const router = t.router({
@@ -39,7 +41,7 @@ const router = t.router({
     user: procedure.query(async (opt) => {
       const user = await opt.ctx.instance.sys.users.getUserById(opt.ctx.userId);
 
-      if (!user) throw new TRPCError({ message: "Unknown user", code: "UNAUTHORIZED" });
+      if (!user) throw new TRPCError({message: "Unknown user", code: "UNAUTHORIZED"});
 
       const fullName = await user.getFullName();
       const isAdministrator = await user.isAdministrator();
@@ -197,7 +199,9 @@ const router = t.router({
         const db = instance.sys.database.postgres();
 
         const passkeys =
-          (await db`SELECT passkey_id, creation_timetamp, last_used_timestamp, device_type, counter FROM public.passkeys WHERE user_id = ${opt.ctx.userId}`) as {
+          (await db`SELECT passkey_id, creation_timetamp, last_used_timestamp, device_type, counter
+                    FROM public.passkeys
+                    WHERE user_id = ${opt.ctx.userId}`) as {
             passkey_id: string;
             creation_timetamp: Date;
             last_used_timestamp: Date;
@@ -215,10 +219,10 @@ const router = t.router({
           };
         });
       }),
-    removePasskey: procedure.input(z.object({ id: z.string() })).mutation(async (opt) => {
+    removePasskey: procedure.input(z.object({id: z.string()})).mutation(async (opt) => {
       await instance.sys.authorization.removePasskey(opt.ctx.userId, opt.input.id);
 
-      return { success: true };
+      return {success: true};
     }),
     getSessions: procedure
       .output(
@@ -241,7 +245,9 @@ const router = t.router({
         const db = instance.sys.database.postgres();
 
         const sessions =
-          (await db`SELECT session_id, device_type, valid_until, ip_address, session_token FROM public.sessions WHERE user_id = ${user.userId}`) as {
+          (await db`SELECT session_id, device_type, valid_until, ip_address, session_token
+                    FROM public.sessions
+                    WHERE user_id = ${user.userId}`) as {
             session_id: number;
             device_type: AuthorizedDeviceType;
             valid_until: number;
@@ -272,12 +278,12 @@ const router = t.router({
           };
         });
       }),
-    setPassword: procedure.input(z.object({ password: z.string() })).mutation(async (opt) => {
+    setPassword: procedure.input(z.object({password: z.string()})).mutation(async (opt) => {
       await opt.ctx.instance.sys.authorization.setPassword(opt.ctx.userId, opt.input.password);
 
       return true;
     }),
-    deleteSession: procedure.input(z.object({ sessionId: z.number() })).mutation(async (opt) => {
+    deleteSession: procedure.input(z.object({sessionId: z.number()})).mutation(async (opt) => {
       await opt.ctx.instance.sys.authorization.endSessionById(opt.ctx.userId, opt.input.sessionId);
 
       return true;
@@ -296,7 +302,7 @@ const router = t.router({
       return users.map((u) => u.userId);
     }),
     getUser: adminProcedure
-      .input(z.object({ userId: z.number() }))
+      .input(z.object({userId: z.number()}))
       .output(
         z
           .object({
@@ -333,7 +339,7 @@ const router = t.router({
 
           return `${forename}`;
         }),
-      setForename: adminProcedure.input(z.object({ userId: z.number(), forename: z.string() })).mutation(async (opt) => {
+      setForename: adminProcedure.input(z.object({userId: z.number(), forename: z.string()})).mutation(async (opt) => {
         await (await opt.ctx.instance.sys.users.getUserById(opt.input.userId))?.setForename(opt.input.forename);
 
         return true;
@@ -346,7 +352,7 @@ const router = t.router({
 
           return `${surname}`;
         }),
-      setSurname: adminProcedure.input(z.object({ userId: z.number(), surname: z.string() })).mutation(async (opt) => {
+      setSurname: adminProcedure.input(z.object({userId: z.number(), surname: z.string()})).mutation(async (opt) => {
         await (await opt.ctx.instance.sys.users.getUserById(opt.input.userId))?.setSurname(opt.input.surname);
 
         return true;
@@ -359,7 +365,7 @@ const router = t.router({
 
           return username || "unknown";
         }),
-      setUsername: adminProcedure.input(z.object({ userId: z.number(), username: z.string() })).mutation(async (opt) => {
+      setUsername: adminProcedure.input(z.object({userId: z.number(), username: z.string()})).mutation(async (opt) => {
         await (await opt.ctx.instance.sys.users.getUserById(opt.input.userId))?.setUsername(opt.input.username.toLowerCase());
 
         return true;
@@ -392,7 +398,7 @@ const router = t.router({
 
           return isAdministrator || false;
         }),
-      setIsAdministrator: adminProcedure.input(z.object({ userId: z.number(), administrator: z.boolean() })).mutation(async (opt) => {
+      setIsAdministrator: adminProcedure.input(z.object({userId: z.number(), administrator: z.boolean()})).mutation(async (opt) => {
         await (await opt.ctx.instance.sys.users.getUserById(opt.input.userId))?.setIsAdministrator(opt.input.administrator);
 
         return true;
@@ -403,12 +409,12 @@ const router = t.router({
         .query(async (opt) => {
           return opt.input === opt.ctx.userId;
         }),
-      delete: adminProcedure.input(z.object({ userId: z.number() })).mutation(async (opt) => {
+      delete: adminProcedure.input(z.object({userId: z.number()})).mutation(async (opt) => {
         await (await opt.ctx.instance.sys.users.getUserById(opt.input.userId))?.delete();
 
         return true;
       }),
-      boop: adminProcedure.input(z.object({ userId: z.number() })).mutation(async (opt) => {
+      boop: adminProcedure.input(z.object({userId: z.number()})).mutation(async (opt) => {
         instance.sys.notifications.send(
           opt.input.userId,
           "commands.notify",
@@ -446,7 +452,7 @@ const router = t.router({
 
       return false;
     }),
-    createUser: procedure.input(z.object({ username: z.string(), password: z.string() })).mutation(async (opt) => {
+    createUser: procedure.input(z.object({username: z.string(), password: z.string()})).mutation(async (opt) => {
       await opt.ctx.instance.sys.users.createUser(opt.input.username.toLowerCase(), opt.input.password);
 
       return true;
@@ -479,7 +485,7 @@ const router = t.router({
           };
         });
       }),
-    setFeature: procedure.input(z.object({ id: z.string(), value: z.boolean() })).mutation(async (opt) => {
+    setFeature: procedure.input(z.object({id: z.string(), value: z.boolean()})).mutation(async (opt) => {
       if (opt.input.value) {
         await instance.sys.configuration.enableFeature(opt.input.id);
       } else {
@@ -523,11 +529,11 @@ const router = t.router({
       loginBanner: {
         preview: procedure
           .output(
-            z.object({ exists: z.literal(false) }).or(
+            z.object({exists: z.literal(false)}).or(
               z.object({
                 exists: z.literal(true),
                 source: z.string(),
-                dimensions: z.object({ width: z.number(), height: z.number() }),
+                dimensions: z.object({width: z.number(), height: z.number()}),
               }),
             ),
           )
@@ -558,16 +564,17 @@ const router = t.router({
             };
           }),
         // TODO: implement me!
-        set: procedure.mutation(async () => {}),
+        set: procedure.mutation(async () => {
+        }),
       },
       loginBackground: {
         preview: procedure
           .output(
-            z.object({ exists: z.literal(false) }).or(
+            z.object({exists: z.literal(false)}).or(
               z.object({
                 exists: z.literal(true),
                 source: z.string(),
-                dimensions: z.object({ width: z.number(), height: z.number() }),
+                dimensions: z.object({width: z.number(), height: z.number()}),
               }),
             ),
           )
@@ -601,11 +608,11 @@ const router = t.router({
       favicon: {
         preview: procedure
           .output(
-            z.object({ exists: z.literal(false) }).or(
+            z.object({exists: z.literal(false)}).or(
               z.object({
                 exists: z.literal(true),
                 source: z.string(),
-                dimensions: z.object({ width: z.number(), height: z.number() }),
+                dimensions: z.object({width: z.number(), height: z.number()}),
               }),
             ),
           )
@@ -639,11 +646,11 @@ const router = t.router({
       squareLogo: {
         preview: procedure
           .output(
-            z.object({ exists: z.literal(false) }).or(
+            z.object({exists: z.literal(false)}).or(
               z.object({
                 exists: z.literal(true),
                 source: z.string(),
-                dimensions: z.object({ width: z.number(), height: z.number() }),
+                dimensions: z.object({width: z.number(), height: z.number()}),
               }),
             ),
           )
@@ -678,7 +685,7 @@ const router = t.router({
   },
   customization: {
     wallpaper: {
-      wallpaperHistory: procedure.output(z.object({ name: z.string(), previewSrc: z.string() }).array()).query(async (opt) => {
+      wallpaperHistory: procedure.output(z.object({name: z.string(), previewSrc: z.string()}).array()).query(async (opt) => {
         const wallpapersPath = path.join((await opt.ctx.user()).getPath(), "assets/wallpapers");
 
         const output: {
@@ -696,7 +703,7 @@ const router = t.router({
               name: wallpaperFile,
               previewSrc: await instance.sys.image.serveImage(opt.ctx.userId, wallpaperPath, {
                 resize: {
-                  dimensions: { width: 296, height: 192 },
+                  dimensions: {width: 296, height: 192},
                 },
               }),
             });
@@ -705,7 +712,7 @@ const router = t.router({
 
         return output;
       }),
-      getDefaultWallpapers: procedure.output(z.object({ name: z.string(), previewSrc: z.string() }).array()).query(async (opt) => {
+      getDefaultWallpapers: procedure.output(z.object({name: z.string(), previewSrc: z.string()}).array()).query(async (opt) => {
         const DEFAULT_WALLPAPERS_PATH = path.join(instance.sys.filesystem.SRC_ROOT, "assets/wallpapers");
 
         const output: {
@@ -721,7 +728,7 @@ const router = t.router({
               name: wallpaperFile,
               previewSrc: await instance.sys.image.serveImage(opt.ctx.userId, wallpaperPath, {
                 resize: {
-                  dimensions: { height: 140, width: 250 },
+                  dimensions: {height: 140, width: 250},
                   position: "centre",
                 },
               }),
@@ -747,7 +754,7 @@ const router = t.router({
           await instance.sys.image.resizeImage(
             rawWallpaperPath,
             requiredResizedWallpaperPath,
-            { width: 504, height: 280 },
+            {width: 504, height: 280},
             {
               changeFormatTo: "webp",
               fit: options?.fit,
@@ -791,7 +798,7 @@ const router = t.router({
 
         return `${wallpaperUUID}.webp`;
       }),
-      delete: procedure.input(z.object({ name: z.string() })).mutation(async (opt) => {
+      delete: procedure.input(z.object({name: z.string()})).mutation(async (opt) => {
         const wallpapersPath = path.join((await opt.ctx.user()).getPath(), "assets/wallpapers");
 
         await fs.rm(path.join(wallpapersPath, opt.input.name), {
@@ -818,7 +825,7 @@ const router = t.router({
 
             return options;
           } else {
-            return { fit: "cover", position: ["center"] };
+            return {fit: "cover", position: ["center"]};
           }
         }),
       setOptions: procedure
@@ -835,7 +842,7 @@ const router = t.router({
 
           if (fsExistsSync(resizedWallpapersPath)) {
             for (const resizedWallpaperFile of await fs.readdir(resizedWallpapersPath)) {
-              await fs.rm(path.join(resizedWallpapersPath, resizedWallpaperFile), { force: true });
+              await fs.rm(path.join(resizedWallpapersPath, resizedWallpaperFile), {force: true});
             }
           }
 
@@ -849,25 +856,25 @@ const router = t.router({
 
           return true;
         }),
-      setWallpaperToCustomWallpaper: procedure.input(z.object({ name: z.string() })).mutation(async (opt) => {
+      setWallpaperToCustomWallpaper: procedure.input(z.object({name: z.string()})).mutation(async (opt) => {
         const userWallpapersPath = path.join((await opt.ctx.user()).getPath(), "assets/wallpapers");
         const resizedWallpapersPath = path.join(userWallpapersPath, "resized");
         const currentWallpaperPath = path.join(userWallpapersPath, "current.webp");
 
         if (fsExistsSync(resizedWallpapersPath)) {
           for (const resizedWallpaperFile of await fs.readdir(resizedWallpapersPath)) {
-            await fs.rm(path.join(resizedWallpapersPath, resizedWallpaperFile), { force: true });
+            await fs.rm(path.join(resizedWallpapersPath, resizedWallpaperFile), {force: true});
           }
         }
 
         if (fsExistsSync(currentWallpaperPath)) {
-          await fs.rm(currentWallpaperPath, { force: true });
+          await fs.rm(currentWallpaperPath, {force: true});
         }
         await fs.copyFile(path.join(userWallpapersPath, opt.input.name.replace(".preview", "")), currentWallpaperPath);
 
         return true;
       }),
-      setWallpaperToDefaultWallpaper: procedure.input(z.object({ name: z.string() })).mutation(async (opt) => {
+      setWallpaperToDefaultWallpaper: procedure.input(z.object({name: z.string()})).mutation(async (opt) => {
         const userWallpapersPath = path.join((await opt.ctx.user()).getPath(), "assets/wallpapers");
         const officialWallpaperPath = path.join(instance.sys.filesystem.SRC_ROOT, "assets/wallpapers");
         const resizedWallpapersPath = path.join(userWallpapersPath, "resized");
@@ -875,12 +882,12 @@ const router = t.router({
 
         if (fsExistsSync(resizedWallpapersPath)) {
           for (const resizedWallpaperFile of await fs.readdir(resizedWallpapersPath)) {
-            await fs.rm(path.join(resizedWallpapersPath, resizedWallpaperFile), { force: true });
+            await fs.rm(path.join(resizedWallpapersPath, resizedWallpaperFile), {force: true});
           }
         }
 
         if (fsExistsSync(currentWallpaperPath)) {
-          await fs.rm(currentWallpaperPath, { force: true });
+          await fs.rm(currentWallpaperPath, {force: true});
         }
         await fs.copyFile(path.join(officialWallpaperPath, opt.input.name), currentWallpaperPath);
 
@@ -911,11 +918,15 @@ const router = t.router({
         const db = instance.sys.database.postgres();
 
         if (opt.input === undefined) {
-          await db`UPDATE public.users SET color_scheme = NULL WHERE id = ${opt.ctx.userId}`;
+          await db`UPDATE public.users
+                   SET color_scheme = NULL
+                   WHERE id = ${opt.ctx.userId}`;
           return true;
         }
 
-        await db`UPDATE public.users SET color_scheme = ${opt.input} WHERE id = ${opt.ctx.userId}`;
+        await db`UPDATE public.users
+                 SET color_scheme = ${opt.input}
+                 WHERE id = ${opt.ctx.userId}`;
 
         return true;
       }),
@@ -1022,12 +1033,12 @@ const router = t.router({
           } as Required<OnlineWorkspaceApplication>["icon"];
 
           if (application.manifest?.icon) {
-              icon = {
-                type: application.manifest.icon.type,
-                value: `${
-                  opt.ctx.instance.sys.configuration.proxy.secure ? "https://" : "http://"
-                }${opt.ctx.instance.sys.configuration.proxy.hostname}/api/application-icon/${application.manifest.id}`,
-              };
+            icon = {
+              type: application.manifest.icon.type,
+              value: `${
+                opt.ctx.instance.sys.configuration.proxy.secure ? "https://" : "http://"
+              }${opt.ctx.instance.sys.configuration.proxy.hostname}/api/application-icon/${application.manifest.id}`,
+            };
           }
 
           shortcuts.push({
@@ -1044,14 +1055,18 @@ const router = t.router({
   storage: {
     usage: procedure
       .output(
-        z
-          .object({
-            displayName: z.string(),
-            percentage: z.number(),
-            size: z.number(),
-            color: z.string()
-          })
-          .array(),
+        z.object({
+          categories:
+            z
+              .object({
+                displayName: z.string(),
+                percentage: z.number(),
+                size: z.number(),
+                color: z.string()
+              })
+              .array(),
+          quotaString: z.string()
+        })
       )
       .query(async (opt) => {
         async function getChildFiles(dir: string) {
@@ -1063,7 +1078,7 @@ const router = t.router({
           }[] = [];
 
           if (fsExistsSync(dir)) {
-            const entries = await fs.readdir(dir, { withFileTypes: true });
+            const entries = await fs.readdir(dir, {withFileTypes: true});
             for (const child of entries) {
               const childPath = path.join(dir, child.name);
               if (child.isDirectory()) {
@@ -1090,7 +1105,6 @@ const router = t.router({
           [categoryId: string]: {
             fileCount: number;
             size: number;
-            percentage: number;
             color: string;
           };
         } = {};
@@ -1104,7 +1118,6 @@ const router = t.router({
             categories[file.type] = {
               fileCount: 0,
               size: 0,
-              percentage: 0,
               color: STORAGE_CATEGORY_COLORS[FileMediaType.Unknown]
             };
           }
@@ -1112,7 +1125,6 @@ const router = t.router({
           categories[file.type] = {
             fileCount: categories[file.type].fileCount + 1,
             size: categories[file.type].size + file.size,
-            percentage: 0,
             color: file.color
           };
         }
@@ -1131,19 +1143,22 @@ const router = t.router({
 
           output.push({
             displayName: categoryName,
-            percentage: Number((category.size / (1024 * 1024) / storageQuota).toFixed(2)),
-            size: category.size / (1024 * 1024),
+            percentage: Number((category.size / BYTES_PER_MB / storageQuota).toFixed(8)),
+            size: Number((category.size / BYTES_PER_MB).toFixed(2)),
             color: category.color
           });
         }
 
-        output = output.sort((i, j) => i.size - j.size).reverse();
+        output = output.sort((i, j) => i.size - j.size);
 
-        return output;
+        return {
+          categories: output,
+          quotaString: (storageQuota / BYTES_PER_MB).toFixed(2) + "MB"
+        };
       }),
   },
   application: {
-    getApplications: procedure.output(z.object({ displayName: z.string(), id: z.string() }).array()).query(async () => {
+    getApplications: procedure.output(z.object({displayName: z.string(), id: z.string()}).array()).query(async () => {
       return instance.sys.applications.enabledApplications.map((enabledApplication) => {
         return {
           displayName:
@@ -1154,7 +1169,7 @@ const router = t.router({
       });
     }),
     getApplication: procedure
-      .input(z.object({ id: z.string() }))
+      .input(z.object({id: z.string()}))
       .output(
         z.object({
           displayName: z.string(),
@@ -1178,7 +1193,7 @@ const router = t.router({
       .query(async (opt) => {
         const application = instance.sys.applications.availableApplications.find((aa) => aa.manifest?.id === opt.input.id);
 
-        if (!application) throw { error: true };
+        if (!application) throw {error: true};
 
         let icon = {
           type: "icon" as "icon" | "image",

@@ -25,8 +25,6 @@ const StoragePage: Component = () => {
         }}
       />
       <div class={styles.page}>
-        This page is still in development and is non-functional. Please check back later for updates.
-        <UKStackLabel>Usage Graph</UKStackLabel>
         <UsageGraph />
         <UKStackLabel>Duplicate Files</UKStackLabel>
         <DuplicateFiles />

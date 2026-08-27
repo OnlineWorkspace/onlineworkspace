@@ -83,6 +83,8 @@
 .permissionWarning {
   width: calc(100% - 2rem);
   max-width: 768px;
+  border-color: rgb(var(--uk-sys-color-error));
+  border-style: solid;
 }
 
 .description {
