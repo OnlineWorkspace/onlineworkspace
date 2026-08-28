@@ -22,6 +22,8 @@
   background: #000;
   height: var(--bar-height);
   width: 100%;
+  border-radius: var(--uk-sys-shape-corner-small);
+  overflow: hidden;
 }
 
 .barSegment {
@@ -62,6 +64,16 @@
 
 .divider {
   margin-top: 2rem;
-  margin-bottom: 2rem;
+  margin-bottom: 0.5rem;
   max-width: 1024px;
+}
+
+.labelContainer {
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+.requestMoreQuotaButton {
+  margin-left: auto;
+  margin-top: 1rem;
 }

@@ -1053,6 +1053,12 @@ const router = t.router({
     },
   },
   storage: {
+    getDuplicateFiles: procedure.output(z.object({ path: z.string(), name: z.string(), type: z.enum(FileMediaType) }).array()).query(async (opt) => {
+      return []
+    }),
+    getTemporaryFiles: procedure.output(z.object({ path: z.string(), name: z.string() }).array()).query(async (opt) => {
+      return []
+    }),
     usage: procedure
       .output(
         z.object({
@@ -1065,7 +1071,8 @@ const router = t.router({
                 color: z.string()
               })
               .array(),
-          quotaString: z.string()
+          quotaString: z.string(),
+          quota: z.number()
         })
       )
       .query(async (opt) => {
@@ -1143,7 +1150,7 @@ const router = t.router({
 
           output.push({
             displayName: categoryName,
-            percentage: Number((category.size / BYTES_PER_MB / storageQuota).toFixed(8)),
+            percentage: (category.size / BYTES_PER_MB / storageQuota),
             size: Number((category.size / BYTES_PER_MB).toFixed(2)),
             color: category.color
           });
@@ -1153,7 +1160,8 @@ const router = t.router({
 
         return {
           categories: output,
-          quotaString: (storageQuota / BYTES_PER_MB).toFixed(2) + "MB"
+          quotaString: (storageQuota / BYTES_PER_MB).toFixed(2) + "MB",
+          quota: (storageQuota / BYTES_PER_MB)
         };
       }),
   },
