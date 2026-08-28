@@ -8,6 +8,7 @@ import clsx from "clsx";
 import UKCard from "@ewsgit/uikit-solid/src/components/card/UKCard.js";
 import UKButton from "@ewsgit/uikit-solid/src/components/button/UKButton.js";
 import UKButtonGroup from "@ewsgit/uikit-solid/src/components/buttonGroup/UKButtonGroup.js";
+import NoticeMessage from "../../../../components/noticeMessage/NoticeMessage.js";
 
 const UsageGraph: Component = () => {
   const [storageUsage] = createResource(() => trpc.storage.usage.query());
@@ -46,19 +47,16 @@ const UsageGraph: Component = () => {
       </div>
       <UKDivider class={styles.divider} direction={"horizontal"}/>
       <Show when={(storageUsage()?.categories.reduce((acc, curr) => acc + curr.size, 0) || 0) > ((storageUsage()?.quota || 0) - 1_048_576)}>
-        <UKCard color={"elevated"}>
-          <UKText role={"title"} size={"m"}>Quota Nearly Full</UKText>
-          <UKText role={"body"} size={"m"}>You have nearly used all of your allocated quota, if you would like to request more, press the button below to send a
-            request to the server's administrator for a quota increase.</UKText>
-          <UKButton
-            class={styles.requestMoreQuotaButton}
-            onClick={() => {
-              alert("Implement me later")
-            }}
-            affirmative={true}>
-            Request Increased Quota
-          </UKButton>
-        </UKCard>
+        <NoticeMessage title={"Quota Nearly Full"}
+                       body={"You have nearly used all of your allocated quota, if you would like to request more, press the button below to send a request to the server's administrator for a quota increase."}
+                       actions={[
+                         {
+                           label: "Request Increased Quota",
+                           cb() {
+                             alert("Implement me later")
+                           }
+                         }
+                       ]}/>
       </Show>
     </>
   )

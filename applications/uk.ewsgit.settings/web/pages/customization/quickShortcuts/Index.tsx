@@ -8,17 +8,18 @@ import UKIcon from "@ewsgit/uikit-solid/src/components/icon/UKIcon.tsx";
 import UKStack from "@ewsgit/uikit-solid/src/components/stack/UKStack.tsx";
 import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.tsx";
 import UKTopAppBar from "@ewsgit/uikit-solid/src/components/topAppBar/UKTopAppBar.tsx";
-import { useNavigate } from "@solidjs/router";
-import { type Component, createResource, createSignal } from "solid-js";
+import {useNavigate} from "@solidjs/router";
+import {type Component, createResource, createSignal} from "solid-js";
 import trpc from "../../../lib/trpc";
 import AddShortcutButton from "./components/addShortcutButton/AddShortcutButton.tsx";
 import QuickShortcuts from "./components/quickShortcuts/QuickShortcuts.tsx";
 import ResetToDefaultsButton from "./components/resetToDefaultsButton/ResetToDefaultsButton.tsx";
 import styles from "./Index.module.scss";
+import NoticeMessage from "../../../components/noticeMessage/NoticeMessage.js";
 
 const QuickShortcutsPage: Component = () => {
   const navigate = useNavigate();
-  const [data, { mutate: mutateData }] = createResource(() => trpc.customization.quickShortcuts.getSettingData.query());
+  const [data, {mutate: mutateData}] = createResource(() => trpc.customization.quickShortcuts.getSettingData.query());
   const [hasBeenModified, setHasBeenModified] = createSignal<boolean>(false);
 
   return (
@@ -35,41 +36,28 @@ const QuickShortcutsPage: Component = () => {
         }}
       />
       <div class={styles.page}>
-        {/*{data() && (*/}
-        {/*  <QuickShortcuts*/}
-        {/*    defaultValue={data()?.defaultValue}*/}
-        {/*    currentValue={data()?.currentValue}*/}
-        {/*  />*/}
-        {/*)}*/}
         <UKText role={"body"} size={"l"}>
           Quick shortcuts are the application shortcuts displayed inside the navigation bar.
-          <br />
+          <br/>
           The navigation bar can be found on the left or bottom of the screen.
         </UKText>
-        {hasBeenModified() ? (
-          <>
-            <UKDivider width={"middle-inset"} direction={"horizontal"} />
-            <UKCard color="elevated" class={styles.hasBeenModifiedCard}>
-              <UKText role={"title"} size={"l"}>
-                Quick Shortcuts have been modified
-              </UKText>
-              <UKText role={"body"} size={"l"}>
-                To see your quick shortcut changes in the navigation bar, you will need to reload the page.
-              </UKText>
-              <UKButtonGroup align="end" size="s">
-                <UKButton
-                  leadingIcon={REFRESH_ICON}
-                  onClick={() => {
-                    window.location.reload();
-                  }}
-                >
-                  Reload
-                </UKButton>
-              </UKButtonGroup>
-            </UKCard>
-          </>
-        ) : null}
-        <UKDivider width={"middle-inset"} direction={"horizontal"} />
+        {hasBeenModified() && <>
+          <UKDivider width={"middle-inset"} direction={"horizontal"}/>
+          <NoticeMessage
+            title={"Quick Shortcuts have been modified"}
+            body={"To see your quick shortcut changes in the navigation bar, you will need to reload the page."}
+            actions={[
+              {
+                label: "Reload",
+                icon: REFRESH_ICON,
+                cb() {
+                  window.location.reload();
+                }
+              }
+            ]}
+          />
+        </>}
+        <UKDivider width={"middle-inset"} direction={"horizontal"}/>
         <UKStack>
           {(data()?.enabledShortcuts ?? []).length === 0 ? (
             <div class={styles.noQuickShortcutsContainer}>
@@ -93,7 +81,7 @@ const QuickShortcutsPage: Component = () => {
                   };
                 });
                 setHasBeenModified(true);
-                await trpc.application.setApplicationStringListSettingValue.mutate({ applicationId: "core", id: "quick_shortcuts", value: shortcuts });
+                await trpc.application.setApplicationStringListSettingValue.mutate({applicationId: "core", id: "quick_shortcuts", value: shortcuts});
               }}
             />
           )}
@@ -102,7 +90,7 @@ const QuickShortcutsPage: Component = () => {
           <ResetToDefaultsButton
             onReset={async () => {
               mutateData((previousData) => {
-                return { ...previousData!, enabledShortcuts: previousData!.defaultShortcuts };
+                return {...previousData!, enabledShortcuts: previousData!.defaultShortcuts};
               });
               setHasBeenModified(true);
               await trpc.application.setApplicationStringListSettingValue.mutate({

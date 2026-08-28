@@ -28,6 +28,7 @@
 
 .barSegment {
   position: relative;
+
   &:last-of-type {
     &::before {
       border-top-right-radius: var(--uk-sys-shape-corner-extra-small);
@@ -71,9 +72,4 @@
 .labelContainer {
   flex-direction: row;
   flex-wrap: wrap;
-}
-
-.requestMoreQuotaButton {
-  margin-left: auto;
-  margin-top: 1rem;
 }
