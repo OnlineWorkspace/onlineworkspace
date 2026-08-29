@@ -23,6 +23,8 @@ export const FEATURE_FLAG_DESCRIPTIONS = {
     "Allow administrators to alter settings / configuration options which may cause the instance to malfunction. (Only enable this if you are sure you know what you are doing!)",
   [WorkspacesFeatureFlags.AllowUserSignups]:
     "Allow new users to create accounts from the instance user login page",
+  [WorkspacesFeatureFlags.DisplayProfilesAtLogon]:
+  "Display the instance's users as profiles on the login screen. This is only recommended for instances not publicly exposed to the internet."
 };
 
 export default class ConfigurationSystem extends System {
@@ -77,10 +79,14 @@ export default class ConfigurationSystem extends System {
     displayName: string;
     tagline: string;
     metaDescription: string;
+    showLoginBackground: boolean;
+    showLoginBanner: boolean;
   } = {
     displayName: "OnlineWorkspace",
     tagline: "Under construction...",
-    metaDescription: "A self-hosted web platform for applications & services with design based on Google's Material 3 Expressive. (Work In Progress)"
+    metaDescription: "A self-hosted web platform for applications & services with design based on Google's Material 3 Expressive. (Work In Progress)",
+    showLoginBackground: true,
+    showLoginBanner: true,
   }
   mailServer: {
     enabled: boolean;
@@ -195,6 +201,7 @@ export default class ConfigurationSystem extends System {
     }
 
     await this.saveConfiguration();
+    INSTANCE.log.system.info(`Enabled feature ${INSTANCE.log.system.emphasis(feature as string)}`);
 
     return true;
   }
@@ -205,6 +212,7 @@ export default class ConfigurationSystem extends System {
     );
 
     await this.saveConfiguration();
+    INSTANCE.log.system.info(`Disabled feature ${INSTANCE.log.system.emphasis(feature as string)}`);
 
     return true;
   }

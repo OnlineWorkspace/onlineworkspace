@@ -259,9 +259,9 @@ const router = t.router({
         );
       }
 
-      await opt.ctx.instance.sys.image.serveImage(
+      return await opt.ctx.instance.sys.image.serveImage(
         opt.ctx.userId,
-        requiredResizedWallpaperPath,
+        requiredResizedWallpaperPath
       );
     }),
   },

@@ -94,6 +94,8 @@ export const coreOnlineWorkspaceRouter = t.router({
       return {
         showSignup: opt.ctx.instance.sys.configuration.hasFeature(WorkspacesFeatureFlags.AllowUserSignups),
         showProfiles: opt.ctx.instance.sys.configuration.hasFeature(WorkspacesFeatureFlags.DisplayProfilesAtLogon),
+        showBackground: opt.ctx.instance.sys.configuration.branding.showLoginBackground,
+        showBanner: opt.ctx.instance.sys.configuration.branding.showLoginBanner,
         tagline: opt.ctx.instance.sys.configuration.branding.tagline,
       };
     }),

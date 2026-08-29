@@ -64,17 +64,6 @@ const ManageInstalledPage: Component = () => {
         }
       />
 
-      {/* Perhaps add this at some point, create a dialogue with a text field for a custom install uri */}
-      {/* {!selectionMode() && (
-                    <UKIconButton
-                        color={"filled"}
-                        alt={"install application"}
-                        icon={"add"}
-                        onClick={() => {
-                            // add logic (probably a dialogue with a UKTextField)
-                        }}
-                    />
-                )} */}
       <Suspense>
         <UKStack class={styles.content}>
           <For each={installedApplications()?.applications || []}>

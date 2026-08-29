@@ -5,16 +5,6 @@
     padding: 0;
     overflow: hidden;
     position: relative;
-    grid-column: span 2;
-    &:nth-child(2n) {
-        grid-column: span 1;
-    }
-    &:nth-child(3n) {
-        grid-column: span 1;
-    }
-    &:nth-child(4n) {
-        grid-column: span 2;
-    }
 
     > * {
         z-index: 1;
@@ -56,6 +46,6 @@
     flex-direction: column;
     margin-top: auto;
     padding: 1rem;
-    background: linear-gradient(to top, #000a, #0003);
+    background: rgb(var(--uk-sys-color-surface-container-highest));
     backdrop-filter: blur(0.125rem);
 }

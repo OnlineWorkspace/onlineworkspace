@@ -26,11 +26,9 @@ const command: CommandModule = {
     switch (action) {
       case "enable":
         await INSTANCE.sys.configuration.enableFeature(args.featureId as string);
-        INSTANCE.log.system.info(`Enabled feature ${INSTANCE.log.system.emphasis(args.featureId as string)}`);
         break;
       case "disable":
         await INSTANCE.sys.configuration.disableFeature(args.featureId as string);
-        INSTANCE.log.system.info(`Disabled feature ${INSTANCE.log.system.emphasis(args.featureId as string)}`);
         break;
     }
   },

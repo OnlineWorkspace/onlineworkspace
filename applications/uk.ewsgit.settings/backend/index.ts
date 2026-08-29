@@ -566,6 +566,14 @@ const router = t.router({
         // TODO: implement me!
         set: procedure.mutation(async () => {
         }),
+        isEnabled: procedure.output(z.boolean()).query(async (opt) => {
+          return instance.sys.configuration.branding.showLoginBanner;
+        }),
+        setEnabled: procedure.input(z.boolean()).output(z.boolean()).mutation(async (opt) => {
+          instance.sys.configuration.branding.showLoginBanner = opt.input;
+          log.info(`Set Login Banner to ${opt.input ? "enabled" : "disabled"}`)
+          return opt.input;
+        })
       },
       loginBackground: {
         preview: procedure
@@ -604,6 +612,14 @@ const router = t.router({
               dimensions: DIMENSIONS,
             };
           }),
+        isEnabled: procedure.output(z.boolean()).query(async (opt) => {
+          return instance.sys.configuration.branding.showLoginBackground;
+        }),
+        setEnabled: procedure.input(z.boolean()).output(z.boolean()).mutation(async (opt) => {
+          instance.sys.configuration.branding.showLoginBackground = opt.input;
+          log.info(`Set Login Background to ${opt.input ? "enabled" : "disabled"}`)
+          return opt.input;
+        })
       },
       favicon: {
         preview: procedure
@@ -1053,10 +1069,10 @@ const router = t.router({
     },
   },
   storage: {
-    getDuplicateFiles: procedure.output(z.object({ path: z.string(), name: z.string(), type: z.enum(FileMediaType) }).array()).query(async (opt) => {
+    getDuplicateFiles: procedure.output(z.object({path: z.string(), name: z.string(), type: z.enum(FileMediaType)}).array()).query(async (opt) => {
       return []
     }),
-    getTemporaryFiles: procedure.output(z.object({ path: z.string(), name: z.string() }).array()).query(async (opt) => {
+    getTemporaryFiles: procedure.output(z.object({path: z.string(), name: z.string()}).array()).query(async (opt) => {
       return []
     }),
     usage: procedure

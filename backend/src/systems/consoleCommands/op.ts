@@ -17,9 +17,13 @@ const command: CommandModule = {
       return;
     }
 
-    await user.setIsAdministrator(true);
+    const result = await user.setIsAdministrator(true);
 
-    log.success(`User '${log.emphasis(username)}' was promoted to administrator successfully!`);
+    if (result) {
+      log.success(`User '${log.emphasis(username)}' was promoted to administrator successfully!`);
+    } else {
+      log.error(`Failed to make user '${log.emphasis(username)}' an administrator!`);
+    }
   }
 };
 
