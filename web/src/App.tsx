@@ -9,33 +9,33 @@ import AppIndex from "./pages/app/Index.tsx";
 import Redirect from "./components/Redirect.js";
 
 const App: Component = () => {
-  return (
-    <UIKitRoot class={styles.root}>
-      <MetaProvider>
-        <Router>
-          <Route component={lazy(() => import("./pages/userSelect/Layout.tsx"))}>
-            <Route path={"/"} component={() => <Redirect to={"/login"}/>}/>
-            <Route path={"/login"} component={lazy(() => import("./pages/userSelect/login/Login.tsx"))}/>
-            <Route path={"/login/profiles"} component={lazy(() => import("./pages/userSelect/login/Login.tsx"))}/>
-            <Route path={"/signup"} component={lazy(() => import("./pages/userSelect/signup/Signup.tsx"))}/>
-            <Route path={"/forgot-password"} component={lazy(() => import("./pages/userSelect/forgotPassword/ForgotPassword.tsx"))}/>
-          </Route>
-          <Route component={lazy(() => import("./pages/auth/app/flow.tsx"))} path="auth/app/flow"/>
-          <Route component={lazy(() => import("./pages/app/AuthCheck.tsx"))}>
-            <Route component={lazy(() => import("./pages/app/Layout.tsx"))}>
-              <Route path={"app"}>
-                <Route path={"/"} component={AppIndex}/>
-                <ApplicationsRouter/>
-                <Route path={":applicationId"} component={MissingApp}/>
-              </Route>
-              <Route path={"*"} component={lazy(() => import("./pages/notFound/Index.tsx"))}/>
-            </Route>
-          </Route>
-          <Route path={"*"} component={lazy(() => import("./pages/notFound/Index.tsx"))}/>
-        </Router>
-      </MetaProvider>
-    </UIKitRoot>
-  );
+    return (<UIKitRoot class={styles.root}>
+            <MetaProvider>
+                <Router>
+                    <Route path={"/"} component={() => <Redirect to={"/auth/login"}/>}/>
+                    <Route path={"/auth"} component={lazy(() => import("./pages/auth/Layout.tsx"))}>
+                        <Route path={"/login"} component={lazy(() => import("./pages/auth/login/Layout.tsx"))}/>
+                        <Route path={"/login/standard"}
+                               component={lazy(() => import("./pages/auth/login/standard/Standard.tsx"))}/>
+                        <Route path={"/login/forgot-password"}
+                               component={lazy(() => import("./pages/auth/login/forgotPassword/ForgotPassword.tsx"))}/>
+                        <Route path={"/signup"} component={lazy(() => import("./pages/auth/signup/Signup.tsx"))}/>
+                        <Route component={lazy(() => import("./pages/auth/app/flow.tsx"))} path="app/flow"/>
+                    </Route>
+                    <Route component={lazy(() => import("./pages/app/AuthCheck.tsx"))}>
+                        <Route component={lazy(() => import("./pages/app/Layout.tsx"))}>
+                            <Route path={"app"}>
+                                <Route path={"/"} component={AppIndex}/>
+                                <ApplicationsRouter/>
+                                <Route path={":applicationId"} component={MissingApp}/>
+                            </Route>
+                            <Route path={"*"} component={lazy(() => import("./pages/notFound/Index.tsx"))}/>
+                        </Route>
+                    </Route>
+                    <Route path={"*"} component={lazy(() => import("./pages/notFound/Index.tsx"))}/>
+                </Router>
+            </MetaProvider>
+        </UIKitRoot>);
 };
 
 export default App;

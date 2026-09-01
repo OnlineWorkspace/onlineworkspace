@@ -1,5 +1,4 @@
 import type {Component} from "solid-js";
-import UKDivider from "@ewsgit/uikit-solid/src/components/divider/UKDivider.js";
 import UKCard from "@ewsgit/uikit-solid/src/components/card/UKCard.js";
 import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.js";
 import UKButtonGroup from "@ewsgit/uikit-solid/src/components/buttonGroup/UKButtonGroup.js";

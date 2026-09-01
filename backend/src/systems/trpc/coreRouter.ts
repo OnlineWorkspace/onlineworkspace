@@ -1,15 +1,15 @@
 import * as nodeCrypto from "node:crypto";
-import type { Server } from "bun";
-import { initTRPC, TRPCError } from "@trpc/server";
-import type { FetchCreateContextFnOptions } from "@trpc/server/adapters/fetch";
+import type {Server} from "bun";
+import {initTRPC, TRPCError} from "@trpc/server";
+import type {FetchCreateContextFnOptions} from "@trpc/server/adapters/fetch";
 import * as hiBase32 from "hi-base32";
 import * as OTPAuth from "otpauth";
 import z from "zod";
-import type { Instance } from "../../index.ts";
-import { AuthorizedDeviceType, SessionCreationError } from "../authorization.ts";
-import { WorkspacesFeatureFlags } from "../configuration.ts";
-import type { WorkspacesUser } from "../users.ts";
-import { deleteCookie, getCookies, setCookie } from "../../utils/cookies.ts";
+import type {Instance} from "../../index.ts";
+import {AuthorizedDeviceType, SessionCreationError} from "../authorization.ts";
+import {WorkspacesFeatureFlags} from "../configuration.ts";
+import type {WorkspacesUser} from "../users.ts";
+import {deleteCookie, getCookies, setCookie} from "../../utils/cookies.ts";
 
 export const createOnlineWorkspaceTRPCContext = (instance: Instance) => (opt: FetchCreateContextFnOptions, server: Server<any>) => {
   return {
@@ -56,7 +56,7 @@ export const procedure = t.procedure.use(async (opt) => {
   const userId = await opt.ctx.instance.sys.authorization.verifySession(decodeURIComponent(cookies.Authorization!));
 
   if (userId === undefined) {
-    throw new TRPCError({ code: "UNAUTHORIZED", message: "invalid session" });
+    throw new TRPCError({code: "UNAUTHORIZED", message: "invalid session"});
   }
 
   return opt.next({
@@ -72,7 +72,7 @@ export const adminProcedure = procedure.use(async (opt) => {
   const user = await opt.ctx.instance.sys.users.getUserById(opt.ctx.userId);
 
   if (!user) {
-    throw new TRPCError({ code: "UNAUTHORIZED", message: "invalid session" });
+    throw new TRPCError({code: "UNAUTHORIZED", message: "invalid session"});
   }
 
   if (!(await user.isAdministrator())) {
@@ -127,10 +127,25 @@ export const coreOnlineWorkspaceRouter = t.router({
 
       return await opt.ctx.instance.sys.authentication.getSessionRequirements(userId);
     }),
+    getProfiles: publicProcedure.output(z.object({
+      username: z.string(),
+      displayName: z.string(),
+      passwordNote: z.string().optional(),
+    }).array()).query(async opt => {
+      const users = await opt.ctx.instance.sys.users.getAllUsers();
+
+      return await Promise.all(users.map(async u => {
+        return {
+          username: await u.getUsername(),
+          displayName: await u.getFormattedFullName(),
+          passwordNote: "Nothing as of yet..."
+        }
+      }));
+    })
   },
   authorization: {
     checkEmailAddressOwnership: publicProcedure
-      .input(z.object({ emailAddress: z.string() }))
+      .input(z.object({emailAddress: z.string()}))
       .output(z.boolean().or(z.string()))
       .mutation(async (opt) => {
         if (emailSignupVerificationCodes.has(opt.input.emailAddress)) {
@@ -146,12 +161,12 @@ export const coreOnlineWorkspaceRouter = t.router({
 
         emailSignupVerificationCodes.set(opt.input.emailAddress, emailCode);
         const emailBody = `Email code for email '${opt.input.emailAddress}' is '${emailCode}'`;
-        await opt.ctx.instance.sys.email.sendEmail(opt.input.emailAddress, "Email verification code", { type: "string", content: emailBody });
+        await opt.ctx.instance.sys.email.sendEmail(opt.input.emailAddress, "Email verification code", {type: "string", content: emailBody});
         opt.ctx.instance.log.system.debug(emailBody);
 
         return true;
       }),
-    validateEmailCode: publicProcedure.input(z.object({ emailAddress: z.string(), emailCode: z.string() })).query(async (opt) => {
+    validateEmailCode: publicProcedure.input(z.object({emailAddress: z.string(), emailCode: z.string()})).query(async (opt) => {
       return emailSignupVerificationCodes.get(opt.input.emailAddress) === opt.input.emailCode;
     }),
     isUsernameValid: publicProcedure.input(z.string()).query(async (opt) => {
@@ -180,7 +195,7 @@ export const coreOnlineWorkspaceRouter = t.router({
       )
       .output(
         z.union([
-          z.object({ type: z.literal("error"), message: z.string() }),
+          z.object({type: z.literal("error"), message: z.string()}),
           z.object({
             type: z.literal("success"),
             sessionToken: z.string(),
@@ -275,7 +290,7 @@ export const coreOnlineWorkspaceRouter = t.router({
           sessionToken: session as string,
         };
       }),
-    confirmTwoFactor: procedure.input(z.object({ twoFactorCode: z.string() })).mutation(async (opt) => {
+    confirmTwoFactor: procedure.input(z.object({twoFactorCode: z.string()})).mutation(async (opt) => {
       const user = await opt.ctx.user();
       const secretString = temporaryTwoFactorSecrets.get(user.userId);
 
@@ -295,7 +310,7 @@ export const coreOnlineWorkspaceRouter = t.router({
         secret: secretString,
       });
 
-      if (totp.validate({ token: opt.input.twoFactorCode }) !== null) {
+      if (totp.validate({token: opt.input.twoFactorCode}) !== null) {
         temporaryTwoFactorSecrets.delete(user.userId);
         await opt.ctx.instance.sys.authorization.setTwoFactorAuthenticationSecret(user.userId, secretString);
         opt.ctx.instance.log.system.success(`(${user.userId})${await user.getUsername()} Setup two-factor authentication on their account!`);
@@ -363,8 +378,8 @@ export const coreOnlineWorkspaceRouter = t.router({
       )
       .output(
         z.union([
-          z.object({ type: z.literal("error"), message: z.string() }),
-          z.object({ type: z.literal("success"), sessionToken: z.string() }),
+          z.object({type: z.literal("error"), message: z.string()}),
+          z.object({type: z.literal("success"), sessionToken: z.string()}),
           z.object({
             type: z.literal("requirementsNotMet"),
             requireAny: z.enum(["totp", "email"]).array(),
@@ -482,7 +497,7 @@ export const coreOnlineWorkspaceRouter = t.router({
           sessionToken: session,
         };
       }),
-    isAuthenticated: publicProcedure.output(z.object({ authenticated: z.boolean() })).query(async (opt) => {
+    isAuthenticated: publicProcedure.output(z.object({authenticated: z.boolean()})).query(async (opt) => {
       const cookies = getCookies(opt.ctx.rawRequest.req.headers);
 
       if (!cookies.Authorization) {
@@ -503,7 +518,7 @@ export const coreOnlineWorkspaceRouter = t.router({
         authenticated: true,
       };
     }),
-    logout: procedure.output(z.object({ success: z.boolean() })).mutation(async (opt) => {
+    logout: procedure.output(z.object({success: z.boolean()})).mutation(async (opt) => {
       const cookies = getCookies(opt.ctx.rawRequest.req.headers);
 
       if (!cookies.Authorization) {
@@ -566,12 +581,14 @@ ${opt.ctx.instance.sys.configuration.termsOfUse.message}`;
           .query(async (opt) => {
             const db = opt.ctx.instance.sys.database.postgres();
 
-            const user = (await db`SELECT username, forename, surname FROM users WHERE id = ${opt.ctx.userId};`)?.[0];
+            const user = (await db`SELECT username, forename, surname
+                                   FROM users
+                                   WHERE id = ${opt.ctx.userId};`)?.[0];
 
             if (!user) {
               throw new TRPCError({
                 code: "NOT_FOUND",
-                cause: { message: "User does not exist" },
+                cause: {message: "User does not exist"},
               });
             }
 
@@ -755,7 +772,9 @@ ${opt.ctx.instance.sys.configuration.termsOfUse.message}`;
     get: procedure.output(z.any().or(z.literal(false))).query(async (opt) => {
       const db = opt.ctx.instance.sys.database.postgres();
 
-      const themeValues = await db`SELECT color_scheme FROM public.users WHERE id = ${opt.ctx.userId}`;
+      const themeValues = await db`SELECT color_scheme
+                                   FROM public.users
+                                   WHERE id = ${opt.ctx.userId}`;
 
       return themeValues?.[0]?.color_scheme || false;
     }),

@@ -7,25 +7,19 @@ import UKTextField from "@ewsgit/uikit-solid/src/components/textField/UKTextFiel
 import { startAuthentication } from "@simplewebauthn/browser";
 import { useNavigate, usePreloadRoute, useSearchParams } from "@solidjs/router";
 import {type Component, createEffect, createSignal, onMount, useContext} from "solid-js";
-import trpc from "../../../lib/trpc";
-import styles from "./Login.module.scss";
-import UserSelectContext from "../userSelectContext.ts";
+import trpc from "../../../../lib/trpc";
+import styles from "./Standard.module.scss";
+import AuthContext from "../../authContext.ts";
 
-const UserSelectPage: Component = () => {
+const LoginStandardPage: Component = () => {
   const navigate = useNavigate();
   const preloadRoute = usePreloadRoute();
-  const options = useContext(UserSelectContext)
+  const options = useContext(AuthContext)
   const [searchParams] = useSearchParams();
 
   const [username, setUsername] = createSignal(searchParams.username as string | undefined || "");
   const [password, setPassword] = createSignal("");
   const [showTwoFactor, setShowTwoFactor] = createSignal<boolean>(false);
-
-  onMount(async () => {
-    if ((await trpc.authorization.isAuthenticated.query()).authenticated) {
-      navigate("/app");
-    }
-  });
 
   createEffect(async () => {
     if (username() === "") return;
@@ -129,10 +123,15 @@ const UserSelectPage: Component = () => {
                     const redirect = new URLSearchParams(window.location.search).get("redirect");
                     if (redirect) {
                       preloadRoute(redirect);
-                      return { state: AffirmativeButtonState.Success, cb: () => navigate(redirect) };
+
+                      return {
+                        state: AffirmativeButtonState.Success,
+                        cb: () => navigate(redirect)
+                      };
                     }
 
                     preloadRoute("/app");
+
                     return {
                       state: AffirmativeButtonState.Success,
                       cb: () => navigate("/app"),
@@ -169,4 +168,4 @@ const UserSelectPage: Component = () => {
   );
 };
 
-export default UserSelectPage;
+export default LoginStandardPage;
