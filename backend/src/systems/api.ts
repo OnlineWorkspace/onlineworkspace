@@ -140,8 +140,6 @@ export default class ApiSystem extends System {
                         self.log.error(`Failed to serve icon at path '${applicationIconPath}'!`)
                         return serveFile(req, path.join(self.instance.sys.filesystem.FS_ROOT, "assets/missing.png"))
                     }
-
-
                 } else {
                     const applicationIconPath = path.join(application.path, application.manifest?.icon?.value || "");
 
