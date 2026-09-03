@@ -71,7 +71,7 @@ export class WorkspacesUser {
                      SET forename = ${forename}
                      WHERE id = ${this.userId}`;
 
-            this.instance.log.system.info(`Set Forename to '${surname}' for ${this.userId}`);
+            this.instance.log.system.info(`Set Forename to '${forename}' for ${this.userId}`);
 
             return true;
         } catch (_) {
@@ -150,10 +150,13 @@ export class WorkspacesUser {
         return {forename: forenameRes, surname: surnameRes};
     }
 
+    /**
+     Gets the user's forename and surname formatted into a single string
+     */
     async getFormattedFullName(): Promise<string> {
         const fullName = await this.getFullName()
 
-        return `${fullName.forename}${fullName.surname !== "" ? " " + fullName.surname : ""}`
+        return `${fullName.forename}${(fullName.surname !== "" || fullName.surname !== undefined) ? ` ${fullName.surname}` : ""}`
     }
 
     /**
@@ -383,6 +386,19 @@ export class WorkspacesUser {
     }
 
     /**
+     Gets a user's password note
+     @returns `string` - the user's password note
+     @returns `undefined` - the user has no password note set
+     */
+    async getPasswordNote(): Promise<string | undefined> {
+        const db = this.instance.sys.database.postgres();
+
+        return (await db`SELECT password_note
+                         FROM public.users
+                         WHERE id = ${this.userId}`)?.[0]?.password_note || undefined;
+    }
+
+    /**
      sets the user's original quality avatar to avatarFile
      @returns `true` - copied the avatarFile successfully
      @returns `false` - failed to copy the avatarFile
@@ -519,6 +535,7 @@ export default class UsersSystem extends System {
                      is_email_verified    BOOL   DEFAULT FALSE,
                      socials              TEXT[] DEFAULT '{}',
                      hashed_password      TEXT,
+                     password_note        TEXT,
                      two_factor_secret    TEXT,
                      session_requirements INT,
                      settings             JSONB  DEFAULT '{}'::JSONB,

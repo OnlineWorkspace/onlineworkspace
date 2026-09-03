@@ -8,10 +8,19 @@ import backend from "../../lib/backend";
 import styles from "./Layout.module.scss";
 import AuthContext from "./authContext.ts";
 import trpc from "../../lib/trpc.ts";
+import useIsMobile from "@ewsgit/uikit-solid/src/core/useIsMobile.ts";
 
 const UserSelectLayout: Component<RouteSectionProps<unknown>> = (props) => {
     const navigate = useNavigate();
-    const [options] = createResource(() => trpc.userSelect.getOptions.query())
+    const isMobile = useIsMobile();
+    const [options, { mutate: mutateOptions }] = createResource(async () => {
+        const data = await trpc.userSelect.getOptions.query();
+
+        return {
+            ...data,
+            showProfiles: isMobile() ? false : data.showProfiles
+        }
+    })
 
     onMount(async () => {
         const {authenticated: isAuthenticated} = await trpc.authorization.isAuthenticated.query()

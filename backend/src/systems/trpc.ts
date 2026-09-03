@@ -17,7 +17,7 @@ export default class TRPCSystem extends System {
     router: TRPCBuiltRouter<any, any>;
     createContext: (
       opts: FetchCreateContextFnOptions,
-      server: Server,
+      server: Server<any>,
     ) => object;
   }[];
 
@@ -38,7 +38,7 @@ export default class TRPCSystem extends System {
     basePath: string,
     createContext: (
       opts: FetchCreateContextFnOptions,
-      server: Server,
+      server: Server<any>,
     ) => object = createOnlineWorkspaceTRPCContext(this.instance),
   ) {
     if (this.routers.find((r) => r.basePath === basePath)) {
@@ -75,7 +75,7 @@ export default class TRPCSystem extends System {
 
   attemptTRPCRequest(
     req: Request,
-    server: Server,
+    server: Server<any>,
   ) {
     const self = this;
     const url = new URL(req.url);
