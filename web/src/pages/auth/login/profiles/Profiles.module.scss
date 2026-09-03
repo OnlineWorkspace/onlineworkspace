@@ -33,7 +33,7 @@
   left: 50%;
   top: 0;
   height: max-content;
-  transition: transform var(--uk-sys-motion-duration-150) var(--uk-sys-motion-easing-standard-decelerate), left var(--uk-sys-motion-duration-150) var(--uk-sys-motion-easing-standard-decelerate);
+  transition: transform var(--uk-sys-motion-duration-500) var(--uk-sys-motion-easing-standard-decelerate), left var(--uk-sys-motion-duration-150) var(--uk-sys-motion-easing-standard-decelerate);
 }
 
 .signupButton {

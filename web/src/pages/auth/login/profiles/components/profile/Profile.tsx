@@ -13,6 +13,8 @@ const Profile: Component<{
         onClick={props.select}
     >
         <UKAvatar
+            containerClass={styles.avatarContainer}
+            class={styles.avatar}
             size={props.selected ? "xl" : "l"}
             username={props.username}
             avatar={backend(`/api/user/${props.username}/avatar/${props.selected ? "xl" : "l"}`)}

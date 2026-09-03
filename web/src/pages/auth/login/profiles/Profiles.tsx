@@ -72,7 +72,7 @@ const LoginProfilesPage: Component = () => {
         }
     })
 
-    return <div class={styles.root}>
+    return <>
         <div class={styles.contentContainer}>
             <div
                 class={styles.profilesContainer}
@@ -113,7 +113,7 @@ const LoginProfilesPage: Component = () => {
 
             <Show when={selected() !== undefined}>
                 <UKCard>
-                    Signup Card
+                    Login Card
                 </UKCard>
             </Show>
         </div>
@@ -127,7 +127,7 @@ const LoginProfilesPage: Component = () => {
                 navigate("/auth/login/standard")
             }}
         />
-    </div>
+    </>
 }
 
 export default LoginProfilesPage;

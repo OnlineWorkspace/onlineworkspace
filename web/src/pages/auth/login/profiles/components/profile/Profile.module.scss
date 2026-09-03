@@ -12,14 +12,20 @@
   transition: height var(--uk-sys-motion-duration-500) var(--uk-sys-motion-easing-standard-decelerate);
   interpolate-size: allow-keywords;
   height: max-content;
+  //transition: padding-top var(--uk-sys-motion-duration-500) var(--uk-sys-motion-easing-standard-decelerate);
 }
 
 .otherProfileSelected {
   opacity: 0.5;
 
   > .text {
-    display: none;
-    visibility: hidden;
-    height: 0;
   }
+}
+
+.avatarContainer {
+  transition: height var(--uk-sys-motion-duration-500) var(--uk-sys-motion-easing-standard-decelerate);
+}
+
+.avatar {
+  transition: height var(--uk-sys-motion-duration-500) var(--uk-sys-motion-easing-standard-decelerate), width var(--uk-sys-motion-duration-500) var(--uk-sys-motion-easing-standard-decelerate);
 }

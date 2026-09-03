@@ -151,7 +151,7 @@ const LoginStandardPage: Component = () => {
                     <UKText role={"body"} size={"m"}>
                         Don't have an account?
                     </UKText>
-                    <UKButton onClick={() => navigate("/signup")} color={"tonal"}>
+                    <UKButton onClick={() => navigate("/auth/signup")} color={"tonal"}>
                         Signup
                     </UKButton>
                 </div>
