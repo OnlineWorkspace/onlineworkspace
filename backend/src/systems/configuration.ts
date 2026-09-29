@@ -137,9 +137,16 @@ export default class ConfigurationSystem extends System {
   constructor(instance: Instance) {
     super("configuration", instance);
 
-    if (process.env.POSTGRES_DATABASE_HOST) {
-      this.databases.postgres.host = process.env.POSTGRES_DATABASE_HOST;
-    }
+    const env = process.env;
+    const postgres = this.databases.postgres;
+    postgres.user = env.ONLINEWORKSPACE_POSTGRES_DATABASE_USER || postgres.user;
+    postgres.password =
+      env.ONLINEWORKSPACE_POSTGRES_DATABASE_PASSWORD || postgres.password;
+    postgres.host = env.ONLINEWORKSPACE_POSTGRES_DATABASE_HOST || postgres.host;
+    postgres.port =
+      Number(env.ONLINEWORKSPACE_POSTGRES_DATABASE_PORT) || postgres.port;
+    postgres.database =
+      env.ONLINEWORKSPACE_POSTGRES_DATABASE_NAME || postgres.database;
     this.termsOfUse = {
       message: `1. Acceptance of Terms
     - By logging in, you agree to these rules. If you do not agree, please do not use the service.
