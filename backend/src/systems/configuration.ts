@@ -134,10 +134,13 @@ export default class ConfigurationSystem extends System {
   caddyfile: string | undefined = "../Caddyfile";
   apiPort: number = 3563;
 
-  constructor(instance: Instance) {
-    super("configuration", instance);
+  /** The databases as configured by the file, without the environment overrides, which are never written back to it. */
+  #fileDatabases: ConfigurationSystem["databases"] | undefined;
 
+  /** Environment variables always take priority over the configuration file. */
+  applyEnvironmentOverrides() {
     const env = process.env;
+    this.#fileDatabases = structuredClone(this.databases);
     const postgres = this.databases.postgres;
     postgres.user = env.ONLINEWORKSPACE_POSTGRES_DATABASE_USER || postgres.user;
     postgres.password =
@@ -147,6 +150,11 @@ export default class ConfigurationSystem extends System {
       Number(env.ONLINEWORKSPACE_POSTGRES_DATABASE_PORT) || postgres.port;
     postgres.database =
       env.ONLINEWORKSPACE_POSTGRES_DATABASE_NAME || postgres.database;
+  }
+
+  constructor(instance: Instance) {
+    super("configuration", instance);
+
     this.termsOfUse = {
       message: `1. Acceptance of Terms
     - By logging in, you agree to these rules. If you do not agree, please do not use the service.
@@ -196,6 +204,8 @@ export default class ConfigurationSystem extends System {
         }
       }
     }
+
+    this.applyEnvironmentOverrides();
   }
 
   hasFeature(feature: WorkspacesFeatureFlags | string): boolean {
@@ -243,6 +253,8 @@ export default class ConfigurationSystem extends System {
     for (const propertyKey of allowedProperties) {
       configurationFileContents[propertyKey] = this[propertyKey];
     }
+    configurationFileContents.databases =
+      this.#fileDatabases ?? this.databases;
 
     await fs.writeFile(
       CONFIGURATION_FILE_PATH,
@@ -280,6 +292,8 @@ export default class ConfigurationSystem extends System {
         this[propertyKey] = configurationFile[propertyKey];
       }
     }
+
+    this.applyEnvironmentOverrides();
 
     for (
       const feature of Object.keys(
