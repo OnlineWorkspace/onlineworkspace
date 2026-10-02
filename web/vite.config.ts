@@ -24,6 +24,9 @@ export default defineConfig({
     exclude: ["fs-events"],
   },
   resolve: {
+    // applications keep their own node_modules, and a build bundles every copy of these it finds, while the dev server
+    // pre-bundles one. Two copies of solid-js do not share a reactive root, so routes of applications would never match.
+    dedupe: ["solid-js", "solid-js/web", "solid-js/store", "@solidjs/router"],
     alias: {
       "@solidjs/router": "/../node_modules/@solidjs/router",
       "@ewsgit/uikit-solid": "/../node_modules/@ewsgit/uikit-solid",

@@ -91,6 +91,7 @@ export default class TRPCSystem extends System {
         endpoint: router.basePath ?? "",
         router: router.router,
         onError(opts) {
+          if (opts.error.code === "UNAUTHORIZED") return;
           self.log.error(`${opts.error.name} occurred on path: ${router.basePath} -> ${opts.path}; type: ${opts.type}`, opts.input, opts.error)
         }
       });

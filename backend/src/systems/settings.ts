@@ -1,6 +1,6 @@
 import type { Instance } from "../index.ts";
 import System from "../system.ts";
-import { ApplicationSetting, type GlobalApplicationSetting } from "./settings/applicationSetting/applicationSetting.ts";
+import { type ApplicationSetting, GlobalApplicationSetting } from "./settings/applicationSetting/applicationSetting.ts";
 
 export default class SettingsSystem extends System {
   applicationSettings: {
@@ -35,12 +35,12 @@ export default class SettingsSystem extends System {
 
     if (!applicationSetting) return false;
 
-    if (applicationSetting instanceof ApplicationSetting) {
-      await applicationSetting?.setValue(userId, value);
-      return true;
-    } else {
-      return false;
-    }
+    // applications import their own copy of this package (a `file:` dependency is copied, not linked), so their settings are never
+    // `instanceof` this copy's ApplicationSetting; rule out the global kind instead, which the settings app does too
+    if (applicationSetting instanceof GlobalApplicationSetting) return false;
+
+    await (applicationSetting as ApplicationSetting<T>).setValue(userId, value);
+    return true;
   }
 
   async setUserSettings(userId: number, settings: Record<string, any>): Promise<boolean> {
@@ -77,7 +77,7 @@ export default class SettingsSystem extends System {
     }
 
     setting.instance = this.instance;
-    this.log.info(`Setting '${setting.id}' was registered for application '${setting.applicationId}'`);
+    this.log.info(`Registered '${setting.applicationId}' setting '${setting.id}'`);
     this.applicationSettings[setting.applicationId].push(setting);
 
     return this;
