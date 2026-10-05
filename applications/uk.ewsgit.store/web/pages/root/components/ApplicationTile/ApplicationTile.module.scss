@@ -1,0 +1,42 @@
+.root {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 1rem;
+  user-select: none;
+
+  &[data-loading="true"] {
+    min-height: 5.5rem;
+    opacity: 0.5;
+  }
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.description {
+  color: rgb(var(--uk-sys-color-on-surface-variant));
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.installed {
+  flex-shrink: 0;
+  padding: 0.125rem 0.625rem;
+  border-radius: 100rem;
+  background: rgb(var(--uk-sys-color-secondary-container));
+  color: rgb(var(--uk-sys-color-on-secondary-container));
+}

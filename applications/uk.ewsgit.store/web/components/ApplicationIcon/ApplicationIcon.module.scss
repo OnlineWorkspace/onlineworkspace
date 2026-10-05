@@ -1,0 +1,27 @@
+.root {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: var(--uk-sys-shape-corner-large);
+  background-color: rgb(var(--uk-sys-color-surface-container-highest));
+  overflow: hidden;
+
+  &[data-size="m"] {
+    --icon-box: 3.5rem;
+  }
+
+  &[data-size="l"] {
+    --icon-box: 6rem;
+    border-radius: var(--uk-sys-shape-corner-extra-large, 1.75rem);
+  }
+
+  width: var(--icon-box);
+  height: var(--icon-box);
+}
+
+.icon {
+  width: 70%;
+  height: 70%;
+  object-fit: contain;
+}

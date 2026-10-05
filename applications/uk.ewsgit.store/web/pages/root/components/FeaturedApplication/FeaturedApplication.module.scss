@@ -1,0 +1,79 @@
+.root {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  min-height: 20rem;
+  border-radius: var(--uk-sys-shape-corner-extra-large, 1.75rem);
+  overflow: hidden;
+  background: rgb(var(--uk-sys-color-surface-container-high));
+  color: white;
+
+  &[data-loading="true"] .content {
+    opacity: 0;
+  }
+}
+
+.banner {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  user-select: none;
+  pointer-events: none;
+}
+
+// keeps the text readable on any banner
+.scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgb(0 0 0 / 0.85) 0%, rgb(0 0 0 / 0.55) 45%, rgb(0 0 0 / 0.1) 100%);
+}
+
+.content {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  gap: 1.5rem;
+  width: 100%;
+  padding: 1.5rem;
+  transition: opacity var(--uk-sys-motion-duration-250) var(--uk-sys-motion-easing-standard);
+
+  @media (max-width: 40rem) {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  opacity: 0.85;
+}
+
+.description {
+  max-width: 40rem;
+  opacity: 0.9;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.authors {
+  opacity: 0.75;
+}
+
+.action {
+  flex-shrink: 0;
+}

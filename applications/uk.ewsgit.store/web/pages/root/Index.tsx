@@ -1,31 +1,49 @@
+import UKStackLabel from "@ewsgit/uikit-solid/src/components/stack/UKStackLabel.tsx";
 import UKTopAppBar from "@ewsgit/uikit-solid/src/components/topAppBar/UKTopAppBar.tsx";
-import {type Component, createResource, For} from "solid-js";
+import { type Component, createResource, For, Show } from "solid-js";
 import trpc from "../../lib/trpc";
-import PromotedApplication from "./components/PromotedApplication/PromotedApplication";
+import SearchResult from "../search/components/SearchResult/SearchResult";
+import ApplicationTile from "./components/ApplicationTile/ApplicationTile";
+import FeaturedApplication from "./components/FeaturedApplication/FeaturedApplication";
 import styles from "./Index.module.scss";
-import UKDivider from "@ewsgit/uikit-solid/src/components/divider/UKDivider.js";
 
-const PromotedApplicationsPage: Component = () => {
-  const [promotedApplications] = createResource(() => trpc.homepage.promotedApplications.query());
+const DiscoverPage: Component = () => {
+  const [promoted] = createResource(() => trpc.homepage.promotedApplications.query());
+  const [all] = createResource(() => trpc.search.searchFor.query(""));
+
+  const featured = () => promoted()?.[0];
+  const otherPromoted = () => promoted()?.slice(1) ?? [];
+  // everything that isn't already shown above
+  const remaining = () => (all() ?? []).filter((a) => !promoted()?.some((p) => p.repository === a.repository && p.applicationId === a.applicationId));
 
   return (
     <div class={styles.page}>
-      <UKTopAppBar type="small" headline={"Promoted Applications"}/>
+      <UKTopAppBar type="small" headline={"Discover"} />
       <div class={styles.content}>
-        <div class={styles.header}>
-          <For each={promotedApplications()}>
-            {(app) => {
-              return <PromotedApplication repository={app.repository} applicationId={app.applicationId}/>;
-            }}
-          </For>
-        </div>
-        <UKDivider direction={"horizontal"} width={"middle-inset"}/>
-        <div>
-          More apps here?
-        </div>
+        <Show when={featured()} fallback={<div class={styles.featuredPlaceholder} />}>
+          {(app) => <FeaturedApplication repository={app().repository} applicationId={app().applicationId} />}
+        </Show>
+
+        <Show when={otherPromoted().length > 0}>
+          <section class={styles.section}>
+            <UKStackLabel>Recommended</UKStackLabel>
+            <div class={styles.recommended}>
+              <For each={otherPromoted()}>{(app) => <SearchResult repository={app.repository} applicationId={app.applicationId} />}</For>
+            </div>
+          </section>
+        </Show>
+
+        <Show when={remaining().length > 0}>
+          <section class={styles.section}>
+            <UKStackLabel>All applications</UKStackLabel>
+            <div class={styles.tiles}>
+              <For each={remaining()}>{(app) => <ApplicationTile repository={app.repository} applicationId={app.applicationId} />}</For>
+            </div>
+          </section>
+        </Show>
       </div>
     </div>
   );
 };
 
-export default PromotedApplicationsPage;
+export default DiscoverPage;

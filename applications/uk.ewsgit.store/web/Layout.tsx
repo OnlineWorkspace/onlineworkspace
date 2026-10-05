@@ -26,7 +26,7 @@ const Layout: Component<ParentProps> = (props) => {
           {
             type: "button",
             icon: {type: "icon", value: REWARDED_ADS_ICON},
-            label: "Promoted Applications",
+            label: "Discover",
             onClick() {
               navigate("/app/uk.ewsgit.store/");
             },
