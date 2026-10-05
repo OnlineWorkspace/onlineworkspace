@@ -48,6 +48,22 @@ export default class UserFilesystem {
     return absolute;
   }
 
+  /**
+   * Resolves a regular file that really lives inside the user's files: symlinks (also in parent folders) are refused,
+   * so a file that was swapped for a link to somewhere else can never be read through the app.
+   */
+  async resolveFile(virtualPath: string): Promise<{ absolute: string; stats: Stats }> {
+    const absolute = this.resolve(virtualPath);
+    const stats = await fs.lstat(absolute).catch(() => undefined);
+
+    if (!stats?.isFile()) throw new TRPCError({ code: "NOT_FOUND", message: "That file does not exist" });
+
+    const [real, realRoot] = await Promise.all([fs.realpath(absolute), fs.realpath(this.root)]);
+    if (!real.startsWith(realRoot + path.sep)) throw new TRPCError({ code: "FORBIDDEN", message: "That location is outside of your files" });
+
+    return { absolute: real, stats };
+  }
+
   toVirtual(absolute: string): string {
     const relative = path.relative(this.root, absolute).split(path.sep).join("/");
     return this.normalise(relative);

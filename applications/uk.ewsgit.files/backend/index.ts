@@ -7,6 +7,7 @@ import { type createOnlineWorkspaceTRPCContext, procedure } from "@onlineworkspa
 import { initTRPC, TRPCError } from "@trpc/server";
 import z from "zod";
 import { describeFileType, type FileGroup, groupOf } from "./lib/fileTypes.ts";
+import { canThumbnail, snapSize, thumbnailFor } from "./lib/thumbnails.ts";
 import UserData from "./lib/userData.ts";
 import UserFilesystem, { type FileEntry } from "./lib/userFilesystem.ts";
 
@@ -40,7 +41,7 @@ async function userContext(user: () => Promise<{ getPath(): string }>) {
   const files = new UserFilesystem(userDirectory);
   await files.ensureRoot();
 
-  return { files, data: new UserData(userDirectory, files) };
+  return { files, directory: userDirectory, data: new UserData(userDirectory, files) };
 }
 
 const markStarred = (entries: FileEntry[], starred: string[]): ListedEntry[] => {
@@ -377,6 +378,65 @@ instance.sys.api.addRoute({
 
       log.error("upload failed", error);
       return Response.json({ code: "INTERNAL_SERVER_ERROR", message: "The upload failed" }, { status: 500 });
+    }
+  },
+});
+
+const statusFor = (error: TRPCError) => (error.code === "FORBIDDEN" ? 403 : error.code === "NOT_FOUND" ? 404 : 400);
+
+async function sessionUser(req: Request) {
+  const authorization = getCookies(req.headers).Authorization;
+  const userId = authorization ? await instance.sys.authorization.verifySession(decodeURIComponent(authorization)) : undefined;
+
+  return userId === undefined ? undefined : instance.sys.users.getUserById(userId);
+}
+
+// Thumbnails are generated once per file version and cached next to the user's data.
+// GET /api/uk.ewsgit.files/thumbnail?path=<file>&size=<pixels>
+instance.sys.api.addRoute({
+  method: "GET",
+  pattern: new URLPattern({ pathname: `/api/${APPLICATION_ID}/thumbnail` }),
+  async handler(req) {
+    const user = await sessionUser(req);
+    if (!user) return Response.json({ code: "UNAUTHORIZED", message: "invalid session" }, { status: 401 });
+
+    const url = new URL(req.url);
+    const virtualPath = url.searchParams.get("path") ?? "";
+
+    if (virtualPath === "" || virtualPath.length > 4096) return Response.json({ code: "BAD_REQUEST", message: "invalid path" }, { status: 400 });
+
+    try {
+      const { files, directory } = await userContext(async () => user);
+      const { absolute, stats } = await files.resolveFile(virtualPath);
+
+      if (!canThumbnail(absolute)) return Response.json({ code: "UNSUPPORTED", message: "no preview for this type" }, { status: 415 });
+
+      const size = snapSize(Number(url.searchParams.get("size")) || 192);
+      const etag = `"${stats.mtimeMs}-${stats.size}-${size}"`;
+      const headers = {
+        "Cache-Control": "private, max-age=86400",
+        ETag: etag,
+        "X-Content-Type-Options": "nosniff",
+        "Content-Security-Policy": "default-src 'none'; sandbox",
+      };
+
+      if (req.headers.get("if-none-match") === etag) return new Response(null, { status: 304, headers });
+
+      const output = await thumbnailFor({
+        cacheDirectory: path.join(directory, "system", "thumbnails"),
+        source: absolute,
+        virtualPath: files.normalise(virtualPath),
+        size,
+        mtimeMs: stats.mtimeMs,
+        bytes: stats.size,
+      });
+
+      return new Response(Bun.file(output), { headers: { ...headers, "Content-Type": "image/webp" } });
+    } catch (error) {
+      if (error instanceof TRPCError) return Response.json({ code: error.code, message: error.message }, { status: statusFor(error) });
+
+      log.warning(`thumbnail failed for '${virtualPath}'`, error);
+      return Response.json({ code: "UNSUPPORTED", message: "no preview for this file" }, { status: 415 });
     }
   },
 });

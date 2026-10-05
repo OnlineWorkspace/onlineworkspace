@@ -37,6 +37,7 @@ import type { Entry, SortKey } from "../lib/types";
 import Breadcrumbs from "./Breadcrumbs";
 import DetailsPane from "./DetailsPane";
 import FileBadge from "./FileBadge";
+import Thumbnail from "./Thumbnail";
 import styles from "./FileBrowser.module.scss";
 
 export interface FileBrowserProps {
@@ -358,7 +359,7 @@ const FileBrowser: Component<FileBrowserProps> = (props) => {
       <For each={visibleFiles()}>
         {(file) => (
           <div class={styles.fileTile} role="button" tabindex="0" data-selected={selected().has(file.path)} {...handlersFor(file)}>
-            <FileBadge entry={file} size="l" class={styles.tileBadge} />
+            <Thumbnail entry={file} size="l" pixels={200} class={styles.tileBadge} />
             <UKText role="label" size="l" class={styles.ellipsis}>
               {file.name}
             </UKText>
@@ -435,7 +436,7 @@ const FileBrowser: Component<FileBrowserProps> = (props) => {
                 {(file) => (
                   <div class={styles.tableRow} role="row" tabindex="0" data-selected={selected().has(file.path)} {...handlersFor(file)}>
                     <div class={styles.nameCell}>
-                      <FileBadge entry={file} size="s" />
+                      <Thumbnail entry={file} size="s" pixels={36} />
                       <div class={styles.cardText}>
                         <UKText role="label" size="l" class={styles.ellipsis}>
                           {file.name}
@@ -475,7 +476,7 @@ const FileBrowser: Component<FileBrowserProps> = (props) => {
       <For each={visibleFiles()}>
         {(file) => (
           <div class={styles.mobileRow} role="button" tabindex="0" data-selected={selected().has(file.path)} {...handlersFor(file)}>
-            <Show when={selected().has(file.path)} fallback={<FileBadge entry={file} size="s" />}>
+            <Show when={selected().has(file.path)} fallback={<Thumbnail entry={file} size="s" pixels={36} />}>
               <div class={styles.selectedCheck}>
                 <UKIcon>{CHECK_ICON}</UKIcon>
               </div>
