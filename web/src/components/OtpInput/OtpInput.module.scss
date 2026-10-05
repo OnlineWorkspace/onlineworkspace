@@ -1,0 +1,71 @@
+.root {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.boxes {
+  position: relative;
+  display: flex;
+  gap: 0.5rem;
+  width: 100%;
+  max-width: 20rem;
+  cursor: text;
+
+  &[data-disabled="true"] {
+    opacity: 0.6;
+    cursor: default;
+  }
+}
+
+.box {
+  flex: 1 1 0;
+  min-width: 0;
+  aspect-ratio: 1 / 1.15;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  border-radius: var(--uk-sys-shape-corner-small, 0.5rem);
+  outline: 1px solid rgb(var(--uk-sys-color-outline));
+  outline-offset: 0;
+  background-color: transparent;
+  color: rgb(var(--uk-sys-color-on-surface));
+  font-family: var(--uk-sys-typescale-headline-small-font), sans-serif;
+  font-size: var(--uk-sys-typescale-headline-small-size, 1.5rem);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  transition: outline-color var(--uk-sys-motion-duration-100) var(--uk-sys-motion-easing-standard-decelerate),
+  outline-width var(--uk-sys-motion-duration-100) var(--uk-sys-motion-easing-standard-decelerate),
+  background-color var(--uk-sys-motion-duration-100) var(--uk-sys-motion-easing-standard-decelerate);
+
+  &[data-filled="true"] {
+    background-color: rgb(var(--uk-sys-color-surface-container-highest));
+  }
+
+  &[data-active="true"] {
+    outline-color: rgb(var(--uk-sys-color-primary));
+    outline-width: 3px;
+    outline-offset: -1px;
+  }
+
+  .boxes[data-error="true"] & {
+    outline-color: rgb(var(--uk-sys-color-error));
+  }
+}
+
+// Invisible but focusable, covering all boxes so taps/pastes/autofill hit the real input
+.input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: transparent;
+  caret-color: transparent;
+  font-size: 1rem; // >=16px stops iOS zooming on focus
+  cursor: inherit;
+}
