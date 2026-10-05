@@ -20,6 +20,7 @@ import UKTextField from "@ewsgit/uikit-solid/src/components/textField/UKTextFiel
 import { useNavigate } from "@solidjs/router";
 import { createResource, createSignal, For, type ParentProps, Show, Suspense } from "solid-js";
 import DestinationDialogContent from "../components/DestinationDialog";
+import ShareDialogContent from "../components/ShareDialog";
 import { FilesContext, type FilesContextValue, type Place } from "./context";
 import { pluralise } from "./format";
 import { routes } from "./routes";
@@ -31,6 +32,7 @@ type DialogState =
   | { type: "name"; title: string; label: string; initial: string; confirmLabel: string; onSubmit: (name: string) => Promise<void> }
   | { type: "confirm"; title: string; body: string; confirmLabel: string; onConfirm: () => Promise<void> }
   | { type: "destination"; mode: "move" | "copy"; entries: Entry[] }
+  | { type: "share"; entry: Entry }
   | { type: "places" };
 
 type MenuState = { x: number; y: number; align: "right" };
@@ -208,20 +210,12 @@ const FilesProvider = (props: ParentProps) => {
     },
 
     async share(entry) {
-      try {
-        const url = new URL(await fileUrl(entry), window.location.origin).toString();
-
-        if (navigator.share) {
-          await navigator.share({ title: entry.name, url });
-        } else {
-          await navigator.clipboard.writeText(url);
-          notify("Link copied. Only people signed in to this workspace can open it.");
-        }
-      } catch (error) {
-        // the user dismissing the share sheet is not an error
-        if (error instanceof DOMException && error.name === "AbortError") return;
-        notify(errorMessage(error));
+      if (entry.kind !== "file") {
+        notify("Only files can be shared");
+        return;
       }
+
+      openDialog({ type: "share", entry });
     },
 
     async download(entry) {
@@ -343,6 +337,8 @@ const FilesProvider = (props: ParentProps) => {
               </div>
             );
           }
+
+          if (state.type === "share") return <ShareDialogContent entry={state.entry} onClose={closeDialog} notify={notify} />;
 
           if (state.type === "destination") {
             return (

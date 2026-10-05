@@ -7,6 +7,8 @@ import { type createOnlineWorkspaceTRPCContext, procedure } from "@onlineworkspa
 import { initTRPC, TRPCError } from "@trpc/server";
 import z from "zod";
 import { describeFileType, type FileGroup, groupOf } from "./lib/fileTypes.ts";
+import ShareStore, { isExpired, parseToken, passwordAttempts, verifyPassword } from "./lib/shares.ts";
+import { attachment, PAGE_HEADERS, renderBlockedPage, renderSharePage, renderUnavailablePage } from "./lib/sharePage.ts";
 import { canThumbnail, snapSize, thumbnailFor } from "./lib/thumbnails.ts";
 import UserData from "./lib/userData.ts";
 import UserFilesystem, { type FileEntry } from "./lib/userFilesystem.ts";
@@ -41,7 +43,7 @@ async function userContext(user: () => Promise<{ getPath(): string }>) {
   const files = new UserFilesystem(userDirectory);
   await files.ensureRoot();
 
-  return { files, directory: userDirectory, data: new UserData(userDirectory, files) };
+  return { files, directory: userDirectory, data: new UserData(userDirectory, files), shares: new ShareStore(userDirectory, files) };
 }
 
 const markStarred = (entries: FileEntry[], starred: string[]): ListedEntry[] => {
@@ -211,6 +213,38 @@ const router = t.router({
     return instance.sys.filesystem.serveFile(opt.ctx.userId, absolute);
   }),
 
+  shares: {
+    list: procedure.input(z.object({ path: pathInput.optional() })).query(async (opt) => {
+      const { shares } = await userContext(opt.ctx.user);
+      return shares.list(opt.input.path);
+    }),
+    create: procedure
+      .input(z.object({ path: pathInput, expiresInDays: z.union([z.literal(1), z.literal(7), z.literal(30), z.null()]), password: z.string().min(4).max(128).optional() }))
+      .mutation(async (opt) => {
+        const { files, shares } = await userContext(opt.ctx.user);
+        const { absolute } = await files.resolveFile(opt.input.path);
+
+        const { share, secret } = await shares.create({
+          path: files.normalise(opt.input.path),
+          name: path.basename(absolute),
+          expiresAt: opt.input.expiresInDays === null ? null : Date.now() + opt.input.expiresInDays * 86_400_000,
+          password: opt.input.password,
+        });
+
+        log.info(`User ${opt.ctx.userId} shared '${share.path}'${share.hasPassword ? " (password protected)" : ""}`);
+
+        // the secret is only ever returned here, the link cannot be shown again
+        return { share, link: `/api/${APPLICATION_ID}/share/${opt.ctx.userId}.${secret}` };
+      }),
+    revoke: procedure.input(z.object({ id: z.string().uuid() })).mutation(async (opt) => {
+      const { shares } = await userContext(opt.ctx.user);
+
+      if (!(await shares.revoke(opt.input.id))) throw new TRPCError({ code: "NOT_FOUND", message: "That link no longer exists" });
+
+      return true;
+    }),
+  },
+
   createFolder: procedure.input(z.object({ path: pathInput, name: z.string() })).mutation(async (opt) => {
     const { files } = await userContext(opt.ctx.user);
     files.assertValidName(opt.input.name);
@@ -234,7 +268,7 @@ const router = t.router({
   }),
 
   rename: procedure.input(z.object({ path: pathInput, name: z.string() })).mutation(async (opt) => {
-    const { files, data } = await userContext(opt.ctx.user);
+    const { files, data, shares } = await userContext(opt.ctx.user);
     files.assertValidName(opt.input.name);
 
     const source = files.resolve(opt.input.path);
@@ -247,12 +281,13 @@ const router = t.router({
 
     await fs.rename(source, destination);
     await data.remapStarred(files.toVirtual(source), files.toVirtual(destination));
+    await shares.remap(files.toVirtual(source), files.toVirtual(destination));
 
     return files.entryFor(destination);
   }),
 
   move: procedure.input(z.object({ paths: pathsInput, destination: pathInput })).mutation(async (opt) => {
-    const { files, data } = await userContext(opt.ctx.user);
+    const { files, data, shares } = await userContext(opt.ctx.user);
     const destinationDirectory = await requireDirectory(files, opt.input.destination);
 
     for (const virtualPath of opt.input.paths) {
@@ -264,6 +299,7 @@ const router = t.router({
       const destination = path.join(destinationDirectory, await files.uniqueName(destinationDirectory, path.basename(source)));
       await files.movePath(source, destination);
       await data.remapStarred(files.toVirtual(source), files.toVirtual(destination));
+      await shares.remap(files.toVirtual(source), files.toVirtual(destination));
     }
 
     return true;
@@ -285,9 +321,13 @@ const router = t.router({
   }),
 
   delete: procedure.input(z.object({ paths: pathsInput })).mutation(async (opt) => {
-    const { data } = await userContext(opt.ctx.user);
+    const { data, shares } = await userContext(opt.ctx.user);
 
-    for (const virtualPath of opt.input.paths) await data.moveToTrash(virtualPath);
+    for (const virtualPath of opt.input.paths) {
+      await data.moveToTrash(virtualPath);
+      // a file in the trash must not stay reachable through a link, restoring it does not bring the link back
+      await shares.remap(virtualPath, undefined);
+    }
 
     return true;
   }),
@@ -438,5 +478,114 @@ instance.sys.api.addRoute({
       log.warning(`thumbnail failed for '${virtualPath}'`, error);
       return Response.json({ code: "UNSUPPORTED", message: "no preview for this file" }, { status: 415 });
     }
+  },
+});
+
+// ---- public share links ----
+// These are reachable without signing in, so everything below treats the request as hostile:
+// the secret is checked against a hash, every failure looks identical, files are always sent as downloads and never rendered by the browser.
+
+const html = (body: string, status = 200) => new Response(body, { status, headers: PAGE_HEADERS });
+const unavailable = () => html(renderUnavailablePage(), 404);
+const MAX_FORM_BYTES = 4096;
+
+/** Reads a request body, giving up (undefined) as soon as it is bigger than `limit` bytes. */
+async function readLimited(req: Request, limit: number): Promise<string | undefined> {
+  if (!req.body || Number(req.headers.get("content-length") ?? 0) > limit) return undefined;
+
+  const reader = req.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let received = 0;
+
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+
+    received += value.byteLength;
+    if (received > limit) {
+      await reader.cancel();
+      return undefined;
+    }
+    chunks.push(value);
+  }
+
+  return Buffer.concat(chunks).toString("utf8");
+}
+
+async function openShare(token: string) {
+  const parsed = parseToken(token);
+  if (!parsed) return undefined;
+
+  const user = await instance.sys.users.getUserById(parsed.userId).catch(() => undefined);
+  if (!user) return undefined;
+
+  const { files, shares } = await userContext(async () => user);
+  const share = await shares.find(parsed.secret);
+  if (!share || isExpired(share)) return undefined;
+
+  const file = await files.resolveFile(share.path).catch(() => undefined);
+  if (!file) return undefined;
+
+  return { share, shares, absolute: file.absolute, size: file.stats.size, attemptKey: `${parsed.userId}:${share.id}` };
+}
+
+type OpenShare = NonNullable<Awaited<ReturnType<typeof openShare>>>;
+
+const sharePageFor = (token: string, found: OpenShare, error?: string) =>
+  renderSharePage({ name: found.share.name, size: found.size, expiresAt: found.share.expiresAt, needsPassword: found.share.passwordHash !== undefined, downloadUrl: `/api/${APPLICATION_ID}/share/${token}/download`, error });
+
+function sendShared(found: OpenShare) {
+  found.shares.countDownload(found.share.id).catch(() => undefined);
+
+  return new Response(Bun.file(found.absolute), {
+    headers: {
+      // never the real type: a shared .html must download, not run on this origin
+      "Content-Type": "application/octet-stream",
+      "Content-Disposition": attachment(found.share.name),
+      "Cache-Control": "no-store",
+      "Referrer-Policy": "no-referrer",
+      "X-Content-Type-Options": "nosniff",
+      "Content-Security-Policy": "default-src 'none'; sandbox",
+    },
+  });
+}
+
+instance.sys.api.addRoute({
+  method: "GET",
+  pattern: new URLPattern({ pathname: `/api/${APPLICATION_ID}/share/:token` }),
+  async handler(_req, params) {
+    const token = params?.pathname.groups.token ?? "";
+    const found = await openShare(token).catch(() => undefined);
+
+    return found ? html(sharePageFor(token, found)) : unavailable();
+  },
+});
+
+instance.sys.api.addRoute({
+  method: ["GET", "POST"],
+  pattern: new URLPattern({ pathname: `/api/${APPLICATION_ID}/share/:token/download` }),
+  async handler(req, params) {
+    const token = params?.pathname.groups.token ?? "";
+    const found = await openShare(token).catch(() => undefined);
+
+    if (!found) return unavailable();
+
+    if (found.share.passwordHash === undefined) return sendShared(found);
+
+    // protected links only hand the file out in answer to a correct password
+    if (req.method !== "POST") return new Response(null, { status: 303, headers: { Location: `/api/${APPLICATION_ID}/share/${token}`, "Cache-Control": "no-store" } });
+
+    if (passwordAttempts.blocked(found.attemptKey)) return html(renderBlockedPage(), 429);
+
+    const body = await readLimited(req, MAX_FORM_BYTES);
+    const password = body === undefined ? undefined : new URLSearchParams(body).get("password");
+
+    if (typeof password !== "string" || password.length > 128 || !(await verifyPassword(password, found.share.passwordHash))) {
+      passwordAttempts.failed(found.attemptKey);
+      return html(sharePageFor(token, found, "That password is not correct."), 401);
+    }
+
+    passwordAttempts.succeeded(found.attemptKey);
+    return sendShared(found);
   },
 });
