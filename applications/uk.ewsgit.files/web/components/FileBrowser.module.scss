@@ -386,3 +386,14 @@
     background-color: rgb(var(--uk-sys-color-on-surface), var(--uk-sys-state-hover-state-layer-opacity));
   }
 }
+
+// the rubber band of a drag selection, positioned against the window so it can follow the pointer anywhere
+.marquee {
+  position: fixed;
+  z-index: 50;
+  box-sizing: border-box;
+  border: 1px solid rgb(var(--uk-sys-color-primary));
+  border-radius: 4px;
+  background-color: rgb(var(--uk-sys-color-primary), 0.16);
+  pointer-events: none;
+}

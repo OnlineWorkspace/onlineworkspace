@@ -62,6 +62,17 @@ type ViewMode = "list" | "grid";
 const SORT_LABELS: Record<SortKey, string> = { name: "Name", modified: "Modified", size: "Size" };
 const VIEW_STORAGE_KEY = "uk.ewsgit.files:view";
 const LONG_PRESS_MS = 450;
+// how far the pointer has to travel before a press turns into a drag selection
+const DRAG_THRESHOLD_PX = 4;
+
+/** The nearest ancestor that scrolls, which is what a drag selection has to follow. */
+const scrollParentOf = (element: HTMLElement): HTMLElement => {
+  for (let parent = element.parentElement; parent; parent = parent.parentElement) {
+    if (/(auto|scroll)/.test(getComputedStyle(parent).overflowY)) return parent;
+  }
+
+  return document.documentElement;
+};
 
 const readStoredView = (): ViewMode => {
   try {
@@ -174,6 +185,108 @@ const FileBrowser: Component<FileBrowserProps> = (props) => {
     onCleanup(() => window.removeEventListener("keydown", onKeyDown));
   });
 
+  // ---- drag selection ----
+
+  const [marquee, setMarquee] = createSignal<{ left: number; top: number; width: number; height: number } | undefined>();
+  // the browser follows a drag with a click on the common ancestor, which must not clear the selection that was just made
+  let suppressClick = false;
+
+  const startMarquee = (event: PointerEvent & { currentTarget: HTMLElement }) => {
+    if (isMobile() || event.button !== 0 || event.pointerType !== "mouse") return;
+
+    const origin = event.target as HTMLElement;
+    if (origin.closest("[data-path], button, input, textarea, a, select, [role='button'], [role='menu']")) return;
+
+    const container = event.currentTarget;
+    const scroller = scrollParentOf(container);
+    const additive = event.ctrlKey || event.metaKey || event.shiftKey;
+    const base = additive ? new Set(selected()) : new Set<string>();
+
+    // the start is remembered against the scroll position so that it stays on the same spot of the list while scrolling
+    const start = { x: event.clientX, y: event.clientY, scroll: scroller.scrollTop };
+    const pointer = { x: event.clientX, y: event.clientY };
+    let active = false;
+    let frame = 0;
+
+    const update = () => {
+      const bounds = scroller.getBoundingClientRect();
+      const startY = start.y - (scroller.scrollTop - start.scroll);
+      const clamp = (value: number, low: number, high: number) => Math.max(low, Math.min(high, value));
+
+      const left = clamp(Math.min(start.x, pointer.x), bounds.left, bounds.right);
+      const right = clamp(Math.max(start.x, pointer.x), bounds.left, bounds.right);
+      const top = clamp(Math.min(startY, pointer.y), bounds.top, bounds.bottom);
+      const bottom = clamp(Math.max(startY, pointer.y), bounds.top, bounds.bottom);
+
+      setMarquee({ left, top, width: right - left, height: bottom - top });
+
+      const hits = new Set(base);
+      let last: string | undefined;
+
+      for (const element of container.querySelectorAll<HTMLElement>("[data-path]")) {
+        const box = element.getBoundingClientRect();
+        if (box.right < left || box.left > right || box.bottom < top || box.top > bottom) continue;
+
+        hits.add(element.dataset.path!);
+        last = element.dataset.path;
+      }
+
+      const current = selected();
+      if (hits.size !== current.size || [...hits].some((path) => !current.has(path))) setSelected(hits);
+      if (last) setAnchor(last);
+    };
+
+    // dragging near the top or bottom edge scrolls the list
+    const autoscroll = () => {
+      const bounds = scroller.getBoundingClientRect();
+      const edge = 48;
+      const speed = pointer.y < bounds.top + edge ? -(bounds.top + edge - pointer.y) : pointer.y > bounds.bottom - edge ? pointer.y - (bounds.bottom - edge) : 0;
+
+      if (speed !== 0) {
+        scroller.scrollTop += Math.max(-24, Math.min(24, speed / 2));
+        update();
+      }
+
+      frame = requestAnimationFrame(autoscroll);
+    };
+
+    const onMove = (move: PointerEvent) => {
+      pointer.x = move.clientX;
+      pointer.y = move.clientY;
+
+      if (!active) {
+        if (Math.hypot(pointer.x - start.x, pointer.y - start.y) < DRAG_THRESHOLD_PX) return;
+
+        active = true;
+        document.body.style.userSelect = "none";
+        window.getSelection()?.removeAllRanges();
+        if (!additive) clearSelection();
+        frame = requestAnimationFrame(autoscroll);
+      }
+
+      update();
+    };
+
+    const finish = () => {
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerup", finish);
+      window.removeEventListener("pointercancel", finish);
+      cancelAnimationFrame(frame);
+      document.body.style.userSelect = "";
+      setMarquee(undefined);
+
+      if (active) {
+        suppressClick = true;
+        // the click, if any, arrives right after the pointer is released
+        setTimeout(() => (suppressClick = false), 0);
+      }
+    };
+
+    window.addEventListener("pointermove", onMove);
+    window.addEventListener("pointerup", finish);
+    window.addEventListener("pointercancel", finish);
+  };
+
   // ---- interaction ----
 
   let pressTimer: ReturnType<typeof setTimeout> | undefined;
@@ -182,6 +295,8 @@ const FileBrowser: Component<FileBrowserProps> = (props) => {
   const cancelPress = () => clearTimeout(pressTimer);
 
   const handlersFor = (entry: Entry) => ({
+    // lets the drag selection find the item under the pointer
+    "data-path": entry.path,
     onPointerDown: (event: PointerEvent) => {
       if (!isMobile() || event.pointerType === "mouse") return;
       longPressed = false;
@@ -385,7 +500,13 @@ const FileBrowser: Component<FileBrowserProps> = (props) => {
 
   const Desktop = () => (
     <div class={styles.desktop} {...dropHandlers}>
-      <div class={styles.main} onClick={(event) => event.target === event.currentTarget && clearSelection()}>
+      <div
+        class={styles.main}
+        onPointerDown={startMarquee}
+        onClick={(event) => {
+          if (!suppressClick && event.target === event.currentTarget) clearSelection();
+        }}
+      >
         <div class={styles.toolbar}>
           <Show when={props.search}>{(search) => <UKSearchBar class={styles.searchBar} value={search().value} placeholder={search().placeholder} onValueChange={search().onChange} leadingIcon={SEARCH_ICON} />}</Show>
           <div class={styles.toolbarEnd}>
@@ -456,6 +577,8 @@ const FileBrowser: Component<FileBrowserProps> = (props) => {
           </Show>
         </Show>
 
+        <Show when={marquee()}>{(box) => <div class={styles.marquee} style={{ left: `${box().left}px`, top: `${box().top}px`, width: `${box().width}px`, height: `${box().height}px` }} />}</Show>
+
         <Show when={dragging()}>
           <div class={styles.dropOverlay}>
             <UKText role="title" size="l">Drop files to upload</UKText>
@@ -463,7 +586,7 @@ const FileBrowser: Component<FileBrowserProps> = (props) => {
         </Show>
       </div>
 
-      <Show when={detailsOpen() && selectedEntries().length > 0}>
+      <Show when={detailsOpen() && selectedEntries().length > 0 && !marquee()}>
         <DetailsPane entries={selectedEntries()} />
       </Show>
     </div>
