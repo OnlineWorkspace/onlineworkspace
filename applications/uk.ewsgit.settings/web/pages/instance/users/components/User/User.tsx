@@ -28,7 +28,7 @@ const User: Component<{
 }> = (props) => {
   const appContext = useContext(AppContext)!;
   const [showDialog, setShowDialog] = createSignal<
-    "user" | "confirmDelete" | "removeOwnAdmin" | undefined
+    "user" | "confirmDelete" | "removeOwnAdmin" | "invalidateSessions" | "resetPassword" | undefined
   >(undefined);
   const [username, { mutate: setUsername }] = createResource(
     () => trpc.instance.user.getUsername.query(props.userId),
@@ -60,6 +60,8 @@ const User: Component<{
       initialValue: false,
     },
   );
+  const [newPassword, setNewPassword] = createSignal("");
+  const [newPasswordRepeat, setNewPasswordRepeat] = createSignal("");
   const [isMe] = createResource(
     () => trpc.instance.user.getIsMe.query(props.userId),
     {
@@ -173,11 +175,18 @@ const User: Component<{
             />
           </div>
           <UKButtonGroup size={"s"} align={"start"}>
-            <UKButton color={"tonal"} disabled={true} onClick={() => {}}>
+            <UKButton color={"tonal"} onClick={() => setShowDialog("invalidateSessions")}>
               Invalidate all sessions
             </UKButton>
-            <UKButton color={"tonal"} disabled={true} onClick={() => {}}>
-              Force password reset
+            <UKButton
+              color={"tonal"}
+              onClick={() => {
+                setNewPassword("");
+                setNewPasswordRepeat("");
+                setShowDialog("resetPassword");
+              }}
+            >
+              Reset password
             </UKButton>
             <UKButton
               color={"standard"}
@@ -206,6 +215,106 @@ const User: Component<{
           >
             Close
           </UKButton>
+        </div>
+      </UKDialog>
+
+      <UKDialog
+        show={() => showDialog() === "invalidateSessions"}
+        onClose={() => setShowDialog("user")}
+      >
+        <UKText role="title" size="l">
+          Invalidate All Sessions
+        </UKText>
+        <UKDivider direction="horizontal" />
+        <UKText role="body" size="m">
+          This will sign {isMe() ? "you" : "the user"} out of every device.
+        </UKText>
+        <UKButtonGroup size={"s"} align={"end"}>
+          <UKButton
+            affirmative={true}
+            color={"tonal"}
+            onClick={async () => {
+              await trpc.instance.user.invalidateSessions.mutate({
+                userId: props.userId,
+              });
+
+              return {
+                state: AffirmativeButtonState.Success,
+                cb() {
+                  setShowDialog("user");
+                },
+              };
+            }}
+          >
+            Yes, invalidate
+          </UKButton>
+          <UKButton color={"filled"} onClick={() => setShowDialog("user")}>
+            Cancel
+          </UKButton>
+        </UKButtonGroup>
+      </UKDialog>
+
+      <UKDialog
+        show={() => showDialog() === "resetPassword"}
+        onClose={() => setShowDialog("user")}
+      >
+        <div class={styles.expanded}>
+          <UKText role="title" size="l">
+            Reset Password
+          </UKText>
+          <UKDivider direction="horizontal" />
+          <UKText role="body" size="m">
+            Set a new password for this user. All of their sessions will be
+            signed out.
+          </UKText>
+          <UKTextField
+            color="outlined"
+            shouldMask
+            label="New Password"
+            onValueChange={setNewPassword}
+            value={newPassword()}
+            defaultValue={newPassword()}
+          />
+          <UKTextField
+            color="outlined"
+            shouldMask
+            label="Re-Enter New Password"
+            onValueChange={setNewPasswordRepeat}
+            value={newPasswordRepeat()}
+            defaultValue={newPasswordRepeat()}
+          />
+          <UKButtonGroup size={"s"} align={"end"}>
+            <UKButton
+              affirmative={true}
+              color={"tonal"}
+              disabled={
+                !(
+                  newPassword() === newPasswordRepeat() &&
+                  newPassword().length > 3
+                )
+              }
+              onClick={async () => {
+                await trpc.instance.user.resetPassword.mutate({
+                  userId: props.userId,
+                  password: newPassword(),
+                });
+
+                return {
+                  state: AffirmativeButtonState.Success,
+                  cb() {
+                    setNewPassword("");
+                    setNewPasswordRepeat("");
+                    setShowDialog("user");
+                  },
+                };
+              }}
+            >
+              Confirm
+            </UKButton>
+            <UKButton color={"filled"} onClick={() => setShowDialog("user")}>
+              Cancel
+            </UKButton>
+          </UKButtonGroup>
         </div>
       </UKDialog>
 

@@ -22,37 +22,6 @@
   transition: opacity 0.5s var(--uk-sys-motion-easing-standard-decelerate), filter 0.5s var(--uk-sys-motion-easing-standard-decelerate);
   opacity: 0;
   filter: blur(0.25rem);
-
-  --transform-x: 0;
-  --transform-y: 0;
-
-  .left {
-    left: 0.25rem;
-  }
-
-  .center {
-    left: 50%;
-    --transform-x: -50%;
-  }
-
-  .right {
-    right: 0.25rem;
-  }
-
-  .top {
-    top: 0.25rem;
-  }
-
-  .middle {
-    top: 50%;
-    --transform-y: -50%;
-  }
-
-  .bottom {
-    bottom: 0.25rem;
-  }
-
-  transform: translateX(var(--transform-x, 0)) translateY(var(--transform-y, 0));
 }
 
 .wallpaperSpinner {

@@ -36,6 +36,21 @@ const BYTES_PER_MB = 1_048_576;
 
 export const t = initTRPC.context<ReturnType<typeof createOnlineWorkspaceTRPCContext>>().create();
 
+/** Makes `sourcePath` the user's current wallpaper, discarding any cached resized copies of the previous one. */
+async function applyCurrentWallpaper(userWallpapersPath: string, sourcePath: string) {
+  const resizedWallpapersPath = path.join(userWallpapersPath, "resized");
+  const currentWallpaperPath = path.join(userWallpapersPath, "current.webp");
+
+  if (fsExistsSync(resizedWallpapersPath)) {
+    for (const resizedWallpaperFile of await fs.readdir(resizedWallpapersPath)) {
+      await fs.rm(path.join(resizedWallpapersPath, resizedWallpaperFile), {force: true});
+    }
+  }
+
+  await fs.rm(currentWallpaperPath, {force: true});
+  await fs.copyFile(sourcePath, currentWallpaperPath);
+}
+
 const router = t.router({
   overview: {
     user: procedure.query(async (opt) => {
@@ -414,7 +429,23 @@ const router = t.router({
 
         return true;
       }),
+      invalidateSessions: adminProcedure.input(z.object({userId: z.number()})).mutation(async (opt) => {
+        await opt.ctx.instance.sys.authorization.endAllSessions(opt.input.userId);
+
+        return true;
+      }),
+      resetPassword: adminProcedure.input(z.object({userId: z.number(), password: z.string().min(4)})).mutation(async (opt) => {
+        const ok = await opt.ctx.instance.sys.authorization.setPassword(opt.input.userId, opt.input.password);
+
+        if (!ok) throw new TRPCError({code: "NOT_FOUND", message: "user not found"});
+
+        await opt.ctx.instance.sys.authorization.endAllSessions(opt.input.userId);
+
+        return true;
+      }),
       boop: adminProcedure.input(z.object({userId: z.number()})).mutation(async (opt) => {
+        const senderId = opt.ctx.userId;
+
         instance.sys.notifications.send(
           opt.input.userId,
           "commands.notify",
@@ -425,18 +456,18 @@ const router = t.router({
             icon: "person",
           },
           {
-            buttons: [
-              {
-                id: "a",
-                label: "label",
-                type: "filled",
-              },
-              {
-                id: "a",
-                label: "label",
-                type: "tonal",
-              },
-            ],
+            buttons: [{id: "boop-back", label: "Boop back", type: "filled"}],
+          },
+          {
+            onButton(buttonId) {
+              if (buttonId !== "boop-back") return;
+
+              instance.sys.notifications.send(senderId, "commands.notify", WorkspacesNotificationPriority.Normal, {
+                title: "Boop",
+                body: "You have been booped back!",
+                icon: "person",
+              });
+            },
           },
         );
 
@@ -710,10 +741,16 @@ const router = t.router({
         }[] = [];
 
         if (fsExistsSync(wallpapersPath)) {
+          // the current wallpaper is a copy of one of the stored wallpapers, so it's identified by its contents
+          const currentWallpaperPath = path.join(wallpapersPath, "current.webp");
+          const currentWallpaper = fsExistsSync(currentWallpaperPath) ? await fs.readFile(currentWallpaperPath) : undefined;
+
           for (const wallpaperFile of await fs.readdir(wallpapersPath)) {
             if (wallpaperFile === "current.webp" || wallpaperFile === "resized" || !wallpaperFile.endsWith(".webp")) continue;
 
             const wallpaperPath = path.join(wallpapersPath, wallpaperFile);
+
+            if (currentWallpaper && currentWallpaper.equals(await fs.readFile(wallpaperPath))) continue;
 
             output.push({
               name: wallpaperFile,
@@ -754,23 +791,27 @@ const router = t.router({
 
         return output;
       }),
-      getCurrentWallpaper: procedure.query(async (opt) => {
+      getCurrentWallpaper: procedure
+        .input(z.object({width: z.number().int().min(1).max(8192), height: z.number().int().min(1).max(8192)}).optional())
+        .query(async (opt) => {
+        const {width, height} = opt.input ?? {width: 504, height: 280};
         const wallpapersRootPath = path.join((await opt.ctx.user()).getPath(), "assets/wallpapers");
         const rawWallpaperPath = path.join(wallpapersRootPath, "current.webp");
         const resizedWallpapersPath = path.join(wallpapersRootPath, "resized");
-        const requiredResizedWallpaperPath = path.join(resizedWallpapersPath, `${504}x${280}.webp`);
+        const requiredResizedWallpaperPath = path.join(resizedWallpapersPath, `${width}x${height}.webp`);
 
         if (!fsExistsSync(rawWallpaperPath)) {
           return undefined;
         }
 
         if (!fsExistsSync(requiredResizedWallpaperPath)) {
-          const options = JSON.parse(await fs.readFile(path.join(wallpapersRootPath, "config.json"), "utf8"));
+          const configPath = path.join(wallpapersRootPath, "config.json");
+          const options = fsExistsSync(configPath) ? JSON.parse(await fs.readFile(configPath, "utf8")) : {fit: "cover", position: "center"};
 
           await instance.sys.image.resizeImage(
             rawWallpaperPath,
             requiredResizedWallpaperPath,
-            {width: 504, height: 280},
+            {width, height},
             {
               changeFormatTo: "webp",
               fit: options?.fit,
@@ -793,24 +834,11 @@ const router = t.router({
         let image = new Bun.Image(await new Response(opt.input).arrayBuffer()).webp()
 
         await fs.writeFile(path.join(wallpapersPath, `${wallpaperUUID}.webp`), await image.bytes())
+        await applyCurrentWallpaper(wallpapersPath, path.join(wallpapersPath, `${wallpaperUUID}.webp`));
 
         log.info(
           `converted '${wallpaperUUID}' to WEBP -> '${path.relative(instance.sys.filesystem.FS_ROOT, path.join(wallpapersPath, `${wallpaperUUID}.webp`))}'`,
         );
-
-        instance.sys.notifications.send(
-          opt.ctx.userId,
-          "commands.notify",
-          WorkspacesNotificationPriority.Important,
-          {
-            title: "Wallpaper uploaded",
-            body: `Your wallpaper '${wallpaperUUID}' has been uploaded!`,
-            icon: "image",
-          },
-          {
-            buttons: []
-          }
-        )
 
         return `${wallpaperUUID}.webp`;
       }),
@@ -874,38 +902,16 @@ const router = t.router({
         }),
       setWallpaperToCustomWallpaper: procedure.input(z.object({name: z.string()})).mutation(async (opt) => {
         const userWallpapersPath = path.join((await opt.ctx.user()).getPath(), "assets/wallpapers");
-        const resizedWallpapersPath = path.join(userWallpapersPath, "resized");
-        const currentWallpaperPath = path.join(userWallpapersPath, "current.webp");
 
-        if (fsExistsSync(resizedWallpapersPath)) {
-          for (const resizedWallpaperFile of await fs.readdir(resizedWallpapersPath)) {
-            await fs.rm(path.join(resizedWallpapersPath, resizedWallpaperFile), {force: true});
-          }
-        }
-
-        if (fsExistsSync(currentWallpaperPath)) {
-          await fs.rm(currentWallpaperPath, {force: true});
-        }
-        await fs.copyFile(path.join(userWallpapersPath, opt.input.name.replace(".preview", "")), currentWallpaperPath);
+        await applyCurrentWallpaper(userWallpapersPath, path.join(userWallpapersPath, path.basename(opt.input.name.replace(".preview", ""))));
 
         return true;
       }),
       setWallpaperToDefaultWallpaper: procedure.input(z.object({name: z.string()})).mutation(async (opt) => {
         const userWallpapersPath = path.join((await opt.ctx.user()).getPath(), "assets/wallpapers");
         const officialWallpaperPath = path.join(instance.sys.filesystem.SRC_ROOT, "assets/wallpapers");
-        const resizedWallpapersPath = path.join(userWallpapersPath, "resized");
-        const currentWallpaperPath = path.join(userWallpapersPath, "current.webp");
 
-        if (fsExistsSync(resizedWallpapersPath)) {
-          for (const resizedWallpaperFile of await fs.readdir(resizedWallpapersPath)) {
-            await fs.rm(path.join(resizedWallpapersPath, resizedWallpaperFile), {force: true});
-          }
-        }
-
-        if (fsExistsSync(currentWallpaperPath)) {
-          await fs.rm(currentWallpaperPath, {force: true});
-        }
-        await fs.copyFile(path.join(officialWallpaperPath, opt.input.name), currentWallpaperPath);
+        await applyCurrentWallpaper(userWallpapersPath, path.join(officialWallpaperPath, path.basename(opt.input.name)));
 
         return true;
       }),
