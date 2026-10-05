@@ -28,6 +28,10 @@ export enum SessionCreationError {
   GenericError,
 }
 
+// failed logins allowed before an account is temporarily locked, and how long the lock lasts
+const MAX_FAILED_LOGIN_ATTEMPTS = 5;
+const LOGIN_LOCKOUT_MS = 15 * 60 * 1000;
+
 // the number of ms that a login session is valid for
 export const SESSION_VALID_TERM_MS = 7 * 24 * 60 * 60 * 1000;
 const PASSWORD_HASH_ITERATIONS = 600_000;
@@ -43,6 +47,56 @@ export default class AuthorizationSystem extends System {
     this.temporaryPasskeyCreationChallenges = new Map();
     this.temporaryPasskeyAuthenticationChallenges = new Map();
     this.loginAttemptCount = new Map();
+  }
+
+  private isLoginLockedOut(userId: number): boolean {
+    const attempts = this.loginAttemptCount.get(userId);
+
+    if (!attempts) return false;
+
+    if (Date.now() - attempts.lastAttempt >= LOGIN_LOCKOUT_MS) {
+      this.loginAttemptCount.delete(userId);
+      return false;
+    }
+
+    return attempts.amount >= MAX_FAILED_LOGIN_ATTEMPTS;
+  }
+
+  /**
+    Checks a TOTP code against the user's stored two-factor secret.
+    Failures count towards the login lockout so a code cannot be brute-forced.
+    @returns {true} the code is valid
+    @returns {false} the code is invalid, the user has no secret, or they are locked out
+  */
+  async verifyTwoFactorCode(userId: number, code: string): Promise<boolean> {
+    if (this.isLoginLockedOut(userId)) return false;
+
+    const db = this.instance.sys.database.postgres();
+    const secret = (await db`SELECT two_factor_secret FROM public.users WHERE id = ${userId}`)?.[0]?.two_factor_secret as string | null | undefined;
+
+    if (!secret) return false;
+
+    const totp = new OTPAuth.TOTP({
+      issuer: this.instance.sys.configuration.proxy.hostname,
+      label: `${this.instance.sys.configuration.branding.displayName} (Workspace)`,
+      algorithm: "SHA1",
+      digits: 6,
+      secret,
+    });
+
+    if (totp.validate({ token: code }) === null) {
+      this.recordFailedLogin(userId);
+      return false;
+    }
+
+    return true;
+  }
+
+  private recordFailedLogin(userId: number) {
+    const attempts = this.loginAttemptCount.get(userId);
+    const stillCounting = attempts && Date.now() - attempts.lastAttempt < LOGIN_LOCKOUT_MS;
+
+    this.loginAttemptCount.set(userId, { amount: (stillCounting ? attempts.amount : 0) + 1, lastAttempt: Date.now() });
   }
 
   private async _internalHashPassword(password: string) {
@@ -91,16 +145,15 @@ export default class AuthorizationSystem extends System {
     otpCode?: string,
     ipAddress?: string,
   ): Promise<string | SessionCreationError> {
-    if (this.loginAttemptCount.has(userId)) {
+    if (this.isLoginLockedOut(userId)) {
+      return SessionCreationError.UserTimedOut;
     }
 
     try {
       const db = this.instance.sys.database.postgres();
 
       if (!(await this._internalVerifyPassword(password, (await db`SELECT hashed_password FROM public.users WHERE id = ${userId}`)?.[0]?.hashed_password))) {
-        if (this.loginAttemptCount.has(userId)) {
-          this.loginAttemptCount.set(userId, { amount: this.loginAttemptCount.get(userId)!.amount + 1, lastAttempt: Date.now() });
-        }
+        this.recordFailedLogin(userId);
 
         return SessionCreationError.InvalidCredentials;
       }
@@ -120,9 +173,13 @@ export default class AuthorizationSystem extends System {
         });
 
         if (totp.validate({ token: otpCode }) === null) {
+          this.recordFailedLogin(userId);
+
           return SessionCreationError.InvalidCredentials;
         }
       }
+
+      this.loginAttemptCount.delete(userId);
 
       const sessionToken = crypto.getRandomValues(new Uint32Array(16)).join("");
 
