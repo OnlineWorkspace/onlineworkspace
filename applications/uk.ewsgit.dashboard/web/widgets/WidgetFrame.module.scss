@@ -1,0 +1,11 @@
+.frame {
+  display: grid;
+  min-width: 0;
+  grid-column: span var(--cols, 1);
+  grid-row: span var(--rows, 1);
+
+  // there is only room for a single column on narrow screens
+  @media (max-width: 44rem) {
+    grid-column: span 1;
+  }
+}

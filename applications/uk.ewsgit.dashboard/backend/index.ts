@@ -53,19 +53,26 @@ const router = t.router({
               }${opt.ctx.instance.sys.configuration.proxy.hostname}/api/user/me/avatar/m`,
             };
           }),
-        avatar: procedure.output(z.string()).query(async (opt) => {
-          return `${
-            opt.ctx.instance.sys.configuration.proxy.secure
-              ? "https://"
-              : "http://"
-          }${opt.ctx.instance.sys.configuration.proxy.hostname}/api/user/me/avatar/2xl`;
-        }),
+        // `size` is the avatar resolution to serve, so the widget can ask for one that matches how large it's displayed
+        avatar: procedure
+          .input(z.enum(["xs", "s", "m", "l", "xl", "2xl"]).default("2xl"))
+          .output(z.string())
+          .query(async (opt) => {
+            return `${
+              opt.ctx.instance.sys.configuration.proxy.secure
+                ? "https://"
+                : "http://"
+            }${opt.ctx.instance.sys.configuration.proxy.hostname}/api/user/me/avatar/${opt.input}`;
+          }),
       },
     },
     getWidgets: procedure.output(z.string().array()).query(async (opt) => {
       return await opt.ctx.instance.sys.settings.getUserApplicationSetting<
         StringListApplicationSetting
       >(opt.ctx.userId, "uk.ewsgit.dashboard", "widgets");
+    }),
+    setWidgets: procedure.input(z.string().array().max(64)).mutation(async (opt) => {
+      return await opt.ctx.instance.sys.settings.setUserApplicationSetting(opt.ctx.userId, "uk.ewsgit.dashboard", "widgets", opt.input);
     }),
     getWelcomeMessage: procedure
       .input(z.number())

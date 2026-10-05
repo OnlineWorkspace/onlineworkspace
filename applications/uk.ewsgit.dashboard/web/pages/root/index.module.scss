@@ -8,6 +8,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(16rem, 23rem));
   grid-auto-rows: 7rem;
+  grid-auto-flow: row dense;
   padding: 1rem;
   gap: 1rem;
 }

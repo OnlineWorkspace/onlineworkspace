@@ -10,9 +10,9 @@ import Hour from "./components/hour/Hour";
 
 import styles from "./Widget.module.scss";
 
-const Widget: Component = (props) => {
+const Widget: Component = () => {
   return (
-    <div {...props} class={styles.root}>
+    <div class={styles.root}>
       <UKCard class={styles.card}>
         <UKText role={"title"} size={"s"}>
           Weather For [Loc] (No weather app installed)

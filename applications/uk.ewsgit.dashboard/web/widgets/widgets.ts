@@ -1,3 +1,7 @@
+import ACCOUNT_CIRCLE_ICON from "@material-symbols/svg-700/outlined/account_circle.svg";
+import NOTIFICATIONS_ICON from "@material-symbols/svg-700/outlined/notifications.svg";
+import PARTLY_CLOUDY_DAY_ICON from "@material-symbols/svg-700/outlined/partly_cloudy_day.svg";
+import PERSON_ICON from "@material-symbols/svg-700/outlined/person.svg";
 import { lazy } from "solid-js";
 
 const Widgets = {
@@ -6,5 +10,62 @@ const Widgets = {
   notifications: lazy(() => import("./notifications/Widget")),
   weather: lazy(() => import("./weather/Widget")),
 };
+
+export type WidgetType = keyof typeof Widgets;
+
+/** a widget's size in dashboard grid cells */
+export interface WidgetSize {
+  cols: number;
+  rows: number;
+}
+
+export interface WidgetInfo {
+  label: string;
+  description: string;
+  icon: string;
+  /** the sizes the widget supports, smallest first */
+  sizes: WidgetSize[];
+  /** the size a newly-added widget starts at, the first of `sizes` if not set */
+  defaultSize?: WidgetSize;
+}
+
+export const WidgetInfos: Record<WidgetType, WidgetInfo> = {
+  "user.profile": { label: "Profile", description: "Your name and username", icon: PERSON_ICON, sizes: [{ cols: 1, rows: 1 }] },
+  "user.avatar": {
+    label: "Avatar",
+    description: "Your avatar",
+    icon: ACCOUNT_CIRCLE_ICON,
+    sizes: [
+      { cols: 1, rows: 1 },
+      { cols: 1, rows: 2 },
+    ],
+    defaultSize: { cols: 1, rows: 2 },
+  },
+  notifications: { label: "Notifications", description: "Your recent notifications", icon: NOTIFICATIONS_ICON, sizes: [{ cols: 1, rows: 3 }] },
+  weather: { label: "Weather", description: "The forecast for your location", icon: PARTLY_CLOUDY_DAY_ICON, sizes: [{ cols: 1, rows: 2 }] },
+};
+
+export const defaultWidgetSize = (type: string): WidgetSize => WidgetInfos[type as WidgetType]?.defaultSize ?? WidgetInfos[type as WidgetType]?.sizes[0] ?? { cols: 1, rows: 1 };
+
+export const sizeLabel = (size: WidgetSize) => `${size.cols}×${size.rows}`;
+
+const sameSize = (a: WidgetSize, b: WidgetSize) => a.cols === b.cols && a.rows === b.rows;
+
+/**
+ * Dashboard widgets are stored as a list of strings: `type` for a widget at its default size, or `type@COLSxROWS` for any other size.
+ * Sizes a widget doesn't support fall back to its default.
+ */
+export function parseWidgetEntry(entry: string): { type: string; size: WidgetSize } {
+  const [type = entry, rawSize] = entry.split("@");
+  const match = rawSize?.match(/^(\d+)x(\d+)$/);
+  const requested = match ? { cols: Number(match[1]), rows: Number(match[2]) } : undefined;
+  const supported = WidgetInfos[type as WidgetType]?.sizes.find((s) => requested && sameSize(s, requested));
+
+  return { type, size: supported ?? defaultWidgetSize(type) };
+}
+
+export function serialiseWidgetEntry(type: string, size: WidgetSize): string {
+  return sameSize(size, defaultWidgetSize(type)) ? type : `${type}@${size.cols}x${size.rows}`;
+}
 
 export default Widgets;

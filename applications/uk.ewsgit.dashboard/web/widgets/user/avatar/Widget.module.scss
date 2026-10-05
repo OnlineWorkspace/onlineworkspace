@@ -1,13 +1,18 @@
-.root {
-  grid-row: span 3;
-}
-
 .card {
   display: flex;
+  flex-direction: row;
   align-items: center;
   justify-content: center;
+  min-width: 0;
+  overflow: hidden;
 }
 
+.avatarSize {
+  display: contents; // only carries the size variable to the avatar
+}
+
+// the size is set by the widget (see avatarRem), which also picks the image resolution to match
 .avatar {
-  --size: 21rem !important;
+  --size: var(--avatar-size) !important;
+  flex-shrink: 0;
 }

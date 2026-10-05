@@ -1,109 +1,216 @@
-.backButton {
-  position: absolute;
-  left: 1rem;
-  top: 1rem;
-  z-index: 10;
-}
+$transition: 0.2s var(--uk-sys-motion-easing-standard, ease);
 
-.page {
-  height: 100%;
-  width: 100%;
+.toolbar {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  right: 1rem;
+  z-index: 10;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  justify-content: center;
-  margin-bottom: -2rem;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.5rem 0.5rem 0.5rem 1rem;
+  border-radius: var(--uk-sys-shape-corner-large);
+  background: rgb(var(--uk-sys-color-surface-container));
+  box-shadow: 0 0.25rem 1rem rgb(0 0 0 / 0.2);
   user-select: none;
 }
 
-.widgets {
-  padding: 1rem;
-  gap: 1rem;
-  margin-top: auto;
-  margin-bottom: auto;
-  width: 100%;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(16rem, 23rem));
-  grid-auto-rows: 7rem;
-  flex-shrink: 0;
-  transition: all 0.2s ease;
+// the dashboard's greeting and search are shown only to keep the layout identical
+.header {
+  display: contents;
+  pointer-events: none;
+}
 
-  &.draggingActive {
-    opacity: 0.8;
-  }
+.toolbarText {
+  display: flex;
+  flex-direction: column;
+}
 
-  > div {
-    transition: all 0.2s ease;
-    position: relative;
-    border-radius: var(--uk-sys-shape-corner-medium, 0.5rem);
+.status {
+  color: rgb(var(--uk-sys-color-on-surface-variant));
 
-    &::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      border-radius: var(--uk-sys-shape-corner-medium, 0.5rem);
-      border: 2px dashed transparent;
-      pointer-events: none;
-      transition: border-color 0.2s ease;
-    }
-
-    &:hover::before {
-      border-color: rgba(63, 81, 181, 0.2);
-    }
+  &[data-error="true"] {
+    color: rgb(var(--uk-sys-color-error));
   }
 }
 
-.dragging {
-  opacity: 0.4;
-  transform: scale(0.92);
-
-  &::before {
-    border-color: transparent !important;
-  }
+.muted {
+  color: rgb(var(--uk-sys-color-on-surface-variant));
 }
 
-.dragOver {
-  background: linear-gradient(
-    135deg,
-    rgba(63, 81, 181, 0.15) 0%,
-    rgba(66, 133, 244, 0.15) 100%
-  );
-  box-shadow: inset 0 0 0 2px rgba(63, 81, 181, 0.4);
-  transform: scale(1.02);
-
-  &::before {
-    border-color: rgba(63, 81, 181, 0.6) !important;
-    background: rgba(63, 81, 181, 0.05);
-  }
-}
-
-.dropIndicatorActive {
+// sizing, padding, gap and columns all come from the dashboard's own `.widgets` class, so nothing here may change the box
+// (no border or margin); feedback uses box-shadow, which doesn't affect layout
+.canvas {
   position: relative;
+  user-select: none;
+  transition: box-shadow $transition;
+
+  &[data-dragging="true"] {
+    box-shadow: 0 0 0 2px rgb(var(--uk-sys-color-primary));
+  }
+
+  &[data-empty="true"] {
+    min-width: 16rem;
+    min-height: 9rem;
+  }
 }
 
-*[data-show-background="true"] {
-  .widgets {
-    border-radius: calc(var(--uk-sys-shape-corner-medium) + 1rem);
-    backdrop-filter: blur(2rem);
-    background: #0004;
+.widget {
+  position: relative;
+  // the grid cells it occupies come from the shared widget frame class
+  border-radius: var(--uk-sys-shape-corner-medium);
+  cursor: grab;
+  touch-action: none;
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  transition: outline-color $transition, opacity $transition;
+
+  &:hover,
+  &:focus-within {
+    outline-color: rgb(var(--uk-sys-color-outline));
+
+    .widgetControls {
+      opacity: 1;
+    }
+  }
+
+  &.dragging {
+    opacity: 0.35;
+  }
+
+  &.dropTarget {
+    outline-color: rgb(var(--uk-sys-color-primary));
+  }
+}
+
+// widgets are only a preview while editing, so they can't be clicked
+.widgetContent {
+  display: grid;
+  min-width: 0;
+  pointer-events: none;
+  overflow: hidden;
+  border-radius: var(--uk-sys-shape-corner-medium);
+
+  > * {
+    min-width: 0;
+  }
+}
+
+.widgetControls {
+  position: absolute;
+  inset: 0 0 auto 0;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.375rem 0.375rem 0.375rem 0.5rem;
+  border-radius: var(--uk-sys-shape-corner-medium) var(--uk-sys-shape-corner-medium) 0 0;
+  background: linear-gradient(rgb(0 0 0 / 0.55), transparent);
+  color: white;
+  opacity: 0;
+  transition: opacity $transition;
+
+  @media (hover: none) {
+    opacity: 1;
+  }
+}
+
+.controlActions {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.sizes {
+  display: flex;
+  flex-direction: row;
+  border-radius: var(--uk-sys-shape-corner-full);
+  background: rgb(0 0 0 / 0.35);
+  padding: 0.125rem;
+}
+
+.sizeChip {
+  border: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 0.75rem;
+  line-height: 1;
+  padding: 0.375rem 0.625rem;
+  border-radius: var(--uk-sys-shape-corner-full);
+  cursor: pointer;
+
+  &[data-selected="true"] {
+    background: rgb(var(--uk-sys-color-primary));
+    color: rgb(var(--uk-sys-color-on-primary));
+  }
+
+  &:focus-visible {
+    outline: 2px solid white;
+  }
+}
+
+.grip {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+// floats below the grid so showing it never changes the grid's size
+.endSlot {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(100% + 0.5rem);
+  height: 4rem;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: var(--uk-sys-shape-corner-medium);
+  border: 2px dashed rgb(var(--uk-sys-color-primary));
+  background: rgb(var(--uk-sys-color-surface-container) / 0.85);
+  color: rgb(var(--uk-sys-color-primary));
+  text-align: center;
+  transition: background-color $transition, color $transition;
+
+  &.endSlotEmpty {
+    inset: 0;
+    height: auto;
+  }
+
+  &.dropTarget {
+    background: rgb(var(--uk-sys-color-primary-container));
+    color: rgb(var(--uk-sys-color-on-primary-container));
   }
 }
 
 .drawer {
-  border-bottom: unset !important;
-  border-bottom-left-radius: 0 !important;
-  border-bottom-right-radius: 0 !important;
-  animation: slideIn 0.3s ease-out;
-  width: 100%;
-  max-width: 96rem;
+  position: absolute;
+  left: 1rem;
+  right: 1rem;
+  bottom: 1rem;
+  z-index: 10;
+  max-width: 64rem;
+  margin: 0 auto;
   gap: 0.5rem;
   display: flex;
   flex-direction: column;
-  overflow-y: auto;
+  animation: slideIn 0.3s ease-out;
+  user-select: none;
+  background: rgb(var(--uk-sys-color-surface-container));
+  box-shadow: 0 0.25rem 1rem rgb(0 0 0 / 0.2);
 
   @keyframes slideIn {
     from {
-      transform: translateY(100%);
+      transform: translateY(1rem);
       opacity: 0;
     }
     to {
@@ -111,45 +218,67 @@
       opacity: 1;
     }
   }
+}
 
-  .widgetGrid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(16rem, 23rem));
-    grid-auto-rows: 7rem;
-    padding-top: 0.25rem;
-    padding-bottom: 1rem;
-    width: 100%;
-    margin-left: auto;
-    margin-right: auto;
-    gap: 1rem;
+.paletteGrid {
+  display: flex;
+  flex-direction: row;
+  gap: 0.75rem;
+  overflow-x: auto;
+  padding-bottom: 0.25rem;
+}
 
-    > div {
-      transition: all 0.2s ease;
-      position: relative;
-      border-radius: var(--uk-sys-shape-corner-medium, 0.5rem);
+.paletteTile {
+  flex: 0 0 15rem;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border-radius: var(--uk-sys-shape-corner-medium);
+  background: rgb(var(--uk-sys-color-surface-container-high));
+  cursor: grab;
+  touch-action: none;
+  transition: background-color $transition, opacity $transition;
 
-      &::before {
-        content: "";
-        position: absolute;
-        inset: 0;
-        border-radius: var(--uk-sys-shape-corner-medium, 0.5rem);
-        border: 2px dashed transparent;
-        pointer-events: none;
-        transition: border-color 0.2s ease;
-      }
-
-      &:hover::before {
-        border-color: rgba(63, 81, 181, 0.15);
-      }
-    }
-
-    .dragging {
-      opacity: 0.5;
-      transform: scale(0.92);
-
-      &::before {
-        border-color: transparent !important;
-      }
-    }
+  &:hover {
+    background: rgb(var(--uk-sys-color-surface-container-highest));
   }
+
+  &.dragging {
+    opacity: 0.4;
+  }
+}
+
+.paletteIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  height: 2.5rem;
+  width: 2.5rem;
+  border-radius: var(--uk-sys-shape-corner-full);
+  background: rgb(var(--uk-sys-color-secondary-container));
+  color: rgb(var(--uk-sys-color-on-secondary-container));
+}
+
+.paletteText {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.overlay {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-radius: var(--uk-sys-shape-corner-large);
+  background: rgb(var(--uk-sys-color-primary-container));
+  color: rgb(var(--uk-sys-color-on-primary-container));
+  box-shadow: 0 0.5rem 1.5rem rgb(0 0 0 / 0.35);
+  cursor: grabbing;
+  pointer-events: none;
 }
