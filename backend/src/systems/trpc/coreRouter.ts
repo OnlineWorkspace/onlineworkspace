@@ -79,6 +79,37 @@ export const adminProcedure = procedure.use(async (opt) => {
 const temporaryTwoFactorSecrets: Map<number, string> = new Map();
 const emailSignupVerificationCodes: Map<string, string> = new Map();
 
+const PASSWORD_RESET_CODE_LENGTH = 8;
+const PASSWORD_RESET_CODE_VALID_MS = 15 * 60 * 1000;
+const PASSWORD_RESET_RESEND_MS = 60 * 1000;
+const PASSWORD_RESET_MAX_ATTEMPTS = 5;
+const passwordResetCodes: Map<number, { code: string; expires: number; sentAt: number; attempts: number }> = new Map();
+
+const generatePasswordResetCode = () => {
+    const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+    let code = "";
+    for (let i = 0; i < PASSWORD_RESET_CODE_LENGTH; i++) code += chars[nodeCrypto.randomInt(chars.length)];
+    return code;
+};
+
+const passwordResetCodeMatches = (expected: string, given: string) => {
+    const a = Buffer.from(expected);
+    const b = Buffer.from(given.trim().toUpperCase());
+    return a.length === b.length && nodeCrypto.timingSafeEqual(a, b);
+};
+
+const getPasswordRequirementError = (instance: Instance, password: string): string | undefined => {
+    const req = instance.sys.configuration.signupRequirements;
+    const count = (re: RegExp) => password.match(re)?.length || 0;
+
+    if (req.passwordMinimumLength !== undefined && password.length < req.passwordMinimumLength) return `Your password must be at least ${req.passwordMinimumLength} characters long`;
+    if (count(/[a-z]/g) < (req.passwordContains?.minimumLowercase || 0)) return "Your password does not contain enough lowercase letters";
+    if (count(/[A-Z]/g) < (req.passwordContains?.minimumUppercase || 0)) return "Your password does not contain enough uppercase letters";
+    if (count(/[0-9]/g) < (req.passwordContains?.minimumNumbers || 0)) return "Your password does not contain enough numbers";
+    if (count(/[^a-zA-Z0-9]/g) < (req.passwordContains?.minimumSymbols || 0)) return "Your password does not contain enough symbols";
+    return undefined;
+};
+
 export const coreOnlineWorkspaceRouter = t.router({
     userSelect: {
         getOptions: publicProcedure.query(async (opt) => {
@@ -278,6 +309,7 @@ export const coreOnlineWorkspaceRouter = t.router({
 
             return false;
         }), enableTwoFactor: procedure
+            .input(z.object({currentTwoFactorCode: z.string().optional()}).optional())
             .output(z
                 .object({
                     twoFactorSecret: z.string(), twoFactorSecretURI: z.string(),
@@ -292,10 +324,15 @@ export const coreOnlineWorkspaceRouter = t.router({
 
                 const user = await opt.ctx.user();
 
+                // Replacing an existing authenticator requires proving you still hold the current one
                 if (await opt.ctx.instance.sys.authorization.hasTwoFactorAuthenticationSecret(user.userId)) {
-                    opt.ctx.instance.log.system.warning(`User (${user.userId})${await user.getUsername()} has attempted to re-setup their two factor from the signup method... this is suspicious...`,);
+                    const currentCode = opt.input?.currentTwoFactorCode;
 
-                    return undefined;
+                    if (!currentCode || !(await opt.ctx.instance.sys.authorization.verifyTwoFactorCode(user.userId, currentCode))) {
+                        opt.ctx.instance.log.system.warning(`User (${user.userId})${await user.getUsername()} tried to re-setup their two factor without a valid current code`,);
+
+                        return undefined;
+                    }
                 }
 
                 let secretString = generateSecretString();
@@ -318,6 +355,95 @@ export const coreOnlineWorkspaceRouter = t.router({
                 return {
                     twoFactorSecretURI: totp.toString(), twoFactorSecret: secretString,
                 };
+            }), passwordResetRequest: publicProcedure
+            .input(z.object({username: z.string()}))
+            .output(z.object({emailEnabled: z.boolean()}))
+            .mutation(async (opt) => {
+                const instance = opt.ctx.instance;
+                const emailEnabled = instance.sys.configuration.mailServer.enabled;
+
+                // Always respond the same way so usernames cannot be probed
+                if (!emailEnabled) return {emailEnabled};
+
+                const user = await instance.sys.users.getUserByUsername(opt.input.username.toLowerCase());
+                const emailAddress = await user?.getEmail();
+
+                if (!user || !emailAddress) return {emailEnabled};
+
+                const existing = passwordResetCodes.get(user.userId);
+                if (existing && Date.now() - existing.sentAt < PASSWORD_RESET_RESEND_MS) return {emailEnabled};
+
+                const code = generatePasswordResetCode();
+                passwordResetCodes.set(user.userId, {
+                    code, expires: Date.now() + PASSWORD_RESET_CODE_VALID_MS, sentAt: Date.now(), attempts: 0,
+                });
+
+                try {
+                    await instance.sys.email.sendEmail(emailAddress, "Password reset code", {
+                        type: "string",
+                        content: `Someone requested a password reset for the account '${await user.getUsername()}'. Your code is '${code}' and is valid for 15 minutes. If this wasn't you, you can ignore this email and your password will not change.`,
+                    });
+                } catch (err) {
+                    instance.log.system.error(err);
+                }
+
+                return {emailEnabled};
+            }), passwordResetComplete: publicProcedure
+            .input(z.object({
+                username: z.string(), code: z.string(), newPassword: z.string(), twoFactorCode: z.string().optional(),
+            }))
+            .output(z.union([
+                z.object({type: z.literal("success")},),
+                z.object({type: z.literal("error"), message: z.string()}),
+                z.object({type: z.literal("requirementsNotMet"), requireAny: z.enum(["totp"]).array()}),
+            ]))
+            .mutation(async (opt) => {
+                const instance = opt.ctx.instance;
+                const invalid = {type: "error" as const, message: "That code is invalid or has expired"};
+
+                const user = await instance.sys.users.getUserByUsername(opt.input.username.toLowerCase());
+                if (!user) return invalid;
+
+                const entry = passwordResetCodes.get(user.userId);
+                if (!entry || entry.expires < Date.now() || entry.attempts >= PASSWORD_RESET_MAX_ATTEMPTS) {
+                    passwordResetCodes.delete(user.userId);
+                    return invalid;
+                }
+
+                if (!passwordResetCodeMatches(entry.code, opt.input.code)) {
+                    entry.attempts++;
+                    return invalid;
+                }
+
+                const requirementError = getPasswordRequirementError(instance, opt.input.newPassword);
+                if (requirementError) return {type: "error" as const, message: requirementError};
+
+                if (await instance.sys.authorization.hasTwoFactorAuthenticationSecret(user.userId)) {
+                    if (!opt.input.twoFactorCode) return {type: "requirementsNotMet" as const, requireAny: ["totp" as const]};
+
+                    const db = instance.sys.database.postgres();
+                    const totp = new OTPAuth.TOTP({
+                        issuer: instance.sys.configuration.proxy.hostname,
+                        label: `${instance.sys.configuration.branding.displayName} (Workspace)`,
+                        algorithm: "SHA1",
+                        digits: 6,
+                        secret: (await db`SELECT two_factor_secret FROM public.users WHERE id = ${user.userId}`)?.[0]?.two_factor_secret,
+                    });
+
+                    if (totp.validate({token: opt.input.twoFactorCode}) === null) {
+                        entry.attempts++;
+                        return {type: "error" as const, message: "The two factor code was incorrect"};
+                    }
+                }
+
+                if (!(await instance.sys.authorization.setPassword(user.userId, opt.input.newPassword))) {
+                    return {type: "error" as const, message: "Failed to set the new password"};
+                }
+
+                passwordResetCodes.delete(user.userId);
+                await instance.sys.authorization.endAllSessions(user.userId);
+
+                return {type: "success" as const};
             }), passwordSignin: publicProcedure
             .input(z.object({
                 username: z.string(), password: z.string(), twoFactorCode: z.string().optional(),
@@ -340,7 +466,7 @@ export const coreOnlineWorkspaceRouter = t.router({
                 if (await opt.ctx.instance.sys.authorization.hasTwoFactorAuthenticationSecret(user.userId)) {
                     if (opt.input.twoFactorCode === undefined) {
                         return {
-                            type: "requirementsNotMet" as const, requireAny: ["totp", "email"],
+                            type: "requirementsNotMet" as const, requireAny: ["totp"],
                         };
                     }
                 }
@@ -349,7 +475,10 @@ export const coreOnlineWorkspaceRouter = t.router({
 
                 if (session in SessionCreationError) {
                     return {
-                        type: "error" as const, message: "Failed to create a session?",
+                        type: "error" as const,
+                        message: session === SessionCreationError.UserTimedOut
+                            ? "Too many failed attempts. Please try again in 15 minutes."
+                            : "Incorrect username, password or code",
                     };
                 }
 
