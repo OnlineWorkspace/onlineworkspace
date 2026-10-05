@@ -5,6 +5,7 @@ import type {Server} from "bun";
 import type {Instance} from "../index.ts";
 import System from "../system.ts";
 import {getCookies} from "../utils/cookies.ts";
+import {NOTIFICATIONS_WEBSOCKET_PATH} from "./notifications.ts";
 
 export interface Route {
     method?: string | string[];
@@ -319,8 +320,15 @@ export default class ApiSystem extends System {
         this.listening = true;
         const self = this;
         this.webServer = Bun.serve({
-            port: this.instance.sys.configuration.apiPort, async fetch(req) {
+            port: this.instance.sys.configuration.apiPort,
+            websocket: self.instance.sys.notifications.websocketHandler,
+            async fetch(req, server) {
                 const url = new URL(req.url);
+
+                if (url.pathname === NOTIFICATIONS_WEBSOCKET_PATH) {
+                    return self.instance.sys.notifications.handleUpgrade(req, server) as Promise<Response>;
+                }
+
                 for (const route of self.routes) {
                     if (route.method) {
                         const methods = Array.isArray(route.method) ? route.method : [route.method];

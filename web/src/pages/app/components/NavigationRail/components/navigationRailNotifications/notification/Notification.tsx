@@ -5,11 +5,11 @@ import UKDivider from "@ewsgit/uikit-solid/src/components/divider/UKDivider.tsx"
 import UKIcon from "@ewsgit/uikit-solid/src/components/icon/UKIcon.tsx";
 import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.tsx";
 import { type Component, For } from "solid-js";
-import type { WorkspacesNotification } from "../../../../../../../../../systems/notifications";
+import type { ClientNotification } from "../../../../../../../lib/notifications";
 import styles from "./Notification.module.scss";
 
 const Notification: Component<{
-  notification: WorkspacesNotification;
+  notification: ClientNotification;
   respond: (type: "button" | "close", value: string) => void;
 }> = (props) => {
   return (

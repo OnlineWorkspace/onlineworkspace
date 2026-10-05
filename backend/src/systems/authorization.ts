@@ -229,6 +229,18 @@ export default class AuthorizationSystem extends System {
   }
 
   /**
+    Removes all of a user's sessions and invalidates their tokens
+    @returns {true} all sessions removed
+  */
+  async endAllSessions(userId: number): Promise<boolean> {
+    const sessionsDb = this.instance.sys.database.postgres();
+
+    await sessionsDb`DELETE FROM public.sessions WHERE user_id = ${userId}`;
+
+    return true;
+  }
+
+  /**
     Sets a user's password to password
     @returns {true} successful
     @returns {false} failed

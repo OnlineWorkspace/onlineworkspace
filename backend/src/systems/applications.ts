@@ -78,7 +78,7 @@ export default class ApplicationsSystem extends System {
         await this.loadApplication(app.path);
 
         if (app.enabled) {
-          await this.enableApplication(app.manifest!.id);
+          await this.enableApplication(app.manifest!.id, { notify: false });
         }
       }
 
@@ -188,7 +188,7 @@ export default class ApplicationsSystem extends System {
 
     await this.saveApplicationsConfig();
 
-    for (const administrator of (await this.instance.sys.users.getAllUsers()).filter((u) => u.isAdministrator())) {
+    for (const administrator of await this.instance.sys.users.getAdministrators()) {
       this.instance.sys.notifications.send(
         administrator.userId,
         "instance.system.application.install",
@@ -227,7 +227,7 @@ export default class ApplicationsSystem extends System {
 
     await this.saveApplicationsConfig();
 
-    for (const administrator of (await this.instance.sys.users.getAllUsers()).filter((u) => u.isAdministrator())) {
+    for (const administrator of await this.instance.sys.users.getAdministrators()) {
       this.instance.sys.notifications.send(
         administrator.userId,
         "instance.system.application.uninstall",
@@ -282,7 +282,8 @@ export default class ApplicationsSystem extends System {
 
   // Enable an application by its id
   // Loads the specified backend and web frontend
-  async enableApplication(applicationId: string): Promise<boolean> {
+  async enableApplication(applicationId: string, options: { notify?: boolean } = {}): Promise<boolean> {
+    const { notify = true } = options;
     const app = this.availableApplications.find((a) => a.manifest?.id === applicationId);
 
     if (app) {
@@ -371,7 +372,7 @@ export default class ApplicationsSystem extends System {
         }
       }
 
-      for (const administrator of (await this.instance.sys.users.getAllUsers()).filter((u) => u.isAdministrator())) {
+      for (const administrator of notify ? await this.instance.sys.users.getAdministrators() : []) {
         this.instance.sys.notifications.send(
           administrator.userId,
           "instance.system.application.enable",
@@ -436,7 +437,7 @@ export default class ApplicationsSystem extends System {
 
     const self = this;
 
-    for (const administrator of (await this.instance.sys.users.getAllUsers()).filter((u) => u.isAdministrator()))
+    for (const administrator of await this.instance.sys.users.getAdministrators())
       this.instance.sys.notifications.send(
         administrator.userId,
         "instance.system.application.disable",

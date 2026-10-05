@@ -633,7 +633,7 @@ export default class UsersSystem extends System {
                color_scheme         JSONB
              )`;
 
-    if (!(await this.getAllUsers()).find((u) => u.isAdministrator())) {
+    if ((await this.getAdministrators()).length === 0) {
       this.log.warning("No administrator account exists, creating default administrator account with username 'admin' and password 'password'");
 
       const administratorUserId = await this.createUser("admin");
@@ -739,6 +739,13 @@ export default class UsersSystem extends System {
    Gets an array of all users registered on this instance
    @returns `WorkspacesUser[]` - an array of all users
    */
+  async getAdministrators(): Promise<WorkspacesUser[]> {
+    const users = await this.getAllUsers();
+    const administratorFlags = await Promise.all(users.map((u) => u.isAdministrator()));
+
+    return users.filter((_, i) => administratorFlags[i]);
+  }
+
   async getAllUsers(): Promise<WorkspacesUser[]> {
     const db = this.instance.sys.database.postgres();
 

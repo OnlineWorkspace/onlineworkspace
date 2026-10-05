@@ -1,6 +1,17 @@
 // import devtools from "solid-devtools/vite";
-import { defineConfig } from "vite";
+import { existsSync } from "node:fs";
+import path from "node:path";
+import { defineConfig, searchForWorkspaceRoot } from "vite";
 import solid from "vite-plugin-solid";
+
+// applications kept outside this workspace (artemis_admin in the mono repo, where this is a submodule) import their own images and
+// data, and vite refuses to serve files outside its allow list. The mono checkout is allowed when this sits in one, and
+// VITE_FS_ALLOW (a comma separated list of paths) adds anything else.
+const monoRoot = path.resolve(import.meta.dirname, "../../..");
+const extraAllowed = [
+  ...(existsSync(path.join(monoRoot, "petra.json")) ? [monoRoot] : []),
+  ...(process.env.VITE_FS_ALLOW?.split(",").filter(Boolean).map((entry) => path.resolve(entry)) ?? []),
+];
 
 export default defineConfig({
   plugins: [
@@ -14,6 +25,7 @@ export default defineConfig({
   server: {
     host: true,
     allowedHosts: [process.env.ALLOW_HOST || "localhost"],
+    fs: { allow: [searchForWorkspaceRoot(process.cwd()), ...extraAllowed] },
     hmr: {
       clientPort: 443,
       protocol: "wss",
