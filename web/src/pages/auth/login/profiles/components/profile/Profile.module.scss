@@ -1,31 +1,52 @@
 .component {
   background: transparent;
   border: none;
+  cursor: pointer;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-  transition: opacity var(--uk-sys-motion-duration-150) var(--uk-sys-motion-easing-standard-decelerate);
-  opacity: 1;
-}
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  width: 10rem;
+  border-radius: 1.75rem;
+  color: rgb(var(--uk-sys-color-on-surface));
 
-.text {
-  transition: height var(--uk-sys-motion-duration-500) var(--uk-sys-motion-easing-standard-decelerate);
-  interpolate-size: allow-keywords;
-  height: max-content;
-  //transition: padding-top var(--uk-sys-motion-duration-500) var(--uk-sys-motion-easing-standard-decelerate);
-}
+  &:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px rgb(var(--uk-sys-color-primary));
+  }
 
-.otherProfileSelected {
-  opacity: 0.5;
-
-  > .text {
+  &:hover .tile, &:focus-visible .tile {
+    transform: scale(1.04);
   }
 }
 
-.avatarContainer {
-  transition: height var(--uk-sys-motion-duration-500) var(--uk-sys-motion-easing-standard-decelerate);
+.tile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 7rem;
+  height: 7rem;
+  border-radius: 1.5rem;
+  overflow: hidden;
+  background-color: rgb(var(--uk-sys-color-surface-container));
+  transition: transform var(--uk-sys-motion-duration-250, 250ms) var(--uk-sys-motion-easing-standard-decelerate);
+
+  &[data-add="true"] {
+    background-color: transparent;
+    border: 2px dashed rgb(var(--uk-sys-color-outline));
+    color: rgb(var(--uk-sys-color-on-surface-variant));
+  }
 }
 
 .avatar {
-  transition: height var(--uk-sys-motion-duration-500) var(--uk-sys-motion-easing-standard-decelerate), width var(--uk-sys-motion-duration-500) var(--uk-sys-motion-easing-standard-decelerate);
+  width: 100%;
+  height: 100%;
+}
+
+.name {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
