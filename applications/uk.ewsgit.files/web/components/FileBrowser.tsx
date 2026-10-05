@@ -37,6 +37,7 @@ import type { Entry, SortKey } from "../lib/types";
 import Breadcrumbs from "./Breadcrumbs";
 import DetailsPane from "./DetailsPane";
 import FileBadge from "./FileBadge";
+import QuickLook from "./QuickLook";
 import Thumbnail from "./Thumbnail";
 import styles from "./FileBrowser.module.scss";
 
@@ -122,6 +123,29 @@ const FileBrowser: Component<FileBrowserProps> = (props) => {
   const selectedEntries = () => ordered().filter((entry) => selected().has(entry.path));
   const selectionMode = () => isMobile() && selected().size > 0;
 
+  // ---- quick look ----
+
+  const [previewPath, setPreviewPath] = createSignal<string | undefined>();
+
+  // with several items selected the arrows move through those, with one they move through the whole folder
+  const previewList = () => (selectedEntries().length > 1 ? selectedEntries() : ordered());
+  const previewIndex = () => previewList().findIndex((entry) => entry.path === previewPath());
+  const previewEntry = () => previewList()[previewIndex()];
+
+  const stepPreview = (step: number) => {
+    const list = previewList();
+    if (list.length < 2) return;
+
+    const next = list[(previewIndex() + step + list.length) % list.length]!;
+    setPreviewPath(next.path);
+    if (selectedEntries().length <= 1) selectOnly(next);
+  };
+
+  // the item went away (deleted, reloaded) while it was open
+  createEffect(() => {
+    if (previewPath() !== undefined && previewIndex() === -1) setPreviewPath(undefined);
+  });
+
   // ---- selection ----
 
   const clearSelection = () => {
@@ -174,7 +198,21 @@ const FileBrowser: Component<FileBrowserProps> = (props) => {
       const target = event.target as HTMLElement | null;
       if (target && (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable)) return;
 
-      if (event.key === "Escape") clearSelection();
+      if (previewPath() !== undefined) {
+        // while the preview is open the keys belong to it
+        if (event.key === " " || event.key === "Escape") setPreviewPath(undefined);
+        else if (event.key === "ArrowRight" || event.key === "ArrowDown") stepPreview(1);
+        else if (event.key === "ArrowLeft" || event.key === "ArrowUp") stepPreview(-1);
+        else return;
+
+        event.preventDefault();
+        return;
+      }
+
+      if (event.key === " " && !isMobile() && !event.repeat && selected().size > 0) {
+        event.preventDefault();
+        setPreviewPath(selectedEntries()[0]?.path);
+      } else if (event.key === "Escape") clearSelection();
       else if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "a") {
         event.preventDefault();
         selectAll();
@@ -334,10 +372,8 @@ const FileBrowser: Component<FileBrowserProps> = (props) => {
     },
     onKeyDown: (event: KeyboardEvent) => {
       if (event.key === "Enter") actions.open(entry);
-      else if (event.key === " ") {
-        event.preventDefault();
-        toggle(entry);
-      }
+      // space is handled for the whole browser, it opens the preview
+      else if (event.key === " ") event.preventDefault();
     },
   });
 
@@ -732,6 +768,19 @@ const FileBrowser: Component<FileBrowserProps> = (props) => {
         <Mobile />
       </Show>
       <UKMenu items={sortMenuItems()} showMenu={sortMenu} closeMenu={() => setSortMenu(false)} />
+      <Show when={previewEntry()}>
+        {(entry) => (
+          <QuickLook
+            entry={entry()}
+            position={previewList().length > 1 ? `${previewIndex() + 1} of ${previewList().length}` : undefined}
+            onPrevious={previewList().length > 1 ? () => stepPreview(-1) : undefined}
+            onNext={previewList().length > 1 ? () => stepPreview(1) : undefined}
+            onClose={() => setPreviewPath(undefined)}
+            onOpen={() => actions.open(entry())}
+            onDownload={() => void actions.download(entry())}
+          />
+        )}
+      </Show>
     </>
   );
 };
