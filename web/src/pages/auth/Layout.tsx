@@ -1,4 +1,3 @@
-import UKCard from "@ewsgit/uikit-solid/src/components/card/UKCard.tsx";
 import UKCircularProgressIndicator
     from "@ewsgit/uikit-solid/src/components/circularProgressIndicator/UKCircularProgressIndicator.tsx";
 import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.tsx";
@@ -37,20 +36,23 @@ const UserSelectLayout: Component<RouteSectionProps<unknown>> = (props) => {
                     <Suspense fallback={<UKCircularProgressIndicator/>}>
                         <Show when={options()?.showBackground}>
                             <img class={styles.background} alt="" src={backend("/api/instance/login/background")}/>
+                            <div class={styles.scrim}/>
                         </Show>
                         <Show when={options()?.showBanner}>
                             <img class={styles.banner} alt="" src={backend("/api/instance/login/banner")}/>
                         </Show>
-                        {props.children}
+                        <main class={styles.content}>
+                            {props.children}
+                        </main>
                     </Suspense>
-                    <UKCard color={"outlined"} class={styles.copyrightAndTaglineContainer}>
-                        <UKText role={"body"} size={"m"}>
+                    <footer class={styles.footer}>
+                        <UKText role={"body"} size={"s"} class={styles.tagline}>
                             {options()?.tagline}
                         </UKText>
-                        <UKText href="https://ewsgit.uk" role={"body"} size={"s"} emphasized={true}>
+                        <UKText href="https://ewsgit.uk" role={"body"} size={"s"} class={styles.copyright}>
                             Copyright © 2025-2026 Ewsgit
                         </UKText>
-                    </UKCard>
+                    </footer>
                 </div>
             </AuthContext.Provider>
         </Show>);
