@@ -1,0 +1,117 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  box-sizing: border-box;
+  width: 100%;
+  padding: 16px;
+  border-radius: var(--uk-sys-shape-corner-extra-large);
+  background-color: rgb(var(--uk-sys-color-surface-container));
+  color: rgb(var(--uk-sys-color-on-surface));
+
+  &[data-compact="true"] {
+    gap: 6px;
+    padding: 12px 16px;
+    border-radius: var(--uk-sys-shape-corner-large);
+  }
+}
+
+.headline {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.used {
+  font-family: var(--uk-ref-typeface-brand);
+  font-weight: var(--uk-ref-weight-medium);
+  font-size: 32px;
+  line-height: 40px;
+}
+
+.total {
+  color: rgb(var(--uk-sys-color-on-surface-variant));
+  font-size: 14px;
+}
+
+.title,
+.caption {
+  color: rgb(var(--uk-sys-color-on-surface-variant));
+}
+
+.bar {
+  display: flex;
+  height: 12px;
+  gap: 2px;
+  overflow: hidden;
+  border-radius: 6px;
+  background-color: rgb(var(--uk-sys-color-surface-variant));
+
+  .root[data-compact="true"] & {
+    height: 6px;
+    border-radius: 3px;
+  }
+}
+
+.segment {
+  height: 100%;
+  min-width: 0;
+  transition: width var(--uk-sys-motion-duration-300) var(--uk-sys-motion-easing-standard-normal);
+}
+
+.segment[data-segment="images"],
+.dot[data-segment="images"] {
+  background-color: #00363a;
+}
+
+.segment[data-segment="videos"],
+.dot[data-segment="videos"] {
+  background-color: #1f7a7a;
+}
+
+.segment[data-segment="documents"],
+.dot[data-segment="documents"] {
+  background-color: #6bb3b8;
+}
+
+.segment[data-segment="other"],
+.dot[data-segment="other"] {
+  background-color: #a3aaab;
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  margin-top: 4px;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: rgb(var(--uk-sys-color-on-surface-variant));
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.action {
+  border: none;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
+  color: rgb(var(--uk-sys-color-primary));
+  font-family: var(--uk-ref-typeface-brand);
+  font-weight: var(--uk-ref-weight-medium);
+  font-size: 14px;
+}

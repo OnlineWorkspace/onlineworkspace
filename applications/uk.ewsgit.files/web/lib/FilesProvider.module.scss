@@ -1,0 +1,26 @@
+.dialog {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.snackbar {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  transform: translateX(-50%);
+  z-index: 200;
+}
+
+@media (max-width: 768px) {
+  .snackbar {
+    // sit above the bottom navigation bar
+    bottom: 96px;
+  }
+}

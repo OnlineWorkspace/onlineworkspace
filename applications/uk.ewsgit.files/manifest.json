@@ -17,10 +17,10 @@
   "source": "https://github.com/onlineworkspace/onlineworkspace/src/branch/main/packages/applications/uk.ewsgit.files",
   "modules": {
     "web": {
-      "path": "./frontend"
+      "path": "./web"
     },
     "internal": {
-      "path": "./server/index.ts"
+      "path": "./backend/index.ts"
     }
   }
 }

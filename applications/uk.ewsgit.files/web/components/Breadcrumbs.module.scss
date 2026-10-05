@@ -1,0 +1,39 @@
+.root {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  overflow-x: auto;
+  white-space: nowrap;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.crumb {
+  flex-shrink: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: var(--uk-sys-shape-corner-small);
+  color: rgb(var(--uk-sys-color-on-surface-variant));
+
+  &:hover {
+    background-color: rgb(var(--uk-sys-color-on-surface), var(--uk-sys-state-hover-state-layer-opacity));
+  }
+
+  &[data-current="true"] {
+    color: rgb(var(--uk-sys-color-on-surface));
+    cursor: default;
+  }
+}
+
+.separator {
+  --icon-size: 20px;
+  flex-shrink: 0;
+  color: rgb(var(--uk-sys-color-on-surface-variant));
+}

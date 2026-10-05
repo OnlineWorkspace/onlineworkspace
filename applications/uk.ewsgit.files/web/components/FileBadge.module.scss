@@ -1,0 +1,73 @@
+.root {
+  --badge-size: 40px;
+  --badge-container: rgb(var(--uk-sys-color-surface-variant));
+  --badge-content: rgb(var(--uk-sys-color-on-surface-variant));
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: var(--badge-size);
+  height: var(--badge-size);
+  border-radius: 12px;
+  background-color: var(--badge-container);
+  color: var(--badge-content);
+  font-family: var(--uk-ref-typeface-brand);
+  font-weight: var(--uk-ref-weight-bold);
+  font-size: calc(var(--badge-size) * 0.28);
+  letter-spacing: 0.5px;
+  user-select: none;
+
+  &[data-size="s"] {
+    --badge-size: 36px;
+    border-radius: 10px;
+  }
+
+  &[data-size="l"] {
+    --badge-size: 96px;
+    border-radius: 24px;
+  }
+
+  &[data-category="pdf"] {
+    --badge-container: #ffd9d6;
+    --badge-content: #8c1d18;
+  }
+
+  &[data-category="archive"] {
+    --badge-container: #e0e3e3;
+    --badge-content: #3f4948;
+  }
+
+  &[data-category="spreadsheet"] {
+    --badge-container: #c8ebd0;
+    --badge-content: #0f5223;
+  }
+
+  &[data-category="image"] {
+    --badge-container: #ffdcc6;
+    --badge-content: #6b3410;
+  }
+
+  &[data-category="text"],
+  &[data-category="document"],
+  &[data-category="presentation"],
+  &[data-category="code"] {
+    --badge-container: #d6e3ff;
+    --badge-content: #1a3a70;
+  }
+
+  &[data-category="video"],
+  &[data-category="audio"] {
+    --badge-container: #eaddff;
+    --badge-content: #4f378b;
+  }
+
+  &[data-category="directory"] {
+    --badge-container: rgb(var(--uk-sys-color-primary-container));
+    --badge-content: rgb(var(--uk-sys-color-on-primary-container));
+  }
+}
+
+.folder {
+  --icon-size: calc(var(--badge-size) * 0.6);
+}

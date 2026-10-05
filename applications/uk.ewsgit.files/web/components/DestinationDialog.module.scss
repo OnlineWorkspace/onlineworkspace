@@ -1,0 +1,40 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.location {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.locationLabel {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.folders {
+  display: flex;
+  flex-direction: column;
+  min-height: 160px;
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.spinner,
+.empty {
+  margin: auto;
+}
+
+.empty {
+  color: rgb(var(--uk-sys-color-on-surface-variant));
+}
+
+.buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}

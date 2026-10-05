@@ -1,0 +1,30 @@
+.root {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-height: 64px;
+  cursor: pointer;
+  outline: none;
+  border-radius: var(--uk-sys-shape-corner-large);
+
+  &:focus-visible {
+    outline: var(--uk-sys-state-focus-indicator-thickness) solid rgb(var(--uk-sys-color-secondary));
+  }
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.subtitle {
+  color: rgb(var(--uk-sys-color-on-surface-variant));
+}
