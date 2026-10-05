@@ -3,6 +3,12 @@
   user-select: none;
 }
 
+.rail.rail[data-type] {
+  // light themes: no token is dark enough, so tint the container colour towards the text colour instead
+  --rail-light-background: color-mix(in srgb, rgb(var(--uk-sys-color-surface-container)) 93%, rgb(var(--uk-sys-color-on-surface)));
+  background-color: light-dark(var(--rail-light-background), rgb(var(--uk-sys-color-surface-container)));
+}
+
 .rail {
   border-right: 1px solid rgb(var(--uk-sys-color-outline-variant));
 
