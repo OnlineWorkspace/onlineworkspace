@@ -47,8 +47,12 @@ const MethodTwoFactor: Component = () => {
           </Suspense>
         }
       />
-      <UKDialog onClose={() => setShowDialog(null)} show={() => showDialog() === "createCode"}>
-        <TwoFactorCreateCodeDialog />
+      <UKDialog onClose={() => setShowDialog(null)} show={() => showDialog() === "createCode"} maxWidth="24rem" adaptToMobile={true}>
+        <TwoFactorCreateCodeDialog
+          hasTwoFactor={!!hasTwoFactor()}
+          onDone={() => void refetchHasTwoFactor()}
+          onClose={() => setShowDialog(null)}
+        />
       </UKDialog>
     </>
   );
