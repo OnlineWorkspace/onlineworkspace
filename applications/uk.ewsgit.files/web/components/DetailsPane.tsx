@@ -8,7 +8,7 @@ import STAR_FILL_ICON from "@material-symbols/svg-700/outlined/star-fill.svg";
 import UKButton from "@ewsgit/uikit-solid/src/components/button/UKButton.tsx";
 import UKIconButton from "@ewsgit/uikit-solid/src/components/iconButton/UKIconButton.tsx";
 import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.tsx";
-import { type Component, createResource, For, Show } from "solid-js";
+import { type Component, createResource, For, Show, Suspense } from "solid-js";
 import { useFiles } from "../lib/context";
 import { formatBytes, formatDate, formatModified, pluralise } from "../lib/format";
 import trpc from "../lib/trpc";
@@ -38,9 +38,11 @@ const SingleDetails: Component<{ entry: Entry }> = (props) => {
   return (
     <>
       <div class={styles.preview} data-category={props.entry.category}>
-        <Show when={previewUrl.latest} fallback={<FileBadge class={styles.previewBadge} entry={props.entry} size="l" />}>
-          {(url) => <img src={url()} alt={props.entry.name} class={styles.previewImage} />}
-        </Show>
+        <Suspense fallback={<FileBadge class={styles.previewBadge} entry={props.entry} size="l" />}>
+          <Show when={previewUrl.latest} fallback={<FileBadge class={styles.previewBadge} entry={props.entry} size="l" />}>
+            {(url) => <img src={url()} alt={props.entry.name} class={styles.previewImage} />}
+          </Show>
+        </Suspense>
       </div>
       <div class={styles.heading}>
         <UKText role="headline" size="s" class={styles.name}>

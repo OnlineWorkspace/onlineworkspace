@@ -18,7 +18,7 @@ import UKSnackbar from "@ewsgit/uikit-solid/src/components/snackbar/UKSnackbar.t
 import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.tsx";
 import UKTextField from "@ewsgit/uikit-solid/src/components/textField/UKTextField.tsx";
 import { useNavigate } from "@solidjs/router";
-import { createResource, createSignal, For, type ParentProps, Show } from "solid-js";
+import { createResource, createSignal, For, type ParentProps, Show, Suspense } from "solid-js";
 import DestinationDialogContent from "../components/DestinationDialog";
 import { FilesContext, type FilesContextValue, type Place } from "./context";
 import { pluralise } from "./format";
@@ -364,6 +364,7 @@ const FilesProvider = (props: ParentProps) => {
               <UKText role="title" size="l">
                 Places
               </UKText>
+              <Suspense>
               <For each={places.latest ?? []}>
                 {(place) => (
                   <UKListItem
@@ -378,6 +379,7 @@ const FilesProvider = (props: ParentProps) => {
                   />
                 )}
               </For>
+              </Suspense>
               <UKListItem
                 labelText="Trash"
                 supportingText="Deleted items"

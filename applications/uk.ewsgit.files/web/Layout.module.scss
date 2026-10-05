@@ -43,3 +43,23 @@
   min-height: 0;
   overflow-y: auto;
 }
+
+.placesSkeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.placeSkeleton {
+  height: 3.5rem;
+  border-radius: var(--uk-sys-shape-corner-full);
+  background-color: rgb(var(--uk-sys-color-surface-container-high));
+  opacity: 0.5;
+}
+
+.storageSkeleton {
+  height: 4.5rem;
+  margin-top: 16px;
+  border-radius: var(--uk-sys-shape-corner-large);
+  background-color: rgb(var(--uk-sys-color-surface-container));
+}

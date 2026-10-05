@@ -21,7 +21,7 @@ import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.tsx";
 import useIsMobile from "@ewsgit/uikit-solid/src/core/useIsMobile.ts";
 import { MetaProvider, Title } from "@solidjs/meta";
 import { useLocation, useNavigate } from "@solidjs/router";
-import { type Component, type ParentProps, Show, Suspense } from "solid-js";
+import { type Component, For, type ParentProps, Show, Suspense } from "solid-js";
 import StorageMeter from "./components/StorageMeter";
 import { useFiles } from "./lib/context";
 import FilesProvider from "./lib/FilesProvider";
@@ -68,6 +68,19 @@ const Chrome: Component<ParentProps> = (props) => {
     </div>
   );
 
+  // built once: the sidebar items are rebuilt whenever the route changes, and remounting this would refetch the usage
+  const storageMeter = (
+    <Suspense fallback={<div class={styles.storageSkeleton} />}>
+      <StorageMeter compact class={styles.storage} />
+    </Suspense>
+  );
+
+  const placesSkeleton = () => (
+    <div class={styles.placesSkeleton} aria-hidden="true">
+      <For each={[0, 1, 2, 3, 4]}>{() => <div class={styles.placeSkeleton} />}</For>
+    </div>
+  );
+
   const newButton = () => (
     <UKButton
       color="tonal"
@@ -96,21 +109,22 @@ const Chrome: Component<ParentProps> = (props) => {
             items={[
               { type: "component", component: desktopHeader },
               { type: "component", component: newButton },
-              { type: "margin" },
               { type: "button", icon: { type: "icon", value: is(routes.recent()) ? SCHEDULE_FILL_ICON : SCHEDULE_ICON }, label: "Recent", onClick: () => navigate(routes.recent()), active: is(routes.recent()) },
               { type: "button", icon: { type: "icon", value: is(routes.starred()) ? STAR_FILL_ICON : STAR_ICON }, label: "Starred", onClick: () => navigate(routes.starred()), active: is(routes.starred()) },
               { type: "divider" },
               { type: "label", label: "PLACES" },
-              ...(files.places.latest ?? []).map((place) => ({
+              // places load independently of the page, so hold their space instead of suspending the whole app
+              ...(files.places.state === "ready" ? [] : [{ type: "component" as const, component: placesSkeleton }]),
+              ...(files.places.state === "ready" ? files.places() : []).map((place) => ({
                 type: "button" as const,
                 icon: { type: "icon" as const, value: PLACE_ICONS[place.icon] ?? FOLDER_ICON },
                 label: place.label,
                 onClick: () => navigate(routes.browse(place.path)),
                 active: browsing(place.path),
               })),
-              { type: "divider" },
+              { type: "margin" },
               { type: "button", icon: { type: "icon", value: DELETE_ICON }, label: "Trash", onClick: () => navigate(routes.trash()), active: is(routes.trash()) },
-              { type: "component", component: () => <StorageMeter compact class={styles.storage} /> },
+              { type: "component", component: () => storageMeter },
             ]}
           >
             {page()}
