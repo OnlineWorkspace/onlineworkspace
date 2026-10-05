@@ -6,6 +6,7 @@ const ApplicationPage = lazy(() => import("./pages/applications/applicationId/In
 const ApplicationsPage = lazy(() => import("./pages/applications/Index.tsx"));
 const AuthenticationPage = lazy(() => import("./pages/authentication/Index"));
 const ColorThemePage = lazy(() => import("./pages/customization/colorTheme/Index.tsx"));
+const ColorThemeCustomiserPage = lazy(() => import("./pages/customization/colorTheme/customiser/Customiser.tsx"));
 const CustomizationPage = lazy(() => import("./pages/customization/Index"));
 const QuickShortcutsPage = lazy(() => import("./pages/customization/quickShortcuts/Index.tsx"));
 const WallpaperPage = lazy(() => import("./pages/customization/wallpaper/Index.tsx"));
@@ -31,6 +32,7 @@ const App: Component = () => {
         <Route path={"/"} component={CustomizationPage} />
         <Route path={"/wallpaper"} component={WallpaperPage} />
         <Route path={"/color-theme"} component={ColorThemePage} />
+        <Route path={"/color-theme/customise"} component={ColorThemeCustomiserPage} />
         <Route path={"/quick-shortcuts"} component={QuickShortcutsPage} />
       </Route>
       <Route path={"/instance"}>

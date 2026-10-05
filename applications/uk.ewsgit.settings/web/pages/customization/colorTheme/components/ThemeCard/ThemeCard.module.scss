@@ -1,0 +1,33 @@
+.root {
+  all: unset;
+  box-sizing: border-box;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  border-radius: var(--uk-sys-shape-corner-extra-large, 1.75rem);
+  background: rgb(var(--uk-sys-color-surface-container));
+  outline: 2px solid transparent;
+  outline-offset: -2px;
+  transition: outline-color var(--uk-sys-motion-duration-250) var(--uk-sys-motion-easing-standard),
+    background var(--uk-sys-motion-duration-250) var(--uk-sys-motion-easing-standard);
+
+  &:hover {
+    background: rgb(var(--uk-sys-color-surface-container-high));
+  }
+
+  &:focus-visible,
+  &[data-selected="true"] {
+    outline-color: rgb(var(--uk-sys-color-primary));
+  }
+}
+
+.label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 0.5rem 0.25rem;
+  color: rgb(var(--uk-sys-color-on-surface));
+  --icon-size: 20px;
+}

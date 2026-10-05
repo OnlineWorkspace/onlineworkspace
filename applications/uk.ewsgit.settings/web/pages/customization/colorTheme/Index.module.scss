@@ -1,8 +1,3 @@
-.backButton {
-  padding-top: 2rem;
-  padding-bottom: 2rem;
-}
-
 .page {
   margin-left: auto;
   margin-right: auto;
@@ -14,9 +9,95 @@
   padding: 2rem 1rem;
 }
 
-.themeList {
+.preview {
   display: flex;
   flex-direction: row;
-  gap: 0.5rem;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1rem;
+  border-radius: var(--uk-sys-shape-corner-extra-large, 1.75rem);
+  background: rgb(var(--uk-sys-color-surface-container));
+
+  @media (max-width: 40rem) {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+.previewMock {
+  flex: 1 1 50%;
+  max-width: 28rem;
+}
+
+.previewInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.hint {
+  color: rgb(var(--uk-sys-color-on-surface-variant));
+}
+
+.themeList {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
+  gap: 0.75rem;
+}
+
+.customRow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+
+  > button {
+    width: 14rem;
+  }
+}
+
+.colorInput {
+  appearance: none;
+  border: none;
+  padding: 0;
+  width: 4rem;
+  height: 4rem;
+  cursor: pointer;
+  background: none;
+
+  &::-webkit-color-swatch-wrapper {
+    padding: 0;
+  }
+
+  &::-webkit-color-swatch {
+    border: none;
+    border-radius: var(--uk-sys-shape-corner-large);
+  }
+
+  &::-moz-color-swatch {
+    border: none;
+    border-radius: var(--uk-sys-shape-corner-large);
+  }
+}
+
+.appearance {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
   flex-wrap: wrap;
+  padding: 1rem;
+  border-radius: var(--uk-sys-shape-corner-extra-large, 1.75rem);
+  background: rgb(var(--uk-sys-color-surface-container));
+}
+
+.appearanceText {
+  display: flex;
+  flex-direction: column;
+}
+
+.appearanceButtons {
+  display: flex;
+  gap: 0.5rem;
 }

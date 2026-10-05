@@ -51,6 +51,31 @@ async function applyCurrentWallpaper(userWallpapersPath: string, sourcePath: str
   await fs.copyFile(sourcePath, currentWallpaperPath);
 }
 
+const savedSchemeInput = z.object({
+  darkMode: z.record(z.string(), z.string()),
+  lightMode: z.record(z.string(), z.string()),
+});
+
+type SavedColorTheme = { id: string; name: string; scheme: z.infer<typeof savedSchemeInput> };
+
+/** named, user-created color themes live in the user's settings JSONB under `savedColorThemes` */
+async function readSavedColorThemes(userId: number): Promise<SavedColorTheme[]> {
+  const db = instance.sys.database.postgres();
+  const rows = await db`SELECT settings -> 'savedColorThemes' AS saved
+                        FROM public.users
+                        WHERE id = ${userId}`;
+
+  return (rows?.[0]?.saved as SavedColorTheme[] | null) ?? [];
+}
+
+async function writeSavedColorThemes(userId: number, themes: SavedColorTheme[]) {
+  const db = instance.sys.database.postgres();
+
+  await db`UPDATE public.users
+           SET settings = jsonb_set(COALESCE(settings, '{}'::jsonb), '{savedColorThemes}', ${JSON.stringify(themes)}::jsonb)
+           WHERE id = ${userId}`;
+}
+
 const router = t.router({
   overview: {
     user: procedure.query(async (opt) => {
@@ -949,6 +974,37 @@ const router = t.router({
         await db`UPDATE public.users
                  SET color_scheme = ${opt.input}
                  WHERE id = ${opt.ctx.userId}`;
+
+        return true;
+      }),
+      getCurrent: procedure.query(async (opt) => {
+        const db = instance.sys.database.postgres();
+        const rows = await db`SELECT color_scheme
+                              FROM public.users
+                              WHERE id = ${opt.ctx.userId}`;
+
+        return (rows?.[0]?.color_scheme as unknown) ?? null;
+      }),
+      listSaved: procedure.query(async (opt) => {
+        return await readSavedColorThemes(opt.ctx.userId);
+      }),
+      saveTheme: procedure
+        .input(z.object({ name: z.string().trim().min(1).max(40), scheme: savedSchemeInput }))
+        .mutation(async (opt) => {
+          const saved = await readSavedColorThemes(opt.ctx.userId);
+          const entry = { id: crypto.randomUUID(), name: opt.input.name, scheme: opt.input.scheme };
+
+          await writeSavedColorThemes(opt.ctx.userId, [...saved, entry]);
+
+          return entry;
+        }),
+      deleteSaved: procedure.input(z.object({ id: z.string() })).mutation(async (opt) => {
+        const saved = await readSavedColorThemes(opt.ctx.userId);
+
+        await writeSavedColorThemes(
+          opt.ctx.userId,
+          saved.filter((s) => s.id !== opt.input.id),
+        );
 
         return true;
       }),

@@ -1,0 +1,76 @@
+.root {
+  display: flex;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  border-radius: var(--uk-sys-shape-corner-large);
+  overflow: hidden;
+  container-type: inline-size;
+}
+
+.sidebar {
+  width: 16%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8cqw;
+  padding-top: 10cqw;
+}
+
+.dot {
+  width: 5cqw;
+  height: 5cqw;
+  border-radius: 50%;
+  opacity: 0.7;
+}
+
+.navActive {
+  width: 70%;
+  height: 7cqw;
+  border-radius: 4cqw;
+}
+
+.nav {
+  width: 50%;
+  height: 3cqw;
+  border-radius: 2cqw;
+  opacity: 0.35;
+}
+
+.content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 5cqw;
+  padding: 7cqw;
+}
+
+.title {
+  width: 40%;
+  height: 5cqw;
+  border-radius: 3cqw;
+  opacity: 0.85;
+}
+
+.card {
+  flex: 1;
+  border-radius: 5cqw;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.line {
+  width: 45%;
+  height: 3cqw;
+  border-radius: 2cqw;
+  opacity: 0.4;
+}
+
+.button {
+  width: 22%;
+  height: 8cqw;
+  border-radius: 4cqw;
+}
