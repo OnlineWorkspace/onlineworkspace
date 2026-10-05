@@ -59,36 +59,24 @@
 }
 
 *[data-show-background="true"] {
+  // the surface token is light in light themes and dark in dark themes, so the blurred panels follow the active mode
+  --panel-background: color-mix(in srgb, rgb(var(--uk-sys-color-surface)) 65%, transparent);
+
   .welcomeMessage {
+    color: rgb(var(--uk-sys-color-on-surface));
     border-radius: var(--uk-sys-shape-corner-medium);
-    background: #0004;
+    background: var(--panel-background);
     backdrop-filter: blur(2rem);
   }
 
   .widgets {
     border-radius: calc(var(--uk-sys-shape-corner-medium) + 1rem);
     backdrop-filter: blur(2rem);
-    background: #0004;
+    background: var(--panel-background);
   }
 
   .searchBar {
-    background: #0004;
+    background: var(--panel-background);
     backdrop-filter: blur(2rem);
-  }
-}
-
-@media (prefers-color-scheme: light) {
-  *[data-show-background="true"] {
-    .welcomeMessage {
-      background: #fff6;
-    }
-
-    .widgets {
-      background: #fff6;
-    }
-
-    .searchBar {
-      background: #fff6;
-    }
   }
 }
