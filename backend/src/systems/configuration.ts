@@ -3,6 +3,7 @@ import {
   promises as fs,
   readFileSync as fsReadFileSync,
 } from "node:fs";
+import { randomBytes, timingSafeEqual } from "node:crypto";
 import path from "node:path";
 import type { Instance } from "../index.ts";
 import System from "../system.ts";
@@ -127,6 +128,7 @@ export default class ConfigurationSystem extends System {
     { id: "uk.ewsgit.settings", uri: "local:uk.ewsgit.settings" },
     { id: "uk.ewsgit.photos", uri: "local:uk.ewsgit.photos" },
     { id: "uk.ewsgit.files", uri: "local:uk.ewsgit.files" },
+    { id: "uk.ewsgit.guide", uri: "local:uk.ewsgit.guide" },
   ];
   userDefault: {
     homeDirectories: string[];
@@ -134,11 +136,33 @@ export default class ConfigurationSystem extends System {
     displayNameFormat: string;
   } = {
     homeDirectories: ["Documents", "Photos", "Videos", "Projects"],
-    quotaSize: 1024 * 1024 * 10,
+    quotaSize: 1024 * 1024 * 1024,
     displayNameFormat: "New User %num%",
   };
   caddyfile: string | undefined = "../Caddyfile";
   apiPort: number = 3563;
+  /** Has the instance setup wizard been completed, until it is the wizard is shown at `/` instead of the usual page */
+  setupComplete: boolean = false;
+
+  /** The one-time token printed to the console which must be provided to the setup wizard, only present while the instance is not set up. */
+  #setupToken: string | undefined;
+
+  /** @returns true if the token matches, the token can only be used while the instance has not been setup */
+  verifySetupToken(token: string): boolean {
+    if (this.setupComplete || this.#setupToken === undefined) return false;
+
+    const expected = Buffer.from(this.#setupToken);
+    const given = Buffer.from(token.trim());
+
+    return expected.length === given.length && timingSafeEqual(expected, given);
+  }
+
+  async completeSetup() {
+    this.setupComplete = true;
+    this.#setupToken = undefined;
+    await this.saveConfiguration();
+    this.log.success("Instance setup complete!");
+  }
 
   /** The databases as configured by the file, without the environment overrides, which are never written back to it. */
   #fileDatabases: ConfigurationSystem["databases"] | undefined;
@@ -276,7 +300,9 @@ export default class ConfigurationSystem extends System {
       "configuration.json",
     );
 
-    if (!fsExistsSync(CONFIGURATION_FILE_PATH)) {
+    const isExistingInstance = fsExistsSync(CONFIGURATION_FILE_PATH);
+
+    if (!isExistingInstance) {
       await this.saveConfiguration();
     }
 
@@ -297,6 +323,17 @@ export default class ConfigurationSystem extends System {
         // @ts-expect-error We can ignore this as the properties which are read-only are already removed from the allowedProperties by this stage.
         this[propertyKey] = configurationFile[propertyKey];
       }
+    }
+
+    // instances which were configured before the setup wizard existed are already set up
+    if (isExistingInstance && !("setupComplete" in configurationFile)) {
+      this.setupComplete = true;
+    }
+
+    if (!this.setupComplete) {
+      this.#setupToken = randomBytes(6).toString("hex");
+      this.log.warning("This instance has not been set up yet. Open it in a browser to run the setup wizard.");
+      this.log.warning(`Setup token: ${this.log.emphasis(this.#setupToken)}`);
     }
 
     this.applyEnvironmentOverrides();

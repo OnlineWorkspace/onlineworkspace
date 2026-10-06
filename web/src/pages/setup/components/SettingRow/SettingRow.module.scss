@@ -1,0 +1,17 @@
+.row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.supporting {
+  color: rgb(var(--uk-sys-color-on-surface-variant));
+}

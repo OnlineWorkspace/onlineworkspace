@@ -1,0 +1,27 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 1rem;
+  border-radius: var(--uk-sys-shape-corner-large);
+  background-color: rgb(var(--uk-sys-color-surface-container));
+}
+
+.row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+}
+
+.label {
+  color: rgb(var(--uk-sys-color-on-surface-variant));
+  flex-shrink: 0;
+}
+
+.value {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}

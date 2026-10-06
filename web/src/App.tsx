@@ -6,13 +6,12 @@ import styles from "./App.module.scss";
 import ApplicationsRouter from "./ApplicationsRouter.tsx";
 import MissingApp from "./MissingApp.tsx";
 import AppIndex from "./pages/app/Index.tsx";
-import Redirect from "./components/Redirect.js";
 
 const App: Component = () => {
     return (<UIKitRoot class={styles.root}>
             <MetaProvider>
                 <Router>
-                    <Route path={"/"} component={() => <Redirect to={"/auth/login"}/>}/>
+                    <Route path={"/"} component={lazy(() => import("./pages/Home.tsx"))}/>
                     <Route path={"/auth"} component={lazy(() => import("./pages/auth/Layout.tsx"))}>
                         <Route path={"/login"} component={lazy(() => import("./pages/auth/login/Layout.tsx"))}/>
                         <Route path={"/login/standard"}

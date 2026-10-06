@@ -8,6 +8,7 @@ import QRCode from "qrcode";
 import { type Accessor, type Component, createEffect, createResource, createSignal, type Resource } from "solid-js";
 import trpc from "../../../../../lib/trpc";
 import { UserSelectStage } from "../../Signup";
+import StageHeader from "../../components/StageHeader/StageHeader";
 import modalStyles from "../../Signup.module.scss";
 import styles from "./TwoFactorAuthentication.module.scss";
 
@@ -56,10 +57,7 @@ const TwoFactorAuthentication: Component<{
         </UKCard>
       ) : (
         <UKCard color={"filled"} class={clsx(modalStyles.modal, styles.twoFactorStage)}>
-          <UKText role={"title"} size={"l"} emphasized={true}>
-            Setup Two Factor Authentication
-          </UKText>
-          <UKDivider direction={"horizontal"} />
+          <StageHeader title={"Two factor authentication"} description={"Scan the QR code with an authenticator app, then enter the code it shows."} />
           <div class={styles.qr}>
             <canvas ref={canvasElement} />
             <UKText role={"body"} size={"m"}>

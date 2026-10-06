@@ -1,11 +1,11 @@
 import UKButton from "@ewsgit/uikit-solid/src/components/button/UKButton.tsx";
 import UKCard from "@ewsgit/uikit-solid/src/components/card/UKCard.tsx";
-import UKDivider from "@ewsgit/uikit-solid/src/components/divider/UKDivider.tsx";
 import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.tsx";
 import UKTextField from "@ewsgit/uikit-solid/src/components/textField/UKTextField.tsx";
 import { type Accessor, type Component, createSignal } from "solid-js";
 import trpc from "../../../../../lib/trpc";
 import { UserSelectStage } from "../../Signup";
+import StageHeader from "../../components/StageHeader/StageHeader";
 import modalStyles from "../../Signup.module.scss";
 import styles from "./VerifyEmail.module.scss";
 
@@ -20,10 +20,7 @@ const VerifyEmail: Component<{
   return (
     <>
       <UKCard color={"filled"} class={modalStyles.modal}>
-        <UKText role={"title"} size={"l"} emphasized={true}>
-          Verify Email
-        </UKText>
-        <UKDivider direction={"horizontal"} />
+        <StageHeader title={"Verify your email"} description={"Enter the code we sent to your email address."} />
         <UKText role={"body"} size={"m"}>
           Please enter the code which was sent to the email you provided to continue.
         </UKText>

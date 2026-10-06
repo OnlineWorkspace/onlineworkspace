@@ -1,35 +1,103 @@
-.avatar {
-  margin-left: auto;
-  margin-right: auto;
+.profileStage {
+  min-width: min(30rem, calc(100% - 2rem));
+}
+
+.preview {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  border-radius: var(--uk-sys-shape-corner-large);
+  background-color: rgb(var(--uk-sys-color-surface-container));
+}
+
+.identity {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
 }
 
 .displayName {
-  font-variation-settings:
-    "wght" 900,
-    "wdth" 151,
-    "opsz" 8,
-    "GRAD" 60,
-    "XTRA" 475,
-    "XOPQ" 175,
-    "YOPQ" 100,
-    "YTLC" 570,
-    "YTAS" 850 !important;
-  text-align: center;
-  word-wrap: normal;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .username {
-  margin-top: -0.75rem;
   color: rgb(var(--uk-sys-color-secondary));
 }
 
-.pronouns {
-  margin-top: -0.75rem;
-  color: rgb(var(--uk-sys-color-secondary), 0.75);
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
-.buttonContainer {
+.sectionTitle {
+  color: rgb(var(--uk-sys-color-on-surface-variant));
+}
+
+.genders {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+}
+
+.gender {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: endcop;
+  justify-content: center;
+  gap: 0.5rem;
+  height: 5.5rem;
+  padding: 0;
+  border: 0;
+  border-radius: var(--uk-sys-shape-corner-large);
+  background-color: rgb(var(--uk-sys-color-surface-container));
+  color: rgb(var(--uk-sys-color-on-surface-variant));
+  cursor: pointer;
+  transition: background-color var(--uk-sys-motion-duration-100) var(--uk-sys-motion-easing-standard-normal);
+
+  &:hover {
+    background-color: rgb(var(--uk-sys-color-surface-container-low));
+  }
+
+  &[data-selected="true"] {
+    background-color: rgb(var(--uk-sys-color-primary-container));
+    color: rgb(var(--uk-sys-color-on-primary-container));
+  }
+}
+
+.pronouns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.pronoun {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 4.25rem;
+  height: 4.25rem;
+  padding: 0;
+  border: 1px solid rgb(var(--uk-sys-color-outline));
+  border-radius: var(--uk-sys-shape-corner-large);
+  background-color: transparent;
+  color: rgb(var(--uk-sys-color-on-surface));
+  cursor: pointer;
+  transition:
+    background-color var(--uk-sys-motion-duration-100) var(--uk-sys-motion-easing-standard-normal),
+    border-color var(--uk-sys-motion-duration-100) var(--uk-sys-motion-easing-standard-normal);
+
+  &[data-selected="true"] {
+    border-color: transparent;
+    background-color: rgb(var(--uk-sys-color-secondary-container));
+    color: rgb(var(--uk-sys-color-on-secondary-container));
+  }
+}
+
+.pronounPart {
+  color: inherit;
 }

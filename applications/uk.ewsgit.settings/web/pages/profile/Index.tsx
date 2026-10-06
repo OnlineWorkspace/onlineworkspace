@@ -8,7 +8,7 @@ import UKTopAppBar from "@ewsgit/uikit-solid/src/components/topAppBar/UKTopAppBa
 import useIsMobile from "@ewsgit/uikit-solid/src/core/useIsMobile.js";
 import webInstanceTRPC from "@onlineworkspace/workspace-web/src/lib/trpc.ts";
 import { useNavigate } from "@solidjs/router";
-import { type Component, createResource, Show, Suspense } from "solid-js";
+import { type Component, createEffect, createResource, createSignal, Show, Suspense } from "solid-js";
 import baseSettingsPageStyles from "../../BaseSettingsPage.module.scss";
 import trpc from "../../lib/trpc";
 import EmailCard from "./components/EmailCard/EmailCard.tsx";
@@ -31,6 +31,13 @@ const ProfilePage: Component = () => {
     ]);
 
     return { displayName, username, gender, pronouns, bio };
+  });
+  // female/male imply their pronouns; "other" uses the ones the user picked
+  const pronounsFor = (gender: string, pronouns: string) => (gender === "female" ? "she/her" : gender === "male" ? "he/him" : pronouns);
+  const [bannerPronouns, setBannerPronouns] = createSignal("");
+  createEffect(() => {
+    const d = details();
+    if (d) setBannerPronouns(pronounsFor(d.gender, d.pronouns));
   });
   const [avatar, { refetch: refetchAvatar }] = createResource(() => trpc.profile.getProfilePicture.query());
 
@@ -61,6 +68,7 @@ const ProfilePage: Component = () => {
                   </UKText>
                   <UKText role="label" size="l" align="start" class={styles.username}>
                     @{username() || "unknown"}
+                    <Show when={bannerPronouns()}> · {bannerPronouns()}</Show>
                   </UKText>
                 </div>
                 <ProfilePicture refetchAvatar={refetchAvatar} />
@@ -70,9 +78,11 @@ const ProfilePage: Component = () => {
               {(initial) => (
                 <ProfileForm
                   initial={initial()}
+                  onChange={(values) => setBannerPronouns(pronounsFor(values.gender, values.pronouns))}
                   onSaved={(values) => {
                     mutateName(values.displayName);
                     mutateUsername(values.username);
+                    setBannerPronouns(pronounsFor(values.gender, values.pronouns));
                   }}
                 />
               )}

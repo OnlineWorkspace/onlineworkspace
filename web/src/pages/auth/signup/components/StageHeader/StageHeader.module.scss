@@ -1,0 +1,13 @@
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.title {
+  color: rgb(var(--uk-sys-color-on-surface));
+}
+
+.description {
+  color: rgb(var(--uk-sys-color-on-surface-variant));
+}

@@ -9,6 +9,7 @@ import clsx from "clsx";
 import type { Accessor, Component, Resource } from "solid-js";
 import trpc from "../../../../../lib/trpc";
 import { UserSelectStage } from "../../Signup";
+import StageHeader from "../../components/StageHeader/StageHeader";
 import modalStyles from "../../Signup.module.scss";
 import styles from "./Username.module.scss";
 
@@ -27,10 +28,7 @@ const Username: Component<{
   return (
     <>
       <UKCard color={"filled"} class={clsx(modalStyles.modal, styles.usernameStage)}>
-        <UKText role={"title"} size={"l"} emphasized={true}>
-          Signup
-        </UKText>
-        <UKDivider direction={"horizontal"} />
+        <StageHeader title={"Create your account"} description={"Choose a username to get started."} />
         <UKTextField
           leadingIcon={{ icon: PERSON_ICON }}
           color={"outlined"}

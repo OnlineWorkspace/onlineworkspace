@@ -6,6 +6,7 @@ import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.tsx";
 import UKTextField from "@ewsgit/uikit-solid/src/components/textField/UKTextField.tsx";
 import type { Accessor, Component, Resource } from "solid-js";
 import { UserSelectStage } from "../../Signup";
+import StageHeader from "../../components/StageHeader/StageHeader";
 import modalStyles from "../../Signup.module.scss";
 import Requirement from "./components/Requirement/Requirement";
 import styles from "./Password.module.scss";
@@ -29,10 +30,7 @@ const Password: Component<{
 }> = (props) => {
   return (
     <UKCard color={"filled"} class={modalStyles.modal}>
-      <UKText role={"title"} size={"l"} emphasized={true}>
-        Create a strong password
-      </UKText>
-      <UKDivider direction={DividerDirection.horizontal} />
+      <StageHeader title={"Create a password"} description={"Pick something strong that you have not used elsewhere."} />
       <UKText role={"title"} size={"m"}>
         Password Requirements
       </UKText>

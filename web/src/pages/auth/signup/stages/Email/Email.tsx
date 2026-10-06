@@ -1,12 +1,12 @@
 import UKButton from "@ewsgit/uikit-solid/src/components/button/UKButton.tsx";
 import UKCard from "@ewsgit/uikit-solid/src/components/card/UKCard.tsx";
-import UKDivider from "@ewsgit/uikit-solid/src/components/divider/UKDivider.tsx";
 import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.tsx";
 import UKTextField from "@ewsgit/uikit-solid/src/components/textField/UKTextField.tsx";
 import type { Accessor, Component } from "solid-js";
 import z from "zod";
 import trpc from "../../../../../lib/trpc";
 import { UserSelectStage } from "../../Signup";
+import StageHeader from "../../components/StageHeader/StageHeader";
 import modalStyles from "../../Signup.module.scss";
 
 const Email: Component<{
@@ -17,10 +17,7 @@ const Email: Component<{
 }> = (props) => {
   return (
     <UKCard color={"filled"} class={modalStyles.modal}>
-      <UKText role={"title"} size={"l"} emphasized={true}>
-        Set Email
-      </UKText>
-      <UKDivider direction={"horizontal"} />
+      <StageHeader title={"Add your email"} description={"We will send a verification code to this address."} />
       <UKTextField
         color={"outlined"}
         label={"Email Address*"}

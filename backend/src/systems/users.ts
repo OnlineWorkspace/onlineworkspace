@@ -657,10 +657,13 @@ export default class UsersSystem extends System {
           await adminUser.setDisplayName("Admin Istrator");
           await adminUser.setIsAdministrator(true);
 
-          const defaultPassword = "password";
+          // until the setup wizard has claimed the account nobody can know its password
+          const setupPending = !this.instance.sys.configuration.setupComplete;
+          const defaultPassword = setupPending ? crypto.randomUUID() : "password";
 
           await this.instance.sys.authorization.setPassword(adminUser.userId, defaultPassword);
-          this.log.info(`The default admin user has a password of '${defaultPassword}'`);
+          if (setupPending) this.log.info("The default admin user will be claimed by the setup wizard");
+          else this.log.info(`The default admin user has a password of '${defaultPassword}'`);
         }
       }
     }

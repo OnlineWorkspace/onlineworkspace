@@ -7,6 +7,7 @@ import clsx from "clsx";
 import { type Component, createResource } from "solid-js";
 import trpc from "../../../../../lib/trpc";
 import type { UserSelectStage } from "../../Signup";
+import StageHeader from "../../components/StageHeader/StageHeader";
 import modalStyles from "../../Signup.module.scss";
 import styles from "./TermsOfUse.module.scss";
 
@@ -20,11 +21,8 @@ const TermsOfUse: Component<{
 
   return (
     <UKCard color={"filled"} class={clsx(modalStyles.modal, styles.modal)}>
-      <UKText role={"title"} size={"l"} emphasized={true}>
-        Terms Of Use
-      </UKText>
-      <UKDivider direction={"horizontal"} />
-      <UKText retainTextFormatting role={"body"} size={"m"}>
+      <StageHeader title={"Terms of use"} description={"Please read and accept the terms of this workspace."} />
+      <UKText retainTextFormatting class={styles.terms} role={"body"} size={"m"} align={"start"}>
         {termsOfUse()}
       </UKText>
       <UKDivider direction={"horizontal"} />

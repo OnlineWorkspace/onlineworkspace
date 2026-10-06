@@ -22,6 +22,12 @@ const UserSelectLayout: Component<RouteSectionProps<unknown>> = (props) => {
     })
 
     onMount(async () => {
+        // the setup wizard is shown at / until the instance has been set up
+        if (!(await trpc.setup.status.query()).complete) {
+            navigate("/");
+            return;
+        }
+
         const {authenticated: isAuthenticated} = await trpc.authorization.isAuthenticated.query()
 
         if (isAuthenticated) {

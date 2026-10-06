@@ -6,7 +6,7 @@ import UKCard from "@ewsgit/uikit-solid/src/components/card/UKCard.tsx";
 import UKIcon from "@ewsgit/uikit-solid/src/components/icon/UKIcon.tsx";
 import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.tsx";
 import UKTextField from "@ewsgit/uikit-solid/src/components/textField/UKTextField.tsx";
-import { type Component, createSignal, For, type ParentProps, Show } from "solid-js";
+import { type Component, createEffect, createSignal, For, type ParentProps, Show } from "solid-js";
 import trpc from "../../../../lib/trpc";
 import styles from "./ProfileForm.module.scss";
 
@@ -41,10 +41,12 @@ const Group: Component<ParentProps<{ title: string; description: string }>> = (p
 );
 
 /** every editable field of the profile, saved together from one bar that only shows when something changed */
-const ProfileForm: Component<{ initial: Values; onSaved(values: Values): void }> = (props) => {
+const ProfileForm: Component<{ initial: Values; onSaved(values: Values): void; onChange?(values: Values): void }> = (props) => {
   const [saved, setSaved] = createSignal<Values>(props.initial);
   const [values, setValues] = createSignal<Values>(props.initial);
   const [error, setError] = createSignal<string>();
+
+  createEffect(() => props.onChange?.(values()));
 
   const set = <K extends keyof Values>(key: K) => (value: Values[K]) => setValues((v) => ({ ...v, [key]: value }));
   // pronouns are stored as a comma separated list, as more than one set can apply

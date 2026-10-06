@@ -10,11 +10,18 @@ import styles from "./AuthCheck.module.scss";
 
 const AuthCheck: Component<ParentProps> = (props) => {
   const navigate = useNavigate();
-  const [checkResult] = createResource(() => trpc.authorization.isAuthenticated.query());
+  const [checkResult] = createResource(async () => {
+    // the setup wizard is shown at / until the instance has been set up
+    if (!(await trpc.setup.status.query()).complete) {
+      navigate("/");
+    }
+
+    return trpc.authorization.isAuthenticated.query();
+  });
 
   return (
     <>
-      {checkResult() === undefined || !checkResult()?.authenticated ? (
+      {checkResult.loading ? null : checkResult.error || !checkResult()?.authenticated ? (
         <UKCard color={"filled"} class={styles.root}>
           <UKText role={"title"} size={"l"} emphasized={true}>
             Unauthorized

@@ -13,13 +13,15 @@ import {
   createResource,
   createSignal,
   Match,
+  Show,
   Switch,
 } from "solid-js";
 import trpc from "../../../lib/trpc";
 import styles from "./Signup.module.scss";
 import Email from "./stages/Email/Email";
 import Password from "./stages/Password/Password";
-import Profile from "./stages/Profile/Profile";
+import StepIndicator from "./components/StepIndicator/StepIndicator";
+import Profile, { pronounsFor } from "./stages/Profile/Profile";
 import TermsOfUse from "./stages/TermsOfUse/TermsOfUse";
 import TwoFactorAuthentication from "./stages/TwoFactorAuthentication/TwoFactorAuthentication";
 import Username from "./stages/Username/Username";
@@ -33,8 +35,7 @@ export enum UserSelectStage {
   Profile = 4, // set profile information
   TermsOfUse = 5, // accept the terms of use for this instance
   TwoFactorAuthentication = 6, // attempt to setup 2FA
-  GuidePrompt = 7, // prompt the user for if they want to see the introductory guide
-  Guide = 8, // guide the new user through the basics
+  GuidePrompt = 7, // prompt the user for if they want to see the introductory guide (the uk.ewsgit.guide application)
 }
 
 const UserSelectPage: Component = () => {
@@ -53,8 +54,9 @@ const UserSelectPage: Component = () => {
   const [emailCode, setEmailCode] = createSignal<string>("");
   const [displayName, setDisplayName] = createSignal<string>("");
   const [gender, setGender] = createSignal<"female" | "male" | "other">(
-    "other",
+    "female",
   );
+  const [pronouns, setPronouns] = createSignal<string>("they/them");
   const [bio, setBio] = createSignal<string>("");
 
   const [requirements] = createResource(() =>
@@ -65,8 +67,28 @@ const UserSelectPage: Component = () => {
   const [twoFactorTestCode, setTwoFactorTestCode] = createSignal<string>("");
   const [isEmailCodeValid, setIsEmailCodeValid] = createSignal<boolean>(false);
 
+  // the stages the user will actually see, the email ones are only present when the instance requires an email
+  const steps = () => {
+    const list: { stage: UserSelectStage; label: string }[] = [{ stage: UserSelectStage.Username, label: "Username" }];
+    if (requirements()?.email) {
+      list.push({ stage: UserSelectStage.Email, label: "Email" }, { stage: UserSelectStage.VerifyEmail, label: "Verify email" });
+    }
+    list.push(
+      { stage: UserSelectStage.Password, label: "Password" },
+      { stage: UserSelectStage.Profile, label: "Profile" },
+      { stage: UserSelectStage.TermsOfUse, label: "Terms of use" },
+      { stage: UserSelectStage.TwoFactorAuthentication, label: "Two factor" },
+    );
+    return list;
+  };
+  const currentStep = () => steps().findIndex((step) => step.stage === stage());
+
   return (
-    <Switch fallback={<UKCircularProgressIndicator />}>
+    <div class={styles.flow}>
+      <Show when={currentStep() !== -1}>
+        <StepIndicator steps={steps().map((step) => step.label)} current={currentStep()} />
+      </Show>
+      <Switch fallback={<UKCircularProgressIndicator />}>
       <Match when={stage() === UserSelectStage.Username}>
         <Username
           setStage={setStage}
@@ -112,6 +134,9 @@ const UserSelectPage: Component = () => {
           setDisplayName={setDisplayName}
           gender={gender}
           setGender={setGender}
+          pronouns={pronouns}
+          setPronouns={setPronouns}
+          previousStage={UserSelectStage.Password}
           bio={bio}
           setBio={setBio}
           setStage={setStage}
@@ -129,6 +154,7 @@ const UserSelectPage: Component = () => {
               emailAddress: emailAddress(),
               emailCode: emailCode(),
               gender: gender(),
+              pronouns: pronounsFor(gender(), pronouns()),
               password: password(),
             });
 
@@ -178,9 +204,7 @@ const UserSelectPage: Component = () => {
               Skip guide
             </UKButton>
             <UKButton
-              onClick={() => {
-                setStage(UserSelectStage.Guide);
-              }}
+              onClick={() => navigate("/app/uk.ewsgit.guide")}
               color={"filled"}
             >
               Continue
@@ -188,24 +212,8 @@ const UserSelectPage: Component = () => {
           </div>
         </UKCard>
       </Match>
-      <Match when={stage() === UserSelectStage.Guide}>
-        <UKCard color={"filled"} class={clsx(styles.modal, styles.guideStage)}>
-          <UKText role={"title"} size={"l"} emphasized={true}>
-            {"Unimplemented"}
-          </UKText>
-          <UKDivider direction={DividerDirection.horizontal} />
-          <UKText role={"body"} size={"l"} align={"center"} emphasized={true}>
-            {"The guide is not yet implemented"}
-          </UKText>
-          <UKDivider direction={DividerDirection.horizontal} />
-          <div class={styles.continueSegment}>
-            <UKButton onClick={() => navigate("/app")} color={"filled"}>
-              Skip guide and continue
-            </UKButton>
-          </div>
-        </UKCard>
-      </Match>
-    </Switch>
+      </Switch>
+    </div>
   );
 };
 

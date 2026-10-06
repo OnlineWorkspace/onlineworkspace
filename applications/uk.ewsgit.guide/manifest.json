@@ -1,0 +1,23 @@
+{
+  "id": "uk.ewsgit.guide",
+  "displayName": "Guide",
+  "icon": {
+    "type": "material-symbol",
+    "value": "waving_hand"
+  },
+  "bannerImage": "./guide_banner.svg",
+  "description": "A short tour of your Workspace and its applications",
+  "authors": [
+    {
+      "name": "Ewsgit",
+      "link": "<https://ewsgit.uk>"
+    }
+  ],
+  "license": "MIT",
+  "source": "https://github.com/onlineworkspace/onlineworkspace/src/branch/main/packages/applications/uk.ewsgit.guide",
+  "modules": {
+    "web": {
+      "path": "./web"
+    }
+  }
+}

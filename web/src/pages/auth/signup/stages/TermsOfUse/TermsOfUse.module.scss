@@ -9,3 +9,11 @@
     justify-content: space-between;
     gap: 0.5rem;
 }
+
+// UKText keeps the line breaks with `white-space: pre`, which never wraps, so wrap long lines here
+.terms.terms {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    max-height: 50vh;
+    overflow-y: auto;
+}
