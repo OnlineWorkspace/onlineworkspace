@@ -81,12 +81,18 @@ export default class ConfigurationSystem extends System {
     metaDescription: string;
     showLoginBackground: boolean;
     showLoginBanner: boolean;
+    showSquareLogoInNavigation: boolean;
+    squareLogoLinkEnabled: boolean;
+    squareLogoLinkUrl: string;
   } = {
     displayName: "OnlineWorkspace",
     tagline: "Under construction...",
     metaDescription: "A self-hosted web platform for applications & services with design based on Google's Material 3 Expressive. (Work In Progress)",
     showLoginBackground: true,
     showLoginBanner: true,
+    showSquareLogoInNavigation: false,
+    squareLogoLinkEnabled: false,
+    squareLogoLinkUrl: "",
   }
   mailServer: {
     enabled: boolean;

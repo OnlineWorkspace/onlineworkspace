@@ -20,9 +20,6 @@ const FeaturedApplication: Component<{ repository: string; applicationId: string
       <div class={styles.content}>
         <ApplicationIcon icon={app()?.icon} size="l" />
         <div class={styles.text}>
-          <UKText role="label" size="l" class={styles.eyebrow}>
-            Featured{app()?.isInstalled ? " · Installed" : ""}
-          </UKText>
           <UKText role="display" size="s" emphasized align="start">
             {app()?.displayName}
           </UKText>

@@ -12,7 +12,7 @@ import {
 import trpc from "../../lib/trpc";
 import NavigationRailApplications from "./components/NavigationRail/components/navigationRailApplications/NavigationRailApplications";
 import NavigationRailAvatar from "./components/NavigationRail/components/navigationRailAvatar/NavigationRailAvatar";
-import NavigationRailNotifications from "./components/NavigationRail/components/navigationRailNotifications/NavigationRailNotifications";
+import NavigationRailLogo from "./components/NavigationRail/components/navigationRailLogo/NavigationRailLogo";
 import NavigationRailClock from "./components/NavigationRail/components/navigationRailClock/NavigationRailClock";
 import styles from "./Navigation.module.scss";
 
@@ -25,10 +25,9 @@ const AppNavigation: Component<ParentProps> = (props) => {
     () => trpc.app.navigation.getQuickShortcuts.query(),
     { initialValue: [] },
   );
+  const [branding] = createResource(() => trpc.app.navigation.getBranding.query());
   const [expanded, setExpanded] = createSignal<boolean>(false);
-  const [toggledDrawer, setToggledDrawer] = createSignal<
-    "applications" | "notifications" | false
-  >(false);
+  const [toggledDrawer, setToggledDrawer] = createSignal<"applications" | false>(false);
 
   const shouldBeExpanded = () => isMobile() ? false : expanded()
 
@@ -68,7 +67,11 @@ const AppNavigation: Component<ParentProps> = (props) => {
         top: <NavigationRailAvatar expanded={expanded()} />,
         bottom: (
           <>
+            <Show when={!isMobile() && branding()?.squareLogo}>
+              {(source) => <NavigationRailLogo source={source()} link={branding()?.squareLogoLink} />}
+            </Show>
             <NavigationRailApplications
+              hasLogo={!isMobile() && !!branding()?.squareLogo}
               isToggled={toggledDrawer() === "applications"}
               toggle={(str) => {
                 setToggledDrawer(
@@ -88,14 +91,6 @@ const AppNavigation: Component<ParentProps> = (props) => {
                 Dev Build
               </UKText>
             </Show>
-            {/* TODO: move this into the applications drawer instead, only using one nav button */}
-            <NavigationRailNotifications
-              isToggled={toggledDrawer() === "notifications"}
-              toggle={(drawerState) => {
-                setToggledDrawer((td) => (td === "notifications" ? false : drawerState));
-              }}
-              expanded={expanded()}
-            />
           </>
         ),
       }}

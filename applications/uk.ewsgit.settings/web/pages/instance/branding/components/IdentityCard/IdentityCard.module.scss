@@ -1,0 +1,22 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  box-sizing: border-box;
+  border-radius: 1.75rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.hint {
+  padding: 0 1rem;
+  color: rgb(var(--uk-sys-color-on-surface-variant));
+}
+
+.save {
+  margin-left: auto;
+}

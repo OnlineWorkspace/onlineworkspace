@@ -76,6 +76,28 @@ async function writeSavedColorThemes(userId: number, themes: SavedColorTheme[]) 
            WHERE id = ${userId}`;
 }
 
+// stored larger than they are displayed so they stay sharp on high density screens
+const FAVICON_SIZE = 64;
+const SQUARE_LOGO_SIZE = 256;
+
+/** crops the uploaded image to a centred square and stores it as a PNG in the instance's assets folder */
+async function saveBrandingImage(input: Blob | ReadableStream, fileName: string, size: number) {
+  const source = Buffer.from(await new Response(input).arrayBuffer());
+
+  const output = await sharp(source)
+    .resize(size, size, {fit: "cover", position: "centre"})
+    .png()
+    .toBuffer()
+    .catch(() => {
+      throw new TRPCError({code: "BAD_REQUEST", message: "That file is not a valid image"});
+    });
+
+  const assetsPath = path.join(instance.sys.filesystem.FS_ROOT, "assets");
+
+  await fs.mkdir(assetsPath, {recursive: true});
+  await fs.writeFile(path.join(assetsPath, fileName), output);
+}
+
 const router = t.router({
   overview: {
     user: procedure.query(async (opt) => {
@@ -705,6 +727,7 @@ const router = t.router({
             return {
               exists: true as const,
               source: await instance.sys.image.serveImage(opt.ctx.userId, loginBannerCachePath, {
+                evadeCache: true,
                 resize: {
                   dimensions: DIMENSIONS,
                   fit: "fill",
@@ -714,6 +737,12 @@ const router = t.router({
               dimensions: DIMENSIONS,
             };
           }),
+        set: adminProcedure.input(octetInputParser).mutation(async (opt) => {
+          await saveBrandingImage(opt.input, "favicon.png", FAVICON_SIZE);
+          log.info("Updated the favicon");
+
+          return true;
+        }),
       },
       squareLogo: {
         preview: procedure
@@ -743,6 +772,7 @@ const router = t.router({
             return {
               exists: true as const,
               source: await instance.sys.image.serveImage(opt.ctx.userId, loginBannerCachePath, {
+                evadeCache: true,
                 resize: {
                   dimensions: DIMENSIONS,
                   fit: "fill",
@@ -752,6 +782,50 @@ const router = t.router({
               dimensions: DIMENSIONS,
             };
           }),
+        set: adminProcedure.input(octetInputParser).mutation(async (opt) => {
+          await saveBrandingImage(opt.input, "square_logo.png", SQUARE_LOGO_SIZE);
+          log.info("Updated the square logo");
+
+          return true;
+        }),
+        getLink: procedure.output(z.object({enabled: z.boolean(), url: z.string()})).query(async () => {
+          const branding = instance.sys.configuration.branding;
+
+          // configuration files saved before this setting existed don't contain it
+          return {enabled: branding.squareLogoLinkEnabled === true, url: branding.squareLogoLinkUrl ?? ""};
+        }),
+        setLink: adminProcedure
+          .input(z.object({enabled: z.boolean(), url: z.string().trim().max(2048)}))
+          .output(z.object({enabled: z.boolean(), url: z.string()}))
+          .mutation(async (opt) => {
+            // external links or paths inside this workspace only; anything else (javascript:, data:, ...) is refused
+            if (opt.input.url !== "" && !/^(https?:\/\/\S+|\/(?!\/)\S*)$/i.test(opt.input.url)) {
+              throw new TRPCError({code: "BAD_REQUEST", message: "Enter a full http(s) address, or a path starting with /"});
+            }
+
+            if (opt.input.enabled && opt.input.url === "") {
+              throw new TRPCError({code: "BAD_REQUEST", message: "Enter a link before turning this on"});
+            }
+
+            const branding = instance.sys.configuration.branding;
+
+            branding.squareLogoLinkEnabled = opt.input.enabled;
+            branding.squareLogoLinkUrl = opt.input.url;
+            await instance.sys.configuration.saveConfiguration();
+            log.info(`Square Logo link is now ${opt.input.enabled ? `enabled (${opt.input.url})` : "disabled"}`);
+
+            return opt.input;
+          }),
+        isEnabled: procedure.output(z.boolean()).query(async () => {
+          return instance.sys.configuration.branding.showSquareLogoInNavigation === true;
+        }),
+        setEnabled: adminProcedure.input(z.boolean()).output(z.boolean()).mutation(async (opt) => {
+          instance.sys.configuration.branding.showSquareLogoInNavigation = opt.input;
+          await instance.sys.configuration.saveConfiguration();
+          log.info(`Set Square Logo in the navigation rail to ${opt.input ? "enabled" : "disabled"}`);
+
+          return opt.input;
+        }),
       },
     },
   },

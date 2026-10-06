@@ -47,6 +47,27 @@ export default class ApiSystem extends System {
                 return serveFile(req, path.join(self.instance.sys.filesystem.FS_ROOT, "assets/login/background.png"));
             },
         }, {
+            // public: the favicon is requested before anyone has logged in; without a custom one the default logo is used
+            method: ["GET"], pattern: new URLPattern({pathname: "/api/instance/favicon"}), async handler(req) {
+                const faviconPath = path.join(self.instance.sys.filesystem.FS_ROOT, "assets/favicon.png");
+
+                if (!(await Bun.file(faviconPath).exists())) {
+                    return new Response(null, {status: 302, headers: {Location: "/assets/onlineworkspace/online_workspace_logo.svg"}});
+                }
+
+                return serveFile(req, faviconPath);
+            },
+        }, {
+            method: ["GET"], pattern: new URLPattern({pathname: "/api/instance/square-logo"}), async handler(req) {
+                const squareLogoPath = path.join(self.instance.sys.filesystem.FS_ROOT, "assets/square_logo.png");
+
+                if (!(await Bun.file(squareLogoPath).exists())) {
+                    return new Response("Not found", {status: 404});
+                }
+
+                return serveFile(req, squareLogoPath);
+            },
+        }, {
             method: ["GET"], pattern: new URLPattern({pathname: "/api/user/:username/avatar/:size"}),
             async handler(req, rawParams, _info) {
                 const params = rawParams?.pathname.groups;

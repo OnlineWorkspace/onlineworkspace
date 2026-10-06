@@ -33,7 +33,7 @@ const Notification: Component<{
           <UKIcon>{iconUrl(props.notification.content.icon)}</UKIcon>
         </span>
         <UKText role="label" size="m" class={styles.source}>
-          {props.notification.sourceId}
+          {props.notification.sourceName}
         </UKText>
         <UKIconButton class={styles.close} color="standard" icon={CLOSE_ICON} alt="Dismiss notification" onClick={() => props.respond("close", "")} />
       </div>

@@ -1,4 +1,5 @@
 import * as nodeCrypto from "node:crypto";
+import path from "node:path";
 import type {Server} from "bun";
 import {initTRPC, TRPCError} from "@trpc/server";
 import type {FetchCreateContextFnOptions} from "@trpc/server/adapters/fetch";
@@ -608,6 +609,24 @@ Effective Date: ${formattedDate}
 ${opt.ctx.instance.sys.configuration.termsOfUse.message}`;
     }), app: {
         navigation: {
+            getBranding: procedure
+                .output(z.object({squareLogo: z.string().nullable(), squareLogoLink: z.string().nullable()}))
+                .query(async (opt) => {
+                    const squareLogoPath = path.join(opt.ctx.instance.sys.filesystem.FS_ROOT, "assets/square_logo.png");
+                    const file = Bun.file(squareLogoPath);
+
+                    if (!opt.ctx.instance.sys.configuration.branding.showSquareLogoInNavigation || !(await file.exists())) {
+                        return {squareLogo: null, squareLogoLink: null};
+                    }
+
+                    // the modified time busts the browser cache when a new logo is uploaded
+                    const branding = opt.ctx.instance.sys.configuration.branding;
+
+                    return {
+                        squareLogo: `/api/instance/square-logo?v=${file.lastModified}`,
+                        squareLogoLink: branding.squareLogoLinkEnabled && branding.squareLogoLinkUrl ? branding.squareLogoLinkUrl : null,
+                    };
+                }),
             user: {
                 name: procedure
                     .output(z.object({

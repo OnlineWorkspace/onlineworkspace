@@ -1,22 +1,31 @@
-import type { Component } from "solid-js";
+import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.tsx";
 import UKTopAppBar from "@ewsgit/uikit-solid/src/components/topAppBar/UKTopAppBar.tsx";
 import CHEVRON_LEFT_ICON from "@material-symbols/svg-700/outlined/chevron_left.svg";
 import { useNavigate } from "@solidjs/router";
-import UKStackLabel from "@ewsgit/uikit-solid/src/components/stack/UKStackLabel.tsx";
-import UKStack from "@ewsgit/uikit-solid/src/components/stack/UKStack.tsx";
-import LoginBanner from "./components/LoginBanner/LoginBanner.tsx";
-import LoginBackground from "./components/LoginBackground/LoginBackground.tsx";
-import Favicon from "./components/Favicon/Favicon.tsx";
-import SquareLogo from "./components/SquareLogo/SquareLogo.tsx";
-import DefaultUserBackground from "./components/DefaultUserBackground/DefaultUserBackground.tsx";
-import Tagline from "./components/Tagline/Tagline.tsx";
-import DisplayName from "./components/DisplayName/DisplayName.tsx";
-import MetaDescription from "./components/MetaDescription/MetaDescription.tsx";
+import { type Component, createResource, type ParentProps } from "solid-js";
+import trpc from "../../../lib/trpc.ts";
 import baseSettingsPageStyles from "../../../BaseSettingsPage.module.scss";
-import ShowSquareLogoInNavigation from "./components/ShowSquareLogoInNavigation/ShowSquareLogoInNavigation.tsx";
+import AssetCard from "./components/AssetCard/AssetCard.tsx";
+import LogoLink from "./components/LogoLink/LogoLink.tsx";
+import IdentityCard from "./components/IdentityCard/IdentityCard.tsx";
+import styles from "./index.module.scss";
+
+const Section: Component<ParentProps<{ title: string }>> = (props) => (
+  <section class={styles.section}>
+    <UKText role="title" size="m" emphasized class={styles.sectionHeading}>
+      {props.title}
+    </UKText>
+    {props.children}
+  </section>
+);
 
 const ManageInstanceBrandingPage: Component = () => {
   const navigate = useNavigate();
+  const [bannerEnabled, { mutate: setBannerEnabled }] = createResource(() => trpc.instance.branding.loginBanner.isEnabled.query(), { initialValue: true });
+  const [backgroundEnabled, { mutate: setBackgroundEnabled }] = createResource(() => trpc.instance.branding.loginBackground.isEnabled.query(), {
+    initialValue: true,
+  });
+  const [showSquareLogo, { mutate: setShowSquareLogo }] = createResource(() => trpc.instance.branding.squareLogo.isEnabled.query(), { initialValue: false });
 
   return (
     <>
@@ -32,18 +41,80 @@ const ManageInstanceBrandingPage: Component = () => {
         }}
       />
       <div class={baseSettingsPageStyles.baseSettingsPageContent}>
-        <UKStackLabel>Branding</UKStackLabel>
-        <UKStack>
-          <LoginBanner />
-          <LoginBackground />
-          <Favicon />
-          <SquareLogo />
-          <ShowSquareLogoInNavigation/>
-          <DefaultUserBackground />
-          <Tagline />
-          <DisplayName />
-          <MetaDescription />
-        </UKStack>
+        <div class={styles.page}>
+          <Section title="Identity">
+            <IdentityCard />
+          </Section>
+          <Section title="Login page">
+            <div class={styles.grid}>
+              <AssetCard
+                title="Banner"
+                description="Displayed above the login form."
+                size={{ width: 1200, height: 400 }}
+                segment="loginBanner"
+                toggle={{
+                  label: "Show banner",
+                  value: bannerEnabled(),
+                  onChange: async (value) => {
+                    await trpc.instance.branding.loginBanner.setEnabled.mutate(value);
+                    setBannerEnabled(value);
+                  },
+                }}
+              />
+              <AssetCard
+                title="Background"
+                description="Displayed behind the login page."
+                size={{ width: 2560, height: 1440 }}
+                segment="loginBackground"
+                toggle={{
+                  label: "Show background",
+                  value: backgroundEnabled(),
+                  onChange: async (value) => {
+                    await trpc.instance.branding.loginBackground.setEnabled.mutate(value);
+                    setBackgroundEnabled(value);
+                  },
+                }}
+              />
+            </div>
+          </Section>
+          <Section title="Logos and icons">
+            <div class={styles.grid}>
+              <AssetCard
+                title="Favicon"
+                description="Shown in the browser tab and bookmarks. Images are cropped to a square."
+                size={{ width: 32, height: 32 }}
+                segment="favicon"
+                onUpload={(file) => trpc.instance.branding.favicon.set.mutate(file)}
+              />
+              <AssetCard
+                title="Square logo"
+                description="Shown in the navigation rail, above the applications button. Images are cropped to a square."
+                size={{ width: 128, height: 128 }}
+                segment="squareLogo"
+                onUpload={(file) => trpc.instance.branding.squareLogo.set.mutate(file)}
+                toggle={{
+                  label: "Show in navigation rail",
+                  value: showSquareLogo(),
+                  onChange: async (value) => {
+                    await trpc.instance.branding.squareLogo.setEnabled.mutate(value);
+                    setShowSquareLogo(value);
+                  },
+                }}
+              >
+                <LogoLink />
+              </AssetCard>
+            </div>
+          </Section>
+          <Section title="Dashboard">
+            <div class={styles.grid}>
+              <AssetCard
+                title="Default user background"
+                description="The dashboard background, unless a user changes it."
+                size={{ width: 2560, height: 1440 }}
+              />
+            </div>
+          </Section>
+        </div>
       </div>
     </>
   );

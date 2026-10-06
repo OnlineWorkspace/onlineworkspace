@@ -45,6 +45,17 @@ export interface WorkspacesNotification {
   optionsCallbacks?: WorkspacesNotificationOptionsCallbacks;
 }
 
+/** user-facing names for notification sources; sourceId stays the internal identifier */
+const SOURCE_NAMES: Record<string, string> = {
+  "authorization.createSession": "Account security",
+  "instance.system.application.install": "Applications",
+  "instance.system.application.uninstall": "Applications",
+  "instance.system.application.enable": "Applications",
+  "instance.system.application.disable": "Applications",
+};
+
+const DEFAULT_SOURCE_NAME = "System";
+
 export const NOTIFICATIONS_WEBSOCKET_PATH = "/api/notifications/ws";
 
 const MAX_PENDING_NOTIFICATIONS_PER_USER = 50;
@@ -52,7 +63,7 @@ const MAX_PENDING_NOTIFICATIONS_PER_USER = 50;
 export type WorkspacesNotificationAction = { type: "navigate"; value: string } | { type: "reload" };
 
 /** A notification as sent over the websocket (callbacks can't be serialised). */
-export type WorkspacesNotificationPayload = Omit<WorkspacesNotification, "optionsCallbacks">;
+export type WorkspacesNotificationPayload = Omit<WorkspacesNotification, "optionsCallbacks"> & { sourceName: string };
 
 export type NotificationServerMessage =
   | { type: "sync"; notifications: WorkspacesNotificationPayload[] }
@@ -81,7 +92,7 @@ export default class NotificationsSystem extends System {
   private toPayload(notification: WorkspacesNotification): WorkspacesNotificationPayload {
     const { optionsCallbacks: _, ...payload } = notification;
 
-    return payload;
+    return { ...payload, sourceName: SOURCE_NAMES[notification.sourceId] ?? DEFAULT_SOURCE_NAME };
   }
 
   private broadcast(userId: number, message: NotificationServerMessage) {

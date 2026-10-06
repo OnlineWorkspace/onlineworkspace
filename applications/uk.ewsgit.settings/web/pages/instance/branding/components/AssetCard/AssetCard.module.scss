@@ -1,0 +1,88 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  min-width: 0;
+  box-sizing: border-box;
+  border-radius: 1.75rem;
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.heading {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+.toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-shrink: 0;
+}
+
+.description {
+  color: rgb(var(--uk-sys-color-on-surface-variant));
+}
+
+.preview {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  max-height: 16rem;
+  overflow: hidden;
+  border-radius: 1.25rem;
+  background: rgb(var(--uk-sys-color-surface-container-low));
+  border: 1px solid rgb(var(--uk-sys-color-outline-variant));
+
+  // logos and icons are tiny: keep the tile compact instead of stretching them across the card
+  &[data-small="true"] {
+    width: 8rem;
+    max-width: 100%;
+  }
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 1.5rem 1rem;
+  color: rgb(var(--uk-sys-color-on-surface-variant));
+}
+
+.footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.size {
+  color: rgb(var(--uk-sys-color-on-surface-variant));
+}
+
+.actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-left: auto;
+}
+
+.error {
+  color: rgb(var(--uk-sys-color-error));
+}
