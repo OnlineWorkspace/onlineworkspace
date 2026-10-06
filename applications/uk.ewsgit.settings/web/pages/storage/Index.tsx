@@ -1,19 +1,29 @@
 import CHEVRON_LEFT_ICON from "@material-symbols/svg-700/outlined/chevron_left.svg";
-import UKStackLabel from "@ewsgit/uikit-solid/src/components/stack/UKStackLabel.tsx";
+import CONTENT_COPY_ICON from "@material-symbols/svg-700/outlined/content_copy.svg";
+import AUTO_DELETE_ICON from "@material-symbols/svg-700/outlined/auto_delete.svg";
+import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.tsx";
 import UKTopAppBar from "@ewsgit/uikit-solid/src/components/topAppBar/UKTopAppBar.tsx";
-import {useNavigate} from "@solidjs/router";
-import {type Component, createResource} from "solid-js";
-import DuplicateFiles from "./components/DuplicateFiles/DuplicateFiles";
-import TemporaryFiles from "./components/TemporaryFiles/TemporaryFiles";
+import { useNavigate } from "@solidjs/router";
+import { type Component, createResource, type ParentProps } from "solid-js";
+import baseSettingsPageStyles from "../../BaseSettingsPage.module.scss";
+import trpc from "../../lib/trpc.js";
+import CleanupCard from "./components/CleanupCard/CleanupCard";
 import UsageGraph from "./components/UsageGraph/UsageGraph";
 import styles from "./Index.module.scss";
-import trpc from "../../lib/trpc.js";
-import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.js";
+
+const Section: Component<ParentProps<{ title: string }>> = (props) => (
+  <section class={styles.section}>
+    <UKText role="title" size="m" emphasized align="start" class={styles.sectionHeading}>
+      {props.title}
+    </UKText>
+    {props.children}
+  </section>
+);
 
 const StoragePage: Component = () => {
   const navigate = useNavigate();
-  const [duplicateFiles] = createResource(() => trpc.storage.getDuplicateFiles.query(), {initialValue: []});
-  const [temporaryFiles] = createResource(() => trpc.storage.getTemporaryFiles.query(), {initialValue: []});
+  const [duplicateFiles] = createResource(() => trpc.storage.getDuplicateFiles.query(), { initialValue: [] });
+  const [temporaryFiles] = createResource(() => trpc.storage.getTemporaryFiles.query(), { initialValue: [] });
 
   return (
     <>
@@ -28,25 +38,26 @@ const StoragePage: Component = () => {
           accessibleLabel: "Go back",
         }}
       />
-      <div class={styles.page}>
-        <UsageGraph/>
-        <UKText role={"title"} size={"l"} align={"start"} class={styles.header}>Cleanup Tasks</UKText>
-        {
-          (duplicateFiles()?.length > 0) ? <>
-            <UKStackLabel>Duplicate Files</UKStackLabel>
-            <DuplicateFiles/>
-          </> : <>
-            <UKText role={"title"} size={"m"} align={"start"} class={styles.header}>{"->"} No Duplicate Files to delete</UKText>
-          </>
-        }
-        {
-          (temporaryFiles()?.length > 0) ? <>
-            <UKStackLabel>Temporary Files</UKStackLabel>
-            <TemporaryFiles/>
-          </> : <>
-            <UKText role={"title"} size={"m"} align={"start"} class={styles.header}>{"->"} No Temporary Files to delete</UKText>
-          </>
-        }
+      <div class={baseSettingsPageStyles.baseSettingsPageContent}>
+        <div class={styles.page}>
+          <Section title="Usage">
+            <UsageGraph />
+          </Section>
+          <Section title="Cleanup">
+            <CleanupCard
+              title="Duplicate files"
+              icon={CONTENT_COPY_ICON}
+              emptyMessage="No duplicate files to delete"
+              items={duplicateFiles().map((file) => ({ label: file.name, detail: file.path }))}
+            />
+            <CleanupCard
+              title="Temporary files"
+              icon={AUTO_DELETE_ICON}
+              emptyMessage="No temporary files to delete"
+              items={temporaryFiles().map((file) => ({ label: file.name, detail: file.path }))}
+            />
+          </Section>
+        </div>
       </div>
     </>
   );

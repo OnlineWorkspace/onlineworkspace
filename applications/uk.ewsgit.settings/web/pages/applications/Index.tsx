@@ -33,7 +33,7 @@ const ApplicationsPage: Component = () => {
             <For each={applications()}>
               {(app) => {
                 return (
-                  <UKStackItem leading={{ type: "icon", value: `/api/application-icon/${app.id}`, alt: `${app.displayName} icon` }} labelText={app.displayName} supportingText={app.id} onClick={() => navigate(`/app/uk.ewsgit.settings/applications/${app.id}`)} />
+                  <UKStackItem leading={{ type: app.icon.type, value: app.icon.value, alt: `${app.displayName} icon` }} labelText={app.displayName} supportingText={app.id} onClick={() => navigate(`/app/uk.ewsgit.settings/applications/${app.id}`)} />
                 );
               }}
             </For>

@@ -1,15 +1,50 @@
+.component {
+  display: flex;
+  flex-shrink: 0;
+}
+
 .expanded {
-  padding: 1rem;
   display: flex;
   flex-direction: column;
+  gap: 1.25rem;
+}
+
+.header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
   gap: 1rem;
 }
 
-.component {
-  max-width: 64rem;
+.headerIcon {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 1rem;
+  background: rgb(var(--uk-sys-color-secondary-container));
+  color: rgb(var(--uk-sys-color-on-secondary-container));
+}
+
+.headerText {
   display: flex;
-  width: 100%;
-  flex-direction: row;
-  align-items: center;
-  justify-content: end;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.hint {
+  padding: 0 1rem;
+  color: rgb(var(--uk-sys-color-on-surface-variant));
+}
+
+.error {
+  padding: 0 1rem;
+  color: rgb(var(--uk-sys-color-error));
 }

@@ -11,7 +11,7 @@ import { type Component, createResource, createSignal, type JSX, Show } from "so
 import trpc from "../../../../../lib/trpc.ts";
 import styles from "./AssetCard.module.scss";
 
-export type BrandingImageSegment = "loginBanner" | "loginBackground" | "favicon" | "squareLogo";
+export type BrandingImageSegment = "loginBanner" | "loginBackground" | "favicon" | "squareLogo" | "defaultUserBackground";
 
 /**
  * One branding image: a live preview with its recommended size, an optional on/off switch and the upload actions.

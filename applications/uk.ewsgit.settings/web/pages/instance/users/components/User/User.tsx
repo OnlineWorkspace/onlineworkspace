@@ -1,12 +1,13 @@
-import PERSON_ICON from "@material-symbols/svg-700/outlined/person.svg";
 import SHIELD_PERSON_ICON from "@material-symbols/svg-700/outlined/shield_person.svg";
+import UKAvatar from "@ewsgit/uikit-solid/src/components/avatar/UKAvatar.tsx";
+import UKCard from "@ewsgit/uikit-solid/src/components/card/UKCard.tsx";
+import UKChip from "@ewsgit/uikit-solid/src/components/chip/UKChip.tsx";
 import UKButton, {
   AffirmativeButtonState,
 } from "@ewsgit/uikit-solid/src/components/button/UKButton.tsx";
 import UKButtonGroup from "@ewsgit/uikit-solid/src/components/buttonGroup/UKButtonGroup.tsx";
 import UKDialog from "@ewsgit/uikit-solid/src/components/dialog/UKDialog.tsx";
 import UKDivider from "@ewsgit/uikit-solid/src/components/divider/UKDivider.tsx";
-import UKStackItem from "@ewsgit/uikit-solid/src/components/stack/UKStackItem.tsx";
 import UKSwitch from "@ewsgit/uikit-solid/src/components/switch/UKSwitch.tsx";
 import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.tsx";
 import UKTextField from "@ewsgit/uikit-solid/src/components/textField/UKTextField.tsx";
@@ -23,6 +24,8 @@ import styles from "./User.module.scss";
 
 const User: Component<{
   userId: number;
+  /** only users matching this text (name, username or email) are listed */
+  query: string;
   updateUsers: () => void;
   removeUser: (userId: number) => void;
 }> = (props) => {
@@ -42,14 +45,8 @@ const User: Component<{
       initialValue: "",
     },
   );
-  const [forename, { mutate: setForename }] = createResource(
-    () => trpc.instance.user.getForename.query(props.userId),
-    {
-      initialValue: "",
-    },
-  );
-  const [surname, { mutate: setSurname }] = createResource(
-    () => trpc.instance.user.getSurname.query(props.userId),
+  const [displayNameValue, { mutate: setDisplayName }] = createResource(
+    () => trpc.instance.user.getDisplayName.query(props.userId),
     {
       initialValue: "",
     },
@@ -69,156 +66,235 @@ const User: Component<{
     },
   );
 
+  const displayName = () => {
+    return displayNameValue().trim() || username();
+  };
+
+  const matchesQuery = () => {
+    const query = props.query.trim().toLowerCase();
+
+    return query === "" || [displayName(), username(), email()].some((value) => value.toLowerCase().includes(query));
+  };
+
   return (
     <>
-      <UKStackItem
-        leading={{
-          type: "icon",
-          value: isAdministrator() ? SHIELD_PERSON_ICON : PERSON_ICON,
-        }}
-        labelText={`${isMe() ? "(YOU) - " : ""} ${forename()} ${
-          surname() !== "undefined" ? surname() : ""
-        }`}
-        supportingText={`(${props.userId}) ${username()}`}
-        onClick={() => setShowDialog("user")}
-      />
-
-      <UKDialog
-        show={() => showDialog() === "user"}
-        onClose={() => setShowDialog(undefined)}
-      >
-        <div class={styles.expanded}>
-          <UKText role="title" size="l">
-            Modify User
-          </UKText>
-          <UKDivider direction="horizontal" />
-          <UKTextField
-            color="outlined"
-            onValueChange={async (val) => {
-              if (val === username()) return;
-
-              setUsername(val);
-              await trpc.instance.user.setUsername.mutate({
-                userId: props.userId,
-                username: val,
-              });
-            }}
-            defaultValue={username()}
-            label="Username"
-            value={username()}
-          />
-          <div class={styles.name}>
-            <UKTextField
-              color="outlined"
-              onValueChange={async (val) => {
-                if (val === forename()) return;
-
-                setForename(val);
-                await trpc.instance.user.setForename.mutate({
-                  userId: props.userId,
-                  forename: val,
-                });
-              }}
-              defaultValue={forename()}
-              label="Forename"
-              value={forename()}
-            />
-            <UKTextField
-              color="outlined"
-              onValueChange={async (val) => {
-                if (val === surname()) return;
-
-                setSurname(val);
-                await trpc.instance.user.setSurname.mutate({
-                  userId: props.userId,
-                  surname: val,
-                });
-              }}
-              defaultValue={surname()}
-              label="Surname"
-              value={surname()}
-            />
-          </div>
-          <UKTextField
-            color="outlined"
-            onValueChange={async (val) => {
-              if (val === email()) return;
-
-              setEmail(val);
-              await trpc.instance.user.setEmail.mutate({
-                userId: props.userId,
-                email: val,
-              });
-            }}
-            defaultValue={email()}
-            label="Email"
-            value={email()}
-          />
-          <div class={styles.boolean}>
-            <UKText role="label" size="m">
-              Is Administrator
+      <Show when={matchesQuery()}>
+        <UKCard class={styles.row} onClick={() => void setShowDialog("user")}>
+          <UKAvatar size="m" username={username()} avatar={`${window.location.origin}/api/user/${encodeURIComponent(username())}/avatar/m`} />
+          <div class={styles.info}>
+            <UKText role="title" size="m" align="start">
+              {displayName()}
             </UKText>
-            <UKSwitch
-              disabled={isMe() && !appContext.shootYourselfInTheFoot()}
+            <UKText role="body" size="s" align="start" class={styles.details}>
+              {`@${username()}${email() ? ` · ${email()}` : ""}`}
+            </UKText>
+          </div>
+          <div class={styles.badges}>
+            <Show when={isMe()}>
+              <UKChip type="assist">You</UKChip>
+            </Show>
+            <Show when={isAdministrator()}>
+              <UKChip type="assist" leading={{ type: "icon", value: SHIELD_PERSON_ICON }}>
+                Administrator
+              </UKChip>
+            </Show>
+          </div>
+        </UKCard>
+      </Show>
+
+      <UKDialog show={() => showDialog() === "user"} onClose={() => setShowDialog(undefined)} maxWidth="36rem">
+        <div class={styles.expanded}>
+          <div class={styles.dialogHeader}>
+            <UKAvatar size="l" username={username()} avatar={`${window.location.origin}/api/user/${encodeURIComponent(username())}/avatar/l`} />
+            <div class={styles.info}>
+              <UKText role="title" size="l" align="start">
+                {displayName()}
+              </UKText>
+              <UKText role="body" size="m" align="start" class={styles.details}>
+                {`@${username()}`}
+              </UKText>
+            </div>
+            <div class={styles.badges}>
+              <Show when={isMe()}>
+                <UKChip type="assist">You</UKChip>
+              </Show>
+              <Show when={isAdministrator()}>
+                <UKChip type="assist" leading={{ type: "icon", value: SHIELD_PERSON_ICON }}>
+                  Administrator
+                </UKChip>
+              </Show>
+            </div>
+          </div>
+
+          <section class={styles.section}>
+            <UKText role="label" size="l" emphasized class={styles.sectionTitle}>
+              Profile
+            </UKText>
+            <UKTextField
+              color="outlined"
               onValueChange={async (val) => {
-                if (isMe() && !val) {
-                  setShowDialog("removeOwnAdmin");
-                  return;
-                }
-                setIsAdministrator(val);
-                await trpc.instance.user.setIsAdministrator.mutate({
-                  administrator: val,
+                if (val === username()) return;
+
+                setUsername(val);
+                await trpc.instance.user.setUsername.mutate({
                   userId: props.userId,
+                  username: val,
                 });
               }}
-              value={isAdministrator()}
+              defaultValue={username()}
+              label="Username"
+              value={username()}
             />
-          </div>
-          <UKButtonGroup size={"s"} align={"start"}>
-            <UKButton color={"tonal"} onClick={() => setShowDialog("invalidateSessions")}>
-              Invalidate all sessions
-            </UKButton>
-            <UKButton
-              color={"tonal"}
-              onClick={() => {
-                setNewPassword("");
-                setNewPasswordRepeat("");
-                setShowDialog("resetPassword");
+            <UKTextField
+              color="outlined"
+              onValueChange={async (val) => {
+                if (val === displayNameValue()) return;
+
+                setDisplayName(val);
+                await trpc.instance.user.setDisplayName.mutate({
+                  userId: props.userId,
+                  displayName: val,
+                });
               }}
-            >
-              Reset password
-            </UKButton>
-            <UKButton
-              color={"standard"}
-              onClick={async () => {
-                // send a boop notification
-                await trpc.instance.user.boop.mutate({ userId: props.userId });
+              defaultValue={displayNameValue()}
+              label="Display name"
+              value={displayNameValue()}
+            />
+            <UKTextField
+              color="outlined"
+              onValueChange={async (val) => {
+                if (val === email()) return;
+
+                setEmail(val);
+                await trpc.instance.user.setEmail.mutate({
+                  userId: props.userId,
+                  email: val,
+                });
               }}
-            >
-              Boop
-            </UKButton>
-            <UKButton
-              color={"standard"}
-              onClick={async () => {
-                setShowDialog("confirmDelete");
-              }}
-            >
-              Delete
-            </UKButton>
-          </UKButtonGroup>
-          <UKButton
-            class={styles.closeButton}
-            color={"filled"}
-            onClick={() => {
-              setShowDialog(undefined);
-            }}
-          >
-            Close
+              defaultValue={email()}
+              label="Email"
+              value={email()}
+            />
+            <UKText role="body" size="s" class={styles.hint}>
+              Changes to these fields are saved as you make them.
+            </UKText>
+          </section>
+
+          <section class={styles.section}>
+            <UKText role="label" size="l" emphasized class={styles.sectionTitle}>
+              Access
+            </UKText>
+            <div class={styles.setting}>
+              <div class={styles.settingText}>
+                <UKText role="title" size="s" align="start">
+                  Administrator
+                </UKText>
+                <UKText role="body" size="s" align="start" class={styles.hint}>
+                  Can manage users, features and the settings of this instance.
+                </UKText>
+              </div>
+              <UKSwitch
+                disabled={isMe() && !appContext.shootYourselfInTheFoot()}
+                onValueChange={async (val) => {
+                  if (isMe() && !val) {
+                    setShowDialog("removeOwnAdmin");
+                    return;
+                  }
+                  setIsAdministrator(val);
+                  await trpc.instance.user.setIsAdministrator.mutate({
+                    administrator: val,
+                    userId: props.userId,
+                  });
+                }}
+                value={isAdministrator()}
+              />
+            </div>
+          </section>
+
+          <section class={styles.section}>
+            <UKText role="label" size="l" emphasized class={styles.sectionTitle}>
+              Security
+            </UKText>
+            <div class={styles.setting}>
+              <div class={styles.settingText}>
+                <UKText role="title" size="s" align="start">
+                  Sign out everywhere
+                </UKText>
+                <UKText role="body" size="s" align="start" class={styles.hint}>
+                  Ends every session on every device.
+                </UKText>
+              </div>
+              <UKButton color={"tonal"} onClick={() => void setShowDialog("invalidateSessions")}>
+                Invalidate sessions
+              </UKButton>
+            </div>
+            <div class={styles.setting}>
+              <div class={styles.settingText}>
+                <UKText role="title" size="s" align="start">
+                  Password
+                </UKText>
+                <UKText role="body" size="s" align="start" class={styles.hint}>
+                  Set a new password. Their sessions are signed out.
+                </UKText>
+              </div>
+              <UKButton
+                color={"tonal"}
+                onClick={() => {
+                  setNewPassword("");
+                  setNewPasswordRepeat("");
+                  setShowDialog("resetPassword");
+                }}
+              >
+                Reset password
+              </UKButton>
+            </div>
+            <div class={styles.setting}>
+              <div class={styles.settingText}>
+                <UKText role="title" size="s" align="start">
+                  Test notification
+                </UKText>
+                <UKText role="body" size="s" align="start" class={styles.hint}>
+                  Sends this user a notification.
+                </UKText>
+              </div>
+              <UKButton
+                color={"standard"}
+                onClick={async () => {
+                  await trpc.instance.user.boop.mutate({ userId: props.userId });
+                }}
+              >
+                Boop
+              </UKButton>
+            </div>
+          </section>
+
+          <section class={styles.section}>
+            <UKText role="label" size="l" emphasized class={styles.sectionTitle}>
+              Danger zone
+            </UKText>
+            <div class={styles.setting}>
+              <div class={styles.settingText}>
+                <UKText role="title" size="s" align="start">
+                  Delete user
+                </UKText>
+                <UKText role="body" size="s" align="start" class={styles.hint}>
+                  Permanently removes this account. This cannot be undone.
+                </UKText>
+              </div>
+              <UKButton color={"outlined"} onClick={() => void setShowDialog("confirmDelete")}>
+                Delete
+              </UKButton>
+            </div>
+          </section>
+
+          <UKButton class={styles.closeButton} color={"filled"} onClick={() => setShowDialog(undefined)}>
+            Done
           </UKButton>
         </div>
       </UKDialog>
 
       <UKDialog
+        maxWidth="28rem"
         show={() => showDialog() === "invalidateSessions"}
         onClose={() => setShowDialog("user")}
       >
@@ -248,13 +324,14 @@ const User: Component<{
           >
             Yes, invalidate
           </UKButton>
-          <UKButton color={"filled"} onClick={() => setShowDialog("user")}>
+          <UKButton color={"filled"} onClick={() => void setShowDialog("user")}>
             Cancel
           </UKButton>
         </UKButtonGroup>
       </UKDialog>
 
       <UKDialog
+        maxWidth="28rem"
         show={() => showDialog() === "resetPassword"}
         onClose={() => setShowDialog("user")}
       >
@@ -311,7 +388,7 @@ const User: Component<{
             >
               Confirm
             </UKButton>
-            <UKButton color={"filled"} onClick={() => setShowDialog("user")}>
+            <UKButton color={"filled"} onClick={() => void setShowDialog("user")}>
               Cancel
             </UKButton>
           </UKButtonGroup>
@@ -319,6 +396,7 @@ const User: Component<{
       </UKDialog>
 
       <UKDialog
+        maxWidth="28rem"
         show={() => showDialog() === "confirmDelete"}
         onClose={() => setShowDialog(undefined)}
       >
@@ -367,6 +445,7 @@ const User: Component<{
       </UKDialog>
 
       <UKDialog
+        maxWidth="28rem"
         show={() => showDialog() === "removeOwnAdmin"}
         onClose={() => setShowDialog(undefined)}
       >

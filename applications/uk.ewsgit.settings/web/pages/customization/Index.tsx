@@ -1,13 +1,17 @@
 import CHEVRON_LEFT_ICON from "@material-symbols/svg-700/outlined/chevron_left.svg";
-import { DividerDirection } from "@ewsgit/uikit-solid/src/components/divider/lib/direction.ts";
-import UKDivider from "@ewsgit/uikit-solid/src/components/divider/UKDivider.tsx";
+import DOCK_TO_LEFT_ICON from "@material-symbols/svg-700/outlined/dock_to_left.svg";
+import PALETTE_ICON from "@material-symbols/svg-700/outlined/palette.svg";
+import WALLPAPER_ICON from "@material-symbols/svg-700/outlined/wallpaper.svg";
 import UKStack from "@ewsgit/uikit-solid/src/components/stack/UKStack.tsx";
 import UKStackItem from "@ewsgit/uikit-solid/src/components/stack/UKStackItem.tsx";
 import UKTopAppBar from "@ewsgit/uikit-solid/src/components/topAppBar/UKTopAppBar.tsx";
 import { useNavigate } from "@solidjs/router";
 import type { Component } from "solid-js";
+import baseSettingsPageStyles from "../../BaseSettingsPage.module.scss";
 import ThemePreview from "./components/ThemePreview/ThemePreview.tsx";
 import styles from "./Index.module.scss";
+
+const BASE = "/app/uk.ewsgit.settings/customization";
 
 const CustomizationPage: Component = () => {
   const navigate = useNavigate();
@@ -25,34 +29,30 @@ const CustomizationPage: Component = () => {
           accessibleLabel: "Go back",
         }}
       />
-      <div class={styles.page}>
-        <div class={styles.header}>
+      <div class={baseSettingsPageStyles.baseSettingsPageContent}>
+        <div class={styles.page}>
           <ThemePreview />
-          <UKDivider direction={DividerDirection.horizontal} width={"middle-inset"} />
+          <UKStack>
+            <UKStackItem
+              leading={{ type: "icon", value: PALETTE_ICON }}
+              labelText={"Color Theme"}
+              supportingText={"Choose and customize your color theme"}
+              onClick={() => navigate(`${BASE}/color-theme`)}
+            />
+            <UKStackItem
+              leading={{ type: "icon", value: WALLPAPER_ICON }}
+              labelText={"Wallpaper"}
+              supportingText={"Set and adjust your wallpaper"}
+              onClick={() => navigate(`${BASE}/wallpaper`)}
+            />
+            <UKStackItem
+              leading={{ type: "icon", value: DOCK_TO_LEFT_ICON }}
+              labelText={"Quick Shortcuts"}
+              supportingText={"Modify the applications shown in your quick shortcuts"}
+              onClick={() => navigate(`${BASE}/quick-shortcuts`)}
+            />
+          </UKStack>
         </div>
-        <UKStack>
-          <UKStackItem
-            labelText={"Color Theme"}
-            supportingText={"Choose and customize your color theme"}
-            onClick={() => {
-              navigate("/app/uk.ewsgit.settings/customization/color-theme");
-            }}
-          />
-          <UKStackItem
-            labelText={"Wallpaper"}
-            supportingText={"Set and adjust your wallpaper"}
-            onClick={() => {
-              navigate("/app/uk.ewsgit.settings/customization/wallpaper");
-            }}
-          />
-          <UKStackItem
-            labelText={"Quick Shortcuts"}
-            supportingText={"Modify the applications shown in your quick shortcuts"}
-            onClick={() => {
-              navigate("/app/uk.ewsgit.settings/customization/quick-shortcuts");
-            }}
-          />
-        </UKStack>
       </div>
     </>
   );

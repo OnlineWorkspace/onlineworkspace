@@ -12,6 +12,7 @@ import trpc from "../../../lib/trpc.ts";
 import ThemeMock from "./components/ThemeMock/ThemeMock.tsx";
 import ThemeCard from "./components/ThemeCard/ThemeCard.tsx";
 import { argbFromHex, grayScheme, type Scheme, schemeFromArgb } from "./lib.ts";
+import { CATPPUCCIN_NAMES, CATPPUCCIN_THEMES } from "./catppuccin.ts";
 import styles from "./Index.module.scss";
 import { type ColorModePreference, setColorModePreference, useColorMode } from "@onlineworkspace/workspace-web/src/lib/colorMode.ts";
 
@@ -469,6 +470,7 @@ const ColorThemePage: Component = () => {
     { id: "default", name: "Default", scheme: undefined },
     ...Object.entries(DEFAULT_COLOR_THEMES).map(([id, scheme]) => ({ id, name: capitalize(id), scheme: scheme as Scheme })),
     ...(saved() ?? []).map((s) => ({ id: `saved:${s.id}`, name: s.name, scheme: s.scheme as Scheme })),
+    ...Object.entries(CATPPUCCIN_THEMES).map(([id, scheme]) => ({ id, name: CATPPUCCIN_NAMES[id], scheme })),
     { id: "gray", name: "Gray", scheme: grayScheme() },
     ...Object.entries(GENERATED_THEMES).map(([id, hex]) => ({ id, name: capitalize(id), scheme: schemeFromArgb(argbFromHex(hex)) })),
   ]);

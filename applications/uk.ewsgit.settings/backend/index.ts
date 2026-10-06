@@ -20,6 +20,13 @@ import {OnlineWorkspaceApplication} from "@onlineworkspace/workspace-backend/src
 const APPLICATION_ID = "uk.ewsgit.settings";
 const log = instance.log.createLogger(APPLICATION_ID);
 
+const EMAIL_VERIFICATION_CODE_LENGTH = 6;
+const EMAIL_VERIFICATION_CODE_CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+const EMAIL_VERIFICATION_VALID_MS = 15 * 60 * 1000;
+const EMAIL_VERIFICATION_RESEND_MS = 60 * 1000;
+const EMAIL_VERIFICATION_MAX_ATTEMPTS = 5;
+const pendingEmailVerifications = new Map<number, {email: string; code: string; expires: number; sentAt: number; attempts: number}>();
+
 const STORAGE_CATEGORY_COLORS: Record<FileMediaType, string> = {
   [FileMediaType.Image]: "#3B82F6",
   [FileMediaType.Video]: "#EC4899",
@@ -76,6 +83,9 @@ async function writeSavedColorThemes(userId: number, themes: SavedColorTheme[]) 
            WHERE id = ${userId}`;
 }
 
+/** the dashboard background used for users who have not chosen their own wallpaper */
+const DEFAULT_USER_BACKGROUND_FILE = "assets/default_user_background.webp";
+
 // stored larger than they are displayed so they stay sharp on high density screens
 const FAVICON_SIZE = 64;
 const SQUARE_LOGO_SIZE = 256;
@@ -105,12 +115,12 @@ const router = t.router({
 
       if (!user) throw new TRPCError({message: "Unknown user", code: "UNAUTHORIZED"});
 
-      const fullName = await user.getFullName();
+      const displayName = await user.getDisplayName();
       const isAdministrator = await user.isAdministrator();
       const username = await user.getUsername();
 
       return {
-        fullName: `${fullName?.forename} ${fullName?.surname || ""}` || "Unknown User",
+        fullName: displayName,
         username: username || "unknown",
         isAdministrator: isAdministrator,
         avatar: `${instance.sys.api.getProxyBasePath()}/api/user/me/avatar/l`,
@@ -119,14 +129,12 @@ const router = t.router({
   },
   profile: {
     getName: procedure.output(z.string()).query(async (opt) => {
-      const fullName = await (await opt.ctx.instance.sys.users.getUserById(opt.ctx.userId))?.getFullName();
+      const displayName = await (await opt.ctx.instance.sys.users.getUserById(opt.ctx.userId))?.getDisplayName();
 
-      return `${fullName?.forename} ${fullName?.surname || ""}` || "Unknown User";
+      return displayName || "Unknown User";
     }),
     setName: procedure.input(z.string()).mutation(async (opt) => {
-      const fullNameSplit = opt.input.split(" ");
-
-      await (await opt.ctx.instance.sys.users.getUserById(opt.ctx.userId))?.setFullName(fullNameSplit.shift() || "Unknown", fullNameSplit.join(" "));
+      await (await opt.ctx.instance.sys.users.getUserById(opt.ctx.userId))?.setDisplayName(opt.input.trim() || "Unknown");
 
       return true;
     }),
@@ -152,13 +160,89 @@ const router = t.router({
 
       return true;
     }),
+    getPronouns: procedure.output(z.string()).query(async (opt) => {
+      return (await (await opt.ctx.instance.sys.users.getUserById(opt.ctx.userId))?.getPronouns()) || "";
+    }),
+    setPronouns: procedure.input(z.string().trim().max(40)).mutation(async (opt) => {
+      await (await opt.ctx.instance.sys.users.getUserById(opt.ctx.userId))?.setPronouns(opt.input);
+
+      return true;
+    }),
     getEmail: procedure.output(z.string()).query(async (opt) => {
       const email = await (await opt.ctx.instance.sys.users.getUserById(opt.ctx.userId))?.getEmail();
 
       return email || "unknown";
     }),
-    setEmail: procedure.input(z.email()).mutation(async (opt) => {
-      await (await opt.ctx.instance.sys.users.getUserById(opt.ctx.userId))?.setEmail(opt.input);
+    getEmailStatus: procedure
+      .output(z.object({sendingEnabled: z.boolean(), email: z.string(), verified: z.boolean()}))
+      .query(async (opt) => {
+        const user = await opt.ctx.instance.sys.users.getUserById(opt.ctx.userId);
+
+        return {
+          sendingEnabled: opt.ctx.instance.sys.configuration.mailServer.enabled,
+          email: (await user?.getEmail()) || "",
+          verified: (await user?.isEmailVerified()) || false,
+        };
+      }),
+    // emails are only saved once the user has entered a code sent to the address, which proves they own it
+    startEmailVerification: procedure.input(z.email()).mutation(async (opt) => {
+      if (!opt.ctx.instance.sys.configuration.mailServer.enabled) {
+        throw new TRPCError({code: "PRECONDITION_FAILED", message: "This instance has email sending disabled, so an email address cannot be added"});
+      }
+
+      const email = opt.input.toLowerCase();
+      const pending = pendingEmailVerifications.get(opt.ctx.userId);
+
+      if (pending && pending.email === email && Date.now() - pending.sentAt < EMAIL_VERIFICATION_RESEND_MS) {
+        throw new TRPCError({code: "TOO_MANY_REQUESTS", message: "A code was sent recently, please wait a minute before requesting another"});
+      }
+
+      let code = "";
+      for (let i = 0; i < EMAIL_VERIFICATION_CODE_LENGTH; i++) code += EMAIL_VERIFICATION_CODE_CHARS[crypto.randomInt(EMAIL_VERIFICATION_CODE_CHARS.length)];
+
+      pendingEmailVerifications.set(opt.ctx.userId, {email, code, expires: Date.now() + EMAIL_VERIFICATION_VALID_MS, sentAt: Date.now(), attempts: 0});
+
+      const sent = await opt.ctx.instance.sys.email.sendEmail(email, "Verify your email address", {
+        type: "string",
+        content: `Your code to verify this email address for your '${opt.ctx.instance.sys.configuration.branding.displayName}' account is '${code}'. It is valid for 15 minutes. If you didn't request this, you can ignore this email.`,
+      });
+
+      if (sent === false) {
+        pendingEmailVerifications.delete(opt.ctx.userId);
+        throw new TRPCError({code: "PRECONDITION_FAILED", message: "This instance has email sending disabled, so an email address cannot be added"});
+      }
+
+      return true;
+    }),
+    confirmEmail: procedure.input(z.object({email: z.email(), code: z.string()})).mutation(async (opt) => {
+      const pending = pendingEmailVerifications.get(opt.ctx.userId);
+
+      if (!pending || pending.email !== opt.input.email.toLowerCase() || pending.expires < Date.now()) {
+        throw new TRPCError({code: "BAD_REQUEST", message: "The code has expired, please request a new one"});
+      }
+
+      pending.attempts++;
+
+      if (pending.attempts > EMAIL_VERIFICATION_MAX_ATTEMPTS) {
+        pendingEmailVerifications.delete(opt.ctx.userId);
+        throw new TRPCError({code: "TOO_MANY_REQUESTS", message: "Too many incorrect attempts, please request a new code"});
+      }
+
+      const given = Buffer.from(opt.input.code.trim().toUpperCase());
+      const expected = Buffer.from(pending.code);
+
+      if (given.length !== expected.length || !crypto.timingSafeEqual(given, expected)) {
+        throw new TRPCError({code: "BAD_REQUEST", message: "That code isn't right"});
+      }
+
+      pendingEmailVerifications.delete(opt.ctx.userId);
+      await (await opt.ctx.instance.sys.users.getUserById(opt.ctx.userId))?.setEmail(pending.email, true);
+
+      return true;
+    }),
+    removeEmail: procedure.mutation(async (opt) => {
+      await (await opt.ctx.instance.sys.users.getUserById(opt.ctx.userId))?.removeEmail();
+      pendingEmailVerifications.delete(opt.ctx.userId);
 
       return true;
     }),
@@ -370,10 +454,7 @@ const router = t.router({
           .object({
             id: z.number(),
             username: z.string(),
-            fullName: z.object({
-              forename: z.string().optional(),
-              surname: z.string().optional(),
-            }),
+            displayName: z.string(),
             email: z.string().optional(),
             isAdministrator: z.boolean(),
           })
@@ -387,35 +468,20 @@ const router = t.router({
         return {
           id: u.userId,
           username: (await u.getUsername()) || "unknown",
-          fullName: await u.getFullName(),
+          displayName: await u.getDisplayName(),
           email: await u.getEmail(),
           isAdministrator: (await u.isAdministrator()) || false,
         };
       }),
     user: {
-      getForename: adminProcedure
+      getDisplayName: adminProcedure
         .input(z.number())
         .output(z.string())
         .query(async (opt) => {
-          const forename = await (await opt.ctx.instance.sys.users.getUserById(opt.input))?.getForename();
-
-          return `${forename}`;
+          return (await (await opt.ctx.instance.sys.users.getUserById(opt.input))?.getDisplayName()) || "Unknown";
         }),
-      setForename: adminProcedure.input(z.object({userId: z.number(), forename: z.string()})).mutation(async (opt) => {
-        await (await opt.ctx.instance.sys.users.getUserById(opt.input.userId))?.setForename(opt.input.forename);
-
-        return true;
-      }),
-      getSurname: adminProcedure
-        .input(z.number())
-        .output(z.string())
-        .query(async (opt) => {
-          const surname = await (await opt.ctx.instance.sys.users.getUserById(opt.input))?.getSurname();
-
-          return `${surname}`;
-        }),
-      setSurname: adminProcedure.input(z.object({userId: z.number(), surname: z.string()})).mutation(async (opt) => {
-        await (await opt.ctx.instance.sys.users.getUserById(opt.input.userId))?.setSurname(opt.input.surname);
+      setDisplayName: adminProcedure.input(z.object({userId: z.number(), displayName: z.string()})).mutation(async (opt) => {
+        await (await opt.ctx.instance.sys.users.getUserById(opt.input.userId))?.setDisplayName(opt.input.displayName);
 
         return true;
       }),
@@ -530,7 +596,7 @@ const router = t.router({
 
       return false;
     }),
-    createUser: procedure.input(z.object({username: z.string(), password: z.string()})).mutation(async (opt) => {
+    createUser: adminProcedure.input(z.object({username: z.string(), password: z.string()})).mutation(async (opt) => {
       await opt.ctx.instance.sys.users.createUser(opt.input.username.toLowerCase(), opt.input.password);
 
       return true;
@@ -573,37 +639,102 @@ const router = t.router({
       return true;
     }),
     mailserver: {
-      get: procedure
+      get: adminProcedure
         .output(
-          z
-            .object({
-              host: z.string(),
-              port: z.number(),
-              secure: z.boolean(),
-              auth: z.object({
-                user: z.string(),
-                pass: z.string(),
-              }),
-            })
-            .or(z.undefined()),
+          z.object({
+            enabled: z.boolean(),
+            host: z.string(),
+            port: z.number(),
+            secure: z.boolean(),
+            user: z.string(),
+            // the password itself is never sent to the browser
+            hasPassword: z.boolean(),
+          }),
         )
         .query(async () => {
           const mailserverConfig = instance.sys.configuration.mailServer;
 
-          if (!mailserverConfig) return undefined;
-
           return {
+            enabled: mailserverConfig.enabled === true,
             host: mailserverConfig.host,
             port: mailserverConfig.port,
             secure: mailserverConfig.secure,
-            auth: {
-              user: mailserverConfig.auth.user,
-              pass: "********",
-            },
+            user: mailserverConfig.auth.user,
+            hasPassword: mailserverConfig.auth.pass !== "",
           };
         }),
+      set: adminProcedure
+        .input(
+          z.object({
+            enabled: z.boolean(),
+            host: z.string().trim().min(1, "Enter the mail server's host"),
+            port: z.number().int().min(1, "The port must be between 1 and 65535").max(65535, "The port must be between 1 and 65535"),
+            secure: z.boolean(),
+            user: z.string().trim(),
+            // left out to keep the current password
+            password: z.string().optional(),
+          }),
+        )
+        .output(z.object({error: z.string().optional()}))
+        .mutation(async (opt) => {
+          const mailserverConfig = instance.sys.configuration.mailServer;
+
+          mailserverConfig.enabled = opt.input.enabled;
+          mailserverConfig.host = opt.input.host;
+          mailserverConfig.port = opt.input.port;
+          mailserverConfig.secure = opt.input.secure;
+          mailserverConfig.auth.user = opt.input.user;
+          if (opt.input.password) mailserverConfig.auth.pass = opt.input.password;
+
+          await instance.sys.configuration.saveConfiguration();
+          log.info(`Updated the mail server settings (${opt.input.enabled ? "enabled" : "disabled"})`);
+
+          // the settings are saved either way; the error says why the connection to the server could not be made
+          const result = await instance.sys.email.reconfigure();
+
+          return result.ok ? {} : {error: result.error};
+        }),
+      sendTest: adminProcedure.output(z.object({error: z.string().optional()})).mutation(async (opt) => {
+        const email = await (await opt.ctx.user()).getEmail();
+
+        if (!email) return {error: "Your account has no email address to send the test to"};
+
+        try {
+          const sent = await instance.sys.email.sendEmail(email, "Test email", {
+            type: "string",
+            content: `This is a test email from '${instance.sys.configuration.branding.displayName}'. Your mail server is working.`,
+          });
+
+          return sent ? {} : {error: "The mail server is turned off"};
+        } catch (err) {
+          return {error: err instanceof Error ? err.message : "The test email could not be sent"};
+        }
+      }),
     },
     branding: {
+      getIdentity: procedure
+        .output(z.object({displayName: z.string(), tagline: z.string(), metaDescription: z.string()}))
+        .query(async () => {
+          const {displayName, tagline, metaDescription} = instance.sys.configuration.branding;
+
+          return {displayName, tagline, metaDescription};
+        }),
+      setIdentity: adminProcedure
+        .input(
+          z.object({
+            displayName: z.string().trim().min(1, "The display name cannot be empty").max(100),
+            tagline: z.string().trim().max(200),
+            metaDescription: z.string().trim().max(500),
+          }),
+        )
+        .output(z.object({displayName: z.string(), tagline: z.string(), metaDescription: z.string()}))
+        .mutation(async (opt) => {
+          Object.assign(instance.sys.configuration.branding, opt.input);
+          await instance.sys.configuration.saveConfiguration();
+          log.info("Updated the instance identity");
+
+          return opt.input;
+        }),
       loginBanner: {
         preview: procedure
           .output(
@@ -825,6 +956,65 @@ const router = t.router({
           log.info(`Set Square Logo in the navigation rail to ${opt.input ? "enabled" : "disabled"}`);
 
           return opt.input;
+        }),
+      },
+      defaultUserBackground: {
+        preview: procedure
+          .output(
+            z.object({exists: z.literal(false)}).or(
+              z.object({
+                exists: z.literal(true),
+                source: z.string(),
+                dimensions: z.object({width: z.number(), height: z.number()}),
+              }),
+            ),
+          )
+          .query(async (opt) => {
+            const backgroundPath = path.join(instance.sys.filesystem.FS_ROOT, DEFAULT_USER_BACKGROUND_FILE);
+
+            if (!(await fs.exists(backgroundPath))) {
+              return {
+                exists: false as const,
+              };
+            }
+
+            const DIMENSIONS = {
+              width: 2560,
+              height: 1440,
+            };
+
+            return {
+              exists: true as const,
+              source: await instance.sys.image.serveImage(opt.ctx.userId, backgroundPath, {
+                evadeCache: true,
+                resize: {
+                  dimensions: DIMENSIONS,
+                  fit: "inside",
+                  position: "centre",
+                },
+              }),
+              dimensions: DIMENSIONS,
+            };
+          }),
+        set: adminProcedure.input(octetInputParser).mutation(async (opt) => {
+          const source = Buffer.from(await new Response(opt.input).arrayBuffer());
+
+          // large enough for a 4K display, but never enlarged, and keeping the original proportions
+          const output = await sharp(source)
+            .resize(3840, 2160, {fit: "inside", withoutEnlargement: true})
+            .webp({quality: 85})
+            .toBuffer()
+            .catch(() => {
+              throw new TRPCError({code: "BAD_REQUEST", message: "That file is not a valid image"});
+            });
+
+          await fs.mkdir(path.join(instance.sys.filesystem.FS_ROOT, "assets"), {recursive: true});
+          await fs.writeFile(path.join(instance.sys.filesystem.FS_ROOT, DEFAULT_USER_BACKGROUND_FILE), output);
+          // the dashboard's resized copies are keyed by this file's modified time, so the old ones are just clutter now
+          await fs.rm(path.join(instance.sys.filesystem.FS_ROOT, "cache/default_user_background"), {recursive: true, force: true});
+          log.info("Updated the default user background");
+
+          return true;
         }),
       },
     },
@@ -1318,13 +1508,25 @@ const router = t.router({
       }),
   },
   application: {
-    getApplications: procedure.output(z.object({displayName: z.string(), id: z.string()}).array()).query(async () => {
+    getApplications: procedure
+      .output(
+        z
+          .object({
+            displayName: z.string(),
+            id: z.string(),
+            icon: z.object({type: z.enum(["icon", "image"]), value: z.string()}),
+          })
+          .array(),
+      )
+      .query(async () => {
       return instance.sys.applications.enabledApplications.map((enabledApplication) => {
+        const manifest = instance.sys.applications.availableApplications.find((availableApplication) => availableApplication.manifest?.id === enabledApplication)?.manifest;
+
         return {
-          displayName:
-            instance.sys.applications.availableApplications.find((availableApplication) => availableApplication.manifest?.id === enabledApplication)?.manifest
-              ?.displayName || `Failed to find application '${enabledApplication}'`,
+          displayName: manifest?.displayName || `Failed to find application '${enabledApplication}'`,
           id: enabledApplication,
+          // both kinds are served as a file by the application-icon endpoint, material symbols as their svg
+          icon: {type: manifest?.icon?.type === "image" ? "image" as const : "icon" as const, value: `/api/application-icon/${enabledApplication}`},
         };
       });
     }),
@@ -1398,31 +1600,35 @@ const router = t.router({
           )
         ).filter((a) => a !== undefined);
 
-        const globalSettings = (
-          await Promise.all(
-            instance.sys.settings.applicationSettings[opt.input.id]?.map(async (a) => {
-              if (a instanceof GlobalApplicationSetting) {
-                if (a.hidden) return undefined;
+        // instance-wide settings are the administrator's to see and change
+        const isAdministrator = (await (await opt.ctx.instance.sys.users.getUserById(opt.ctx.userId))?.isAdministrator()) ?? false;
 
-                return {
-                  displayName: a.displayName,
-                  defaultValue: a.defaultValue,
-                  currentValue: await a.onValueChange(),
-                  type: a.type,
-                  id: a.id,
-                  global: false,
-                  description: a.description || "No description provided.",
-                };
-              }
-            }) || [],
-          )
-        ).filter((a) => a !== undefined);
+        const globalSettings = isAdministrator
+          ? (
+              await Promise.all(
+                instance.sys.settings.applicationSettings[opt.input.id]?.map(async (a) => {
+                  if (a instanceof GlobalApplicationSetting) {
+                    if (a.hidden) return undefined;
+
+                    return {
+                      displayName: a.displayName,
+                      defaultValue: a.defaultValue,
+                      currentValue: await a.onValueChange(),
+                      type: a.type,
+                      id: a.id,
+                      global: true,
+                      description: a.description || "No description provided.",
+                    };
+                  }
+                }) || [],
+              )
+            ).filter((a) => a !== undefined)
+          : [];
 
         return {
           displayName: application?.manifest?.displayName || opt.input.id,
           icon: icon,
-          settings: settings || [],
-          globalSettings: globalSettings || [],
+          settings: [...(settings || []), ...globalSettings],
         };
       }),
     setApplicationBooleanSettingValue: procedure
@@ -1435,6 +1641,23 @@ const router = t.router({
       )
       .mutation(async (opt) => {
         await instance.sys.settings.setUserApplicationSetting(opt.ctx.userId, opt.input.applicationId, opt.input.id, opt.input.value);
+
+        return true;
+      }),
+    setApplicationGlobalBooleanSettingValue: adminProcedure
+      .input(
+        z.object({
+          applicationId: z.string(),
+          id: z.string(),
+          value: z.boolean(),
+        }),
+      )
+      .mutation(async (opt) => {
+        const setting = instance.sys.settings.applicationSettings[opt.input.applicationId]?.find((s) => s.id === opt.input.id);
+
+        if (!(setting instanceof GlobalApplicationSetting) || setting.type !== "boolean") return false;
+
+        await setting.setValue(opt.input.value);
 
         return true;
       }),

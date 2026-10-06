@@ -136,26 +136,7 @@ const ApplicationPage: Component = () => {
                 case "boolean":
                   return (
                     <BooleanSetting
-                      id={setting.id}
-                      description={setting.description}
-                      currentValue={setting.currentValue}
-                      defaultValue={setting.defaultValue}
-                      displayName={setting.displayName}
-                    />
-                  );
-                case "string":
-                  return (
-                    <StringSetting
-                      id={setting.id}
-                      description={setting.description}
-                      currentValue={setting.currentValue}
-                      defaultValue={setting.defaultValue}
-                      displayName={setting.displayName}
-                    />
-                  );
-                case "stringList":
-                  return (
-                    <StringListSetting
+                      global
                       id={setting.id}
                       description={setting.description}
                       currentValue={setting.currentValue}

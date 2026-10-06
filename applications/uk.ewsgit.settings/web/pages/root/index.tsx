@@ -1,10 +1,13 @@
+import BRAND_FAMILY_ICON from "@material-symbols/svg-700/outlined/brand_family.svg";
+import DEPLOYED_CODE_ICON from "@material-symbols/svg-700/outlined/deployed_code.svg";
+import GROUP_ICON from "@material-symbols/svg-700/outlined/group.svg";
+import MAIL_ICON from "@material-symbols/svg-700/outlined/mail.svg";
+import TOGGLE_ON_ICON from "@material-symbols/svg-700/outlined/toggle_on.svg";
 import APPS_ICON from "@material-symbols/svg-700/outlined/apps.svg";
 import KEY_ICON from "@material-symbols/svg-700/outlined/key.svg";
 import LOGOUT_ICON from "@material-symbols/svg-700/outlined/logout.svg";
 import PASSKEY_ICON from "@material-symbols/svg-700/outlined/passkey.svg";
 import PERSON_ICON from "@material-symbols/svg-700/outlined/person.svg";
-import SETTINGS_APPLICATIONS_ICON from "@material-symbols/svg-700/outlined/settings_applications.svg";
-import FORMAT_PAINT_ICON from "@material-symbols/svg-700/outlined/format_paint.svg"
 import STORAGE_ICON from "@material-symbols/svg-700/outlined/storage.svg";
 import WALLPAPER_ICON from "@material-symbols/svg-700/outlined/wallpaper.svg";
 import UKAvatar from "@ewsgit/uikit-solid/src/components/avatar/UKAvatar.tsx";
@@ -123,31 +126,31 @@ const RootPage: Component = () => {
                   <Shortcut
                     title="Instance Branding"
                     description=""
-                    icon={FORMAT_PAINT_ICON}
+                    icon={BRAND_FAMILY_ICON}
                     path="/app/uk.ewsgit.settings/instance/branding"
                   />
                   <Shortcut
                     title="Configure Features"
                     description=""
-                    icon={SETTINGS_APPLICATIONS_ICON}
+                    icon={TOGGLE_ON_ICON}
                     path="/app/uk.ewsgit.settings/instance/features"
                   />
                   <Shortcut
                     title="Manage Installed Applications"
                     description=""
-                    icon={SETTINGS_APPLICATIONS_ICON}
+                    icon={DEPLOYED_CODE_ICON}
                     path="/app/uk.ewsgit.settings/instance/installed_applications"
                   />
                   <Shortcut
                     title="Configure Mailserver"
                     description=""
-                    icon={SETTINGS_APPLICATIONS_ICON}
+                    icon={MAIL_ICON}
                     path="/app/uk.ewsgit.settings/instance/mailserver"
                   />
                   <Shortcut
                     title="Manage Users"
                     description=""
-                    icon={SETTINGS_APPLICATIONS_ICON}
+                    icon={GROUP_ICON}
                     path="/app/uk.ewsgit.settings/instance/users"
                   />
                 </UKStack>

@@ -1,0 +1,60 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  box-sizing: border-box;
+  border-radius: 1.75rem;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.title {
+  color: rgb(var(--uk-sys-color-on-surface));
+}
+
+.description {
+  color: rgb(var(--uk-sys-color-on-surface-variant));
+}
+
+.current {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.address {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  color: rgb(var(--uk-sys-color-on-surface));
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--uk-sys-shape-corner-full);
+  background-color: rgb(var(--uk-sys-color-secondary-container));
+  color: rgb(var(--uk-sys-color-on-secondary-container));
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.error {
+  color: rgb(var(--uk-sys-color-error));
+}
+
+.hint {
+  color: rgb(var(--uk-sys-color-on-surface-variant));
+}

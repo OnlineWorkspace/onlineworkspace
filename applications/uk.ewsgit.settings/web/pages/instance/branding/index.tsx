@@ -109,8 +109,10 @@ const ManageInstanceBrandingPage: Component = () => {
             <div class={styles.grid}>
               <AssetCard
                 title="Default user background"
-                description="The dashboard background, unless a user changes it."
+                description="The dashboard background for users who haven't chosen their own wallpaper."
                 size={{ width: 2560, height: 1440 }}
+                segment="defaultUserBackground"
+                onUpload={(file) => trpc.instance.branding.defaultUserBackground.set.mutate(file)}
               />
             </div>
           </Section>

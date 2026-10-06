@@ -1,18 +1,18 @@
 .page {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 1rem;
-  padding-top: 2rem;
-  padding-left: 1rem;
-  padding-right: 1rem;
-  max-width: 1024px;
+  gap: 2rem;
   width: 100%;
-  margin-left: auto;
-  margin-right: auto;
+  max-width: 44rem;
 }
 
-.header {
-  width: 100%;
-  padding-inline-start: 1rem;
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.sectionHeading {
+  padding: 0 0.5rem;
+  color: rgb(var(--uk-sys-color-on-surface-variant));
 }
