@@ -46,6 +46,10 @@
 
 .name {
   max-width: 100%;
+  font-size: 1.125rem;
+  font-weight: 600;
+  line-height: 1.4;
+  color: rgb(var(--uk-sys-color-on-surface));
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;

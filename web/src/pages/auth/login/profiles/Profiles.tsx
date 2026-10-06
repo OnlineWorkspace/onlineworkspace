@@ -27,7 +27,7 @@ const LoginProfilesPage: Component = () => {
                     />}
                 </Match>
                 <Match when={true}>
-                    <UKText role={"display"} size={"l"} align={"center"}>
+                    <UKText role={"display"} size={"l"} align={"center"} class={styles.heading}>
                         Who is signing in?
                     </UKText>
                     <div class={styles.profilesGrid} role={"list"}>

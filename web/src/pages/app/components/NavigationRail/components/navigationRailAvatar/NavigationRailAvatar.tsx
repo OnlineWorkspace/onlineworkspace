@@ -25,7 +25,7 @@ const NavigationRailAvatar: Component<{ expanded: boolean }> = (props) => {
       />
       <div class={styles.nameContainer}>
         <UKText size="m" role="title" class={styles.displayName}>
-          {`${user()?.forename} ${user()?.surname}`}
+          {user()?.displayName}
         </UKText>
         <UKText size="m" role="label">
           {`@${user()?.username}`}

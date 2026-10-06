@@ -21,6 +21,11 @@
   width: 100%;
 }
 
+.heading {
+  font-weight: 800;
+  color: rgb(var(--uk-sys-color-on-surface));
+}
+
 .switchToStandardView {
   position: absolute !important;
   bottom: 1rem;
