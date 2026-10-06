@@ -18,6 +18,18 @@ export enum FileMediaType {
   RichOfficeDocument,
 }
 
+/** thrown when something would take a user over their storage quota */
+export class QuotaExceededError extends Error {
+  constructor(
+    readonly quota: number,
+    readonly used: number,
+  ) {
+    super("There is not enough storage space left in your quota");
+  }
+}
+
+const STORAGE_USED_CACHE_MS = 30 * 1000;
+
 export default class FilesystemSystem extends System {
   readonly SRC_ROOT = path.resolve(process.cwd(), "./backend/src/");
   readonly WEB_ROOT = path.join(this.SRC_ROOT, "../../web/");
@@ -175,6 +187,97 @@ export default class FilesystemSystem extends System {
 
   getUserHomeDirectory(userId: number): string {
     return path.join(this.FS_ROOT, `/users/${userId}`);
+  }
+
+  /** how many bytes a file, or everything in a folder, takes up */
+  async measurePath(target: string): Promise<number> {
+    const info = await fs.lstat(target).catch(() => undefined);
+
+    if (!info) return 0;
+    if (info.isFile()) return info.size;
+    if (!info.isDirectory()) return 0;
+
+    let total = 0;
+
+    for (const entry of await fs.readdir(target)) total += await this.measurePath(path.join(target, entry));
+
+    return total;
+  }
+
+  private storageUsed = new Map<number, { bytes: number; at: number }>();
+  private storageMeasuring = new Map<number, Promise<number>>();
+
+  /** how many bytes everything in the user's home directory takes up */
+  async getUserStorageUsed(userId: number, fresh = false): Promise<number> {
+    const cached = this.storageUsed.get(userId);
+
+    if (!fresh && cached && Date.now() - cached.at < STORAGE_USED_CACHE_MS) return cached.bytes;
+
+    let measuring = this.storageMeasuring.get(userId);
+
+    if (!measuring) {
+      measuring = this.measurePath(this.getUserHomeDirectory(userId)).finally(() => this.storageMeasuring.delete(userId));
+      this.storageMeasuring.set(userId, measuring);
+    }
+
+    const bytes = await measuring;
+    this.storageUsed.set(userId, { bytes, at: Date.now() });
+
+    return bytes;
+  }
+
+  /** something was written or removed, so what was measured is out of date */
+  forgetStorageUsed(userId: number) {
+    this.storageUsed.delete(userId);
+  }
+
+  /** @returns how many more bytes the user can store, `Infinity` when they have no limit */
+  async getStorageRemaining(userId: number): Promise<number> {
+    const quota = Number((await (await this.instance.sys.users.getUserById(userId))?.getQuota()) ?? 0);
+
+    if (!(quota > 0)) return Number.POSITIVE_INFINITY;
+
+    return Math.max(0, quota - (await this.getUserStorageUsed(userId)));
+  }
+
+  /** @throws QuotaExceededError when `incomingBytes` more would not fit in the user's quota */
+  async assertWithinQuota(userId: number, incomingBytes: number): Promise<void> {
+    const remaining = await this.getStorageRemaining(userId);
+
+    if (incomingBytes > remaining) {
+      const quota = Number((await (await this.instance.sys.users.getUserById(userId))?.getQuota()) ?? 0);
+
+      throw new QuotaExceededError(quota, quota - remaining);
+    }
+  }
+
+  /**
+   * A body for a file being written, which fails once it has gone over what the user has left. The declared length cannot be trusted,
+   * and a chunked body has none, so the bytes are counted as they go to the disk.
+   * @throws QuotaExceededError right away when the declared length is already too much
+   */
+  async quotaLimitedBody(userId: number, req: Request): Promise<ReadableStream<Uint8Array>> {
+    const remaining = await this.getStorageRemaining(userId);
+    const declared = Number(req.headers.get("content-length") ?? 0);
+
+    if (declared > remaining) throw new QuotaExceededError(Number((await (await this.instance.sys.users.getUserById(userId))?.getQuota()) ?? 0), 0);
+
+    let received = 0;
+
+    return (req.body ?? new Response("").body!).pipeThrough(
+      new TransformStream<Uint8Array, Uint8Array>({
+        transform: (chunk, controller) => {
+          received += chunk.byteLength;
+
+          if (received > remaining) {
+            controller.error(new QuotaExceededError(0, 0));
+            return;
+          }
+
+          controller.enqueue(chunk);
+        },
+      }),
+    );
   }
 
   override async startup(): Promise<boolean> {

@@ -53,6 +53,7 @@ const MethodPassword: Component = () => {
         maxWidth={"32rem"}
       >
         <ResetPasswordDialogue
+          hasPassword={hasPassword() === true}
           closeDialogue={() => {
             setShowDialog(false);
             refetchHasPassword();

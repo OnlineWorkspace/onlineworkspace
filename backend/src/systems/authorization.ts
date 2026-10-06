@@ -28,9 +28,13 @@ export enum SessionCreationError {
   GenericError,
 }
 
-// failed logins allowed before an account is temporarily locked, and how long the lock lasts
+// failed logins allowed before an address is temporarily locked out of an account, and how long the lock lasts
 const MAX_FAILED_LOGIN_ATTEMPTS = 5;
+// failures from every address added together, so an account can still not be guessed at by many addresses at once
+const MAX_FAILED_LOGIN_ATTEMPTS_ANY_ADDRESS = 30;
 const LOGIN_LOCKOUT_MS = 15 * 60 * 1000;
+// how long an administrator's two factor status is remembered for
+const SECURITY_STATUS_CACHE_MS = 15 * 1000;
 
 // the number of ms that a login session is valid for
 export const SESSION_VALID_TERM_MS = 7 * 24 * 60 * 60 * 1000;
@@ -39,7 +43,9 @@ const PASSWORD_HASH_ITERATIONS = 600_000;
 export default class AuthorizationSystem extends System {
   private temporaryPasskeyCreationChallenges: Map<number, PublicKeyCredentialCreationOptionsJSON>;
   private temporaryPasskeyAuthenticationChallenges: Map<number, PublicKeyCredentialRequestOptionsJSON>;
-  private loginAttemptCount: Map<number, { amount: number; lastAttempt: number }>;
+  /** keyed by `userId:address`, and by `userId` for the failures from all addresses */
+  private loginAttemptCount: Map<string, { amount: number; lastAttempt: number }>;
+  private securityStatus: Map<number, { requiresTwoFactor: boolean; at: number }> = new Map();
 
   constructor(instance: Instance) {
     super("authorization", instance);
@@ -49,17 +55,22 @@ export default class AuthorizationSystem extends System {
     this.loginAttemptCount = new Map();
   }
 
-  private isLoginLockedOut(userId: number): boolean {
-    const attempts = this.loginAttemptCount.get(userId);
+  /** Someone signing in as a user from the same address too many times locks that address out of the account, not the account itself, so a stranger cannot lock the owner out. */
+  private isLoginLockedOut(userId: number, ipAddress: string = "unknown"): boolean {
+    const locked = (key: string, limit: number) => {
+      const attempts = this.loginAttemptCount.get(key);
 
-    if (!attempts) return false;
+      if (!attempts) return false;
 
-    if (Date.now() - attempts.lastAttempt >= LOGIN_LOCKOUT_MS) {
-      this.loginAttemptCount.delete(userId);
-      return false;
-    }
+      if (Date.now() - attempts.lastAttempt >= LOGIN_LOCKOUT_MS) {
+        this.loginAttemptCount.delete(key);
+        return false;
+      }
 
-    return attempts.amount >= MAX_FAILED_LOGIN_ATTEMPTS;
+      return attempts.amount >= limit;
+    };
+
+    return locked(`${userId}:${ipAddress}`, MAX_FAILED_LOGIN_ATTEMPTS) || locked(`${userId}`, MAX_FAILED_LOGIN_ATTEMPTS_ANY_ADDRESS);
   }
 
   /**
@@ -68,8 +79,8 @@ export default class AuthorizationSystem extends System {
     @returns {true} the code is valid
     @returns {false} the code is invalid, the user has no secret, or they are locked out
   */
-  async verifyTwoFactorCode(userId: number, code: string): Promise<boolean> {
-    if (this.isLoginLockedOut(userId)) return false;
+  async verifyTwoFactorCode(userId: number, code: string, ipAddress?: string): Promise<boolean> {
+    if (this.isLoginLockedOut(userId, ipAddress)) return false;
 
     const db = this.instance.sys.database.postgres();
     const secret = (await db`SELECT two_factor_secret FROM public.users WHERE id = ${userId}`)?.[0]?.two_factor_secret as string | null | undefined;
@@ -85,18 +96,52 @@ export default class AuthorizationSystem extends System {
     });
 
     if (totp.validate({ token: code }) === null) {
-      this.recordFailedLogin(userId);
+      this.recordFailedLogin(userId, ipAddress);
       return false;
     }
 
     return true;
   }
 
-  private recordFailedLogin(userId: number) {
-    const attempts = this.loginAttemptCount.get(userId);
-    const stillCounting = attempts && Date.now() - attempts.lastAttempt < LOGIN_LOCKOUT_MS;
+  private recordFailedLogin(userId: number, ipAddress: string = "unknown") {
+    for (const key of [`${userId}:${ipAddress}`, `${userId}`]) {
+      const attempts = this.loginAttemptCount.get(key);
+      const stillCounting = attempts && Date.now() - attempts.lastAttempt < LOGIN_LOCKOUT_MS;
 
-    this.loginAttemptCount.set(userId, { amount: (stillCounting ? attempts.amount : 0) + 1, lastAttempt: Date.now() });
+      this.loginAttemptCount.set(key, { amount: (stillCounting ? attempts.amount : 0) + 1, lastAttempt: Date.now() });
+    }
+
+    if (this.isLoginLockedOut(userId, ipAddress)) {
+      this.instance.sys.audit?.record({ action: "auth.lockout", actorId: userId, ip: ipAddress, outcome: "failure", details: { minutes: LOGIN_LOCKOUT_MS / 60000 } });
+    }
+  }
+
+  private clearFailedLogins(userId: number, ipAddress: string = "unknown") {
+    this.loginAttemptCount.delete(`${userId}:${ipAddress}`);
+    this.loginAttemptCount.delete(`${userId}`);
+  }
+
+  /**
+    Checks a password against the user's, failures count towards the lockout in the same way as when signing in.
+    Used to confirm that it is really the user, before something which would be bad if it was someone else at their computer.
+  */
+  async verifyPassword(userId: number, password: string, ipAddress?: string): Promise<boolean> {
+    if (this.isLoginLockedOut(userId, ipAddress)) return false;
+
+    const db = this.instance.sys.database.postgres();
+    const hashed = (await db`SELECT hashed_password FROM public.users WHERE id = ${userId}`)?.[0]?.hashed_password as string | null | undefined;
+
+    if (!hashed || !(await this._internalVerifyPassword(password, hashed))) {
+      this.recordFailedLogin(userId, ipAddress);
+      return false;
+    }
+
+    return true;
+  }
+
+  /** Spends the same time as checking a password does, so that a username which does not exist cannot be told apart from a wrong password by how long the answer takes. */
+  async burnPasswordCheck(): Promise<void> {
+    await this._internalDeriveBits("burn", crypto.getRandomValues(new Uint8Array(16)));
   }
 
   private async _internalHashPassword(password: string) {
@@ -145,7 +190,8 @@ export default class AuthorizationSystem extends System {
     otpCode?: string,
     ipAddress?: string,
   ): Promise<string | SessionCreationError> {
-    if (this.isLoginLockedOut(userId)) {
+    if (this.isLoginLockedOut(userId, ipAddress)) {
+      this.instance.sys.audit?.record({ action: "auth.login_failed", actorId: userId, ip: ipAddress, outcome: "failure", details: { reason: "locked out" } });
       return SessionCreationError.UserTimedOut;
     }
 
@@ -153,7 +199,8 @@ export default class AuthorizationSystem extends System {
       const db = this.instance.sys.database.postgres();
 
       if (!(await this._internalVerifyPassword(password, (await db`SELECT hashed_password FROM public.users WHERE id = ${userId}`)?.[0]?.hashed_password))) {
-        this.recordFailedLogin(userId);
+        this.recordFailedLogin(userId, ipAddress);
+        this.instance.sys.audit?.record({ action: "auth.login_failed", actorId: userId, ip: ipAddress, outcome: "failure", details: { reason: "wrong password" } });
 
         return SessionCreationError.InvalidCredentials;
       }
@@ -173,19 +220,21 @@ export default class AuthorizationSystem extends System {
         });
 
         if (totp.validate({ token: otpCode }) === null) {
-          this.recordFailedLogin(userId);
+          this.recordFailedLogin(userId, ipAddress);
+          this.instance.sys.audit?.record({ action: "auth.login_failed", actorId: userId, ip: ipAddress, outcome: "failure", details: { reason: "wrong two factor code" } });
 
           return SessionCreationError.InvalidCredentials;
         }
       }
 
-      this.loginAttemptCount.delete(userId);
+      this.clearFailedLogins(userId, ipAddress);
 
       const sessionToken = crypto.getRandomValues(new Uint32Array(16)).join("");
 
       await db`INSERT INTO public.sessions (user_id, session_token, device_type, valid_until, ip_address, login_method) VALUES (${userId}, ${sessionToken}, ${deviceId}, ${
         Date.now() + SESSION_VALID_TERM_MS
       }, ${ipAddress || "Anonymous"}, 'password authentication')`;
+      this.instance.sys.audit?.record({ action: "auth.login", actorId: userId, ip: ipAddress, details: { method: "password" } });
 
       const user = await this.instance.sys.users.getUserById(userId);
 
@@ -236,11 +285,13 @@ export default class AuthorizationSystem extends System {
   }
 
   /**
-    Verifies that a sessionToken exists and is valid
+    Verifies that a sessionToken exists and is valid.
+    An administrator who has not set up two factor authentication can only use their session to set it up, so everything which
+    checks a session refuses theirs, unless it says that it is part of setting it up (`allowTwoFactorSetup`).
     @returns {number} the userId of the session
     @returns {undefined} the session is invalid
   */
-  async verifySession(sessionToken: string): Promise<number | undefined> {
+  async verifySession(sessionToken: string, options: { allowTwoFactorSetup?: boolean } = {}): Promise<number | undefined> {
     const [_, userId, token] = sessionToken.split(":");
 
     const sessionsDb = this.instance.sys.database.postgres();
@@ -252,9 +303,33 @@ export default class AuthorizationSystem extends System {
       return undefined;
     }
 
-    if (session?.session_id !== undefined) return Number(userId);
+    if (session?.session_id === undefined) return undefined;
 
-    return undefined;
+    if (!options.allowTwoFactorSetup && (await this.requiresTwoFactorSetup(Number(userId)))) return undefined;
+
+    return Number(userId);
+  }
+
+  /**
+    Administrators must use two factor authentication, a passkey counts as it is both something you have and something you are.
+    @returns {true} the user is an administrator who has neither
+  */
+  async requiresTwoFactorSetup(userId: number): Promise<boolean> {
+    const cached = this.securityStatus.get(userId);
+
+    if (cached && Date.now() - cached.at < SECURITY_STATUS_CACHE_MS) return cached.requiresTwoFactor;
+
+    const user = await this.instance.sys.users.getUserById(userId);
+    const requiresTwoFactor = !!user && (await user.isAdministrator()) && !(await this.hasTwoFactorAuthenticationSecret(userId)) && !(await this.hasPasskey(userId));
+
+    this.securityStatus.set(userId, { requiresTwoFactor, at: Date.now() });
+
+    return requiresTwoFactor;
+  }
+
+  /** forget what is known about whether the user needs to set up two factor, for when something which changes it happens */
+  forgetSecurityStatus(userId: number) {
+    this.securityStatus.delete(userId);
   }
 
   /**
@@ -287,12 +362,17 @@ export default class AuthorizationSystem extends System {
 
   /**
     Removes all of a user's sessions and invalidates their tokens
+    @param exceptSessionToken a session to keep, as the raw token (the last part of `workspaces_session:[user]:[token]`)
     @returns {true} all sessions removed
   */
-  async endAllSessions(userId: number): Promise<boolean> {
+  async endAllSessions(userId: number, exceptSessionToken?: string): Promise<boolean> {
     const sessionsDb = this.instance.sys.database.postgres();
 
-    await sessionsDb`DELETE FROM public.sessions WHERE user_id = ${userId}`;
+    if (exceptSessionToken) {
+      await sessionsDb`DELETE FROM public.sessions WHERE user_id = ${userId} AND session_token <> ${exceptSessionToken}`;
+    } else {
+      await sessionsDb`DELETE FROM public.sessions WHERE user_id = ${userId}`;
+    }
 
     return true;
   }
@@ -354,6 +434,9 @@ export default class AuthorizationSystem extends System {
     } catch (_) {
       return false;
     }
+
+    this.forgetSecurityStatus(userId);
+    this.instance.sys.audit?.record({ action: "auth.two_factor_enabled", actorId: userId });
 
     return true;
   }
@@ -475,6 +558,8 @@ export default class AuthorizationSystem extends System {
     )`;
 
     this.temporaryPasskeyCreationChallenges.delete(userId);
+    this.forgetSecurityStatus(userId);
+    this.instance.sys.audit?.record({ action: "auth.passkey_added", actorId: userId });
 
     return verification.verified;
   }
@@ -533,6 +618,7 @@ export default class AuthorizationSystem extends System {
       await db`INSERT INTO public.sessions (user_id, session_token, device_type, valid_until, ip_address, login_method) VALUES (${userId}, ${sessionToken}, ${deviceId}, ${
         Date.now() + SESSION_VALID_TERM_MS
       }, ${ipAddress || "Anonymous"}, 'passkey')`;
+      this.instance.sys.audit?.record({ action: "auth.login", actorId: userId, ip: ipAddress, details: { method: "passkey" } });
       await db`UPDATE public.passkeys SET last_used_timestamp = NOW(), counter = ${passkey.counter + 1} WHERE passkey_id = ${passkey.passkey_id}`;
 
       return `workspaces_session:${userId}:${sessionToken}`;
@@ -541,10 +627,30 @@ export default class AuthorizationSystem extends System {
     return undefined;
   }
 
-  removePasskey(userId: number, passkeyId: string) {
+  async removePasskey(userId: number, passkeyId: string) {
     const db = this.instance.sys.database.postgres();
 
-    return db`DELETE FROM public.passkeys WHERE user_id = ${userId} AND passkey_id = ${passkeyId}`;
+    await db`DELETE FROM public.passkeys WHERE user_id = ${userId} AND passkey_id = ${passkeyId}`;
+    this.forgetSecurityStatus(userId);
+    this.instance.sys.audit?.record({ action: "auth.passkey_removed", actorId: userId });
+  }
+
+  /**
+    Removes a user's authenticator app and passkeys, for when they have lost them. Their sessions are ended.
+    Administrators have to set up a factor again before they can use the instance.
+    @returns {false} the user does not exist
+  */
+  async resetTwoFactor(userId: number): Promise<boolean> {
+    const db = this.instance.sys.database.postgres();
+
+    if (!(await this.instance.sys.users.doesUserExist(userId))) return false;
+
+    await db`UPDATE public.users SET two_factor_secret = NULL WHERE id = ${userId}`;
+    await db`DELETE FROM public.passkeys WHERE user_id = ${userId}`;
+    await this.endAllSessions(userId);
+    this.forgetSecurityStatus(userId);
+
+    return true;
   }
 
   override async startup() {

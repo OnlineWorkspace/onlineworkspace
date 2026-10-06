@@ -144,6 +144,29 @@ export default class ConfigurationSystem extends System {
     quotaSize: 1024 * 1024 * 1024,
     displayNameFormat: "New User %num%",
   };
+  /** how long audit log entries are kept for, `0` keeps them forever */
+  auditLogRetentionDays: number = 365;
+  backups: {
+    /** make a backup on a schedule */
+    enabled: boolean;
+    /** the hours between scheduled backups */
+    intervalHours: number;
+    /** how many scheduled backups are kept, the oldest are removed */
+    keep: number;
+    /** scheduled backups include everyone's files, otherwise only the database and configuration */
+    includeFiles: boolean;
+    /** scheduled backups only have the files which changed since the last backup, instead of all of them every time */
+    incremental: boolean;
+    /** a full backup is made again after this many backups, counting the full one, so that a restore needs at most this many */
+    fullEvery: number;
+  } = {
+    enabled: false,
+    intervalHours: 24,
+    keep: 7,
+    includeFiles: true,
+    incremental: true,
+    fullEvery: 7,
+  };
   caddyfile: string | undefined = "../Caddyfile";
   apiPort: number = 3563;
   /** Has the instance setup wizard been completed, until it is the wizard is shown at `/` instead of the usual page */
@@ -351,6 +374,9 @@ export default class ConfigurationSystem extends System {
         this[propertyKey] = configurationFile[propertyKey];
       }
     }
+
+    // schedules saved before incremental backups existed do not have their settings
+    this.backups = { incremental: true, fullEvery: 7, ...this.backups };
 
     // instances which were configured before the setup wizard existed are already set up
     if (isExistingInstance && !("setupComplete" in configurationFile)) {

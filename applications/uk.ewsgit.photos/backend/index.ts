@@ -6,6 +6,7 @@ import path from "node:path";
 import { WorkspacesEvent } from "@onlineworkspace/workspace-backend/src/systems/events.ts";
 import { BooleanApplicationSetting, GlobalBooleanApplicationSetting } from "@onlineworkspace/workspace-backend/src/systems/settings/applicationSetting/booleanSetting.ts";
 import { createOnlineWorkspaceTRPCContext, procedure } from "@onlineworkspace/workspace-backend/src/systems/trpc/coreRouter.ts";
+import { QuotaExceededError } from "@onlineworkspace/workspace-backend/src/systems/filesystem.ts";
 import { getCookies } from "@onlineworkspace/workspace-backend/src/utils/cookies.ts";
 import { initTRPC, TRPCError } from "@trpc/server";
 import sharp from "sharp";
@@ -917,7 +918,8 @@ instance.sys.api.addRoute({
       await fs.mkdir(directory, { recursive: true });
 
       destination = path.join(directory, await uniqueName(directory, name));
-      await Bun.write(destination, new Response(req.body));
+      await Bun.write(destination, new Response(await instance.sys.filesystem.quotaLimitedBody(userId, req)));
+      instance.sys.filesystem.forgetStorageUsed(userId);
 
       const when = Number.isFinite(lastModified) && lastModified > 0 && lastModified < Date.now() + 86_400_000 ? new Date(lastModified) : undefined;
       if (when) await fs.utimes(destination, new Date(), when);
@@ -930,6 +932,10 @@ instance.sys.api.addRoute({
     } catch (error) {
       // a file that could not be read as an image must not be left behind as a stray file
       if (destination) await fs.rm(destination, { force: true });
+
+      if (error instanceof QuotaExceededError || (error as Error)?.cause instanceof QuotaExceededError) {
+        return Response.json({ code: "QUOTA_EXCEEDED", message: "There is not enough space left in your storage quota for that file" }, { status: 413 });
+      }
 
       log.warning("upload failed", error);
       return Response.json({ code: "BAD_REQUEST", message: "That file could not be read as a photo or video" }, { status: 400 });

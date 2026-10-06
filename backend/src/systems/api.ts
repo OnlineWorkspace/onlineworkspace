@@ -2,9 +2,10 @@ import {existsSync} from "node:fs";
 import fs from "node:fs/promises";
 import path from "node:path";
 import type {Server} from "bun";
-import type {Instance} from "../index.ts";
+import {type Instance, InstanceStatus} from "../index.ts";
 import System from "../system.ts";
 import {getCookies} from "../utils/cookies.ts";
+import {clientIp} from "../utils/network.ts";
 import {NOTIFICATIONS_WEBSOCKET_PATH} from "./notifications.ts";
 
 export interface Route {
@@ -37,6 +38,41 @@ export default class ApiSystem extends System {
                     teapot: true,
                     message: "This OnlineWorkspace (Not a teapot?) sadly does not support the Hyper Text Coffee Pot Control Protocol 😢",
                 }, {status: 418},) as unknown as Response;
+            },
+        }, {
+            // public so that something outside can ping it, it says nothing which is not already visible to anyone who opens the instance
+            method: ["GET", "HEAD"], pattern: new URLPattern({pathname: "/api/health"}), async handler(req) {
+                const health = await self.getHealth();
+
+                return new Response(req.method === "HEAD" ? null : JSON.stringify(health.body), {
+                    status: health.httpStatus, headers: {"content-type": "application/json", "cache-control": "no-store"},
+                });
+            },
+        }, {
+            method: ["GET"], pattern: new URLPattern({pathname: "/api/backups/:id/download"}), async handler(req, rawParams) {
+                const authorization = getCookies(req.headers).Authorization;
+                const userId = authorization ? await self.instance.sys.authorization.verifySession(decodeURIComponent(authorization)) : undefined;
+
+                if (userId === undefined) return Response.json({code: "UNAUTHORIZED", message: "invalid session"}, {status: 401});
+
+                const user = await self.instance.sys.users.getUserById(userId);
+
+                if (!user || !(await user.isAdministrator())) return Response.json({code: "FORBIDDEN", message: "user lacks administrator permissions"}, {status: 403});
+
+                const id = rawParams?.pathname.groups.id ?? "";
+                const backup = self.instance.sys.backup;
+
+                if (!backup.isValidId(id) || !(await backup.get(id))) return Response.json({code: "NOT_FOUND", message: "That backup does not exist"}, {status: 404});
+
+                self.instance.sys.audit.record({action: "backup.downloaded", actorId: userId, target: id, ip: clientIp(req)});
+
+                return new Response(Bun.file(backup.archivePath(id)), {
+                    headers: {
+                        "content-type": "application/gzip",
+                        "content-disposition": `attachment; filename="onlineworkspace-backup-${id}.tar.gz"`,
+                        "cache-control": "no-store",
+                    },
+                });
             },
         }, {
             method: ["GET"], pattern: new URLPattern({pathname: "/api/instance/login/banner"}), handler(req) {
@@ -365,46 +401,112 @@ export default class ApiSystem extends System {
             port: this.instance.sys.configuration.apiPort,
             websocket: self.instance.sys.notifications.websocketHandler,
             async fetch(req, server) {
-                const url = new URL(req.url);
+                const security = self.instance.sys.security;
 
-                // setup mode has no database, so only the setup procedures work
-                if (self.instance.mode === "setup" && req.method !== "OPTIONS" && !url.pathname.startsWith("/api/trpc/") && url.pathname !== "/api/teapot") {
-                    return Response.json({setupRequired: true, message: "This instance is being set up"}, {status: 503});
-                }
+                // things which are refused are still given the headers
+                const refused = security.rateLimit(req, server) ?? security.originCheck(req);
 
-                if (url.pathname === NOTIFICATIONS_WEBSOCKET_PATH) {
-                    return self.instance.sys.notifications.handleUpgrade(req, server) as Promise<Response>;
-                }
+                if (refused) return security.applyHeaders(req, refused);
 
-                for (const route of self.routes) {
-                    if (route.method) {
-                        const methods = Array.isArray(route.method) ? route.method : [route.method];
-                        if (!methods.includes(req.method)) continue;
-                    }
-                    const match = route.pattern.exec(url);
-                    if (match) {
-                        return route.handler(req, match);
-                    }
-                }
+                const response = await self.handleRequest(req, server);
 
-                if (req.method === "OPTIONS") {
-                    const headers = new Headers();
-                    headers.set("access-control-allow-origin", self.instance.sys.configuration.proxy.hostname);
-                    headers.set("vary", "origin");
-                    headers.set("access-control-allow-methods", "GET, POST, PUT, DELETE");
-                    headers.set("access-control-allow-headers", "content-type, authorization");
-                    headers.set("access-control-max-age", "86400");
-                    return new Response(null, {
-                        status: 204, headers,
-                    });
-                }
-
-                return Response.json({notFound: true}, {status: 404},);
+                // a websocket which was upgraded has no response
+                return response ? security.applyHeaders(req, response) : response;
             },
         });
 
         this.log.info(`Listening on port ${this.webServer.port}`);
         return true;
+    }
+
+    /** what the health endpoint reports, the instance is healthy once it is online and its database answers */
+    async getHealth() {
+        const instance = this.instance;
+        const online = instance.status === InstanceStatus.Online;
+        let database: "ok" | "down" | "not used" = "not used";
+
+        if (online && instance.mode === "full") {
+            try {
+                await Promise.race([instance.sys.database.postgres()`SELECT 1`, new Promise((_, reject) => setTimeout(() => reject(new Error("timed out")), 2000))]);
+                database = "ok";
+            } catch {
+                database = "down";
+            }
+        }
+
+        const status = !online
+            ? (instance.status === InstanceStatus.Stopping ? "stopping" : "starting")
+            : database === "down" ? "degraded" : instance.mode === "setup" ? "setup" : "ok";
+
+        return {
+            httpStatus: status === "ok" || status === "setup" ? 200 : 503,
+            body: {
+                status,
+                ok: status === "ok" || status === "setup",
+                version: instance.versionString,
+                mode: instance.mode,
+                uptimeSeconds: Math.round(process.uptime()),
+                checks: {database},
+                timestamp: new Date().toISOString(),
+            },
+        };
+    }
+
+    private async handleRequest(req: Request, server: Server<any>): Promise<Response | undefined> {
+        const self = this;
+        const url = new URL(req.url);
+
+        // setup mode has no database, so only the setup procedures work
+        if (self.instance.mode === "setup" && req.method !== "OPTIONS" && !url.pathname.startsWith("/api/trpc/") && url.pathname !== "/api/teapot" && url.pathname !== "/api/health") {
+            return Response.json({setupRequired: true, message: "This instance is being set up"}, {status: 503});
+        }
+
+        if (url.pathname === NOTIFICATIONS_WEBSOCKET_PATH) {
+            // a page on another site could otherwise open the socket with the visitor's cookie
+            const origin = req.headers.get("origin");
+
+            const originHost = (() => {
+                try {
+                    return origin ? new URL(origin).host : undefined;
+                } catch {
+                    return "invalid";
+                }
+            })();
+
+            if (origin && originHost !== (req.headers.get("x-forwarded-host") ?? req.headers.get("host"))) {
+                return Response.json({code: "FORBIDDEN", message: "Cross-site requests are not allowed"}, {status: 403});
+            }
+
+            return self.instance.sys.notifications.handleUpgrade(req, server) as Promise<Response>;
+        }
+
+        for (const route of self.routes) {
+            if (route.method) {
+                const methods = Array.isArray(route.method) ? route.method : [route.method];
+                if (!methods.includes(req.method)) continue;
+            }
+            const match = route.pattern.exec(url);
+            if (match) {
+                return route.handler(req, match);
+            }
+        }
+
+        if (req.method === "OPTIONS") {
+            const headers = new Headers();
+
+            // only the instance's own pages are allowed, which is the same origin so a browser does not ask
+            if (req.headers.get("origin") === self.getProxyBasePath()) headers.set("access-control-allow-origin", self.getProxyBasePath());
+
+            headers.set("vary", "origin");
+            headers.set("access-control-allow-methods", "GET, POST, PUT, DELETE");
+            headers.set("access-control-allow-headers", "content-type, authorization");
+            headers.set("access-control-max-age", "86400");
+            return new Response(null, {
+                status: 204, headers,
+            });
+        }
+
+        return Response.json({notFound: true}, {status: 404},);
     }
 
     override async stop(): Promise<boolean> {

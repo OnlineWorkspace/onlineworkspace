@@ -2,6 +2,7 @@
 
 import fs from "node:fs/promises";
 import path from "node:path";
+import { QuotaExceededError } from "@onlineworkspace/workspace-backend/src/systems/filesystem.ts";
 import { getCookies } from "@onlineworkspace/workspace-backend/src/utils/cookies.ts";
 import { type createOnlineWorkspaceTRPCContext, procedure } from "@onlineworkspace/workspace-backend/src/systems/trpc/coreRouter.ts";
 import { initTRPC, TRPCError } from "@trpc/server";
@@ -313,8 +314,15 @@ const router = t.router({
       const source = files.resolve(virtualPath);
       assertNotIntoItself(source, destinationDirectory);
 
+      // a copy takes up the same space again
+      await instance.sys.filesystem.assertWithinQuota(opt.ctx.userId, await instance.sys.filesystem.measurePath(source)).catch((error) => {
+        if (error instanceof QuotaExceededError) throw new TRPCError({ code: "PAYLOAD_TOO_LARGE", message: "There is not enough space left in your storage quota to copy that" });
+        throw error;
+      });
+
       const destination = path.join(destinationDirectory, await files.uniqueName(destinationDirectory, path.basename(source)));
       await fs.cp(source, destination, { recursive: true, errorOnExist: true, force: false });
+      instance.sys.filesystem.forgetStorageUsed(opt.ctx.userId);
     }
 
     return true;
@@ -393,6 +401,7 @@ instance.sys.api.addRoute({
     const url = new URL(req.url);
     const name = url.searchParams.get("name") ?? "";
     const lastModified = Number(url.searchParams.get("lastModified"));
+    let uploaded: string | undefined;
 
     try {
       const user = await instance.sys.users.getUserById(userId);
@@ -404,7 +413,9 @@ instance.sys.api.addRoute({
       const directory = await requireDirectory(files, url.searchParams.get("path") ?? "/");
       const destination = path.join(directory, await files.uniqueName(directory, name));
 
-      await Bun.write(destination, new Response(req.body));
+      uploaded = destination;
+      await Bun.write(destination, new Response(await instance.sys.filesystem.quotaLimitedBody(userId, req)));
+      instance.sys.filesystem.forgetStorageUsed(userId);
 
       if (Number.isFinite(lastModified) && lastModified > 0) await fs.utimes(destination, new Date(), new Date(lastModified));
 
@@ -412,6 +423,13 @@ instance.sys.api.addRoute({
 
       return Response.json(await files.entryFor(destination));
     } catch (error) {
+      // what was written before it failed is not a file
+      if (uploaded) await fs.rm(uploaded, { force: true });
+
+      if (error instanceof QuotaExceededError || (error as Error)?.cause instanceof QuotaExceededError) {
+        return Response.json({ code: "QUOTA_EXCEEDED", message: "There is not enough space left in your storage quota for that file" }, { status: 413 });
+      }
+
       if (error instanceof TRPCError) {
         return Response.json({ code: error.code, message: error.message }, { status: error.code === "FORBIDDEN" ? 403 : 400 });
       }

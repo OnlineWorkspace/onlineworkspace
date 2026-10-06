@@ -8,13 +8,15 @@ import * as nodemailer from "nodemailer";
 import * as OTPAuth from "otpauth";
 import z from "zod";
 import type {Instance} from "../../index.ts";
+import type {AuditEntryInput} from "../audit.ts";
 import {Authenticator} from "../authentication/authenticator.ts";
-import {AuthorizedDeviceType, SessionCreationError} from "../authorization.ts";
+import {AuthorizedDeviceType, SESSION_VALID_TERM_MS, SessionCreationError} from "../authorization.ts";
 import type ConfigurationSystem from "../configuration.ts";
 import {WorkspacesFeatureFlags} from "../configuration.ts";
 import {createPostgresDatabase, testPostgresConnection} from "../databaseCheck.ts";
 import type {WorkspacesUser} from "../users.ts";
 import {deleteCookie, getCookies, setCookie} from "../../utils/cookies.ts";
+import {clientIp} from "../../utils/network.ts";
 
 export const createOnlineWorkspaceTRPCContext = (instance: Instance) => (opt: FetchCreateContextFnOptions, server: Server<any>) => {
     return {
@@ -36,6 +38,34 @@ export const t = initTRPC.context<ReturnType<typeof createOnlineWorkspaceTRPCCon
     },
 });
 
+/** what the web app looks for, to know to ask an administrator to set up two factor authentication */
+export const TWO_FACTOR_REQUIRED_MESSAGE = "Two-factor authentication is required for administrators";
+
+/** the procedures an administrator without two factor authentication is allowed to use, so they are able to set it up */
+const TWO_FACTOR_SETUP_PROCEDURES = new Set([
+    "authorization.enableTwoFactor",
+    "authorization.confirmTwoFactor",
+    "authorization.securityStatus",
+    "authorization.logout",
+    "authorization.logoutEverywhere",
+    // so that the page which asks for it looks like the rest of the instance
+    "theme.get",
+]);
+
+/** the cookie which keeps someone signed in, it can only be read by the backend and is only ever sent to this instance */
+export const setSessionCookie = (headers: Headers, instance: Instance, sessionToken: string, domain?: string) => {
+    setCookie(headers, {
+        name: "Authorization",
+        value: sessionToken,
+        secure: true,
+        httpOnly: true,
+        maxAge: Math.floor(SESSION_VALID_TERM_MS / 1000),
+        domain: domain ?? instance.sys.configuration.proxy.hostname,
+        sameSite: "Strict",
+        path: "/",
+    });
+};
+
 export const publicProcedure = t.procedure.use(async (opt) => {
     return opt.next({
         ctx: {
@@ -52,10 +82,15 @@ export const procedure = t.procedure.use(async (opt) => {
         });
     }
 
-    const userId = await opt.ctx.instance.sys.authorization.verifySession(decodeURIComponent(cookies.Authorization!));
+    const userId = await opt.ctx.instance.sys.authorization.verifySession(decodeURIComponent(cookies.Authorization!), {allowTwoFactorSetup: true});
 
     if (userId === undefined) {
         throw new TRPCError({code: "UNAUTHORIZED", message: "invalid session"});
+    }
+
+    // administrators can only get as far as setting up two factor authentication until they have
+    if (!TWO_FACTOR_SETUP_PROCEDURES.has(opt.path) && (await opt.ctx.instance.sys.authorization.requiresTwoFactorSetup(userId))) {
+        throw new TRPCError({code: "FORBIDDEN", message: TWO_FACTOR_REQUIRED_MESSAGE});
     }
 
     return opt.next({
@@ -78,11 +113,63 @@ export const adminProcedure = procedure.use(async (opt) => {
         });
     }
 
-    return opt.next();
+    const ip = clientIp(opt.ctx.rawRequest.req, opt.ctx.rawRequest.server);
+    let recorded = false;
+
+    /** records what the administrator did in the audit log, a procedure which does not say anything more specific has a general entry made for it */
+    const audit = (entry: Omit<AuditEntryInput, "actorId" | "ip">) => {
+        recorded = true;
+        opt.ctx.instance.sys.audit.record({...entry, actorId: user.userId, ip});
+    };
+
+    const result = await opt.next({ctx: {audit}});
+
+    if (opt.type === "mutation" && !recorded) {
+        opt.ctx.instance.sys.audit.record({action: `admin.${opt.path}`, actorId: user.userId, ip, outcome: result.ok ? "success" : "failure"});
+    }
+
+    return result;
 });
 
 const temporaryTwoFactorSecrets: Map<number, string> = new Map();
-const emailSignupVerificationCodes: Map<string, string> = new Map();
+const EMAIL_CODE_LENGTH = 8;
+const EMAIL_CODE_CHARS = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+const EMAIL_CODE_VALID_MS = 15 * 60 * 1000;
+const EMAIL_CODE_RESEND_MS = 60 * 1000;
+const EMAIL_CODE_MAX_ATTEMPTS = 5;
+/** the codes sent to prove someone owns the address they are signing up with, they expire and can only be guessed at a few times */
+const emailSignupVerificationCodes: Map<string, { code: string; expires: number; sentAt: number; attempts: number }> = new Map();
+
+const normaliseEmailAddress = (emailAddress: string) => emailAddress.trim().toLowerCase();
+
+const generateEmailCode = () => {
+    let code = "";
+    for (let i = 0; i < EMAIL_CODE_LENGTH; i++) code += EMAIL_CODE_CHARS[nodeCrypto.randomInt(EMAIL_CODE_CHARS.length)];
+    return code;
+};
+
+/** @param consume the code can be used once, so a code which was right is forgotten */
+const emailCodeIsCorrect = (emailAddress: string, given: string, consume = false) => {
+    const key = normaliseEmailAddress(emailAddress);
+    const entry = emailSignupVerificationCodes.get(key);
+
+    if (!entry || entry.expires < Date.now() || entry.attempts >= EMAIL_CODE_MAX_ATTEMPTS) {
+        emailSignupVerificationCodes.delete(key);
+        return false;
+    }
+
+    const a = Buffer.from(entry.code);
+    const b = Buffer.from(given);
+
+    if (a.length !== b.length || !nodeCrypto.timingSafeEqual(a, b)) {
+        entry.attempts++;
+        return false;
+    }
+
+    if (consume) emailSignupVerificationCodes.delete(key);
+
+    return true;
+};
 
 const PASSWORD_RESET_CODE_LENGTH = 8;
 const PASSWORD_RESET_CODE_VALID_MS = 15 * 60 * 1000;
@@ -103,7 +190,7 @@ const passwordResetCodeMatches = (expected: string, given: string) => {
     return a.length === b.length && nodeCrypto.timingSafeEqual(a, b);
 };
 
-const getPasswordRequirementError = (instance: Instance, password: string, req: ConfigurationSystem["signupRequirements"] = instance.sys.configuration.signupRequirements): string | undefined => {
+export const getPasswordRequirementError = (instance: Instance, password: string, req: ConfigurationSystem["signupRequirements"] = instance.sys.configuration.signupRequirements): string | undefined => {
     const count = (re: RegExp) => password.match(re)?.length || 0;
 
     if (req.passwordMinimumLength !== undefined && password.length < req.passwordMinimumLength) return `Your password must be at least ${req.passwordMinimumLength} characters long`;
@@ -122,6 +209,8 @@ const SETUP_RECOMMENDED = {
 };
 
 /** applications which the instance cannot be administered without */
+const SIGNUP_USERNAME = z.string().trim().toLowerCase().regex(/^[a-z0-9_.-]{2,32}$/, "Usernames are 2-32 characters of letters, numbers, '.', '_' or '-'");
+
 const SETUP_REQUIRED_APPLICATIONS = ["uk.ewsgit.dashboard", "uk.ewsgit.settings", "uk.ewsgit.store"];
 
 const mailServerInput = z.object({
@@ -428,24 +517,16 @@ export const coreOnlineWorkspaceRouter = t.router({
                     setFeature(WorkspacesFeatureFlags.DisplayProfilesAtLogon, input.access.displayProfilesAtLogon);
 
                     await config.completeSetup();
+                    instance.sys.audit.record({action: "instance.setup_completed", actorId: admin.userId, ip: clientIp(opt.ctx.rawRequest.req, opt.ctx.rawRequest.server)});
 
                     const mail = await instance.sys.email.reconfigure();
                     if (!mail.ok) instance.log.system.warning(`The mail server configured during setup could not be reached: ${mail.error}`);
 
-                    const session = await instance.sys.authorization.createPasswordSession(admin.userId, input.administrator.password, AuthorizedDeviceType.UnknownBrowser, undefined, opt.ctx.rawRequest.req.headers.get("X-Real-IP")?.split(":")?.[0] || "missing-caddy-ip");
+                    const session = await instance.sys.authorization.createPasswordSession(admin.userId, input.administrator.password, AuthorizedDeviceType.UnknownBrowser, undefined, clientIp(opt.ctx.rawRequest.req, opt.ctx.rawRequest.server));
 
                     if (session === undefined || session in SessionCreationError) return {type: "success" as const, signedIn: false};
 
-                    setCookie(opt.ctx.rawRequest.resHeaders, {
-                        name: "Authorization",
-                        value: session as string,
-                        secure: true,
-                        expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 14),
-                        // the host the browser is on, as the configured one may only now be taking effect
-                        domain: opt.ctx.rawRequest.req.headers.get("host")?.split(":")[0] || config.proxy.hostname,
-                        sameSite: "Strict",
-                        path: "/",
-                    });
+                    setSessionCookie(opt.ctx.rawRequest.resHeaders, instance, session as string, opt.ctx.rawRequest.req.headers.get("host")?.split(":")[0] || config.proxy.hostname);
 
                     return {type: "success" as const, signedIn: true};
                 } finally {
@@ -485,7 +566,8 @@ export const coreOnlineWorkspaceRouter = t.router({
 
             const userId = (await opt.ctx.instance.sys.users.getUserByUsername(username))?.userId;
 
-            if (userId === undefined) return [];
+            // a user who does not exist looks like one who signs in with a password, so usernames cannot be found out
+            if (userId === undefined) return [Authenticator.Password];
 
             return await opt.ctx.instance.sys.authentication.getSessionRequirements(userId);
         }),
@@ -504,54 +586,50 @@ export const coreOnlineWorkspaceRouter = t.router({
         })
     }, authorization: {
         checkEmailAddressOwnership: publicProcedure
-            .input(z.object({emailAddress: z.string()}))
+            .input(z.object({emailAddress: z.string().trim().max(320).email()}))
             .output(z.boolean().or(z.string()))
             .mutation(async (opt) => {
-                if (emailSignupVerificationCodes.has(opt.input.emailAddress)) {
-                    return "An email has already been sent, please wait 5 minutes before sending another.";
+                const key = normaliseEmailAddress(opt.input.emailAddress);
+                const existing = emailSignupVerificationCodes.get(key);
+
+                if (existing && Date.now() - existing.sentAt < EMAIL_CODE_RESEND_MS) {
+                    return "An email has already been sent, please wait a minute before sending another.";
                 }
 
-                let emailCode = "";
-                const CODE_LENGTH = 8;
-                const CODE_VALID_CHARS = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-                for (let i = CODE_LENGTH; i > 0; --i) {
-                    emailCode += CODE_VALID_CHARS[Math.floor(Math.random() * CODE_VALID_CHARS.length)];
-                }
+                const emailCode = generateEmailCode();
+                emailSignupVerificationCodes.set(key, {code: emailCode, expires: Date.now() + EMAIL_CODE_VALID_MS, sentAt: Date.now(), attempts: 0});
 
-                emailSignupVerificationCodes.set(opt.input.emailAddress, emailCode);
-                const emailBody = `Email code for email '${opt.input.emailAddress}' is '${emailCode}'`;
                 await opt.ctx.instance.sys.email.sendEmail(opt.input.emailAddress, "Email verification code", {
-                    type: "string", content: emailBody
+                    type: "string", content: `Email code for email '${opt.input.emailAddress}' is '${emailCode}'. It is valid for 15 minutes.`,
                 });
-                opt.ctx.instance.log.system.debug(emailBody);
 
                 return true;
             }), validateEmailCode: publicProcedure.input(z.object({
             emailAddress: z.string(), emailCode: z.string()
         })).query(async (opt) => {
-            return emailSignupVerificationCodes.get(opt.input.emailAddress) === opt.input.emailCode;
+            return emailCodeIsCorrect(opt.input.emailAddress, opt.input.emailCode);
         }), isUsernameValid: publicProcedure.input(z.string()).query(async (opt) => {
             return (await opt.ctx.instance.sys.users.getUserByUsername(opt.input)) === undefined;
         }), signup: publicProcedure
             .input(z.union([z.object({
-                username: z.string(),
-                password: z.string(),
-                emailAddress: z.string(),
-                emailCode: z.string(),
-                displayName: z.string(),
-                gender: z.string(),
+                username: SIGNUP_USERNAME,
+                password: z.string().min(1).max(1000),
+                emailAddress: z.string().trim().max(320),
+                emailCode: z.string().max(100),
+                displayName: z.string().trim().max(60),
+                gender: z.string().max(20),
                 pronouns: z.string().trim().max(40).optional(),
-                bio: z.string(),
+                bio: z.string().max(1000),
             }), z.object({
-                username: z.string(),
-                password: z.string(),
-                displayName: z.string(),
-                gender: z.string(),
+                username: SIGNUP_USERNAME,
+                password: z.string().min(1).max(1000),
+                displayName: z.string().trim().max(60),
+                gender: z.string().max(20),
                 pronouns: z.string().trim().max(40).optional(),
-                bio: z.string(),
+                bio: z.string().max(1000),
             }),]),)
             .output(z.union([z.object({type: z.literal("error"), message: z.string()}), z.object({
-                type: z.literal("success"), sessionToken: z.string(), notice: z.boolean().optional(),
+                type: z.literal("success"), notice: z.boolean().optional(),
             }),]),)
             .mutation(async (opt) => {
                 if (!opt.ctx.instance.sys.configuration.hasFeature(WorkspacesFeatureFlags.AllowUserSignups)) {
@@ -569,12 +647,16 @@ export const coreOnlineWorkspaceRouter = t.router({
                         };
                     }
 
-                    if (opt.input.emailCode !== emailSignupVerificationCodes.get(opt.input.emailAddress)) {
+                    if (!emailCodeIsCorrect(opt.input.emailAddress, opt.input.emailCode, true)) {
                         return {
                             type: "error" as const, message: "The email code did not match!",
                         };
                     }
                 }
+
+                const passwordError = getPasswordRequirementError(opt.ctx.instance, opt.input.password);
+
+                if (passwordError) return {type: "error" as const, message: passwordError};
 
                 const uid = await opt.ctx.instance.sys.users.createUser(username, opt.input.password);
 
@@ -606,7 +688,7 @@ export const coreOnlineWorkspaceRouter = t.router({
 
                 await user.setQuota(opt.ctx.instance.sys.configuration.userDefault.quotaSize);
 
-                const session = await opt.ctx.instance.sys.authorization.createPasswordSession(user.userId, opt.input.password, AuthorizedDeviceType.UnknownBrowser, undefined, opt.ctx.rawRequest.req.headers.get("X-Real-IP")?.split(":")?.[0] || "missing-caddy-ip",);
+                const session = await opt.ctx.instance.sys.authorization.createPasswordSession(user.userId, opt.input.password, AuthorizedDeviceType.UnknownBrowser, undefined, clientIp(opt.ctx.rawRequest.req, opt.ctx.rawRequest.server),);
 
                 if (session === undefined || session in SessionCreationError) {
                     return {
@@ -614,18 +696,12 @@ export const coreOnlineWorkspaceRouter = t.router({
                     };
                 }
 
-                setCookie(opt.ctx.rawRequest.resHeaders, {
-                    name: "Authorization",
-                    value: session as string,
-                    secure: true,
-                    expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 14),
-                    domain: opt.ctx.instance.sys.configuration.proxy.hostname,
-                    sameSite: "Strict",
-                    path: "/",
-                });
+                setSessionCookie(opt.ctx.rawRequest.resHeaders, opt.ctx.instance, session as string);
+
+                opt.ctx.instance.sys.audit.record({action: "auth.signup", actorId: user.userId, ip: clientIp(opt.ctx.rawRequest.req, opt.ctx.rawRequest.server)});
 
                 return {
-                    type: "success" as const, sessionToken: session as string,
+                    type: "success" as const,
                 };
             }), confirmTwoFactor: procedure.input(z.object({twoFactorCode: z.string()})).mutation(async (opt) => {
             const user = await opt.ctx.user();
@@ -719,6 +795,8 @@ export const coreOnlineWorkspaceRouter = t.router({
                 const existing = passwordResetCodes.get(user.userId);
                 if (existing && Date.now() - existing.sentAt < PASSWORD_RESET_RESEND_MS) return {emailEnabled};
 
+                instance.sys.audit.record({action: "auth.password_reset_requested", actorId: user.userId, ip: clientIp(opt.ctx.rawRequest.req, opt.ctx.rawRequest.server)});
+
                 const code = generatePasswordResetCode();
                 passwordResetCodes.set(user.userId, {
                     code, expires: Date.now() + PASSWORD_RESET_CODE_VALID_MS, sentAt: Date.now(), attempts: 0,
@@ -764,19 +842,12 @@ export const coreOnlineWorkspaceRouter = t.router({
                 const requirementError = getPasswordRequirementError(instance, opt.input.newPassword);
                 if (requirementError) return {type: "error" as const, message: requirementError};
 
+                const ip = clientIp(opt.ctx.rawRequest.req, opt.ctx.rawRequest.server);
+
                 if (await instance.sys.authorization.hasTwoFactorAuthenticationSecret(user.userId)) {
                     if (!opt.input.twoFactorCode) return {type: "requirementsNotMet" as const, requireAny: ["totp" as const]};
 
-                    const db = instance.sys.database.postgres();
-                    const totp = new OTPAuth.TOTP({
-                        issuer: instance.sys.configuration.proxy.hostname,
-                        label: `${instance.sys.configuration.branding.displayName} (Workspace)`,
-                        algorithm: "SHA1",
-                        digits: 6,
-                        secret: (await db`SELECT two_factor_secret FROM public.users WHERE id = ${user.userId}`)?.[0]?.two_factor_secret,
-                    });
-
-                    if (totp.validate({token: opt.input.twoFactorCode}) === null) {
+                    if (!(await instance.sys.authorization.verifyTwoFactorCode(user.userId, opt.input.twoFactorCode, ip))) {
                         entry.attempts++;
                         return {type: "error" as const, message: "The two factor code was incorrect"};
                     }
@@ -788,6 +859,7 @@ export const coreOnlineWorkspaceRouter = t.router({
 
                 passwordResetCodes.delete(user.userId);
                 await instance.sys.authorization.endAllSessions(user.userId);
+                instance.sys.audit.record({action: "auth.password_reset", actorId: user.userId, ip, details: {sessionsEnded: true}});
 
                 return {type: "success" as const};
             }), passwordSignin: publicProcedure
@@ -796,50 +868,52 @@ export const coreOnlineWorkspaceRouter = t.router({
             }),)
             .output(z.union([z.object({
                 type: z.literal("error"), message: z.string()
-            }), z.object({type: z.literal("success"), sessionToken: z.string()}), z.object({
+            }), z.object({type: z.literal("success")}), z.object({
                 type: z.literal("requirementsNotMet"), requireAny: z.enum(["totp", "email"]).array(),
             }),]),)
             .mutation(async (opt) => {
+                const authorization = opt.ctx.instance.sys.authorization;
+                const ip = clientIp(opt.ctx.rawRequest.req, opt.ctx.rawRequest.server);
                 const username = opt.input.username.toLowerCase();
                 const user = await opt.ctx.instance.sys.users.getUserByUsername(username);
+                const incorrect = {type: "error" as const, message: "Incorrect username, password or code"};
 
                 if (user === undefined) {
+                    // takes as long as a real attempt does, and says the same thing, so usernames cannot be found out
+                    await authorization.burnPasswordCheck();
+                    opt.ctx.instance.sys.audit.record({action: "auth.login_failed", actorName: username.slice(0, 64), ip, outcome: "failure", details: {reason: "unknown user"}});
+
+                    return incorrect;
+                }
+
+                if (await authorization.hasTwoFactorAuthenticationSecret(user.userId) && opt.input.twoFactorCode === undefined) {
+                    // the code is only asked for by someone who knows the password
+                    if (!(await authorization.verifyPassword(user.userId, opt.input.password, ip))) {
+                        opt.ctx.instance.sys.audit.record({action: "auth.login_failed", actorId: user.userId, ip, outcome: "failure", details: {reason: "wrong password"}});
+
+                        return incorrect;
+                    }
+
                     return {
-                        type: "error" as const, message: "Failed to find the user",
+                        type: "requirementsNotMet" as const, requireAny: ["totp"],
                     };
                 }
 
-                if (await opt.ctx.instance.sys.authorization.hasTwoFactorAuthenticationSecret(user.userId)) {
-                    if (opt.input.twoFactorCode === undefined) {
-                        return {
-                            type: "requirementsNotMet" as const, requireAny: ["totp"],
-                        };
-                    }
-                }
-
-                const session = await opt.ctx.instance.sys.authorization.createPasswordSession(user.userId, opt.input.password, AuthorizedDeviceType.UnknownBrowser, opt.input.twoFactorCode, opt.ctx.rawRequest.req.headers.get("X-Real-IP")?.split(":")?.[0] || "missing-caddy-ip",);
+                const session = await authorization.createPasswordSession(user.userId, opt.input.password, AuthorizedDeviceType.UnknownBrowser, opt.input.twoFactorCode, ip);
 
                 if (session in SessionCreationError) {
                     return {
                         type: "error" as const,
                         message: session === SessionCreationError.UserTimedOut
                             ? "Too many failed attempts. Please try again in 15 minutes."
-                            : "Incorrect username, password or code",
+                            : incorrect.message,
                     };
                 }
 
-                setCookie(opt.ctx.rawRequest.resHeaders, {
-                    name: "Authorization",
-                    value: session as string,
-                    secure: true,
-                    expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 14),
-                    domain: opt.ctx.instance.sys.configuration.proxy.hostname,
-                    sameSite: "Strict",
-                    path: "/",
-                });
+                setSessionCookie(opt.ctx.rawRequest.resHeaders, opt.ctx.instance, session as string);
 
                 return {
-                    type: "success" as const, sessionToken: session as string,
+                    type: "success" as const,
                 };
             }), passkeyRequestSignIn: publicProcedure
             .input(z.object({
@@ -866,7 +940,7 @@ export const coreOnlineWorkspaceRouter = t.router({
                     });
                 }
 
-                const session = await opt.ctx.instance.sys.authorization.createPasskeySession(user.userId, AuthorizedDeviceType.UnknownBrowser, opt.input.passkeyResponse, opt.ctx.rawRequest.req.headers.get("X-Real-IP")?.split(":")?.[0] || "missing-caddy-ip",);
+                const session = await opt.ctx.instance.sys.authorization.createPasskeySession(user.userId, AuthorizedDeviceType.UnknownBrowser, opt.input.passkeyResponse, clientIp(opt.ctx.rawRequest.req, opt.ctx.rawRequest.server),);
 
                 if (session === undefined) {
                     return {
@@ -874,18 +948,10 @@ export const coreOnlineWorkspaceRouter = t.router({
                     };
                 }
 
-                setCookie(opt.ctx.rawRequest.resHeaders, {
-                    name: "Authorization",
-                    value: session,
-                    secure: true,
-                    expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 14),
-                    domain: opt.ctx.instance.sys.configuration.proxy.hostname,
-                    sameSite: "Strict",
-                    path: "/",
-                });
+                setSessionCookie(opt.ctx.rawRequest.resHeaders, opt.ctx.instance, session);
 
                 return {
-                    type: "success", sessionToken: session,
+                    type: "success",
                 };
             }), isAuthenticated: publicProcedure.output(z.object({authenticated: z.boolean()})).query(async (opt) => {
             const cookies = getCookies(opt.ctx.rawRequest.req.headers);
@@ -896,7 +962,8 @@ export const coreOnlineWorkspaceRouter = t.router({
                 };
             }
 
-            const userId = await opt.ctx.instance.sys.authorization.verifySession(decodeURIComponent(cookies.Authorization!));
+            // an administrator who has to set up two factor authentication is signed in, they are just not let do anything else yet
+            const userId = await opt.ctx.instance.sys.authorization.verifySession(decodeURIComponent(cookies.Authorization!), {allowTwoFactorSetup: true});
 
             if (userId === undefined) {
                 return {
@@ -907,6 +974,14 @@ export const coreOnlineWorkspaceRouter = t.router({
             return {
                 authenticated: true,
             };
+        }), securityStatus: procedure.output(z.object({twoFactorSetupRequired: z.boolean()})).query(async (opt) => {
+            return {twoFactorSetupRequired: await opt.ctx.instance.sys.authorization.requiresTwoFactorSetup(opt.ctx.userId)};
+        }), logoutEverywhere: procedure.output(z.object({sessionsEnded: z.boolean()})).mutation(async (opt) => {
+            await opt.ctx.instance.sys.authorization.endAllSessions(opt.ctx.userId);
+            deleteCookie(opt.ctx.rawRequest.resHeaders, "Authorization", {path: "/", domain: opt.ctx.instance.sys.configuration.proxy.hostname});
+            opt.ctx.instance.sys.audit.record({action: "auth.logout_everywhere", actorId: opt.ctx.userId, ip: clientIp(opt.ctx.rawRequest.req, opt.ctx.rawRequest.server)});
+
+            return {sessionsEnded: true};
         }), logout: procedure.output(z.object({success: z.boolean()})).mutation(async (opt) => {
             const cookies = getCookies(opt.ctx.rawRequest.req.headers);
 
@@ -916,9 +991,10 @@ export const coreOnlineWorkspaceRouter = t.router({
                 };
             }
 
-            deleteCookie(opt.ctx.rawRequest.resHeaders, "Authorization");
+            deleteCookie(opt.ctx.rawRequest.resHeaders, "Authorization", {path: "/", domain: opt.ctx.instance.sys.configuration.proxy.hostname});
 
             await opt.ctx.instance.sys.authorization.endSessionByToken(decodeURIComponent(cookies.Authorization));
+            opt.ctx.instance.sys.audit.record({action: "auth.logout", actorId: opt.ctx.userId, ip: clientIp(opt.ctx.rawRequest.req, opt.ctx.rawRequest.server)});
 
             return {
                 success: true,

@@ -683,7 +683,7 @@ export default class UsersSystem extends System {
    @returns undefined - the user already exists
    */
   async createUser(username: string, password?: string): Promise<number | undefined> {
-    if (username in DISALLOWED_USERNAMES) {
+    if (DISALLOWED_USERNAMES.includes(username.toLowerCase())) {
       this.log.warning(`Failed to create user ${username} as it is a disallowed username`);
 
       return undefined;

@@ -4,9 +4,16 @@
 
 ## Begin OnlineWorkspace -----
 localhost {
+	header {
+		?X-Content-Type-Options nosniff
+		?X-Frame-Options DENY
+		?Referrer-Policy same-origin
+		?Cross-Origin-Opener-Policy same-origin
+		-Server
+	}
 	reverse_proxy /api/* http://localhost:3563 {
-		header_up X-Real-IP {remote}
-		header_up X-Forwarded-For {remote}
+		header_up X-Real-IP {remote_host}
+		header_up X-Forwarded-For {remote_host}
 	}
 	reverse_proxy http://localhost:5173
 }

@@ -5,3 +5,13 @@
 .spinner {
   margin: auto;
 }
+
+.dialog {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.error {
+  color: rgb(var(--uk-sys-color-error));
+}
