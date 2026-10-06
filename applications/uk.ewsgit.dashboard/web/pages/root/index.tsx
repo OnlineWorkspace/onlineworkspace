@@ -22,7 +22,7 @@ const RootPage: Component = () => {
       <div class={styles.widgets}>
         <For each={widgets()}>
           {(entry) => {
-            const { type, size } = parseWidgetEntry(entry);
+            const { type, size, settings } = parseWidgetEntry(entry);
             const Widget = Widgets[type as WidgetType];
 
             if (!Widget)
@@ -34,7 +34,7 @@ const RootPage: Component = () => {
 
             return (
               <WidgetFrame size={size}>
-                <Widget size={size} />
+                <Widget size={size} settings={settings} />
               </WidgetFrame>
             );
           }}

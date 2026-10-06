@@ -5,17 +5,18 @@ import UKCard from "@ewsgit/uikit-solid/src/components/card/UKCard.tsx";
 import UKIcon from "@ewsgit/uikit-solid/src/components/icon/UKIcon.tsx";
 import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.tsx";
 import type { Component } from "solid-js";
+import type { WidgetProps } from "../widgets";
 
 import Hour from "./components/hour/Hour";
 
 import styles from "./Widget.module.scss";
 
-const Widget: Component = () => {
+const Widget: Component<WidgetProps> = (props) => {
   return (
     <div class={styles.root}>
       <UKCard class={styles.card}>
         <UKText role={"title"} size={"s"}>
-          Weather For [Loc] (No weather app installed)
+          {props.settings.location ? `Weather for ${props.settings.location}` : "Choose a location in the dashboard editor"} (No weather app installed)
         </UKText>
         <div class={styles.header}>
           <div class={styles.overviewContainer}>

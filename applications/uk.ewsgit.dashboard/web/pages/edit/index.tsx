@@ -1,12 +1,16 @@
 import ADD_ICON from "@material-symbols/svg-700/outlined/add.svg";
 import CHECK_ICON from "@material-symbols/svg-700/outlined/check.svg";
 import CLOSE_ICON from "@material-symbols/svg-700/outlined/close.svg";
+import SETTINGS_ICON from "@material-symbols/svg-700/outlined/settings.svg";
 import DRAG_INDICATOR_ICON from "@material-symbols/svg-700/outlined/drag_indicator.svg";
 import UKButton from "@ewsgit/uikit-solid/src/components/button/UKButton.tsx";
+import UKButtonGroup from "@ewsgit/uikit-solid/src/components/buttonGroup/UKButtonGroup.tsx";
 import UKCard from "@ewsgit/uikit-solid/src/components/card/UKCard.tsx";
+import UKDialog from "@ewsgit/uikit-solid/src/components/dialog/UKDialog.tsx";
 import UKIcon from "@ewsgit/uikit-solid/src/components/icon/UKIcon.tsx";
 import UKIconButton from "@ewsgit/uikit-solid/src/components/iconButton/UKIconButton.tsx";
 import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.tsx";
+import UKTextField from "@ewsgit/uikit-solid/src/components/textField/UKTextField.tsx";
 import { useNavigate } from "@solidjs/router";
 import {
   closestCenter,
@@ -25,11 +29,13 @@ import DashboardHeader from "../root/Header";
 import rootStyles from "../root/index.module.scss";
 import Widgets, {
   defaultWidgetSize,
+  missingRequiredSetting,
   parseWidgetEntry,
   serialiseWidgetEntry,
   sizeLabel,
   type WidgetInfo,
   WidgetInfos,
+  type WidgetSettings,
   type WidgetSize,
   type WidgetType,
 } from "../../widgets/widgets";
@@ -49,6 +55,7 @@ interface WidgetInstance {
   id: string;
   type: string;
   size: WidgetSize;
+  settings: WidgetSettings;
 }
 
 const PALETTE_PREFIX = "palette:";
@@ -66,7 +73,7 @@ const uikitThemeClasses = () =>
 
 const infoFor = (type: string): WidgetInfo | undefined => WidgetInfos[type as WidgetType];
 
-const CanvasWidget: Component<{ instance: WidgetInstance; onRemove: () => void; onResize: (size: WidgetSize) => void }> = (props) => {
+const CanvasWidget: Component<{ instance: WidgetInstance; onRemove: () => void; onResize: (size: WidgetSize) => void; onOpenSettings: () => void }> = (props) => {
   const sortable = createSortable(props.instance.id);
   const WidgetComponent = Widgets[props.instance.type as WidgetType];
   const info = () => infoFor(props.instance.type);
@@ -95,7 +102,7 @@ const CanvasWidget: Component<{ instance: WidgetInstance; onRemove: () => void; 
         >
           <Suspense>
             {/*@ts-ignore*/}
-            <WidgetComponent size={props.instance.size} />
+            <WidgetComponent size={props.instance.size} settings={props.instance.settings} />
           </Suspense>
         </Show>
       </div>
@@ -123,6 +130,9 @@ const CanvasWidget: Component<{ instance: WidgetInstance; onRemove: () => void; 
                 )}
               </For>
             </div>
+          </Show>
+          <Show when={(info()?.settings?.length ?? 0) > 0}>
+            <UKIconButton size="xs" color="tonal" icon={SETTINGS_ICON} alt={`${info()?.label ?? "Widget"} settings`} onClick={props.onOpenSettings} />
           </Show>
           <UKIconButton size="xs" color="tonal" icon={CLOSE_ICON} alt={`Remove ${info()?.label ?? "widget"}`} onClick={props.onRemove} />
         </div>
@@ -178,17 +188,71 @@ const EndSlot: Component<{ empty: boolean }> = (props) => {
   );
 };
 
+const SettingsDialog: Component<{ widget: WidgetInstance | undefined; onSave: (settings: WidgetSettings) => void; onClose: () => void }> = (props) => {
+  const [draft, setDraft] = createSignal<WidgetSettings>({});
+  const info = () => (props.widget ? infoFor(props.widget.type) : undefined);
+  const canSave = () => !props.widget || !missingRequiredSetting(props.widget.type, draft());
+
+  // each time the dialog opens for a widget, start from that widget's current settings
+  createEffect(on(() => props.widget?.id, () => setDraft({ ...props.widget?.settings })));
+
+  const save = () => {
+    if (canSave()) props.onSave(draft());
+  };
+
+  return (
+    <UKDialog show={() => props.widget !== undefined} onClose={props.onClose} maxWidth="28rem">
+      <div class={styles.settingsDialog}>
+        <UKText role="title" size="l" align="start">
+          {info()?.label} settings
+        </UKText>
+        <For each={info()?.settings}>
+          {(field) => (
+            <div class={styles.settingsField}>
+              <UKTextField
+                color="outlined"
+                label={field.required ? `${field.label} *` : field.label}
+                labelEmpty={field.placeholder}
+                value={draft()[field.key] ?? ""}
+                defaultValue={draft()[field.key] ?? ""}
+                onValueChange={(value) => setDraft((current) => ({ ...current, [field.key]: value }))}
+                onSubmit={save}
+                onEscape={props.onClose}
+              />
+              <Show when={field.description}>
+                <UKText role="body" size="s" align="start" class={styles.muted}>
+                  {field.description}
+                </UKText>
+              </Show>
+            </div>
+          )}
+        </For>
+        <UKButtonGroup size="m" align="end">
+          <UKButton color="standard" onClick={props.onClose}>
+            Cancel
+          </UKButton>
+          <UKButton color="filled" disabled={!canSave()} onClick={save}>
+            Save
+          </UKButton>
+        </UKButtonGroup>
+      </div>
+    </UKDialog>
+  );
+};
+
 const EditWidgets: Component = () => {
   const navigate = useNavigate();
   const [savedWidgets] = createResource(() => trpc.dashboard.getWidgets.query());
   const [items, setItems] = createSignal<WidgetInstance[]>([]);
   const [loaded, setLoaded] = createSignal(false);
+  const [settingsId, setSettingsId] = createSignal<string | undefined>(undefined);
   const [activeId, setActiveId] = createSignal<string | undefined>(undefined);
   const [saveState, setSaveState] = createSignal<"idle" | "saving" | "saved" | "error">("idle");
 
   const allWidgetTypes = Object.keys(Widgets);
+  const settingsWidget = () => items().find((w) => w.id === settingsId());
   const itemIds = () => items().map((w) => w.id);
-  const serialisedItems = () => items().map((w) => serialiseWidgetEntry(w.type, w.size));
+  const serialisedItems = () => items().map((w) => serialiseWidgetEntry(w.type, w.size, w.settings));
   const itemsKey = () => serialisedItems().join("\n");
 
   let lastSavedKey: string | undefined;
@@ -234,7 +298,7 @@ const EditWidgets: Component = () => {
   onCleanup(() => clearTimeout(saveTimer));
 
   const addWidget = (type: string, atIndex?: number) => {
-    const widget = { id: generateInstanceId(), type, size: defaultWidgetSize(type) };
+    const widget: WidgetInstance = { id: generateInstanceId(), type, size: defaultWidgetSize(type), settings: {} };
 
     setItems((current) => {
       const next = [...current];
@@ -243,7 +307,12 @@ const EditWidgets: Component = () => {
 
       return next;
     });
+
+    // a widget that can't work without a setting asks for it straight away
+    if (missingRequiredSetting(type, widget.settings)) setSettingsId(widget.id);
   };
+
+  const updateSettings = (id: string, settings: WidgetSettings) => setItems((current) => current.map((w) => (w.id === id ? { ...w, settings } : w)));
 
   const resizeWidget = (id: string, size: WidgetSize) => setItems((current) => current.map((w) => (w.id === id ? { ...w, size } : w)));
 
@@ -330,7 +399,7 @@ const EditWidgets: Component = () => {
       <div class={`${rootStyles.widgets} ${styles.canvas}`} data-dragging={activeId() !== undefined} data-empty={items().length === 0}>
         <Show when={loaded()}>
           <SortableProvider ids={itemIds()}>
-            <For each={items()}>{(widget) => <CanvasWidget instance={widget} onRemove={() => removeWidget(widget.id)} onResize={(size) => resizeWidget(widget.id, size)} />}</For>
+            <For each={items()}>{(widget) => <CanvasWidget instance={widget} onOpenSettings={() => setSettingsId(widget.id)} onRemove={() => removeWidget(widget.id)} onResize={(size) => resizeWidget(widget.id, size)} />}</For>
           </SortableProvider>
           <Show when={items().length === 0 || activeId() !== undefined}>
             <EndSlot empty={items().length === 0} />
@@ -347,6 +416,15 @@ const EditWidgets: Component = () => {
           <For each={allWidgetTypes}>{(type) => <PaletteTile type={type} onAdd={() => addWidget(type)} />}</For>
         </div>
       </UKCard>
+
+      <SettingsDialog
+        widget={settingsWidget()}
+        onClose={() => setSettingsId(undefined)}
+        onSave={(settings) => {
+          updateSettings(settingsId()!, settings);
+          setSettingsId(undefined);
+        }}
+      />
 
       <DragOverlay>
         {(draggable) => {

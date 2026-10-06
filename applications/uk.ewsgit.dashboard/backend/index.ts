@@ -35,16 +35,15 @@ const router = t.router({
           .query(async (opt) => {
             const db = instance.sys.database.postgres();
 
-            const { forename, surname, username } =
-              (await db`SELECT forename, surname, username FROM public.users WHERE id = ${opt.ctx.userId}`)
+            const { display_name, username } =
+              (await db`SELECT display_name, username FROM public.users WHERE id = ${opt.ctx.userId}`)
                 ?.[0] || {
-                forename: "Unknown",
-                surname: "",
+                display_name: "Unknown",
                 username: "@unknown",
               };
 
             return {
-              displayName: `${forename} ${surname}`,
+              displayName: display_name || username,
               username: username,
               avatar: `${
                 opt.ctx.instance.sys.configuration.proxy.secure
@@ -85,9 +84,9 @@ const router = t.router({
         ) {
           const date = new Date(opt.input);
           const hours = date.getHours();
-          const forename = (await (await opt.ctx.instance.sys.users.getUserById(
+          const displayName = (await (await opt.ctx.instance.sys.users.getUserById(
             opt.ctx.userId,
-          ))?.getForename()) || "Anonymous";
+          ))?.getDisplayName()) || "Anonymous";
           const shouldShowTimeBasedGreeting = Math.random() < 0.5;
 
           if (shouldShowTimeBasedGreeting) {
@@ -97,19 +96,19 @@ const router = t.router({
             }
             // Good Morning 7am - 12pm
             if (hours >= 7 && hours < 12) {
-              return `Good Morning, ${forename}!`;
+              return `Good Morning, ${displayName}!`;
             }
             // Good Afternoon 12pm - 5pm
             if (hours >= 12 && hours < 17) {
-              return `Good Afternoon, ${forename}!`;
+              return `Good Afternoon, ${displayName}!`;
             }
             // Good Evening 5pm - 10pm
             if (hours >= 17 && hours < 22) {
-              return `Good Evening, ${forename}!`;
+              return `Good Evening, ${displayName}!`;
             }
             // Good Night 10pm - 12am
             if (hours >= 22 || hours < 0) {
-              return `Good Night, ${forename}!`;
+              return `Good Night, ${displayName}!`;
             }
             // Night owl 12am - 5am
             if (hours >= 0 && hours < 5) {
@@ -118,15 +117,15 @@ const router = t.router({
           }
 
           const greetingVariants = [
-            `Hiya, ${forename}!`,
-            `Hello, ${forename}!`,
-            `Welcome back, ${forename}!`,
-            `Hey there, ${forename}!`,
-            `Greetings, ${forename}!`,
-            `Howdy, ${forename}!`,
-            `Ahoy, ${forename}!`,
-            `Bonjour, ${forename}!`,
-            `Hola, ${forename}!`,
+            `Hiya, ${displayName}!`,
+            `Hello, ${displayName}!`,
+            `Welcome back, ${displayName}!`,
+            `Hey there, ${displayName}!`,
+            `Greetings, ${displayName}!`,
+            `Howdy, ${displayName}!`,
+            `Ahoy, ${displayName}!`,
+            `Bonjour, ${displayName}!`,
+            `Hola, ${displayName}!`,
           ];
 
           const randomGreetingVariantIndex = Math.floor(
@@ -137,7 +136,7 @@ const router = t.router({
             return greetingVariants[randomGreetingVariantIndex];
           }
 
-          return `Hiya, ${forename}!`;
+          return `Hiya, ${displayName}!`;
         }
 
         return undefined;
@@ -222,20 +221,34 @@ const router = t.router({
         (await opt.ctx.user()).getPath(),
         "assets/wallpapers",
       );
-      const rawWallpaperPath = path.join(wallpapersRootPath, "current.webp");
-      const resizedWallpapersPath = path.join(wallpapersRootPath, "resized");
-      const requiredResizedWallpaperPath = path.join(
-        resizedWallpapersPath,
-        `${opt.input.width}x${opt.input.height}.webp`,
+      const userWallpaperPath = path.join(wallpapersRootPath, "current.webp");
+      const instanceBackgroundPath = path.join(
+        instance.sys.filesystem.FS_ROOT,
+        "assets/default_user_background.webp",
       );
 
-      if (!existsSync(rawWallpaperPath)) {
+      // users who have not chosen a wallpaper get the instance's default background, when it has one
+      const usesInstanceBackground = !existsSync(userWallpaperPath);
+
+      if (usesInstanceBackground && !existsSync(instanceBackgroundPath)) {
         return undefined;
       }
 
+      const rawWallpaperPath = usesInstanceBackground ? instanceBackgroundPath : userWallpaperPath;
+      // the modified time is part of the shared copies' name so a replaced default is never served from the cache
+      const resizedWallpapersPath = usesInstanceBackground
+        ? path.join(instance.sys.filesystem.FS_ROOT, "cache/default_user_background")
+        : path.join(wallpapersRootPath, "resized");
+      const resizedName = usesInstanceBackground
+        ? `${opt.input.width}x${opt.input.height}-${Math.round((await fs.stat(instanceBackgroundPath)).mtimeMs)}.webp`
+        : `${opt.input.width}x${opt.input.height}.webp`;
+      const requiredResizedWallpaperPath = path.join(resizedWallpapersPath, resizedName);
+
       if (!existsSync(requiredResizedWallpaperPath)) {
+        await fs.mkdir(resizedWallpapersPath, { recursive: true });
+
         const options = await (async () => {
-          if (existsSync(path.join(wallpapersRootPath, "config.json"))) {
+          if (!usesInstanceBackground && existsSync(path.join(wallpapersRootPath, "config.json"))) {
             const options = JSON.parse(
               await fs.readFile(
                 path.join(wallpapersRootPath, "config.json"),
@@ -282,7 +295,7 @@ instance.sys.event.on(WorkspacesEvent.BeforeStartupComplete, () => {
     new BooleanApplicationSetting("uk.ewsgit.dashboard", "show_greeting", true)
       .setDisplayName("Show Greeting")
       .setDescription(
-        "Should a greeting message be shown on the dashboard welcoming the user. The message will include the user's forename if available.",
+        "Should a greeting message be shown on the dashboard welcoming the user. The message will include the user's display name if available.",
       ),
   );
   instance.sys.settings.registerApplicationSetting(
