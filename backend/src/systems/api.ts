@@ -104,6 +104,27 @@ export default class ApiSystem extends System {
                 }
             },
         }, {
+            method: ["GET"], pattern: new URLPattern({pathname: "/api/material-symbol/:name"}),
+            async handler(req, rawParams) {
+                const name = rawParams?.pathname.groups.name;
+
+                if (!name || !/^[a-z0-9_]+$/.test(name)) {
+                    return Response.json({
+                        code: "INVALID_REQUEST", message: "invalid icon name",
+                    }) as unknown as Response;
+                }
+
+                const iconPath = path.join(self.instance.sys.filesystem.SRC_ROOT, "../../node_modules/@material-symbols/svg-700/outlined/", `${name}.svg`);
+
+                try {
+                    return serveFile(req, await fs.realpath(iconPath));
+                } catch (err) {
+                    return Response.json({
+                        code: "NOT_FOUND", message: "unknown icon",
+                    }, {status: 404}) as unknown as Response;
+                }
+            },
+        }, {
             method: ["GET"], pattern: new URLPattern({pathname: "/api/application-icon/*"}),
             async handler(req, rawParams) {
                 const params = rawParams?.pathname.groups["0"];

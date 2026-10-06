@@ -1,6 +1,7 @@
 import NOTIFICATIONS_ICON from "@material-symbols/svg-700/outlined/notifications.svg";
 import NOTIFICATIONS_UNREAD_ICON from "@material-symbols/svg-700/outlined/notifications_unread.svg";
 import { DividerDirection } from "@ewsgit/uikit-solid/src/components/divider/lib/direction.ts";
+import UKButton from "@ewsgit/uikit-solid/src/components/button/UKButton.tsx";
 import UKDivider from "@ewsgit/uikit-solid/src/components/divider/UKDivider.tsx";
 import UKIconButton from "@ewsgit/uikit-solid/src/components/iconButton/UKIconButton.tsx";
 import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.tsx";
@@ -39,6 +40,11 @@ const NavigationRailNotifications: Component<{
     if (action?.type === "reload") window.location.reload();
   };
 
+  const clearAll = () => {
+    for (const notification of notifications()) notificationStore.dismiss(notification.uuid);
+    setFlyoutNotifications([]);
+  };
+
   onMount(() => {
     const unsubscribe = notificationStore.onNotification((notification) => {
       setFlyoutNotifications((current) => [...current.filter((n) => n.uuid !== notification.uuid), notification]);
@@ -75,10 +81,22 @@ const NavigationRailNotifications: Component<{
       </div>
       {props.isToggled && (
         <div class={styles.notifications}>
+          <div class={styles.panelHeader}>
+            <UKText role="title" size="l">
+              Notifications
+            </UKText>
+            {notifications().length > 0 && (
+              <UKButton color="standard" onClick={clearAll}>
+                Clear all
+              </UKButton>
+            )}
+          </div>
           {notifications().length > 0 ? (
-            <For each={notifications()}>
-              {(notification) => <Notification respond={(type, value) => respond(notification, type, value)} notification={notification} />}
-            </For>
+            <div class={styles.list}>
+              <For each={notifications()}>
+                {(notification) => <Notification respond={(type, value) => respond(notification, type, value)} notification={notification} />}
+              </For>
+            </div>
           ) : (
             <div class={styles.noNotificationsMessage}>
               <UKText role="title" size="l" align="center">

@@ -1,38 +1,92 @@
-.root {
-    display: flex;
-    flex-direction: column;
-    width: 20rem;
-    overflow: hidden;
-}
+.root.root {
+  --notification-bg: rgb(var(--uk-sys-color-surface-container-highest));
+  --notification-fg: rgb(var(--uk-sys-color-on-surface));
+  --notification-fg-variant: rgb(var(--uk-sys-color-on-surface));
+  --notification-accent: rgb(var(--uk-sys-color-primary));
+  --notification-accent-container: rgb(var(--uk-sys-color-secondary-container));
+  --notification-on-accent: rgb(var(--uk-sys-color-on-primary));
+  --notification-on-accent-container: rgb(var(--uk-sys-color-on-secondary-container));
 
-.progressBar {
-    width: calc(100% + 2rem);
-    height: 0.25rem;
-    background: rgb(var(--uk-sys-color-primary));
-    margin-top: -1rem;
-    margin-left: -1rem;
-    margin-right: -1rem;
-    margin-bottom: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  box-sizing: border-box;
+  align-items: stretch;
+  padding: 1rem;
+  gap: 0.5rem;
+  border-radius: 1.75rem;
+  background: var(--notification-bg);
+  color: var(--notification-fg);
+
+  &[data-priority="important"] {
+    --notification-bg: rgb(var(--uk-sys-color-primary-container));
+    --notification-fg: rgb(var(--uk-sys-color-on-primary-container));
+    --notification-fg-variant: rgb(var(--uk-sys-color-on-primary-container));
+    --notification-accent-container: rgb(var(--uk-sys-color-primary));
+    --notification-on-accent-container: rgb(var(--uk-sys-color-on-primary));
+  }
+
+  &[data-priority="urgent"] {
+    --notification-bg: rgb(var(--uk-sys-color-error-container));
+    --notification-fg: rgb(var(--uk-sys-color-on-error-container));
+    --notification-fg-variant: rgb(var(--uk-sys-color-on-error-container));
+    --notification-accent: rgb(var(--uk-sys-color-error));
+    --notification-accent-container: rgb(var(--uk-sys-color-error));
+    --notification-on-accent-container: rgb(var(--uk-sys-color-on-error));
+  }
 }
 
 .header {
-    display: flex;
-    flex-direction: row;
-    gap: 0.5rem;
-    padding-bottom: 0.5rem;
-    color: rgb(var(--uk-sys-color-on-surface));
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--notification-fg-variant);
+}
+
+// the 40px icon button would stretch the header; pull its box into the card padding so the 24px glyph lines up with the edge
+.close {
+  margin: -0.5rem -0.5rem -0.5rem 0;
+  flex-shrink: 0;
+}
+
+.sourceIcon {
+  display: grid;
+  place-items: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  --icon-size: 1rem;
+  border-radius: 50%;
+  background: var(--notification-accent-container);
+  color: var(--notification-on-accent-container);
+  font-size: 1rem;
+}
+
+.source {
+  color: var(--notification-fg);
+  opacity: 0.85;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.title {
+  padding-top: 0.25rem;
+  color: var(--notification-fg);
 }
 
 .body {
-    padding-top: 0.5rem;
-    color: rgb(var(--uk-sys-color-on-surface-variant));
+  color: var(--notification-fg-variant);
+  overflow-wrap: anywhere;
 }
 
 .footer {
-    display: flex;
-    flex-direction: row;
-    justify-content: end;
-    align-items: center;
-    padding-top: 0.5rem;
-    gap: 0.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  padding-top: 0.5rem;
 }
+

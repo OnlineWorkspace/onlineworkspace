@@ -62,9 +62,9 @@
   height: calc(100vh - 2rem);
   width: calc(20rem + 2rem);
 
-  background-color: rgb(var(--uk-sys-color-surface-container));
+  background-color: rgb(var(--uk-sys-color-surface-container-low));
   border: 1px solid rgb(var(--uk-sys-color-outline-variant));
-  border-radius: calc(var(--uk-sys-shape-corner-medium) + 1rem);
+  border-radius: 2rem;
 
   transition: left var(--uk-sys-motion-duration-250) var(--uk-sys-motion-easing-emphasized-decelerate);
 
@@ -82,8 +82,23 @@
   }
 }
 
+.panelHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.25rem 0.5rem 0.5rem;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  overflow-y: auto;
+}
+
 .flyoutNotifications {
   position: absolute;
+  width: 20rem;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
