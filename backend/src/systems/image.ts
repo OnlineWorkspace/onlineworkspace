@@ -195,7 +195,7 @@ export default class ImageSystem extends System {
 
     imageProcessor.resize(targetDimensions.width, targetDimensions.height, {
       withoutEnlargement: true,
-      fit: options?.fit
+      fit: options?.fit === "fill" || options?.fit === "inside" ? options.fit : "fill",
     });
 
     if (options?.changeFormatTo) {
