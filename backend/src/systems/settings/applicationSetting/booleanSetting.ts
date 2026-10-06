@@ -73,9 +73,10 @@ export class GlobalBooleanApplicationSetting extends GlobalApplicationSetting<bo
   async onValueChange(): Promise<boolean> {
     const settingValue = await this.instance.sys.settings.getGlobalSetting(`app:${this.applicationId}:${this.id}`);
 
-    if (settingValue === undefined) return this.defaultValue;
+    if (settingValue === undefined || settingValue === null) return this.defaultValue;
 
-    return settingValue;
+    // global settings live in a text column, so "false" comes back as a string that would otherwise count as true
+    return settingValue === true || settingValue === "true";
   }
 
   setDisplayName(displayName: string): this {
