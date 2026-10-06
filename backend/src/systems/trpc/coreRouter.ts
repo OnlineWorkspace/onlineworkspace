@@ -155,7 +155,7 @@ export const coreOnlineWorkspaceRouter = t.router({
             return await Promise.all(users.map(async u => {
                 return {
                     username: await u.getUsername(),
-                    displayName: await u.getFormattedFullName(),
+                    displayName: await u.getDisplayName(),
                     passwordNote: await u.getPasswordNote()
                 }
             }));
@@ -248,8 +248,7 @@ export const coreOnlineWorkspaceRouter = t.router({
                     };
                 }
 
-                const splitDisplayName = opt.input.displayName.split(" ");
-                await user.setFullName(splitDisplayName[0], splitDisplayName.slice(1).join(" "));
+                await user.setDisplayName(opt.input.displayName);
 
                 if ("emailAddress" in opt.input) {
                     await user.setEmail(opt.input.emailAddress);
@@ -630,12 +629,12 @@ ${opt.ctx.instance.sys.configuration.termsOfUse.message}`;
             user: {
                 name: procedure
                     .output(z.object({
-                        username: z.string(), forename: z.string(), surname: z.string(),
+                        username: z.string(), displayName: z.string(),
                     }),)
                     .query(async (opt) => {
                         const db = opt.ctx.instance.sys.database.postgres();
 
-                        const user = (await db`SELECT username, forename, surname
+                        const user = (await db`SELECT username, display_name
                                                FROM users
                                                WHERE id = ${opt.ctx.userId};`)?.[0];
 
@@ -647,8 +646,7 @@ ${opt.ctx.instance.sys.configuration.termsOfUse.message}`;
 
                         return {
                             username: user.username || "@",
-                            forename: user.forename || "Unknown",
-                            surname: user.surname || "",
+                            displayName: user.display_name || user.username || "Unknown",
                         };
                     }),
             }, getApplications: procedure

@@ -21,7 +21,7 @@ export default class ConsoleCommandsSystem extends System {
     for (const cmd of commands) {
       const importedCommand = (await import(`file://${path.join(this.instance.sys.filesystem.SRC_ROOT, "/systems/consoleCommands/", cmd)}`)).default;
       this.commands.push(importedCommand);
-      this.log.info(`Registered command ${this.log.emphasis(importedCommand.command)}`);
+      this.log.debug(`Registered command ${this.log.emphasis(importedCommand.command)}`);
     }
 
     return true;

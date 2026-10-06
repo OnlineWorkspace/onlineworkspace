@@ -67,112 +67,40 @@ export class WorkspacesUser {
   }
 
   /**
-   Sets the user's forename to forename
-   @return `false` - failed to change the forename
-   @return `true` - successfully changed the forename
+   Sets the user's display name
+   @return `false` - failed to change the display name
+   @return `true` - successfully changed the display name
    */
-  async setForename(forename: string): Promise<boolean> {
+  async setDisplayName(displayName: string): Promise<boolean> {
     const db = this.instance.sys.database.postgres();
 
     try {
       await db`UPDATE public.users
-               SET forename = ${forename}
+               SET display_name = ${displayName}
                WHERE id = ${this.userId}`;
 
-      this.instance.log.system.info(`Set Forename to '${forename}' for ${this.userId}`);
+      this.instance.log.system.info(`Set display name to '${displayName}' for ${this.userId}`);
 
       return true;
     } catch (_) {
-      this.instance.sys.users.log.error(`Failed to set forename for ${this.userId}`);
+      this.instance.sys.users.log.error(`Failed to set display name for ${this.userId}`);
       return false;
     }
   }
 
   /**
-   Get the user's forename
-   @return `string` - the users forename
-   @return `undefined` - could not get the user's forename
+   Get the user's display name, falling back to their username
    */
-  async getForename(): Promise<string | undefined> {
+  async getDisplayName(): Promise<string> {
     const db = this.instance.sys.database.postgres();
 
-    return (
-      (
-        await db`SELECT forename
-                     FROM public.users
-                     WHERE id = ${this.userId}`
-      )?.[0]?.forename || undefined
-    );
-  }
+    const row = (
+      await db`SELECT display_name, username
+               FROM public.users
+               WHERE id = ${this.userId}`
+    )?.[0];
 
-  /**
-   Sets the user's surname to surname
-   @return `false` - failed to change the surname
-   @return `true` - successfully changed the surname
-   */
-  async setSurname(surname: string): Promise<boolean> {
-    const db = this.instance.sys.database.postgres();
-
-    try {
-      await db`UPDATE public.users
-               SET surname = ${surname}
-               WHERE id = ${this.userId}`;
-
-      this.instance.log.system.info(`Set Surname to '${surname}' for ${this.userId}`);
-
-      return true;
-    } catch (_) {
-      this.instance.sys.users.log.error(`Failed to set surname for ${this.userId}`);
-      return false;
-    }
-  }
-
-  /**
-   Get the user's surname
-   @return `string` - the users surname
-   @return `undefined` - could not get the user's surname
-   */
-  async getSurname(): Promise<string | undefined> {
-    const db = this.instance.sys.database.postgres();
-
-    return (
-      (
-        await db`SELECT surname
-                     FROM public.users
-                     WHERE id = ${this.userId}`
-      )?.[0]?.surname || undefined
-    );
-  }
-
-  /**
-   Sets the user's forename and surname to the provided forename and surname
-   @return `false` - failed to change the surname
-   @return `true` - successfully changed the surname
-   */
-  async setFullName(forename: string, surname: string): Promise<boolean> {
-    const forenameRes = await this.setForename(forename);
-    const surnameRes = await this.setSurname(surname);
-
-    return forenameRes && surnameRes;
-  }
-
-  /**
-   Gets the user's forename and surname
-   */
-  async getFullName(): Promise<{ forename?: string; surname?: string }> {
-    const forenameRes = await this.getForename();
-    const surnameRes = await this.getSurname();
-
-    return { forename: forenameRes, surname: surnameRes };
-  }
-
-  /**
-   Gets the user's forename and surname formatted into a single string
-   */
-  async getFormattedFullName(): Promise<string> {
-    const fullName = await this.getFullName();
-
-    return `${fullName.forename}${fullName.surname !== "" || fullName.surname !== undefined ? ` ${fullName.surname}` : ""}`;
+    return row?.display_name || row?.username || "Unknown";
   }
 
   /**
@@ -248,21 +176,50 @@ export class WorkspacesUser {
   }
 
   /**
-   Sets the user's email to email
+   Sets the user's email, which is unverified unless `verified` is set
    @returns `false` - failed to change the email
    @returns `true` - successfully changed the email
    */
-  async setEmail(email: string): Promise<boolean> {
+  async setEmail(email: string, verified = false): Promise<boolean> {
     const db = this.instance.sys.database.postgres();
     try {
       await db`UPDATE public.users
-               SET email = ${email}
+               SET email = ${email}, is_email_verified = ${verified}
                WHERE id = ${this.userId}`;
       return true;
     } catch (_) {
       this.instance.sys.users.log.error(`Failed to set email for ${this.userId}`);
       return false;
     }
+  }
+
+  /**
+   Removes the user's email and its verification
+   */
+  async removeEmail(): Promise<boolean> {
+    const db = this.instance.sys.database.postgres();
+    try {
+      await db`UPDATE public.users
+               SET email = NULL, is_email_verified = FALSE
+               WHERE id = ${this.userId}`;
+      return true;
+    } catch (_) {
+      this.instance.sys.users.log.error(`Failed to remove email for ${this.userId}`);
+      return false;
+    }
+  }
+
+  /**
+   Has the user proven they own their email
+   */
+  async isEmailVerified(): Promise<boolean> {
+    const db = this.instance.sys.database.postgres();
+
+    return !!(
+      await db`SELECT is_email_verified
+               FROM public.users
+               WHERE id = ${this.userId}`
+    )?.[0]?.is_email_verified;
   }
 
   /**
@@ -315,6 +272,42 @@ export class WorkspacesUser {
                      FROM public.users
                      WHERE id = ${this.userId}`
       )?.[0]?.gender || undefined
+    );
+  }
+
+  /**
+   Sets the user's pronouns, e.g. "they/them"
+   @returns `false` - failed to change the pronouns
+   @returns `true` - successfully changed the pronouns
+   */
+  async setPronouns(pronouns: string): Promise<boolean> {
+    const db = this.instance.sys.database.postgres();
+
+    try {
+      await db`UPDATE public.users
+               SET pronouns = ${pronouns}
+               WHERE id = ${this.userId}`;
+
+      return true;
+    } catch (_) {
+      this.instance.sys.users.log.error(`Failed to set pronouns for ${this.userId}`);
+      return false;
+    }
+  }
+
+  /**
+   Get the user's pronouns
+   @returns `string` - the user's pronouns, empty if they haven't set any
+   */
+  async getPronouns(): Promise<string> {
+    const db = this.instance.sys.database.postgres();
+
+    return (
+      (
+        await db`SELECT pronouns
+                 FROM public.users
+                 WHERE id = ${this.userId}`
+      )?.[0]?.pronouns || ""
     );
   }
 
@@ -596,8 +589,8 @@ export default class UsersSystem extends System {
 
      id - permanent unique user id number (number)
      username - the user's changeable username (string)
-     forename - the user's chosen forename (string)
-     surname - the user's chosen surname (string)
+     display_name - the user's chosen display name (string)
+     pronouns - the user's chosen pronouns, only used when their gender is "other" (string)
      gender - the user's chosen gender ("female" | "male" | "other")
      bio - the user's chosen bio (string)
      storage_quota - the user's storage quota in MB (number)
@@ -615,9 +608,9 @@ export default class UsersSystem extends System {
              (
                id                   SERIAL PRIMARY KEY,
                username             TEXT,
-               forename             TEXT,
-               surname              TEXT   DEFAULT '',
+               display_name         TEXT,
                gender               TEXT   DEFAULT 'other',
+               pronouns             TEXT   DEFAULT '',
                bio                  TEXT,
                storage_quota        BIGINT DEFAULT 8589934592,
                email                TEXT,
@@ -633,6 +626,22 @@ export default class UsersSystem extends System {
                color_scheme         JSONB
              )`;
 
+    // migrate the legacy forename/surname columns into display_name
+    await db`ALTER TABLE users ADD COLUMN IF NOT EXISTS display_name TEXT`;
+    await db`ALTER TABLE users ADD COLUMN IF NOT EXISTS pronouns TEXT DEFAULT ''`;
+    const legacyColumns = await db`SELECT column_name
+                                   FROM information_schema.columns
+                                   WHERE table_schema = 'public'
+                                     AND table_name = 'users'
+                                     AND column_name IN ('forename', 'surname')`;
+    if (legacyColumns.some((c) => c.column_name === "forename")) {
+      await db`UPDATE users
+               SET display_name = TRIM(CONCAT(forename, ' ', COALESCE(surname, '')))
+               WHERE display_name IS NULL`;
+    }
+    await db`ALTER TABLE users DROP COLUMN IF EXISTS forename`;
+    await db`ALTER TABLE users DROP COLUMN IF EXISTS surname`;
+
     if ((await this.getAdministrators()).length === 0) {
       this.log.warning("No administrator account exists, creating default administrator account with username 'admin' and password 'password'");
 
@@ -645,8 +654,7 @@ export default class UsersSystem extends System {
         if (!adminUser) {
           this.log.error("Admin user didn't exist and couldn't be created!");
         } else {
-          // Name: Admin Istrator
-          await adminUser.setFullName("Admin", "Istrator");
+          await adminUser.setDisplayName("Admin Istrator");
           await adminUser.setIsAdministrator(true);
 
           const defaultPassword = "password";
@@ -693,8 +701,7 @@ export default class UsersSystem extends System {
 
     const user = {
       username,
-      forename: "John",
-      surname: `${username}`,
+      display_name: username,
     };
 
     const id = (await db`INSERT INTO public.users ${db(user)} RETURNING id`)?.[0]?.id;

@@ -31,6 +31,31 @@ export default class EmailSystem extends System {
     return true;
   }
 
+  /**
+   * Applies the current mail server configuration without a restart: any open connection is closed and, when the mail server is
+   * enabled, a new one is made and checked.
+   * @returns `error` is the reason the connection check failed
+   */
+  async reconfigure(): Promise<{ ok: true } | { ok: false; error: string }> {
+    this.transporter?.close();
+
+    if (!this.instance.sys.configuration.mailServer.enabled) {
+      this.log.info("Mail server disabled");
+      return { ok: true };
+    }
+
+    this.transporter = nm.createTransport(this.instance.sys.configuration.mailServer);
+
+    try {
+      await this.transporter.verify();
+      this.log.info("Mail server reconfigured");
+      return { ok: true };
+    } catch (err) {
+      this.log.error(err);
+      return { ok: false, error: err instanceof Error ? err.message : "The mail server could not be reached" };
+    }
+  }
+
   override async startup(): Promise<boolean> {
     if (!this.instance.sys.configuration.mailServer.enabled) {
       this.log.info("Mail server disabled");

@@ -30,7 +30,7 @@ export default class EmailAuthenticator {
 
     this.emailCodes[code] = { userId, expires: Date.now() };
 
-    const fullName = await user.getFullName();
+    const displayName = await user.getDisplayName();
     const emailAddress = await user.getEmail();
 
     if (!emailAddress) {
@@ -46,7 +46,7 @@ export default class EmailAuthenticator {
       {
         type: "string",
         content:
-          `Someone has just requested a login code for an account linked to this email address, ${fullName.forename} ${fullName.surname} (${await user
+          `Someone has just requested a login code for an account linked to this email address, ${displayName} (${await user
             .getUsername()}). If this was you, the code is '${code}' otherwise, you can change your login credentials or choose to ignore this email.`,
       },
     );

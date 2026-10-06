@@ -77,7 +77,7 @@ export default class SettingsSystem extends System {
     }
 
     setting.instance = this.instance;
-    this.log.info(`Registered '${setting.applicationId}' setting '${setting.id}'`);
+    this.log.debug(`Registered '${setting.applicationId}' setting '${setting.id}'`);
     this.applicationSettings[setting.applicationId].push(setting);
 
     return this;
