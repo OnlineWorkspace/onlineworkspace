@@ -1,3 +1,21 @@
 .spinner {
   margin: auto;
 }
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 4px 8px 16px 8px;
+}
+
+.brandIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background-color: rgb(var(--uk-sys-color-primary));
+  color: rgb(var(--uk-sys-color-on-primary));
+}

@@ -25,3 +25,11 @@
   height: 70%;
   object-fit: contain;
 }
+
+.glyph {
+  width: 70%;
+  height: 70%;
+  background-color: rgb(var(--uk-sys-color-on-surface));
+  mask: var(--icon-url) center / contain no-repeat;
+  -webkit-mask: var(--icon-url) center / contain no-repeat;
+}

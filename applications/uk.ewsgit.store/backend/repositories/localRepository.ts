@@ -30,32 +30,10 @@ export default class LocalApplicationRepository extends ApplicationRepository {
       displayName: applicationManifest.displayName || "Not Defined",
       authors: applicationManifest.authors,
       description: applicationManifest.description || "Not Defined",
-      icon: applicationManifest.icon
-        ? applicationManifest.icon.type === "image"
-          ? {
-            type: "image",
-            value: path.join(
-              instance.sys.filesystem.APPLICATIONS_ROOT,
-              applicationId,
-              applicationManifest.icon.value,
-            ),
-          }
-          : {
-            type: "icon",
-            value: path.join(
-              instance.sys.filesystem.APPLICATIONS_ROOT,
-              applicationId,
-              applicationManifest.icon.value,
-            ),
-          }
-        : {
-          type: "icon",
-          value: path.join(
-            instance.sys.filesystem.APPLICATIONS_ROOT,
-            applicationId,
-            "web/node_modules/@material-symbols/svg-700/outlined/broken_image.svg",
-          ),
-        },
+      icon: {
+        type: applicationManifest.icon?.type === "image" ? "image" : "icon",
+        value: (await this.getIconPath(applicationId)) ?? "",
+      },
       id: applicationId,
       modules: Object.keys(applicationManifest.modules),
       bannerImage: applicationManifest.bannerImage
@@ -114,6 +92,30 @@ export default class LocalApplicationRepository extends ApplicationRepository {
 
   async getPromotedApplications(): Promise<string[]> {
     return ["uk.ewsgit.dashboard", "uk.ewsgit.settings", "uk.ewsgit.ghostty"];
+  }
+
+  async getIconPath(applicationId: string): Promise<string | undefined> {
+    const manifestPath = path.join(this.getApplicationRoot(applicationId), "manifest.json");
+
+    if (!existsSync(manifestPath)) return undefined;
+
+    const icon = (JSON.parse(await fs.readFile(manifestPath, "utf8")) as OnlineWorkspaceApplication).icon;
+
+    if (!icon) return undefined;
+
+    const iconPath = icon.type === "material-symbol"
+      ? path.join(instance.sys.filesystem.SRC_ROOT, "../../node_modules/@material-symbols/svg-700/outlined/", `${icon.value}.svg`)
+      : path.join(this.getApplicationRoot(applicationId), icon.value);
+
+    try {
+      return await fs.realpath(iconPath);
+    } catch (_) {
+      return undefined;
+    }
+  }
+
+  private getApplicationRoot(applicationId: string): string {
+    return path.join(instance.sys.filesystem.SRC_ROOT, "../../applications/", applicationId);
   }
 
   async getInstallURI(applicationId: string): Promise<string> {

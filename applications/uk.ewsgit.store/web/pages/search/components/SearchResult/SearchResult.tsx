@@ -1,4 +1,5 @@
 import UKCard from "@ewsgit/uikit-solid/src/components/card/UKCard.tsx";
+import ApplicationIcon from "../../../../components/ApplicationIcon/ApplicationIcon";
 import UKIcon from "@ewsgit/uikit-solid/src/components/icon/UKIcon.tsx";
 import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.tsx";
 import { useNavigate } from "@solidjs/router";
@@ -21,11 +22,7 @@ const SearchResult: Component<{ applicationId: string; repository: string }> = (
       <img alt="" class={styles.headerImage} draggable={false} src={result()?.bannerImage || "/assets/placeholder/placeholder_image.svg"} />
       <div class={styles.middleSegment}>
         <div class={styles.iconContainer}>
-          {result()?.icon.type === "icon" ? (
-            <UKIcon class={styles.icon}>{result()?.icon.value || "/assets/onlineworkspace/online_workspace_logo.svg"}</UKIcon>
-          ) : (
-            <img alt="" class={styles.icon} draggable={false} src={result()?.icon.value || "/assets/onlineworkspace/online_workspace_logo.svg"} />
-          )}
+          <ApplicationIcon icon={result()?.icon} size="l" />
         </div>
         <UKText class={styles.title} role={"title"} size={"l"} emphasized>
           {result()?.displayName}

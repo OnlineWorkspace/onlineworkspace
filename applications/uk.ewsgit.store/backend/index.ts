@@ -5,6 +5,7 @@ import { adminProcedure, createOnlineWorkspaceTRPCContext, procedure } from "@on
 import { initTRPC } from "@trpc/server";
 import fastFolderSizeSync from "fast-folder-size/sync.js";
 import z from "zod";
+import path from "node:path";
 import type ApplicationRepository from "./applicationRepository.ts";
 import LocalApplicationRepository from "./repositories/localRepository.ts";
 
@@ -171,7 +172,12 @@ const router = t.router({
       }
 
       if (app.icon) {
-        app.icon.value = await instance.sys.image.serveImage(opt.ctx.userId, await instance.sys.applications.getApplicationIconPath(opt.input.applicationId))
+        const iconPath = await repository.getIconPath(opt.input.applicationId)
+
+        // a missing icon is replaced by a monochrome placeholder, which the web ui tints like a symbol
+        if (!iconPath) app.icon.type = "icon"
+
+        app.icon.value = await instance.sys.image.serveImage(opt.ctx.userId, iconPath ?? path.join(instance.sys.filesystem.FS_ROOT, "assets/missing.png"))
       }
 
       return { ...app, isInstalled: instance.sys.applications.availableApplications.find((aid) => aid.manifest!.id === app.id) };
@@ -187,7 +193,11 @@ const router = t.router({
 
       if (!app) return undefined;
 
-      app.icon.value = await instance.sys.image.serveImage(opt.ctx.userId, await instance.sys.applications.getApplicationIconPath(app.id))
+      const iconPath = await repository.getIconPath(app.id)
+
+      if (!iconPath) app.icon.type = "icon"
+
+      app.icon.value = await instance.sys.image.serveImage(opt.ctx.userId, iconPath ?? path.join(instance.sys.filesystem.FS_ROOT, "assets/missing.png"))
 
       if (app.bannerImage) {
         app.bannerImage = await instance.sys.image.serveImage(opt.ctx.userId, app.bannerImage)

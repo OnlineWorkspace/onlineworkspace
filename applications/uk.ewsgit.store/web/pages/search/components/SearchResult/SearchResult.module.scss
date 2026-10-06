@@ -14,16 +14,6 @@
     .headerImage {
       scale: 1.1;
     }
-
-    .iconContainer {
-      background-color: rgb(var(--uk-sys-color-on-surface), var(--uk-sys-state-hover-state-layer-opacity));
-    }
-  }
-
-  &:active {
-    .iconContainer {
-          background-color: rgb(var(--uk-sys-color-on-surface), var(--uk-sys-state-pressed-state-layer-opacity));
-    }
   }
 }
 
@@ -46,12 +36,7 @@
 }
 
 .iconContainer {
-  padding: 0.25rem;
-  background-color: rgb(var(--uk-sys-color-surface-container-highest));
-  border-radius: 1rem;
   margin-top: -2.25rem;
-  backdrop-filter: blur(1rem);
-  transition: background-color var(--uk-sys-motion-duration-100) var(--uk-sys-motion-easing-standard-normal);
 }
 
 .icon {

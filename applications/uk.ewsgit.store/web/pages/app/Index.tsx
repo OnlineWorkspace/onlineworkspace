@@ -3,7 +3,7 @@ import DELETE_ICON from "@material-symbols/svg-700/outlined/delete.svg";
 import DOWNLOAD_ICON from "@material-symbols/svg-700/outlined/download.svg";
 import UKButton from "@ewsgit/uikit-solid/src/components/button/UKButton.tsx";
 import UKCard from "@ewsgit/uikit-solid/src/components/card/UKCard.tsx";
-import UKIcon from "@ewsgit/uikit-solid/src/components/icon/UKIcon.tsx";
+import ApplicationIcon from "../../components/ApplicationIcon/ApplicationIcon";
 import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.tsx";
 import { useNavigate, useParams, useSearchParams } from "@solidjs/router";
 import { type Component, createResource, For, type JSX, Show } from "solid-js";
@@ -65,19 +65,7 @@ const ApplicationPage: Component = () => {
         />
       </div>
       <div class={styles.headerContent}>
-        {application()?.icon.type === "image"
-          ? (
-            <img
-              alt=""
-              class={styles.iconImage}
-              src={application()?.icon.value || "/assets/onlineworkspace/online_workspace_logo.svg"}
-            />
-          )
-          : (
-            <UKIcon class={styles.iconIcon}>
-              {application()?.icon.value || ""}
-            </UKIcon>
-          )}
+        <ApplicationIcon icon={application()?.icon} size="l" />
         <UKText role="display" size="m">
           {application()?.displayName}
         </UKText>

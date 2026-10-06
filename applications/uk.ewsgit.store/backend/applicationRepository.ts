@@ -25,5 +25,7 @@ export default abstract class ApplicationRepository {
   abstract searchForApplicationIds(query: string): Promise<string[]>;
   abstract getApplicationSummaryById(applicationId: string): Promise<RepositoryApplicationSummary | undefined>;
   abstract getPromotedApplications(): Promise<string[]>;
+  /** Resolves the absolute file path of the application's icon, whether or not it is installed. `undefined` if it has none. */
+  abstract getIconPath(applicationId: string): Promise<string | undefined>;
   abstract getInstallURI(applicationId: string): Promise<string>;
 }
