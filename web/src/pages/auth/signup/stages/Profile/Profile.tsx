@@ -14,13 +14,13 @@ import modalStyles from "../../Signup.module.scss";
 import StageHeader from "../../components/StageHeader/StageHeader";
 import styles from "./Profile.module.scss";
 
-const GENDERS = [
+export const GENDERS = [
   { id: "female", icon: FEMALE_ICON, label: "Female" },
   { id: "male", icon: MALE_ICON, label: "Male" },
   { id: "other", icon: TRANSGENDER_ICON, label: "Other" },
 ];
 
-const PRONOUN_OPTIONS = [
+export const PRONOUN_OPTIONS = [
   { id: "he/him", parts: ["he", "him"] },
   { id: "she/her", parts: ["she", "her"] },
   { id: "they/them", parts: ["they", "them"] },

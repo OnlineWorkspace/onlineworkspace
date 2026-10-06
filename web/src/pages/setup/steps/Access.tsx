@@ -30,7 +30,6 @@ const Access: Component<StepProps> = (props) => {
         <Summary
           rows={[
             ["Public sign-ups", yesNo(access().allowSignups)],
-            ["Profiles on login screen", yesNo(access().displayProfilesAtLogon)],
             ["Email required", yesNo(access().requireEmail)],
             ["Two factor can be skipped", yesNo(!access().requireTwoFactor)],
             ["Password length", `${access().passwordMinimumLength} or more characters`],
@@ -40,7 +39,6 @@ const Access: Component<StepProps> = (props) => {
       }
     >
       <SettingRow label={"Allow sign-ups"} supporting={"Let anyone create an account from the login page"} value={access().allowSignups} onValueChange={(v) => props.setState("access", "allowSignups", v)} />
-      <SettingRow label={"Show profiles on login"} supporting={"Lists users on the login screen, only use on instances which are not public"} value={access().displayProfilesAtLogon} onValueChange={(v) => props.setState("access", "displayProfilesAtLogon", v)} />
       <SettingRow
         label={"Require email"}
         supporting={props.state.mailServer.enabled ? "New users must verify an email address" : "Set up a mail server in the Email step to use this"}

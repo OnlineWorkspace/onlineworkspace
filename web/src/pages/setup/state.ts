@@ -1,26 +1,22 @@
 import trpc from "../../lib/trpc";
+import { BUILT_IN_THEME, THEME_PRESETS } from "./themePresets";
 
 export type SetupDefaults = Awaited<ReturnType<typeof trpc.setup.defaults.query>>;
 
 export interface SetupState {
-  identity: {
-    displayName: string;
-    tagline: string;
-    metaDescription: string;
-    showLoginBackground: boolean;
-    showLoginBanner: boolean;
-  };
+  /** `theme` is the id of one of the theme presets */
+  branding: { displayName: string; tagline: string; metaDescription: string; theme: string };
+  login: { method: "password" | "profiles"; showBackground: boolean; showBanner: boolean };
   address: { hostname: string; secure: boolean };
   mailServer: { enabled: boolean; host: string; port: number; secure: boolean; auth: { user: string; pass: string } };
   access: {
     allowSignups: boolean;
-    displayProfilesAtLogon: boolean;
     requireEmail: boolean;
     requireTwoFactor: boolean;
     passwordMinimumLength: number;
     passwordContains: { minimumUppercase: number; minimumLowercase: number; minimumNumbers: number; minimumSymbols: number };
   };
-  administrator: { username: string; displayName: string; email: string; password: string; confirmPassword: string };
+  administrator: { username: string; displayName: string; email: string; gender: "female" | "male" | "other"; pronouns: string; password: string; confirmPassword: string };
   newUsers: { quotaSize: number; homeDirectories: string[]; displayNameFormat: string };
   applications: { enabled: string[]; quickShortcuts: string[] };
   termsOfUse: string;
@@ -32,19 +28,17 @@ export type ResettableStep = Exclude<keyof SetupState, "administrator">;
 export const GIGABYTE = 1024 * 1024 * 1024;
 
 export const initialState = (defaults: SetupDefaults): SetupState => ({
-  identity: {
-    displayName: defaults.identity.displayName,
-    tagline: defaults.identity.tagline,
-    metaDescription: defaults.identity.metaDescription,
-    showLoginBackground: defaults.identity.showLoginBackground,
-    showLoginBanner: defaults.identity.showLoginBanner,
+  branding: { displayName: defaults.identity.displayName, tagline: defaults.identity.tagline, metaDescription: defaults.identity.metaDescription, theme: THEME_PRESETS.find((t) => JSON.stringify(t.scheme) === JSON.stringify(defaults.identity.defaultTheme))?.id ?? BUILT_IN_THEME },
+  login: {
+    method: defaults.access.displayProfilesAtLogon ? "profiles" : "password",
+    showBackground: defaults.identity.showLoginBackground,
+    showBanner: defaults.identity.showLoginBanner,
   },
   // the instance is most likely being reached at the address it will be used at
   address: { hostname: window.location.hostname, secure: window.location.protocol === "https:" },
   mailServer: { enabled: false, host: "", port: defaults.mailServer.port, secure: defaults.mailServer.secure, auth: { user: "", pass: "" } },
   access: {
     allowSignups: defaults.access.allowSignups,
-    displayProfilesAtLogon: defaults.access.displayProfilesAtLogon,
     requireEmail: defaults.access.requireEmail,
     requireTwoFactor: defaults.access.requireTwoFactor,
     passwordMinimumLength: defaults.access.passwordMinimumLength,
@@ -55,7 +49,7 @@ export const initialState = (defaults: SetupDefaults): SetupState => ({
       minimumSymbols: defaults.access.passwordContains.minimumSymbols,
     },
   },
-  administrator: { username: defaults.administrator.username, displayName: defaults.administrator.displayName, email: "", password: "", confirmPassword: "" },
+  administrator: { username: defaults.administrator.username, displayName: defaults.administrator.displayName, email: "", gender: "female", pronouns: "they/them", password: "", confirmPassword: "" },
   newUsers: {
     quotaSize: defaults.newUsers.quotaSize,
     homeDirectories: [...defaults.newUsers.homeDirectories],

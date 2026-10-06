@@ -140,11 +140,14 @@ const setupInput = z.object({
         metaDescription: z.string().trim().max(300),
         showLoginBackground: z.boolean(),
         showLoginBanner: z.boolean(),
+        defaultTheme: z.object({lightMode: z.record(z.string(), z.string()), darkMode: z.record(z.string(), z.string())}).nullable(),
     }),
     administrator: z.object({
         username: z.string().trim().toLowerCase().regex(/^[a-z0-9_.-]{2,32}$/, "Usernames are 2-32 characters of letters, numbers, '.', '_' or '-'"),
         displayName: z.string().trim().min(1).max(60),
         email: z.string().trim().max(320).optional(),
+        gender: z.enum(["female", "male", "other"]),
+        pronouns: z.string().trim().max(40).optional(),
         password: z.string().min(1).max(1000),
     }),
     address: z.object({hostname: z.string().trim().min(1).max(253), secure: z.boolean()}),
@@ -394,6 +397,8 @@ export const coreOnlineWorkspaceRouter = t.router({
 
                     await admin.setDisplayName(input.administrator.displayName);
                     if (input.administrator.email) await admin.setEmail(input.administrator.email);
+                    await admin.setGender(input.administrator.gender);
+                    if (input.administrator.pronouns) await admin.setPronouns(input.administrator.pronouns);
                     await instance.sys.authentication.setSessionRequirementsForUser(admin.userId, [Authenticator.Password]);
                     await instance.sys.authorization.setPassword(admin.userId, input.administrator.password);
 
@@ -1137,7 +1142,7 @@ ${opt.ctx.instance.sys.configuration.termsOfUse.message}`;
                                          FROM public.users
                                          WHERE id = ${opt.ctx.userId}`;
 
-            return themeValues?.[0]?.color_scheme || false;
+            return themeValues?.[0]?.color_scheme || opt.ctx.instance.sys.configuration.branding.defaultTheme || false;
         }),
     },
 });

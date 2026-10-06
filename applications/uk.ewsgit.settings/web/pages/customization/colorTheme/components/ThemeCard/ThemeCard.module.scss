@@ -7,14 +7,15 @@
   gap: 0.5rem;
   padding: 0.5rem;
   border-radius: var(--uk-sys-shape-corner-extra-large, 1.75rem);
-  background: rgb(var(--uk-sys-color-surface-container));
+  background-color: rgb(var(--uk-sys-color-surface-container));
   outline: 2px solid transparent;
   outline-offset: -2px;
-  transition: outline-color var(--uk-sys-motion-duration-250) var(--uk-sys-motion-easing-standard),
-    background var(--uk-sys-motion-duration-250) var(--uk-sys-motion-easing-standard);
+  transition:
+    outline-color var(--uk-sys-motion-duration-150) var(--uk-sys-motion-easing-standard-normal),
+    background-color var(--uk-sys-motion-duration-150) var(--uk-sys-motion-easing-standard-normal);
 
   &:hover {
-    background: rgb(var(--uk-sys-color-surface-container-high));
+    background-color: rgb(var(--uk-sys-color-surface-container-high));
   }
 
   &:focus-visible,

@@ -1247,7 +1247,7 @@ const router = t.router({
                               FROM public.users
                               WHERE id = ${opt.ctx.userId}`;
 
-        return (rows?.[0]?.color_scheme as unknown) ?? null;
+        return (rows?.[0]?.color_scheme as unknown) ?? instance.sys.configuration.branding.defaultTheme ?? null;
       }),
       listSaved: procedure.query(async (opt) => {
         return await readSavedColorThemes(opt.ctx.userId);

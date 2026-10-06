@@ -5,6 +5,7 @@ import DATABASE_ICON from "@material-symbols/svg-700/outlined/database.svg";
 import DESCRIPTION_ICON from "@material-symbols/svg-700/outlined/description.svg";
 import GROUP_ICON from "@material-symbols/svg-700/outlined/group.svg";
 import LANGUAGE_ICON from "@material-symbols/svg-700/outlined/language.svg";
+import LOGIN_ICON from "@material-symbols/svg-700/outlined/login.svg";
 import MAIL_ICON from "@material-symbols/svg-700/outlined/mail.svg";
 import ADMIN_ICON from "@material-symbols/svg-700/outlined/admin_panel_settings.svg";
 import SHIELD_ICON from "@material-symbols/svg-700/outlined/shield.svg";
@@ -13,17 +14,22 @@ import WAVING_HAND_ICON from "@material-symbols/svg-700/outlined/waving_hand.svg
 import UKIcon from "@ewsgit/uikit-solid/src/components/icon/UKIcon.tsx";
 import UKLinearProgressIndicator from "@ewsgit/uikit-solid/src/components/linearProgressIndicator/UKLinearProgressIndicator.tsx";
 import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.tsx";
-import { type Component, createEffect, createSignal, For, Match, Switch } from "solid-js";
+import UKCircularProgressIndicator from "@ewsgit/uikit-solid/src/components/circularProgressIndicator/UKCircularProgressIndicator.tsx";
+import { type Component, createEffect, createSignal, For, Match, onMount, Switch } from "solid-js";
 import { createStore, reconcile, unwrap } from "solid-js/store";
+import { pronounsFor } from "../auth/signup/stages/Profile/Profile";
 import trpc from "../../lib/trpc";
 import styles from "./Setup.module.scss";
+import { clearSaved, mergeDraft, saveDraft, savedDraft, savedToken, saveToken } from "./draft";
+import { schemeForTheme } from "./themePresets";
 import { type DatabaseForm, type DatabaseInfo, initialDatabaseForm, initialState, type ResettableStep, type SetupDefaults, type SetupState } from "./state";
 import Access from "./steps/Access";
 import Address from "./steps/Address";
 import Administrator from "./steps/Administrator";
 import Applications from "./steps/Applications";
 import Database from "./steps/Database";
-import Identity from "./steps/Identity";
+import Login from "./steps/Login";
+import Branding from "./steps/Branding";
 import Mail from "./steps/Mail";
 import NewUsers from "./steps/NewUsers";
 import Review from "./steps/Review";
@@ -34,8 +40,9 @@ import Welcome from "./steps/Welcome";
 const STEPS: { id: string; icon: string; label: string; reset?: ResettableStep }[] = [
   { id: "welcome", icon: WAVING_HAND_ICON, label: "Welcome" },
   { id: "database", icon: DATABASE_ICON, label: "Database" },
-  { id: "identity", icon: BADGE_ICON, label: "Identity", reset: "identity" },
   { id: "address", icon: LANGUAGE_ICON, label: "Address", reset: "address" },
+  { id: "branding", icon: BADGE_ICON, label: "Branding", reset: "branding" },
+  { id: "login", icon: LOGIN_ICON, label: "Login page" },
   { id: "mail", icon: MAIL_ICON, label: "Email", reset: "mailServer" },
   { id: "access", icon: SHIELD_ICON, label: "Security", reset: "access" },
   { id: "administrator", icon: ADMIN_ICON, label: "Administrator" },
@@ -64,6 +71,16 @@ const Setup: Component = () => {
     if (defaults() && !state.mailServer.enabled && state.access.requireEmail) setState("access", "requireEmail", false);
   });
 
+  // true while a refresh is picking the setup back up where it was left
+  const [resuming, setResuming] = createSignal(savedToken() !== undefined);
+
+  // every change is saved, so a refresh can carry on from the page which was being completed
+  createEffect(() => {
+    if (!defaults()) return;
+
+    saveDraft(state, STEPS[stepIndex()].id, customised());
+  });
+
   const step = () => STEPS[stepIndex()];
   const goTo = (id: string) => setStepIndex(Math.max(0, STEPS.findIndex((s) => s.id === id)));
 
@@ -78,8 +95,26 @@ const Setup: Component = () => {
     // there's nothing to confirm when the current database doesn't work
     setCustomised((c) => ({ ...c, database: !info.connected }));
     setToken(givenToken);
+    saveToken(givenToken);
     setStepIndex(1);
+
+    // the database was already set up, so carry on from where the last visit finished
+    const draft = savedDraft();
+
+    if (draft && mode() === "full" && STEPS.findIndex((s) => s.id === draft.step) > 1 && !(await loadDefaults())) {
+      setState(reconcile(mergeDraft(structuredClone(unwrap(state)), draft.state)));
+      setCustomised((c) => ({ ...c, ...draft.customised }));
+      goTo(draft.step);
+    }
   };
+
+  onMount(async () => {
+    const stored = savedToken();
+
+    if (stored) await verified(stored).catch(() => undefined);
+
+    setResuming(false);
+  });
 
   /** the rest of the wizard needs the backend's full mode, as it is what knows the defaults */
   const loadDefaults = async (): Promise<string | undefined> => {
@@ -148,10 +183,10 @@ const Setup: Component = () => {
     try {
       const result = await trpc.setup.complete.mutate({
         token: token(),
-        identity: { ...state.identity },
-        administrator: { ...administrator, email: email || undefined },
+        identity: { displayName: state.branding.displayName, tagline: state.branding.tagline, metaDescription: state.branding.metaDescription, defaultTheme: schemeForTheme(state.branding.theme), showLoginBackground: state.login.showBackground, showLoginBanner: state.login.showBanner },
+        administrator: { ...administrator, email: email || undefined, pronouns: pronounsFor(administrator.gender, administrator.pronouns) },
         address: { ...state.address },
-        access: { ...state.access, passwordContains: { ...state.access.passwordContains } },
+        access: { ...state.access, displayProfilesAtLogon: state.login.method === "profiles", passwordContains: { ...state.access.passwordContains } },
         mailServer: structuredClone(unwrap(state).mailServer),
         newUsers: { ...state.newUsers, homeDirectories: [...state.newUsers.homeDirectories] },
         applications: { enabled: [...state.applications.enabled], quickShortcuts: [...state.applications.quickShortcuts] },
@@ -160,6 +195,7 @@ const Setup: Component = () => {
 
       if (result.type === "error") return result.message;
 
+      clearSaved();
       // a full load so everything is fetched again now the instance is set up
       window.location.assign(result.signedIn ? "/app" : "/auth/login");
       return undefined;
@@ -222,6 +258,11 @@ const Setup: Component = () => {
       </aside>
       <main class={styles.main}>
         <Switch>
+          <Match when={step().id === "welcome" && resuming()}>
+            <div class={styles.resuming}>
+              <UKCircularProgressIndicator />
+            </div>
+          </Match>
           <Match when={step().id === "welcome"}>
             <Welcome onVerified={verified} />
           </Match>
@@ -242,8 +283,11 @@ const Setup: Component = () => {
               }}
             />
           </Match>
-          <Match when={defaults() && step().id === "identity"}>
-              <Identity {...props(stepIndex())} />
+          <Match when={defaults() && step().id === "branding"}>
+              <Branding {...props(stepIndex())} />
+            </Match>
+            <Match when={defaults() && step().id === "login"}>
+              <Login {...props(stepIndex())} />
             </Match>
             <Match when={defaults() && step().id === "address"}>
               <Address {...props(stepIndex())} />

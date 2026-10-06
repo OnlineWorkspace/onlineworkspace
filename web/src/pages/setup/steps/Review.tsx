@@ -6,6 +6,7 @@ import StepPage from "../components/StepPage/StepPage";
 import Summary from "../components/Summary/Summary";
 import styles from "../Setup.module.scss";
 import { formatBytes } from "../state";
+import { THEME_PRESETS } from "../themePresets";
 import type { StepProps } from "./types";
 
 const Review: Component<StepProps & { goTo(stepId: string): void; apply(): Promise<string | undefined> }> = (props) => {
@@ -13,8 +14,9 @@ const Review: Component<StepProps & { goTo(stepId: string): void; apply(): Promi
   const s = () => props.state;
 
   const sections = () => [
-    { id: "identity", title: "Identity", rows: [["Name", s().identity.displayName], ["Tagline", s().identity.tagline || "None"]] as [string, string][] },
     { id: "address", title: "Address", rows: [["Hostname", s().address.hostname], ["HTTPS", s().address.secure ? "Yes" : "No"]] as [string, string][] },
+    { id: "branding", title: "Branding", rows: [["Name", s().branding.displayName], ["Tagline", s().branding.tagline || "None"], ["Default theme", THEME_PRESETS.find((t) => t.id === s().branding.theme)?.name ?? "Default"]] as [string, string][] },
+    { id: "login", title: "Login page", rows: [["Sign in with", s().login.method === "profiles" ? "Profiles" : "Username and password"], ["Background", s().login.showBackground ? "Shown" : "Hidden"], ["Banner", s().login.showBanner ? "Shown" : "Hidden"]] as [string, string][] },
     { id: "mail", title: "Email", rows: [["Mail server", s().mailServer.enabled ? `${s().mailServer.host}:${s().mailServer.port}` : "Not configured"]] as [string, string][] },
     {
       id: "access",

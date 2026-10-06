@@ -87,6 +87,8 @@ export default class ConfigurationSystem extends System {
     showSquareLogoInNavigation: boolean;
     squareLogoLinkEnabled: boolean;
     squareLogoLinkUrl: string;
+    /** the colour scheme used by everyone who has not picked their own, `null` for the built in one */
+    defaultTheme: { lightMode: Record<string, string>; darkMode: Record<string, string> } | null;
   } = {
     displayName: "OnlineWorkspace",
     tagline: "Under construction...",
@@ -96,6 +98,7 @@ export default class ConfigurationSystem extends System {
     showSquareLogoInNavigation: false,
     squareLogoLinkEnabled: false,
     squareLogoLinkUrl: "",
+    defaultTheme: null,
   }
   mailServer: {
     enabled: boolean;
