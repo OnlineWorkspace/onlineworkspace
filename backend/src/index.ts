@@ -23,6 +23,10 @@ import UsersSystem from "./systems/users.ts";
 import WebFrontendSystem from "./systems/webFrontend.ts";
 import AuthenticationSystem from "./systems/authentication.ts";
 import UploadSystem from "./systems/upload.ts";
+import AuditSystem from "./systems/audit.ts";
+import UpdatesSystem from "./systems/updates.ts";
+import BackupSystem from "./systems/backup.ts";
+import SecuritySystem from "./systems/security.ts";
 
 export enum InstanceStatus {
   Online,
@@ -91,12 +95,14 @@ class Instance {
     const adopted = (id: string) => [...this.adopted].find((s) => s.id === id);
     const full = mode === "full";
 
+    this.sys.security = new SecuritySystem(this);
     if (full) this.sys.database = new DatabaseSystem(this);
     this.sys.notifications = new NotificationsSystem(this);
     this.sys.consoleCommands = new ConsoleCommandsSystem(this);
     if (full) {
       this.sys.users = new UsersSystem(this);
       this.sys.authorization = new AuthorizationSystem(this);
+      this.sys.audit = new AuditSystem(this);
       this.sys.authentication = new AuthenticationSystem(this);
       this.sys.applications = new ApplicationsSystem(this);
     }
@@ -113,6 +119,8 @@ class Instance {
     this.sys.terminal ??= (adopted("terminal") as TerminalUISystem) ?? new TerminalUISystem(this);
     this.sys.api = new ApiSystem(this);
     if (full) this.sys.upload = new UploadSystem(this);
+    if (full) this.sys.backup = new BackupSystem(this);
+    if (full) this.sys.updates = new UpdatesSystem(this);
   }
 
   private async startSystem(sys: System) {

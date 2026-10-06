@@ -7,9 +7,12 @@ import {AuthorizedDeviceType, SESSION_VALID_TERM_MS} from "@onlineworkspace/work
 import {FEATURE_FLAG_DESCRIPTIONS, WorkspacesFeatureFlags} from "@onlineworkspace/workspace-backend/src/systems/configuration.ts";
 import {WorkspacesNotificationPriority} from "@onlineworkspace/workspace-backend/src/systems/notifications.ts";
 import {GlobalApplicationSetting} from "@onlineworkspace/workspace-backend/src/systems/settings/applicationSetting/applicationSetting.ts";
-import {adminProcedure, type createOnlineWorkspaceTRPCContext, procedure} from "@onlineworkspace/workspace-backend/src/systems/trpc/coreRouter.ts";
+import {adminProcedure, type createOnlineWorkspaceTRPCContext, getPasswordRequirementError, procedure} from "@onlineworkspace/workspace-backend/src/systems/trpc/coreRouter.ts";
 import fs from "node:fs/promises";
-import {getCookies} from "@onlineworkspace/workspace-backend/src/utils/cookies.ts";
+import {deleteCookie, getCookies} from "@onlineworkspace/workspace-backend/src/utils/cookies.ts";
+import {clientIp} from "@onlineworkspace/workspace-backend/src/utils/network.ts";
+import {BackupError} from "@onlineworkspace/workspace-backend/src/systems/backup.ts";
+import {QuotaExceededError} from "@onlineworkspace/workspace-backend/src/systems/filesystem.ts";
 import {initTRPC, TRPCError} from "@trpc/server";
 import {octetInputParser} from "@trpc/server/http";
 import sharp from "sharp";
@@ -40,6 +43,17 @@ const STORAGE_CATEGORY_COLORS: Record<FileMediaType, string> = {
 }
 
 const BYTES_PER_MB = 1_048_576;
+
+/** @throws a tRPC error when something being stored would not fit in the user's quota */
+async function assertWithinQuota(userId: number, data: {size?: number; byteLength?: number}) {
+  try {
+    await instance.sys.filesystem.assertWithinQuota(userId, data.size ?? data.byteLength ?? 0);
+  } catch (error) {
+    if (error instanceof QuotaExceededError) throw new TRPCError({code: "PAYLOAD_TOO_LARGE", message: "There is not enough space left in your storage quota"});
+
+    throw error;
+  }
+}
 
 export const t = initTRPC.context<ReturnType<typeof createOnlineWorkspaceTRPCContext>>().create();
 
@@ -269,6 +283,9 @@ const router = t.router({
 
       const filePath = path.join(userPath, "system/temp/avatar");
 
+      // the picture is small and is turned into several sizes, so only a user who is already full is refused
+      await assertWithinQuota(user.userId, {byteLength: 1024 * 1024});
+
       await fs.writeFile(filePath, opt.input);
 
       await user.setAvatar(filePath);
@@ -424,16 +441,159 @@ const router = t.router({
           };
         });
       }),
-    setPassword: procedure.input(z.object({password: z.string()})).mutation(async (opt) => {
-      await opt.ctx.instance.sys.authorization.setPassword(opt.ctx.userId, opt.input.password);
+    setPassword: procedure
+      .input(z.object({currentPassword: z.string().max(1000).optional(), password: z.string().min(1).max(1000)}))
+      .mutation(async (opt) => {
+        const authorization = opt.ctx.instance.sys.authorization;
+        const ip = clientIp(opt.ctx.rawRequest.req, opt.ctx.rawRequest.server);
 
-      return true;
-    }),
+        // someone at an unlocked computer must not be able to take the account over by changing the password
+        if (await authorization.hasPassword(opt.ctx.userId)) {
+          if (!opt.input.currentPassword || !(await authorization.verifyPassword(opt.ctx.userId, opt.input.currentPassword, ip))) {
+            opt.ctx.instance.sys.audit.record({action: "auth.password_change_failed", actorId: opt.ctx.userId, ip, outcome: "failure", details: {reason: "wrong current password"}});
+
+            throw new TRPCError({code: "BAD_REQUEST", message: "Your current password is not correct"});
+          }
+        }
+
+        const requirementError = getPasswordRequirementError(opt.ctx.instance, opt.input.password);
+
+        if (requirementError) throw new TRPCError({code: "BAD_REQUEST", message: requirementError});
+
+        if (!(await authorization.setPassword(opt.ctx.userId, opt.input.password))) {
+          throw new TRPCError({code: "INTERNAL_SERVER_ERROR", message: "The password could not be changed"});
+        }
+
+        // whoever else had the old password is signed out, this device stays signed in
+        const cookie = getCookies(opt.ctx.rawRequest.req.headers).Authorization;
+        await authorization.endAllSessions(opt.ctx.userId, cookie ? decodeURIComponent(cookie).split(":")[2] : undefined);
+        opt.ctx.instance.sys.audit.record({action: "auth.password_changed", actorId: opt.ctx.userId, ip});
+
+        return true;
+      }),
+    logoutEverywhere: procedure
+      .input(z.object({keepCurrent: z.boolean().default(false)}).default({keepCurrent: false}))
+      .output(z.object({signedOut: z.boolean()}))
+      .mutation(async (opt) => {
+        const cookie = getCookies(opt.ctx.rawRequest.req.headers).Authorization;
+        const currentToken = cookie ? decodeURIComponent(cookie).split(":")[2] : undefined;
+
+        await opt.ctx.instance.sys.authorization.endAllSessions(opt.ctx.userId, opt.input.keepCurrent ? currentToken : undefined);
+
+        if (!opt.input.keepCurrent) {
+          deleteCookie(opt.ctx.rawRequest.resHeaders, "Authorization", {path: "/", domain: opt.ctx.instance.sys.configuration.proxy.hostname});
+        }
+
+        opt.ctx.instance.sys.audit.record({
+          action: "auth.logout_everywhere",
+          actorId: opt.ctx.userId,
+          ip: clientIp(opt.ctx.rawRequest.req, opt.ctx.rawRequest.server),
+          details: {keptCurrentSession: opt.input.keepCurrent},
+        });
+
+        return {signedOut: !opt.input.keepCurrent};
+      }),
     deleteSession: procedure.input(z.object({sessionId: z.number()})).mutation(async (opt) => {
       await opt.ctx.instance.sys.authorization.endSessionById(opt.ctx.userId, opt.input.sessionId);
+      opt.ctx.instance.sys.audit.record({action: "auth.session_revoked", actorId: opt.ctx.userId, ip: clientIp(opt.ctx.rawRequest.req, opt.ctx.rawRequest.server), target: String(opt.input.sessionId)});
 
       return true;
     }),
+  },
+  audit: {
+    list: adminProcedure
+      .input(
+        z.object({
+          limit: z.number().int().min(1).max(200).default(50),
+          before: z.number().int().optional(),
+          action: z.string().max(60).optional(),
+          outcome: z.enum(["success", "failure"]).optional(),
+          search: z.string().max(100).optional(),
+        }),
+      )
+      .query(async (opt) => {
+        return await opt.ctx.instance.sys.audit.list(opt.input);
+      }),
+  },
+  updates: {
+    status: adminProcedure.query(async (opt) => {
+      return await opt.ctx.instance.sys.updates.status();
+    }),
+    check: adminProcedure.mutation(async (opt) => {
+      return await opt.ctx.instance.sys.updates.check(opt.ctx.userId);
+    }),
+  },
+  backups: {
+    overview: adminProcedure.query(async (opt) => {
+      const backup = opt.ctx.instance.sys.backup;
+      const configuration = opt.ctx.instance.sys.configuration;
+
+      return {
+        backups: await backup.list(),
+        tools: backup.tools(),
+        job: backup.currentJob ?? null,
+        schedule: {...configuration.backups},
+        scheduleError: backup.lastScheduledError ?? null,
+        failure: backup.lastFailure ?? null,
+      };
+    }),
+    create: adminProcedure
+      .input(z.object({scope: z.enum(["full", "database"]), mode: z.enum(["full", "incremental"]).optional(), note: z.string().trim().max(200).optional()}))
+      .mutation(async (opt) => {
+        try {
+          return await opt.ctx.instance.sys.backup.create({scope: opt.input.scope, mode: opt.input.mode, trigger: "manual", userId: opt.ctx.userId, note: opt.input.note || undefined});
+        } catch (error) {
+          if (error instanceof BackupError) throw new TRPCError({code: "BAD_REQUEST", message: error.message});
+
+          throw error;
+        }
+      }),
+    delete: adminProcedure.input(z.object({id: z.string().max(40)})).mutation(async (opt) => {
+      const backup = opt.ctx.instance.sys.backup;
+
+      try {
+        if (!backup.isValidId(opt.input.id) || !(await backup.delete(opt.input.id))) throw new TRPCError({code: "NOT_FOUND", message: "That backup does not exist"});
+      } catch (error) {
+        if (error instanceof BackupError) throw new TRPCError({code: "BAD_REQUEST", message: error.message});
+
+        throw error;
+      }
+
+      opt.ctx.audit({action: "backup.deleted", target: opt.input.id});
+
+      return true;
+    }),
+    restore: adminProcedure.input(z.object({id: z.string().max(40), password: z.string().max(1000).optional()})).mutation(async (opt) => {
+      const authorization = opt.ctx.instance.sys.authorization;
+      const backup = opt.ctx.instance.sys.backup;
+
+      // restoring replaces everything, so it is only done by someone who can prove it is them
+      if (await authorization.hasPassword(opt.ctx.userId)) {
+        if (!opt.input.password || !(await authorization.verifyPassword(opt.ctx.userId, opt.input.password, clientIp(opt.ctx.rawRequest.req, opt.ctx.rawRequest.server)))) {
+          throw new TRPCError({code: "BAD_REQUEST", message: "Your password is not correct"});
+        }
+      }
+
+      try {
+        const result = await backup.restore(opt.input.id, opt.ctx.userId);
+        backup.restartSoon(result.restartingInMs);
+
+        return {restarting: true};
+      } catch (error) {
+        if (error instanceof BackupError) throw new TRPCError({code: "BAD_REQUEST", message: error.message});
+
+        throw error;
+      }
+    }),
+    setSchedule: adminProcedure
+      .input(z.object({enabled: z.boolean(), intervalHours: z.number().int().min(1).max(24 * 90), keep: z.number().int().min(1).max(365), includeFiles: z.boolean(), incremental: z.boolean().default(true), fullEvery: z.number().int().min(1).max(365).default(7)}))
+      .mutation(async (opt) => {
+        opt.ctx.instance.sys.configuration.backups = {...opt.input};
+        await opt.ctx.instance.sys.configuration.saveConfiguration();
+        opt.ctx.audit({action: "backup.schedule_changed", details: {...opt.input}});
+
+        return true;
+      }),
   },
   instance: {
     hasFeature: procedure
@@ -493,7 +653,7 @@ const router = t.router({
 
           return username || "unknown";
         }),
-      setUsername: adminProcedure.input(z.object({userId: z.number(), username: z.string()})).mutation(async (opt) => {
+      setUsername: adminProcedure.input(z.object({userId: z.number(), username: z.string().trim().toLowerCase().regex(/^[a-z0-9_.-]{2,32}$/, "Usernames are 2-32 characters of letters, numbers, '.', '_' or '-'")})).mutation(async (opt) => {
         await (await opt.ctx.instance.sys.users.getUserById(opt.input.userId))?.setUsername(opt.input.username.toLowerCase());
 
         return true;
@@ -527,10 +687,51 @@ const router = t.router({
           return isAdministrator || false;
         }),
       setIsAdministrator: adminProcedure.input(z.object({userId: z.number(), administrator: z.boolean()})).mutation(async (opt) => {
-        await (await opt.ctx.instance.sys.users.getUserById(opt.input.userId))?.setIsAdministrator(opt.input.administrator);
+        const target = await opt.ctx.instance.sys.users.getUserById(opt.input.userId);
+
+        if (!target) throw new TRPCError({code: "NOT_FOUND", message: "user not found"});
+
+        // the instance must always have someone who can administer it
+        if (!opt.input.administrator && (await target.isAdministrator()) && (await opt.ctx.instance.sys.users.getAdministrators()).length <= 1) {
+          throw new TRPCError({code: "BAD_REQUEST", message: "There must be at least one administrator"});
+        }
+
+        await target.setIsAdministrator(opt.input.administrator);
+        opt.ctx.instance.sys.authorization.forgetSecurityStatus(opt.input.userId);
+        opt.ctx.audit({action: opt.input.administrator ? "user.administrator_granted" : "user.administrator_revoked", target: await target.getUsername()});
 
         return true;
       }),
+      getStorage: adminProcedure
+        .input(z.object({userId: z.number()}))
+        .output(z.object({quotaBytes: z.number(), usedBytes: z.number()}))
+        .query(async (opt) => {
+          const target = await opt.ctx.instance.sys.users.getUserById(opt.input.userId);
+
+          if (!target) throw new TRPCError({code: "NOT_FOUND", message: "user not found"});
+
+          return {
+            // 0 is no limit
+            quotaBytes: Number((await target.getQuota()) ?? 0),
+            usedBytes: await opt.ctx.instance.sys.filesystem.getUserStorageUsed(opt.input.userId, true),
+          };
+        }),
+      setQuota: adminProcedure
+        // a petabyte is far more than a disk holds, and keeps the number exact
+        .input(z.object({userId: z.number(), quotaBytes: z.number().int().min(0).max(2 ** 50)}))
+        .mutation(async (opt) => {
+          const target = await opt.ctx.instance.sys.users.getUserById(opt.input.userId);
+
+          if (!target) throw new TRPCError({code: "NOT_FOUND", message: "user not found"});
+
+          const previous = Number((await target.getQuota()) ?? 0);
+
+          if (!(await target.setQuota(opt.input.quotaBytes))) throw new TRPCError({code: "INTERNAL_SERVER_ERROR", message: "The quota could not be saved"});
+
+          opt.ctx.audit({action: "user.quota_changed", target: await target.getUsername(), details: {previousBytes: previous, quotaBytes: opt.input.quotaBytes}});
+
+          return true;
+        }),
       getIsMe: adminProcedure
         .input(z.number())
         .output(z.boolean())
@@ -538,21 +739,51 @@ const router = t.router({
           return opt.input === opt.ctx.userId;
         }),
       delete: adminProcedure.input(z.object({userId: z.number()})).mutation(async (opt) => {
-        await (await opt.ctx.instance.sys.users.getUserById(opt.input.userId))?.delete();
+        const target = await opt.ctx.instance.sys.users.getUserById(opt.input.userId);
+
+        if (opt.input.userId === opt.ctx.userId) throw new TRPCError({code: "BAD_REQUEST", message: "You cannot delete your own account"});
+
+        if (target && (await target.isAdministrator()) && (await opt.ctx.instance.sys.users.getAdministrators()).length <= 1) {
+          throw new TRPCError({code: "BAD_REQUEST", message: "There must be at least one administrator"});
+        }
+
+        opt.ctx.audit({action: "user.deleted", target: target ? await target.getUsername() : String(opt.input.userId)});
+        await target?.delete();
 
         return true;
       }),
       invalidateSessions: adminProcedure.input(z.object({userId: z.number()})).mutation(async (opt) => {
         await opt.ctx.instance.sys.authorization.endAllSessions(opt.input.userId);
+        opt.ctx.audit({action: "user.sessions_ended", target: (await (await opt.ctx.instance.sys.users.getUserById(opt.input.userId))?.getUsername()) ?? String(opt.input.userId)});
 
         return true;
       }),
-      resetPassword: adminProcedure.input(z.object({userId: z.number(), password: z.string().min(4)})).mutation(async (opt) => {
+      getTwoFactorStatus: adminProcedure
+        .input(z.object({userId: z.number()}))
+        .output(z.object({authenticator: z.boolean(), passkey: z.boolean()}))
+        .query(async (opt) => {
+          const authorization = opt.ctx.instance.sys.authorization;
+
+          return {authenticator: await authorization.hasTwoFactorAuthenticationSecret(opt.input.userId), passkey: await authorization.hasPasskey(opt.input.userId)};
+        }),
+      resetTwoFactor: adminProcedure.input(z.object({userId: z.number()})).mutation(async (opt) => {
+        if (!(await opt.ctx.instance.sys.authorization.resetTwoFactor(opt.input.userId))) throw new TRPCError({code: "NOT_FOUND", message: "user not found"});
+
+        opt.ctx.audit({action: "user.two_factor_reset", target: (await (await opt.ctx.instance.sys.users.getUserById(opt.input.userId))?.getUsername()) ?? String(opt.input.userId)});
+
+        return true;
+      }),
+      resetPassword: adminProcedure.input(z.object({userId: z.number(), password: z.string().min(1).max(1000)})).mutation(async (opt) => {
+        const requirementError = getPasswordRequirementError(opt.ctx.instance, opt.input.password);
+
+        if (requirementError) throw new TRPCError({code: "BAD_REQUEST", message: requirementError});
+
         const ok = await opt.ctx.instance.sys.authorization.setPassword(opt.input.userId, opt.input.password);
 
         if (!ok) throw new TRPCError({code: "NOT_FOUND", message: "user not found"});
 
         await opt.ctx.instance.sys.authorization.endAllSessions(opt.input.userId);
+        opt.ctx.audit({action: "user.password_reset_by_administrator", target: (await (await opt.ctx.instance.sys.users.getUserById(opt.input.userId))?.getUsername()) ?? String(opt.input.userId)});
 
         return true;
       }),
@@ -596,11 +827,22 @@ const router = t.router({
 
       return false;
     }),
-    createUser: adminProcedure.input(z.object({username: z.string(), password: z.string()})).mutation(async (opt) => {
-      await opt.ctx.instance.sys.users.createUser(opt.input.username.toLowerCase(), opt.input.password);
+    createUser: adminProcedure
+      .input(z.object({username: z.string().trim().toLowerCase().regex(/^[a-z0-9_.-]{2,32}$/, "Usernames are 2-32 characters of letters, numbers, '.', '_' or '-'"), password: z.string().min(1).max(1000)}))
+      .mutation(async (opt) => {
+        const requirementError = getPasswordRequirementError(opt.ctx.instance, opt.input.password);
 
-      return true;
-    }),
+        if (requirementError) throw new TRPCError({code: "BAD_REQUEST", message: requirementError});
+
+        const userId = await opt.ctx.instance.sys.users.createUser(opt.input.username, opt.input.password);
+
+        if (userId === undefined) throw new TRPCError({code: "CONFLICT", message: "That username is not available"});
+
+        await (await opt.ctx.instance.sys.users.getUserById(userId))?.setQuota(opt.ctx.instance.sys.configuration.userDefault.quotaSize);
+        opt.ctx.audit({action: "user.created", target: opt.input.username});
+
+        return true;
+      }),
     getFeatures: procedure
       .output(
         z
@@ -629,7 +871,9 @@ const router = t.router({
           };
         });
       }),
-    setFeature: procedure.input(z.object({id: z.string(), value: z.boolean()})).mutation(async (opt) => {
+    setFeature: adminProcedure.input(z.object({id: z.string(), value: z.boolean()})).mutation(async (opt) => {
+      opt.ctx.audit({action: "instance.feature_changed", target: opt.input.id, details: {enabled: opt.input.value}});
+
       if (opt.input.value) {
         await instance.sys.configuration.enableFeature(opt.input.id);
       } else {
@@ -773,12 +1017,12 @@ const router = t.router({
             };
           }),
         // TODO: implement me!
-        set: procedure.mutation(async () => {
+        set: adminProcedure.mutation(async () => {
         }),
         isEnabled: procedure.output(z.boolean()).query(async (opt) => {
           return instance.sys.configuration.branding.showLoginBanner;
         }),
-        setEnabled: procedure.input(z.boolean()).output(z.boolean()).mutation(async (opt) => {
+        setEnabled: adminProcedure.input(z.boolean()).output(z.boolean()).mutation(async (opt) => {
           instance.sys.configuration.branding.showLoginBanner = opt.input;
           log.info(`Set Login Banner to ${opt.input ? "enabled" : "disabled"}`)
           return opt.input;
@@ -824,7 +1068,7 @@ const router = t.router({
         isEnabled: procedure.output(z.boolean()).query(async (opt) => {
           return instance.sys.configuration.branding.showLoginBackground;
         }),
-        setEnabled: procedure.input(z.boolean()).output(z.boolean()).mutation(async (opt) => {
+        setEnabled: adminProcedure.input(z.boolean()).output(z.boolean()).mutation(async (opt) => {
           instance.sys.configuration.branding.showLoginBackground = opt.input;
           log.info(`Set Login Background to ${opt.input ? "enabled" : "disabled"}`)
           return opt.input;
@@ -1121,8 +1365,12 @@ const router = t.router({
         const wallpaperUUID = crypto.randomUUID();
 
         let image = new Bun.Image(await new Response(opt.input).arrayBuffer()).webp()
+        const wallpaperBytes = await image.bytes()
 
-        await fs.writeFile(path.join(wallpapersPath, `${wallpaperUUID}.webp`), await image.bytes())
+        // the wallpaper is kept, and a copy of it is made the current one
+        await assertWithinQuota(opt.ctx.userId, {byteLength: wallpaperBytes.byteLength * 2})
+
+        await fs.writeFile(path.join(wallpapersPath, `${wallpaperUUID}.webp`), wallpaperBytes)
         await applyCurrentWallpaper(wallpapersPath, path.join(wallpapersPath, `${wallpaperUUID}.webp`));
 
         log.info(

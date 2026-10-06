@@ -17,6 +17,9 @@ const ManageInstanceFeaturesPage = lazy(() => import("./pages/instance/features/
 const ManageInstanceInstalledApplicationsPage = lazy(() => import("./pages/instance/installed_applications/index.tsx"));
 const ManageInstanceMailServerPage = lazy(() => import("./pages/instance/mailserver/index.tsx"));
 const ManageInstanceUsersPage = lazy(() => import("./pages/instance/users/index.tsx"));
+const ManageInstanceUpdatesPage = lazy(() => import("./pages/instance/updates/index.tsx"));
+const ManageInstanceAuditLogPage = lazy(() => import("./pages/instance/audit/index.tsx"));
+const ManageInstanceBackupsPage = lazy(() => import("./pages/instance/backups/index.tsx"));
 const ManageInstanceBrandingPage = lazy(() => import("./pages/instance/branding/index.tsx"));
 
 const App: Component = () => {
@@ -36,11 +39,14 @@ const App: Component = () => {
         <Route path={"/quick-shortcuts"} component={QuickShortcutsPage} />
       </Route>
       <Route path={"/instance"}>
+        <Route path={"/audit"} component={ManageInstanceAuditLogPage}/>
+        <Route path={"/backups"} component={ManageInstanceBackupsPage}/>
         <Route path={"/branding"} component={ManageInstanceBrandingPage}/>
         <Route path={"/features"} component={ManageInstanceFeaturesPage}/>
         <Route path={"/installed_applications"} component={ManageInstanceInstalledApplicationsPage}/>
         <Route path={"/mailserver"} component={ManageInstanceMailServerPage}/>
         <Route path={"/users"} component={ManageInstanceUsersPage}/>
+        <Route path={"/updates"} component={ManageInstanceUpdatesPage}/>
       </Route>
       <Route path={"/applications"}>
         <Route path={"/"} component={ApplicationsPage} />

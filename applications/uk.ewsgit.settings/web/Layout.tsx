@@ -1,3 +1,9 @@
+import BACKUP_ICON from "@material-symbols/svg-700/outlined/backup.svg";
+import BACKUP_FILL_ICON from "@material-symbols/svg-700/outlined/backup-fill.svg";
+import UPDATE_ICON from "@material-symbols/svg-700/outlined/update.svg";
+import UPDATE_FILL_ICON from "@material-symbols/svg-700/outlined/update-fill.svg";
+import HISTORY_ICON from "@material-symbols/svg-700/outlined/history.svg";
+import HISTORY_FILL_ICON from "@material-symbols/svg-700/outlined/history-fill.svg";
 import APPS_ICON from "@material-symbols/svg-700/outlined/apps.svg";
 import APPS_FILL_ICON from "@material-symbols/svg-700/outlined/apps-fill.svg";
 import BRAND_FAMILY_ICON from "@material-symbols/svg-700/outlined/brand_family.svg";
@@ -226,6 +232,42 @@ const Layout: Component<ParentProps> = (props) => {
                         navigate("/app/uk.ewsgit.settings/instance/users");
                       },
                       active: location.pathname === "/app/uk.ewsgit.settings/instance/users",
+                    },
+                    {
+                      type: "button" as const,
+                      icon: {
+                        type: "icon" as const,
+                        value: location.pathname === "/app/uk.ewsgit.settings/instance/backups" ? BACKUP_FILL_ICON : BACKUP_ICON,
+                      },
+                      label: "Backups",
+                      onClick() {
+                        navigate("/app/uk.ewsgit.settings/instance/backups");
+                      },
+                      active: location.pathname === "/app/uk.ewsgit.settings/instance/backups",
+                    },
+                    {
+                      type: "button" as const,
+                      icon: {
+                        type: "icon" as const,
+                        value: location.pathname === "/app/uk.ewsgit.settings/instance/updates" ? UPDATE_FILL_ICON : UPDATE_ICON,
+                      },
+                      label: "Updates",
+                      onClick() {
+                        navigate("/app/uk.ewsgit.settings/instance/updates");
+                      },
+                      active: location.pathname === "/app/uk.ewsgit.settings/instance/updates",
+                    },
+                    {
+                      type: "button" as const,
+                      icon: {
+                        type: "icon" as const,
+                        value: location.pathname === "/app/uk.ewsgit.settings/instance/audit" ? HISTORY_FILL_ICON : HISTORY_ICON,
+                      },
+                      label: "Audit log",
+                      onClick() {
+                        navigate("/app/uk.ewsgit.settings/instance/audit");
+                      },
+                      active: location.pathname === "/app/uk.ewsgit.settings/instance/audit",
                     },
                   ]
                   : [],

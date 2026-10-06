@@ -1,3 +1,6 @@
+import UPDATE_ICON from "@material-symbols/svg-700/outlined/update.svg";
+import BACKUP_ICON from "@material-symbols/svg-700/outlined/backup.svg";
+import HISTORY_ICON from "@material-symbols/svg-700/outlined/history.svg";
 import BRAND_FAMILY_ICON from "@material-symbols/svg-700/outlined/brand_family.svg";
 import DEPLOYED_CODE_ICON from "@material-symbols/svg-700/outlined/deployed_code.svg";
 import GROUP_ICON from "@material-symbols/svg-700/outlined/group.svg";
@@ -152,6 +155,24 @@ const RootPage: Component = () => {
                     description=""
                     icon={GROUP_ICON}
                     path="/app/uk.ewsgit.settings/instance/users"
+                  />
+                  <Shortcut
+                    title="Backups"
+                    description=""
+                    icon={BACKUP_ICON}
+                    path="/app/uk.ewsgit.settings/instance/backups"
+                  />
+                  <Shortcut
+                    title="Updates"
+                    description=""
+                    icon={UPDATE_ICON}
+                    path="/app/uk.ewsgit.settings/instance/updates"
+                  />
+                  <Shortcut
+                    title="Audit Log"
+                    description=""
+                    icon={HISTORY_ICON}
+                    path="/app/uk.ewsgit.settings/instance/audit"
                   />
                 </UKStack>
               </>

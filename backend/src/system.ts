@@ -2,6 +2,10 @@ import type { Instance } from "./index.ts";
 import type { Logger } from "./log.ts";
 import type ApiSystem from "./systems/api.ts";
 import type ApplicationsSubsystem from "./systems/applications.ts";
+import type AuditSystem from "./systems/audit.ts";
+import type BackupSystem from "./systems/backup.ts";
+import type UpdatesSystem from "./systems/updates.ts";
+import type SecuritySystem from "./systems/security.ts";
 import type AuthenticationSystem from "./systems/authentication.ts";
 import type AuthorizationSubsystem from "./systems/authorization.ts";
 import type ConfigurationSubsystem from "./systems/configuration.ts";
@@ -40,6 +44,10 @@ export type Sys = {
   terminal: TerminalSystem;
   api: ApiSystem;
   upload: UploadSystem;
+  audit: AuditSystem;
+  backup: BackupSystem;
+  updates: UpdatesSystem;
+  security: SecuritySystem;
 } & { [key: string]: System };
 
 export default abstract class System {
