@@ -1,9 +1,8 @@
 import UKButton from "@ewsgit/uikit-solid/src/components/button/UKButton.tsx";
-import UKCard from "@ewsgit/uikit-solid/src/components/card/UKCard.tsx";
 import UKSegmentedButton from "@ewsgit/uikit-solid/src/components/segmentedButton/UKSegmentedButton.tsx";
 import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.tsx";
 import { type Component, type JSX, Show } from "solid-js";
-import StageHeader from "../../../auth/signup/components/StageHeader/StageHeader";
+import StepPage from "../StepPage/StepPage";
 import styles from "./ChoiceStep.module.scss";
 
 /** the navigation shared by every step */
@@ -26,9 +25,9 @@ const ChoiceStep: Component<
     children: JSX.Element;
   }
 > = (props) => (
-  <UKCard color={"filled"} class={styles.card}>
-    <StageHeader title={props.title} description={props.description} />
+  <StepPage title={props.title} description={props.description} actions={<StepButtons {...props} />}>
     <UKSegmentedButton
+      class={styles.choice}
       items={[
         { id: "recommended", label: props.recommendedLabel ?? "Recommended" },
         { id: "custom", label: "Customise" },
@@ -36,29 +35,28 @@ const ChoiceStep: Component<
       selectedId={() => (props.custom ? "custom" : "recommended")}
       onSelect={(id) => props.onCustomChange(id === "custom")}
     />
-    <Show when={props.custom} fallback={props.summary}>
+    <Show when={props.custom} fallback={<div class={styles.summary}>{props.summary}</div>}>
       <div class={styles.fields}>{props.children}</div>
     </Show>
-    <StepButtons {...props} />
-  </UKCard>
+  </StepPage>
 );
 
 export const StepButtons: Component<StepNavigation> = (props) => (
-  <div class={styles.buttons}>
+  <>
     <Show when={props.onBack} fallback={<span />}>
-      <UKButton color={"tonal"} onClick={() => props.onBack?.()}>
+      <UKButton color={"outlined"} onClick={() => props.onBack?.()}>
         Back
       </UKButton>
     </Show>
     <UKButton color={"filled"} disabled={props.canContinue === false} onClick={() => props.onNext()}>
       {props.nextLabel ?? "Continue"}
     </UKButton>
-  </div>
+  </>
 );
 
 export const FieldError: Component<{ message?: string }> = (props) => (
   <Show when={props.message}>
-    <UKText role={"body"} size={"s"} align={"start"} class={styles.error}>
+    <UKText role={"body"} size={"m"} align={"start"} class={styles.error}>
       {props.message}
     </UKText>
   </Show>

@@ -32,7 +32,7 @@ const Access: Component<StepProps> = (props) => {
             ["Public sign-ups", yesNo(access().allowSignups)],
             ["Profiles on login screen", yesNo(access().displayProfilesAtLogon)],
             ["Email required", yesNo(access().requireEmail)],
-            ["Two factor required", yesNo(access().requireTwoFactor)],
+            ["Two factor can be skipped", yesNo(!access().requireTwoFactor)],
             ["Password length", `${access().passwordMinimumLength} or more characters`],
             ["Password contents", "Upper and lowercase letters, a number and a symbol"],
           ]}
@@ -48,7 +48,7 @@ const Access: Component<StepProps> = (props) => {
         disabled={!props.state.mailServer.enabled}
         onValueChange={(v) => props.setState("access", "requireEmail", v)}
       />
-      <SettingRow label={"Require two factor"} supporting={"New users are asked to set up two factor authentication"} value={access().requireTwoFactor} onValueChange={(v) => props.setState("access", "requireTwoFactor", v)} />
+      <SettingRow label={"Don't allow skipping two factor"} supporting={"Hides the skip button when new users set up two factor during sign-up. This isn't enforced on the server."} value={access().requireTwoFactor} onValueChange={(v) => props.setState("access", "requireTwoFactor", v)} />
       <UKText role={"title"} size={"s"} align={"start"} class={styles.subtle}>
         Password policy
       </UKText>

@@ -14,6 +14,7 @@ const AuthCheck: Component<ParentProps> = (props) => {
     // the setup wizard is shown at / until the instance has been set up
     if (!(await trpc.setup.status.query()).complete) {
       navigate("/");
+      return { authenticated: false };
     }
 
     return trpc.authorization.isAuthenticated.query();

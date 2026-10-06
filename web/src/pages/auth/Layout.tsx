@@ -13,6 +13,12 @@ const UserSelectLayout: Component<RouteSectionProps<unknown>> = (props) => {
     const navigate = useNavigate();
     const isMobile = useIsMobile();
     const [options, { mutate: mutateOptions }] = createResource(async () => {
+        // the setup wizard is shown at / until the instance has been set up, and setup mode can't answer the login page's queries
+        if (!(await trpc.setup.status.query()).complete) {
+            navigate("/");
+            return undefined;
+        }
+
         const data = await trpc.userSelect.getOptions.query();
 
         return {
@@ -22,11 +28,8 @@ const UserSelectLayout: Component<RouteSectionProps<unknown>> = (props) => {
     })
 
     onMount(async () => {
-        // the setup wizard is shown at / until the instance has been set up
-        if (!(await trpc.setup.status.query()).complete) {
-            navigate("/");
-            return;
-        }
+        // the resource above redirects to the wizard, setup mode has no authorization procedures
+        if (!(await trpc.setup.status.query()).complete) return;
 
         const {authenticated: isAuthenticated} = await trpc.authorization.isAuthenticated.query()
 

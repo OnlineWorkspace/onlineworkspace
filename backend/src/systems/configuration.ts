@@ -4,8 +4,10 @@ import {
   readFileSync as fsReadFileSync,
 } from "node:fs";
 import { randomBytes, timingSafeEqual } from "node:crypto";
+import { rmSync } from "node:fs";
 import path from "node:path";
 import type { Instance } from "../index.ts";
+import { rainbowBox } from "../utils/rainbow.ts";
 import System from "../system.ts";
 
 export enum WorkspacesFeatureFlags {
@@ -44,7 +46,7 @@ export default class ConfigurationSystem extends System {
       password: "postgres",
       host: "localhost",
       port: 5432,
-      database: "onlineworkspace_workspace",
+      database: "onlineworkspace",
     },
   };
   proxy: { secure: boolean; hostname: string } = {
@@ -157,9 +159,31 @@ export default class ConfigurationSystem extends System {
     return expected.length === given.length && timingSafeEqual(expected, given);
   }
 
+  /** Prints the setup token for whoever is setting the instance up, nothing is printed once the instance has been set up. */
+  printSetupToken() {
+    if (this.setupComplete || this.#setupToken === undefined) return;
+
+    for (const line of rainbowBox(["SETUP TOKEN", "", this.#setupToken, "", "Open this instance in a browser and enter", "the token to set it up."])) {
+      this.instance.log.system.info(line);
+    }
+  }
+
+  /** The token is kept in a file so it survives the backend restarting once the database has been set up. */
+  get #setupTokenPath() {
+    return path.join(this.instance.sys.filesystem.SYSTEM_PATH, "setup-token");
+  }
+
+  /** Changes where the databases are connected to, environment variables still take priority over this when the configuration is loaded. */
+  async setPostgresConfiguration(postgres: ConfigurationSystem["databases"]["postgres"]) {
+    this.databases = { postgres: { ...postgres } };
+    this.applyEnvironmentOverrides();
+    await this.saveConfiguration();
+  }
+
   async completeSetup() {
     this.setupComplete = true;
     this.#setupToken = undefined;
+    rmSync(this.#setupTokenPath, { force: true });
     await this.saveConfiguration();
     this.log.success("Instance setup complete!");
   }
@@ -331,9 +355,14 @@ export default class ConfigurationSystem extends System {
     }
 
     if (!this.setupComplete) {
-      this.#setupToken = randomBytes(6).toString("hex");
+      this.#setupToken = fsExistsSync(this.#setupTokenPath) ? fsReadFileSync(this.#setupTokenPath).toString().trim() : undefined;
+
+      if (!this.#setupToken) {
+        this.#setupToken = randomBytes(6).toString("hex");
+        await fs.writeFile(this.#setupTokenPath, this.#setupToken, { mode: 0o600 });
+      }
+
       this.log.warning("This instance has not been set up yet. Open it in a browser to run the setup wizard.");
-      this.log.warning(`Setup token: ${this.log.emphasis(this.#setupToken)}`);
     }
 
     this.applyEnvironmentOverrides();

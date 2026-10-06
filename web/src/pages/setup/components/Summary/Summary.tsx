@@ -11,7 +11,7 @@ const Summary: Component<{ rows: [label: string, value: string][] }> = (props) =
           <UKText role={"label"} size={"l"} align={"start"} class={styles.label}>
             {label}
           </UKText>
-          <UKText role={"body"} size={"m"} align={"end"} class={styles.value}>
+          <UKText role={"title"} size={"m"} align={"start"} class={styles.value}>
             {value}
           </UKText>
         </div>

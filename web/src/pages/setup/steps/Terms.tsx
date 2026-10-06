@@ -2,6 +2,7 @@ import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.tsx";
 import UKTextField from "@ewsgit/uikit-solid/src/components/textField/UKTextField.tsx";
 import type { Component } from "solid-js";
 import ChoiceStep from "../components/ChoiceStep/ChoiceStep";
+import choiceStyles from "../components/ChoiceStep/ChoiceStep.module.scss";
 import styles from "../Setup.module.scss";
 import type { StepProps } from "./types";
 
@@ -18,7 +19,7 @@ const Terms: Component<StepProps> = (props) => (
       </UKText>
     }
   >
-    <UKTextField color={"outlined"} as={"textarea"} label={"Terms of use"} defaultValue={props.state.termsOfUse} onValueChange={(v) => props.setState("termsOfUse", v)} error={props.state.termsOfUse.trim() === ""} />
+    <UKTextField color={"outlined"} as={"textarea"} containerClass={choiceStyles.full} label={"Terms of use"} defaultValue={props.state.termsOfUse} onValueChange={(v) => props.setState("termsOfUse", v)} error={props.state.termsOfUse.trim() === ""} />
   </ChoiceStep>
 );
 

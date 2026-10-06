@@ -12,6 +12,7 @@ import {Authenticator} from "../authentication/authenticator.ts";
 import {AuthorizedDeviceType, SessionCreationError} from "../authorization.ts";
 import type ConfigurationSystem from "../configuration.ts";
 import {WorkspacesFeatureFlags} from "../configuration.ts";
+import {createPostgresDatabase, testPostgresConnection} from "../databaseCheck.ts";
 import type {WorkspacesUser} from "../users.ts";
 import {deleteCookie, getCookies, setCookie} from "../../utils/cookies.ts";
 
@@ -182,11 +183,29 @@ const assertSetupAvailable = (instance: Instance, token: string) => {
     }
 };
 
-export const coreOnlineWorkspaceRouter = t.router({
-    setup: {
+const postgresInput = z.object({
+    host: z.string().trim().min(1).max(253),
+    port: z.number().int().min(1).max(65535),
+    user: z.string().trim().min(1).max(63),
+    password: z.string().max(1000),
+    /** use the password which is already configured, as it is never sent to the browser */
+    keepExistingPassword: z.boolean(),
+    database: z.string().trim().min(1).max(63),
+});
+
+const resolvePostgresInput = (instance: Instance, input: z.infer<typeof postgresInput>) => ({
+    host: input.host,
+    port: input.port,
+    user: input.user,
+    database: input.database,
+    password: input.keepExistingPassword ? instance.sys.configuration.databases.postgres.password : input.password,
+});
+
+/** The setup procedures which work without a database, these are all that exist while the instance is in setup mode. */
+const setupBootstrapRouter = {
         status: publicProcedure
-            .output(z.object({complete: z.boolean()}))
-            .query(async (opt) => ({complete: opt.ctx.instance.sys.configuration.setupComplete})),
+            .output(z.object({complete: z.boolean(), mode: z.enum(["setup", "full", "auto"])}))
+            .query(async (opt) => ({complete: opt.ctx.instance.sys.configuration.setupComplete, mode: opt.ctx.instance.mode})),
         verifyToken: publicProcedure
             .input(z.object({token: z.string()}))
             .output(z.object({valid: z.boolean()}))
@@ -200,6 +219,77 @@ export const coreOnlineWorkspaceRouter = t.router({
 
                 return {valid: opt.ctx.instance.sys.configuration.verifySetupToken(opt.input.token)};
             }),
+        database: {
+            /** the database as it is configured, and whether it can be used, the password is never sent */
+            current: publicProcedure
+                .input(z.object({token: z.string()}))
+                .query(async (opt) => {
+                    assertSetupAvailable(opt.ctx.instance, opt.input.token);
+
+                    const {host, port, user, database, password} = opt.ctx.instance.sys.configuration.databases.postgres;
+                    const result = await testPostgresConnection({host, port, user, database, password});
+                    const env = process.env;
+
+                    return {
+                        host, port, user, database,
+                        hasPassword: password !== "",
+                        environmentOverride: [env.ONLINEWORKSPACE_POSTGRES_DATABASE_USER, env.ONLINEWORKSPACE_POSTGRES_DATABASE_PASSWORD, env.ONLINEWORKSPACE_POSTGRES_DATABASE_HOST, env.ONLINEWORKSPACE_POSTGRES_DATABASE_PORT, env.ONLINEWORKSPACE_POSTGRES_DATABASE_NAME].some((v) => !!v),
+                        connected: result.ok,
+                        missingDatabase: !result.ok && result.missingDatabase,
+                        error: result.ok ? undefined : result.error,
+                    };
+                }),
+            test: publicProcedure
+                .input(z.object({token: z.string(), postgres: postgresInput}))
+                .output(z.object({ok: z.boolean(), missingDatabase: z.boolean(), error: z.string().optional()}))
+                .mutation(async (opt) => {
+                    assertSetupAvailable(opt.ctx.instance, opt.input.token);
+
+                    const result = await testPostgresConnection(resolvePostgresInput(opt.ctx.instance, opt.input.postgres));
+
+                    return result.ok ? {ok: true, missingDatabase: false} : {ok: false, missingDatabase: result.missingDatabase, error: result.error};
+                }),
+            /** Saves the database, creating it when asked to, then restarts into full mode so the rest of the setup has a database to use. */
+            apply: publicProcedure
+                .input(z.object({token: z.string(), postgres: postgresInput, createIfMissing: z.boolean()}))
+                .output(z.union([z.object({type: z.literal("error"), message: z.string(), missingDatabase: z.boolean()}), z.object({type: z.literal("success"), restarting: z.boolean()})]))
+                .mutation(async (opt) => {
+                    const instance = opt.ctx.instance;
+                    assertSetupAvailable(instance, opt.input.token);
+
+                    const postgres = resolvePostgresInput(instance, opt.input.postgres);
+                    let result = await testPostgresConnection(postgres);
+
+                    if (!result.ok && result.missingDatabase) {
+                        if (!opt.input.createIfMissing) return {type: "error" as const, message: `The database '${postgres.database}' does not exist`, missingDatabase: true};
+
+                        const created = await createPostgresDatabase(postgres);
+                        if (!created.ok) return {type: "error" as const, message: `The database could not be created: ${created.error}`, missingDatabase: true};
+
+                        instance.log.system.info(`Created the database '${postgres.database}'`);
+                        result = await testPostgresConnection(postgres);
+                    }
+
+                    if (!result.ok) return {type: "error" as const, message: result.error, missingDatabase: result.missingDatabase};
+
+                    const changed = JSON.stringify(postgres) !== JSON.stringify(instance.sys.configuration.databases.postgres);
+                    await instance.sys.configuration.setPostgresConfiguration(postgres);
+
+                    const restarting = instance.mode === "setup" || changed;
+
+                    // after the response has been sent, the restart closes the connection it is sent on
+                    if (restarting) setTimeout(() => void instance.restart("full").catch((err) => instance.log.system.error("The restart failed", err)), 300);
+
+                    return {type: "success" as const, restarting};
+                }),
+        },
+};
+
+export const setupModeRouter = t.router({setup: setupBootstrapRouter});
+
+export const coreOnlineWorkspaceRouter = t.router({
+    setup: {
+        ...setupBootstrapRouter,
         defaults: publicProcedure
             .input(z.object({token: z.string()}))
             .query(async (opt) => {

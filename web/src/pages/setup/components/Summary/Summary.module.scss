@@ -1,27 +1,26 @@
 .root {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+  gap: 1.25rem 2rem;
   margin: 0;
-  padding: 1rem;
-  border-radius: var(--uk-sys-shape-corner-large);
+  padding: 1.5rem;
+  border-radius: var(--uk-sys-shape-corner-extra-large);
   background-color: rgb(var(--uk-sys-color-surface-container));
 }
 
 .row {
   display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: 1rem;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
 }
 
 .label {
   color: rgb(var(--uk-sys-color-on-surface-variant));
-  flex-shrink: 0;
 }
 
 .value {
   min-width: 0;
   overflow-wrap: anywhere;
+  color: rgb(var(--uk-sys-color-on-surface));
 }

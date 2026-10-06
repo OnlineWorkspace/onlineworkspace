@@ -80,3 +80,26 @@ export const passwordIssues = (password: string, access: SetupState["access"]): 
 };
 
 export const formatBytes = (bytes: number) => (bytes % GIGABYTE === 0 ? `${bytes / GIGABYTE} GB` : `${Math.round((bytes / GIGABYTE) * 100) / 100} GB`);
+
+export type DatabaseInfo = Awaited<ReturnType<typeof trpc.setup.database.current.query>>;
+
+export interface DatabaseForm {
+  host: string;
+  port: number;
+  user: string;
+  password: string;
+  /** the password is never sent to the browser, when it is not changed the one already configured is used */
+  keepExistingPassword: boolean;
+  database: string;
+  createIfMissing: boolean;
+}
+
+export const initialDatabaseForm = (info: DatabaseInfo): DatabaseForm => ({
+  host: info.host,
+  port: info.port,
+  user: info.user,
+  password: "",
+  keepExistingPassword: info.hasPassword,
+  database: info.database,
+  createIfMissing: true,
+});

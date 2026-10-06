@@ -1,9 +1,8 @@
-import UKCard from "@ewsgit/uikit-solid/src/components/card/UKCard.tsx";
 import UKText from "@ewsgit/uikit-solid/src/components/text/UKText.tsx";
 import UKTextField from "@ewsgit/uikit-solid/src/components/textField/UKTextField.tsx";
 import { type Component, For, Show } from "solid-js";
-import StageHeader from "../../auth/signup/components/StageHeader/StageHeader";
 import { StepButtons } from "../components/ChoiceStep/ChoiceStep";
+import StepPage from "../components/StepPage/StepPage";
 import choiceStyles from "../components/ChoiceStep/ChoiceStep.module.scss";
 import styles from "../Setup.module.scss";
 import { passwordIssues } from "../state";
@@ -23,8 +22,7 @@ const Administrator: Component<StepProps> = (props) => {
   const issues = () => passwordIssues(admin().password, props.state.access);
 
   return (
-    <UKCard color={"filled"} class={choiceStyles.card}>
-      <StageHeader title={"Create the administrator"} description={"This account manages the instance. It replaces the temporary account the server started with."} />
+    <StepPage title={"Create the administrator"} description={"This account manages the instance. It replaces the temporary account the server started with."} actions={<StepButtons {...props} canContinue={administratorIsValid(props.state)} />}>
       <div class={choiceStyles.fields}>
         <UKTextField color={"outlined"} label={"Username"} supportingText={"Letters, numbers, '.', '_' and '-'"} defaultValue={admin().username} onValueChange={(v) => props.setState("administrator", "username", v.trim())} error={admin().username !== "" && !USERNAME_PATTERN.test(admin().username.toLowerCase())} autocomplete={"username"} />
         <UKTextField color={"outlined"} label={"Display name"} defaultValue={admin().displayName} onValueChange={(v) => props.setState("administrator", "displayName", v)} />
@@ -41,8 +39,7 @@ const Administrator: Component<StepProps> = (props) => {
         </Show>
         <UKTextField shouldMask={true} color={"outlined"} label={"Confirm password*"} defaultValue={admin().confirmPassword} onValueChange={(v) => props.setState("administrator", "confirmPassword", v)} autocomplete={"new-password"} error={admin().confirmPassword !== "" && admin().password !== admin().confirmPassword} supportingText={"*required"} />
       </div>
-      <StepButtons {...props} canContinue={administratorIsValid(props.state)} />
-    </UKCard>
+    </StepPage>
   );
 };
 

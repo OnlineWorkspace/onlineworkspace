@@ -367,6 +367,11 @@ export default class ApiSystem extends System {
             async fetch(req, server) {
                 const url = new URL(req.url);
 
+                // setup mode has no database, so only the setup procedures work
+                if (self.instance.mode === "setup" && req.method !== "OPTIONS" && !url.pathname.startsWith("/api/trpc/") && url.pathname !== "/api/teapot") {
+                    return Response.json({setupRequired: true, message: "This instance is being set up"}, {status: 503});
+                }
+
                 if (url.pathname === NOTIFICATIONS_WEBSOCKET_PATH) {
                     return self.instance.sys.notifications.handleUpgrade(req, server) as Promise<Response>;
                 }

@@ -9,6 +9,7 @@ import System from "../system.ts";
 import {
   coreOnlineWorkspaceRouter,
   createOnlineWorkspaceTRPCContext,
+  setupModeRouter,
 } from "./trpc/coreRouter.ts";
 
 export default class TRPCSystem extends System {
@@ -28,7 +29,8 @@ export default class TRPCSystem extends System {
 
     this.routers.push({
       basePath: "/api/trpc",
-      router: coreOnlineWorkspaceRouter,
+      // the other procedures need a database, which setup mode may not have
+      router: instance.mode === "setup" ? setupModeRouter : coreOnlineWorkspaceRouter,
       createContext: createOnlineWorkspaceTRPCContext(this.instance),
     });
   }

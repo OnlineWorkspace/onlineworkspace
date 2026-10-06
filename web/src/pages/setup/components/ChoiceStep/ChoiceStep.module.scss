@@ -1,23 +1,44 @@
-.card {
+.choice {
+  align-self: flex-start;
+}
+
+.summary {
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  width: 100%;
-  box-sizing: border-box;
 }
 
+// the fields sit side by side on a wide screen, anything which should take the full row spans it
 .fields {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 22rem), 1fr));
+  gap: 1.25rem 1.5rem;
+  align-items: start;
+
+  > * {
+    min-width: 0;
+  }
+
+  > .full {
+    grid-column: 1 / -1;
+  }
+
+  // text, buttons and notes between the fields
+  > :not(div) {
+    grid-column: 1 / -1;
+    justify-self: start;
+  }
 }
 
-.buttons {
+.full {
+  grid-column: 1 / -1;
+}
+
+// kept for steps which lay their fields out themselves
+.stack {
   display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
+  flex-direction: column;
+  gap: 1.25rem;
 }
 
 .error {

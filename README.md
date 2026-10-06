@@ -64,7 +64,7 @@ A self-hosted web platform for applications & services with design based on Goog
 5. change into the newly created directory `cd /var/www/workspaces`
 6. clone the workspaces docker configuration from git `git clone git@github.com:onlineworkspace/workspace.git .`
 7. run `bun install`
-8. create a postgresql database called `onlineworkspace_workspace`
+8. create a postgresql database called `onlineworkspace`
 9. change into the `instance` directory
 10. copy `meta/backend.service` to `/etc/systemd/system/workspaces-backend.service`.
 11. run `systemctl enable workspaces-backend --now` to start the backend
@@ -97,7 +97,7 @@ A self-hosted web platform for applications & services with design based on Goog
     2. Start the PostgreSQL service -> `sudo systemctl enable --now postgresql`
     3. Switch to the postgres user -> `sudo su postgres`
     4. Open PostgreSQL with psql -> `psql`
-    5. Create a PostgreSQL database with the following query -> `CREATE DATABASE onlineworkspace_workspace;`
+    5. Create a PostgreSQL database with the following query -> `CREATE DATABASE onlineworkspace;`
     6. Change the PostgreSQL password with the following query -> `ALTER USER postgres WITH PASSWORD 'postgres';` (Please note: you should set the password to
        anything other than the example shown here, please ensure if you use another password to use an autoinstall configuration with the non-default password
        specified - see [auto-install Configuration](#auto-install-configuration))
@@ -110,7 +110,7 @@ A self-hosted web platform for applications & services with design based on Goog
   - Windows
     1. Install postgreSQL with the setup file downloaded from the postgreSQL website (https://www.postgresql.org/download/)
     2. Open your database viewer of choice (DBeaver Community Edition is recommended)
-    3. Create the `onlineworkspace_workspace` table
+    3. Create the `onlineworkspace` table
     4. Download the caddy executable from the caddy website, this can be placed anywhere but in the repo root directory is recommended for ease of use
   - MacOS
     1. Using Orbstack with an Ubuntu container, follow the Ubuntu Linux instructions above
@@ -141,7 +141,7 @@ file inside with the following structure:
       "password": "postgres",
       "host": "localhost",
       "port": 5432,
-      "database": "onlineworkspace_workspace"
+      "database": "onlineworkspace"
     }
   },
   "proxy": {

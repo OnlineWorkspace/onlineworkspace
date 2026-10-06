@@ -55,6 +55,16 @@ export default class DatabaseSystem extends System {
     return con;
   }
 
+  override async stop(): Promise<boolean> {
+    for (const connection of Object.values(this.databaseConnections)) {
+      await connection.close().catch(() => undefined);
+    }
+
+    this.databaseConnections = {};
+
+    return true;
+  }
+
   override async startup(): Promise<boolean> {
     this.log.info("Starting up...");
     return true;
