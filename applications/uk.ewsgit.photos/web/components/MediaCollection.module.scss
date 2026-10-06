@@ -1,0 +1,16 @@
+.centered {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 64px 0;
+}
+
+.grid {
+  padding: 4px 12px 8px 12px;
+}
+
+.count {
+  padding: 8px 20px 96px 20px;
+  color: rgb(var(--uk-sys-color-on-surface-variant));
+  text-align: center;
+}

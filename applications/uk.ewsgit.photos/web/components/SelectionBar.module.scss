@@ -1,0 +1,18 @@
+.root {
+  position: sticky;
+  top: 0;
+  z-index: 9;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  box-sizing: border-box;
+  min-height: 64px;
+  padding: 8px 12px;
+  background-color: rgb(var(--uk-sys-color-surface-container));
+  color: rgb(var(--uk-sys-color-on-surface));
+}
+
+.count {
+  flex: 1 1 auto;
+  margin-left: 8px;
+}

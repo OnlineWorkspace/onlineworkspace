@@ -1,0 +1,54 @@
+.page {
+  padding: 8px 16px 96px 16px;
+}
+
+.centered {
+  display: flex;
+  justify-content: center;
+  padding: 48px 0;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(120px, 45%), 1fr));
+  gap: 24px 12px;
+}
+
+.person {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: rgb(var(--uk-sys-color-on-surface));
+  cursor: pointer;
+  outline: none;
+
+  &:focus-visible .face {
+    outline: var(--uk-sys-state-focus-indicator-thickness) solid rgb(var(--uk-sys-color-secondary));
+    outline-offset: var(--uk-sys-state-focus-indicator-outer-offset);
+  }
+}
+
+.face {
+  width: 100%;
+  max-width: 120px;
+  aspect-ratio: 1;
+  margin-bottom: 8px;
+  border-radius: var(--uk-sys-shape-corner-full);
+  background-color: rgb(var(--uk-sys-color-surface-container-high));
+  object-fit: cover;
+}
+
+.name {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.count {
+  color: rgb(var(--uk-sys-color-on-surface-variant));
+}

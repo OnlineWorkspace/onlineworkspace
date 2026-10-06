@@ -1,0 +1,22 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  max-height: min(24rem, 50vh);
+  overflow-y: auto;
+}
+
+.error {
+  color: rgb(var(--uk-sys-color-error));
+}
+
+.buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}

@@ -1,0 +1,15 @@
+.root {
+  display: flex;
+  gap: 8px;
+  padding: 4px 16px 8px 16px;
+  overflow-x: auto;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  > * {
+    flex: 0 0 auto;
+  }
+}

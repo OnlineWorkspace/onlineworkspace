@@ -1,0 +1,15 @@
+.page {
+  padding: 8px 16px 96px 16px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(160px, 45%), 1fr));
+  gap: 20px 12px;
+}
+
+.centered {
+  display: flex;
+  justify-content: center;
+  padding: 48px 0;
+}

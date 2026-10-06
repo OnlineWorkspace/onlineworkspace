@@ -1,0 +1,23 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 64px 24px;
+  color: rgb(var(--uk-sys-color-on-surface));
+
+  > :last-child:not(:first-child):not(:nth-child(2)) {
+    margin-top: 8px;
+  }
+}
+
+.icon {
+  --icon-size: 56px;
+  margin-bottom: 8px;
+  color: rgb(var(--uk-sys-color-on-surface-variant));
+}
+
+.body {
+  max-width: 28rem;
+  color: rgb(var(--uk-sys-color-on-surface-variant));
+}
