@@ -1,4 +1,5 @@
 import UKCircularProgressIndicator from "@ewsgit/uikit-solid/src/components/circularProgressIndicator/UKCircularProgressIndicator.tsx";
+import { MetaProvider, Title } from "@solidjs/meta";
 import clsx from "clsx";
 import { type Component, createResource, type ParentProps, Suspense } from "solid-js";
 import PLACEHOLDER_WALLPAPER from "./assets/placeholder_wallpaper.png";
@@ -17,6 +18,9 @@ const DashboardLayout: Component<ParentProps> = (props) => {
 
   return (
     <div class={styles.root} data-show-background={contentBackground()}>
+      <MetaProvider>
+        <Title>Dashboard</Title>
+      </MetaProvider>
       <Suspense fallback={<UKCircularProgressIndicator class={styles.wallpaperSpinner} />}>
         <img
           onLoad={(e) => {
