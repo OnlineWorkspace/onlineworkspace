@@ -1,3 +1,4 @@
 [submodule "uikit-solid"]
 	path = uikit-solid
 	url = git@github.com:ewsgit/uikit-solid
+	branch = master
