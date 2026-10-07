@@ -27,6 +27,7 @@ const Review: Component<StepProps & { goTo(stepId: string): void; apply(): Promi
     { id: "newUsers", title: "New users", rows: [["Storage quota", formatBytes(s().newUsers.quotaSize)], ["Home folders", s().newUsers.homeDirectories.join(", ") || "None"]] as [string, string][] },
     { id: "applications", title: "Applications", rows: [["Enabled", `${s().applications.enabled.length} of ${props.defaults.applications.installed.length}`]] as [string, string][] },
     { id: "terms", title: "Terms of use", rows: [["Terms", "Custom text"]] as [string, string][] },
+    ...(props.defaults.canChooseDevelopmentInstall ? [{ id: "environment", title: "Install type", rows: [["Install", s().environment.development ? "Development" : "Production"], ["Administrator two factor", s().environment.development ? "Not required" : "Required"]] as [string, string][] }] : []),
   ];
 
   return (

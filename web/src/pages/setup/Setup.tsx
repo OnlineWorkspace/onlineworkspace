@@ -1,5 +1,6 @@
 import APPS_ICON from "@material-symbols/svg-700/outlined/apps.svg";
 import BADGE_ICON from "@material-symbols/svg-700/outlined/badge.svg";
+import CODE_ICON from "@material-symbols/svg-700/outlined/code.svg";
 import CHECK_ICON from "@material-symbols/svg-700/outlined/check.svg";
 import DATABASE_ICON from "@material-symbols/svg-700/outlined/database.svg";
 import DESCRIPTION_ICON from "@material-symbols/svg-700/outlined/description.svg";
@@ -27,6 +28,7 @@ import Access from "./steps/Access";
 import Address from "./steps/Address";
 import Administrator from "./steps/Administrator";
 import Applications from "./steps/Applications";
+import Environment from "./steps/Environment";
 import Database from "./steps/Database";
 import Login from "./steps/Login";
 import Branding from "./steps/Branding";
@@ -49,6 +51,7 @@ const STEPS: { id: string; icon: string; label: string; reset?: ResettableStep }
   { id: "newUsers", icon: GROUP_ICON, label: "New users", reset: "newUsers" },
   { id: "applications", icon: APPS_ICON, label: "Applications", reset: "applications" },
   { id: "terms", icon: DESCRIPTION_ICON, label: "Terms of use", reset: "termsOfUse" },
+  { id: "environment", icon: CODE_ICON, label: "Install type" },
   { id: "review", icon: TASK_ICON, label: "Review" },
 ];
 
@@ -78,11 +81,13 @@ const Setup: Component = () => {
   createEffect(() => {
     if (!defaults()) return;
 
-    saveDraft(state, STEPS[stepIndex()].id, customised());
+    saveDraft(state, steps()[stepIndex()].id, customised());
   });
 
-  const step = () => STEPS[stepIndex()];
-  const goTo = (id: string) => setStepIndex(Math.max(0, STEPS.findIndex((s) => s.id === id)));
+  // the install type is only asked of whoever is on localhost
+  const steps = () => STEPS.filter((s) => s.id !== "environment" || defaults()?.canChooseDevelopmentInstall);
+  const step = () => steps()[stepIndex()];
+  const goTo = (id: string) => setStepIndex(Math.max(0, steps().findIndex((s) => s.id === id)));
 
   const verified = async (givenToken: string) => {
     const { valid } = await trpc.setup.verifyToken.mutate({ token: givenToken });
@@ -191,6 +196,7 @@ const Setup: Component = () => {
         newUsers: { ...state.newUsers, homeDirectories: [...state.newUsers.homeDirectories] },
         applications: { enabled: [...state.applications.enabled], quickShortcuts: [...state.applications.quickShortcuts] },
         termsOfUse: state.termsOfUse,
+        developmentInstall: defaults()!.canChooseDevelopmentInstall && state.environment.development,
       });
 
       if (result.type === "error") return result.message;
@@ -205,7 +211,7 @@ const Setup: Component = () => {
   };
 
   const props = (index: number) => {
-    const current = STEPS[index];
+    const current = steps()[index];
 
     return {
       state,
@@ -236,7 +242,7 @@ const Setup: Component = () => {
           </UKText>
         </div>
         <ol class={styles.stepper}>
-          <For each={STEPS}>
+          <For each={steps()}>
             {(s, index) => (
               <li class={styles.step} data-state={index() < stepIndex() ? "done" : index() === stepIndex() ? "current" : "todo"} aria-current={index() === stepIndex() ? "step" : undefined}>
                 <span class={styles.marker}>
@@ -249,11 +255,11 @@ const Setup: Component = () => {
             )}
           </For>
         </ol>
-        <div class={styles.progress} role={"progressbar"} aria-valuemin={1} aria-valuemax={STEPS.length} aria-valuenow={stepIndex() + 1}>
+        <div class={styles.progress} role={"progressbar"} aria-valuemin={1} aria-valuemax={steps().length} aria-valuenow={stepIndex() + 1}>
           <UKText role={"label"} size={"m"} align={"start"} class={styles.subtle}>
-            {`Step ${stepIndex() + 1} of ${STEPS.length} · ${step().label}`}
+            {`Step ${stepIndex() + 1} of ${steps().length} · ${step().label}`}
           </UKText>
-          <UKLinearProgressIndicator start={0} stop={STEPS.length} value={stepIndex() + 1} />
+          <UKLinearProgressIndicator start={0} stop={steps().length} value={stepIndex() + 1} />
         </div>
       </aside>
       <main class={styles.main}>
@@ -309,6 +315,9 @@ const Setup: Component = () => {
             </Match>
             <Match when={defaults() && step().id === "terms"}>
               <Terms {...props(stepIndex())} />
+            </Match>
+            <Match when={defaults() && step().id === "environment"}>
+              <Environment {...props(stepIndex())} />
             </Match>
             <Match when={defaults() && step().id === "review"}>
               <Review {...props(stepIndex())} goTo={goTo} apply={apply} nextLabel={"Finish setup"} />

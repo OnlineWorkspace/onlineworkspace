@@ -315,6 +315,8 @@ export default class AuthorizationSystem extends System {
     @returns {true} the user is an administrator who has neither
   */
   async requiresTwoFactorSetup(userId: number): Promise<boolean> {
+    if (this.instance.sys.configuration.developmentInstall) return false;
+
     const cached = this.securityStatus.get(userId);
 
     if (cached && Date.now() - cached.at < SECURITY_STATUS_CACHE_MS) return cached.requiresTwoFactor;

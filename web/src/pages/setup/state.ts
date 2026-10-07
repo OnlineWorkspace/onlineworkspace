@@ -20,10 +20,12 @@ export interface SetupState {
   newUsers: { quotaSize: number; homeDirectories: string[]; displayNameFormat: string };
   applications: { enabled: string[]; quickShortcuts: string[] };
   termsOfUse: string;
+  /** a development install does not make administrators set up two factor, it is only asked on localhost */
+  environment: { development: boolean };
 }
 
 /** the keys of the state which have a "Recommended" choice that can be restored */
-export type ResettableStep = Exclude<keyof SetupState, "administrator">;
+export type ResettableStep = Exclude<keyof SetupState, "administrator" | "environment">;
 
 export const GIGABYTE = 1024 * 1024 * 1024;
 
@@ -57,6 +59,7 @@ export const initialState = (defaults: SetupDefaults): SetupState => ({
   },
   applications: { enabled: defaults.applications.installed.map((a) => a.id), quickShortcuts: [...defaults.applications.quickShortcuts] },
   termsOfUse: defaults.termsOfUse,
+  environment: { development: false },
 });
 
 /** the problems with a password against the password policy, empty when it is acceptable */

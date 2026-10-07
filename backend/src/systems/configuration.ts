@@ -171,6 +171,8 @@ export default class ConfigurationSystem extends System {
   apiPort: number = 3563;
   /** Has the instance setup wizard been completed, until it is the wizard is shown at `/` instead of the usual page */
   setupComplete: boolean = false;
+  /** Is this a development install, administrators of one are not made to set up two factor authentication */
+  developmentInstall: boolean = false;
 
   /** The one-time token printed to the console which must be provided to the setup wizard, only present while the instance is not set up. */
   #setupToken: string | undefined;

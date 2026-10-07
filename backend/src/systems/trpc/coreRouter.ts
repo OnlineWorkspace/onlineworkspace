@@ -16,7 +16,7 @@ import {WorkspacesFeatureFlags} from "../configuration.ts";
 import {createPostgresDatabase, testPostgresConnection} from "../databaseCheck.ts";
 import type {WorkspacesUser} from "../users.ts";
 import {deleteCookie, getCookies, setCookie} from "../../utils/cookies.ts";
-import {clientIp} from "../../utils/network.ts";
+import {clientIp, isLocalRequest} from "../../utils/network.ts";
 
 export const createOnlineWorkspaceTRPCContext = (instance: Instance) => (opt: FetchCreateContextFnOptions, server: Server<any>) => {
     return {
@@ -261,6 +261,8 @@ const setupInput = z.object({
     }),
     applications: z.object({enabled: z.array(z.string()), quickShortcuts: z.array(z.string())}),
     termsOfUse: z.string().trim().min(1).max(20000),
+    /** only accepted from localhost */
+    developmentInstall: z.boolean().default(false),
 });
 
 let setupInProgress = false;
@@ -390,6 +392,8 @@ export const coreOnlineWorkspaceRouter = t.router({
                 const config = opt.ctx.instance.sys.configuration;
 
                 return {
+                    /** the development install question is only asked of whoever is on the machine the instance runs on */
+                    canChooseDevelopmentInstall: isLocalRequest(opt.ctx.rawRequest.req, opt.ctx.rawRequest.server),
                     identity: {...config.branding},
                     administrator: {username: "admin", displayName: "Administrator"},
                     access: {
@@ -448,6 +452,10 @@ export const coreOnlineWorkspaceRouter = t.router({
                     const input = opt.input;
                     const config = instance.sys.configuration;
 
+                    if (input.developmentInstall && !isLocalRequest(opt.ctx.rawRequest.req, opt.ctx.rawRequest.server)) {
+                        return {type: "error" as const, message: "A development install can only be chosen from localhost"};
+                    }
+
                     // a minimum of 0 means the requirement is not enforced, which is represented by it being absent
                     const optional = (n: number) => (n > 0 ? n : undefined);
                     const signupRequirements: ConfigurationSystem["signupRequirements"] = {
@@ -505,6 +513,7 @@ export const coreOnlineWorkspaceRouter = t.router({
                     Object.assign(config.branding, input.identity);
                     config.proxy = {hostname: input.address.hostname, secure: input.address.secure};
                     config.signupRequirements = signupRequirements;
+                    config.developmentInstall = input.developmentInstall;
                     config.mailServer = input.mailServer;
                     config.userDefault = input.newUsers;
                     config.termsOfUse = {message: input.termsOfUse, lastUpdated: Date.now()};

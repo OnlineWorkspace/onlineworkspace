@@ -24,3 +24,13 @@ export const clientIp = (req: Request, server?: Server<any>): string => {
 
   return direct ? stripPort(direct) : "unknown";
 };
+
+const LOOPBACK_HOSTNAMES = new Set(["localhost", "127.0.0.1", "::1"]);
+
+/** @returns true if the request came from the machine the backend runs on, and was addressed to it as localhost */
+export const isLocalRequest = (req: Request, server?: Server<any>): boolean => {
+  const ip = clientIp(req, server);
+  const host = stripPort(req.headers.get("x-forwarded-host") ?? req.headers.get("host") ?? "").toLowerCase();
+
+  return (ip === "::1" || ip === "::ffff:127.0.0.1" || ip.startsWith("127.")) && LOOPBACK_HOSTNAMES.has(host);
+};

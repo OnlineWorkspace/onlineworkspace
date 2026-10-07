@@ -325,3 +325,59 @@
   justify-content: center;
   min-height: 100%;
 }
+
+.devWarning {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 1.5rem;
+  border-radius: var(--uk-sys-shape-corner-extra-large);
+  color: rgb(var(--uk-sys-color-on-error-container));
+  // caution tape which slowly drifts, over a soft wash of the error colour
+  background-color: rgb(var(--uk-sys-color-error-container));
+  background-image: repeating-linear-gradient(-45deg, rgb(var(--uk-sys-color-error) / 0.16) 0 1.25rem, transparent 1.25rem 2.5rem);
+  background-size: 200% 200%;
+  animation: devWarningDrift 6s linear infinite;
+}
+
+.devWarningHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.devWarningIcon {
+  display: inline-flex;
+  animation: devWarningWobble 2.4s ease-in-out infinite;
+  transform-origin: 50% 80%;
+}
+
+@keyframes devWarningDrift {
+  to {
+    background-position: 2.5rem 2.5rem;
+  }
+}
+
+@keyframes devWarningWobble {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  20% {
+    transform: rotate(-12deg);
+  }
+  40% {
+    transform: rotate(10deg);
+  }
+  60% {
+    transform: rotate(-6deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .devWarning,
+  .devWarningIcon {
+    animation: none;
+  }
+}
