@@ -1,0 +1,140 @@
+.page {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 0 24px 96px 24px;
+}
+
+.search {
+  max-width: 40rem;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.spinner {
+  margin: 32px auto;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(22rem, 1fr));
+  gap: 16px;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  padding: 16px;
+  text-align: start;
+  cursor: pointer;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.name {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sourceIcon {
+  flex: 0 0 auto;
+  color: rgb(var(--uk-sys-color-on-surface-variant));
+}
+
+.command {
+  font-family: ui-monospace, "JetBrains Mono", Menlo, monospace;
+  color: rgb(var(--uk-sys-color-on-surface-variant));
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cardFooter {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+.meta {
+  color: rgb(var(--uk-sys-color-on-surface-variant));
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 64px 16px;
+  text-align: center;
+}
+
+.emptyIcon {
+  width: 64px;
+  height: 64px;
+  color: rgb(var(--uk-sys-color-on-surface-variant));
+}
+
+.emptyActions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.fab {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 10;
+}
+
+.chooser {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 24px 12px 12px 12px;
+
+  > :first-child {
+    padding: 0 12px 8px 12px;
+  }
+}
+
+@media (max-width: 768px) {
+  .content {
+    padding: 0 16px 96px 16px;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .fab {
+    bottom: 88px;
+  }
+}

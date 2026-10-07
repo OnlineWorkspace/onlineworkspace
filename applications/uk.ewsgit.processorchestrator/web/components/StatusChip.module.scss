@@ -1,0 +1,48 @@
+.root {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  padding: 0 12px 0 8px;
+  border-radius: var(--uk-sys-shape-corner-small);
+  background-color: rgb(var(--uk-sys-color-surface-variant));
+  color: rgb(var(--uk-sys-color-on-surface-variant));
+
+  &[data-state="running"] {
+    background-color: rgb(var(--uk-sys-color-tertiary-container));
+    color: rgb(var(--uk-sys-color-on-tertiary-container));
+  }
+
+  &[data-state="crashed"] {
+    background-color: rgb(var(--uk-sys-color-error-container));
+    color: rgb(var(--uk-sys-color-on-error-container));
+  }
+
+  &[data-state="starting"],
+  &[data-state="stopping"],
+  &[data-state="restarting"] {
+    background-color: rgb(var(--uk-sys-color-secondary-container));
+    color: rgb(var(--uk-sys-color-on-secondary-container));
+  }
+}
+
+.icon {
+  width: 18px;
+  height: 18px;
+
+  &[data-busy="true"] {
+    animation: spin 1.2s linear infinite;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .icon[data-busy="true"] {
+    animation: none;
+  }
+}

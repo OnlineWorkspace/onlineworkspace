@@ -1,7 +1,7 @@
 import {existsSync} from "node:fs";
 import fs from "node:fs/promises";
 import path from "node:path";
-import type {Server} from "bun";
+import type {Server, WebSocketHandler} from "bun";
 import {type Instance, InstanceStatus} from "../index.ts";
 import System from "../system.ts";
 import {getCookies} from "../utils/cookies.ts";
@@ -16,6 +16,17 @@ export interface Route {
     }, info?: any,) => Promise<Response> | Response;
 }
 
+/** a websocket which an application serves, its sockets are told apart from the others by `data.kind` */
+export interface WebsocketRoute {
+    kind: string;
+    pattern: URLPattern;
+    /** only administrators may connect */
+    adminOnly?: boolean;
+    handler: WebSocketHandler<any>;
+    /** what is attached to the socket, `kind` is added to it */
+    data(userId: number, params: Record<string, string | undefined>): object;
+}
+
 export function serveFile(_req: Request, filePath: string): Response {
     return new Response(Bun.file(filePath));
 }
@@ -24,6 +35,7 @@ export default class ApiSystem extends System {
     routes: Route[];
     webServer!: Server<any>;
     listening: boolean = false;
+    websocketRoutes: WebsocketRoute[] = [];
 
     constructor(instance: Instance) {
         super("api", instance);
@@ -384,6 +396,34 @@ export default class ApiSystem extends System {
         return true;
     }
 
+    registerWebsocket(route: WebsocketRoute) {
+        this.websocketRoutes.push(route);
+    }
+
+    /** the handler for a socket which was upgraded, anything which isn't an application's is a notifications socket */
+    private socketHandler(socket: { data?: { kind?: string } }): WebSocketHandler<any> {
+        return this.websocketRoutes.find((route) => route.kind === socket.data?.kind)?.handler ?? this.instance.sys.notifications.websocketHandler;
+    }
+
+    /** a page on another site could otherwise open a socket with the visitor's cookie */
+    private refuseCrossSite(req: Request): Response | undefined {
+        const origin = req.headers.get("origin");
+
+        const originHost = (() => {
+            try {
+                return origin ? new URL(origin).host : undefined;
+            } catch {
+                return "invalid";
+            }
+        })();
+
+        if (origin && originHost !== (req.headers.get("x-forwarded-host") ?? req.headers.get("host"))) {
+            return Response.json({code: "FORBIDDEN", message: "Cross-site requests are not allowed"}, {status: 403});
+        }
+
+        return undefined;
+    }
+
     getProxyBasePath(): string {
         // noinspection HttpUrlsUsage
         return `${this.instance.sys.configuration.proxy.secure ? "https://" : "http://"}${this.instance.sys.configuration.proxy.hostname}`;
@@ -399,7 +439,12 @@ export default class ApiSystem extends System {
         const self = this;
         this.webServer = Bun.serve({
             port: this.instance.sys.configuration.apiPort,
-            websocket: self.instance.sys.notifications.websocketHandler,
+            websocket: {
+                open: (socket) => self.socketHandler(socket).open?.(socket),
+                message: (socket, message) => self.socketHandler(socket).message?.(socket, message),
+                close: (socket, code, reason) => self.socketHandler(socket).close?.(socket, code, reason),
+                drain: (socket) => self.socketHandler(socket).drain?.(socket),
+            },
             async fetch(req, server) {
                 const security = self.instance.sys.security;
 
@@ -462,22 +507,36 @@ export default class ApiSystem extends System {
         }
 
         if (url.pathname === NOTIFICATIONS_WEBSOCKET_PATH) {
-            // a page on another site could otherwise open the socket with the visitor's cookie
-            const origin = req.headers.get("origin");
+            const refused = self.refuseCrossSite(req);
 
-            const originHost = (() => {
-                try {
-                    return origin ? new URL(origin).host : undefined;
-                } catch {
-                    return "invalid";
-                }
-            })();
-
-            if (origin && originHost !== (req.headers.get("x-forwarded-host") ?? req.headers.get("host"))) {
-                return Response.json({code: "FORBIDDEN", message: "Cross-site requests are not allowed"}, {status: 403});
-            }
+            if (refused) return refused;
 
             return self.instance.sys.notifications.handleUpgrade(req, server) as Promise<Response>;
+        }
+
+        for (const route of self.websocketRoutes) {
+            const match = route.pattern.exec(url);
+
+            if (!match) continue;
+
+            const refused = self.refuseCrossSite(req);
+
+            if (refused) return refused;
+
+            const cookies = getCookies(req.headers);
+            const userId = cookies.Authorization ? await self.instance.sys.authorization.verifySession(decodeURIComponent(cookies.Authorization)) : undefined;
+
+            if (userId === undefined) return new Response("Unauthorized", {status: 401});
+
+            if (route.adminOnly && !(await (await self.instance.sys.users.getUserById(userId))?.isAdministrator())) {
+                return new Response("Forbidden", {status: 403});
+            }
+
+            if (!(server as Server<object>).upgrade(req, {data: {...route.data(userId, match.pathname.groups), kind: route.kind}})) {
+                return new Response("Expected a websocket upgrade", {status: 426});
+            }
+
+            return undefined;
         }
 
         for (const route of self.routes) {

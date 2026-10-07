@@ -1,0 +1,81 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px;
+  max-height: calc(100vh - 6rem);
+  overflow-y: auto;
+}
+
+.hint {
+  color: rgb(var(--uk-sys-color-on-surface-variant));
+}
+
+.pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.entries {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.entry {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 16px;
+}
+
+.entryText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.mono {
+  font-family: ui-monospace, "JetBrains Mono", Menlo, monospace;
+  overflow-wrap: anywhere;
+}
+
+.stepsCard {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 16px;
+  background-color: rgb(var(--uk-sys-color-error-container));
+  color: rgb(var(--uk-sys-color-on-error-container));
+}
+
+.stepsHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.error {
+  color: rgb(var(--uk-sys-color-error));
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+@media (max-width: 768px) {
+  .pair {
+    grid-template-columns: 1fr;
+  }
+}

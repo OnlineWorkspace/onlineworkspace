@@ -1,0 +1,25 @@
+{
+  "id": "uk.ewsgit.processorchestrator",
+  "displayName": "Process Orchestrator",
+  "icon": {
+    "type": "material-symbol",
+    "value": "terminal"
+  },
+  "description": "Run, supervise and watch processes on the server, from an executable or a git repository",
+  "authors": [
+    {
+      "name": "Ewsgit",
+      "link": "<https://ewsgit.uk>"
+    }
+  ],
+  "license": "MIT",
+  "source": "https://github.com/onlineworkspace/onlineworkspace/src/branch/main/packages/applications/uk.ewsgit.processorchestrator",
+  "modules": {
+    "web": {
+      "path": "./web"
+    },
+    "internal": {
+      "path": "./backend/index.ts"
+    }
+  }
+}

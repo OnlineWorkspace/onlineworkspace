@@ -1,0 +1,28 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  padding: 0 24px 24px 24px;
+  max-width: 56rem;
+}
+
+.spinner {
+  margin: 32px auto;
+}
+
+.empty {
+  color: rgb(var(--uk-sys-color-on-surface-variant));
+}
+
+@media (max-width: 768px) {
+  .content {
+    padding: 0 8px 24px 8px;
+  }
+}

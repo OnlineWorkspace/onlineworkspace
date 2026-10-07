@@ -52,6 +52,7 @@ const SOURCE_NAMES: Record<string, string> = {
   "instance.system.application.uninstall": "Applications",
   "instance.system.application.enable": "Applications",
   "instance.system.application.disable": "Applications",
+  "uk.ewsgit.processorchestrator": "Process Orchestrator",
 };
 
 const DEFAULT_SOURCE_NAME = "System";

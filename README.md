@@ -49,6 +49,7 @@ Applications live in [`applications/`](./applications). Each one is described by
 | Console | `uk.ewsgit.console` | The administrator console as an application. |
 | Guide | `uk.ewsgit.guide` | A short tour of your Workspace and its applications. |
 | Ghostty | `uk.ewsgit.ghostty` | The Ghostty terminal. Mostly a placeholder for now. |
+| Process Orchestrator | `uk.ewsgit.processorchestrator` | Administrators only. Run and supervise server processes from an executable or a git repository, with a live terminal, stdin and crash notifications. |
 
 ### Administration
 

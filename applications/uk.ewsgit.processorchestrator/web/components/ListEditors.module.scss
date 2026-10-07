@@ -1,0 +1,24 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.field {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.hint {
+  color: rgb(var(--uk-sys-color-on-surface-variant));
+}
+
+.add {
+  align-self: flex-start;
+}
